@@ -241,6 +241,9 @@ private:
     else
       switch (i_message)
       {
+        case WM_QUERYENDSESSION:
+	  PostQuitMessage(0);
+	  return TRUE;
 	case WM_APP_msgStreamNotify:
 	{
 	  tomsgstream::StreamBuf *log =
