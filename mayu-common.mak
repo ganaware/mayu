@@ -108,15 +108,23 @@ DISTRIB_SETTINGS =			\
 		emacsedit.mayu		\
 		dot.mayu		\
 
-DISTRIB_MANUAL	=			\
-		README.html		\
-		CONTENTS.html		\
-		CUSTOMIZE.html		\
-		MANUAL.html		\
-		mayu-banner.png		\
-		README.css		\
-		syntax.txt		\
-		mayu-mode.el		\
+DISTRIB_MANUAL	=				\
+		doc\banner-ja.png		\
+		doc\CONTENTS-ja.html		\
+		doc\CUSTOMIZE-ja.html		\
+		doc\edit-setting-ja.png		\
+		doc\investigate-ja.png		\
+		doc\log-ja.png			\
+		doc\MANUAL-ja.html		\
+		doc\menu-ja.png			\
+		doc\pause-ja.png		\
+		doc\README-ja.html		\
+		doc\README.css			\
+		doc\setting-ja.png		\
+		doc\syntax.txt			\
+		doc\target.png			\
+		doc\version-ja.png		\
+		mayu-mode.el			\
 
 DISTRIB_CONTRIBS =				\
 		contrib\mayu-settings.txt	\
@@ -140,44 +148,6 @@ DISTRIB		=			\
 		$(DISTRIB_MANUAL)	\
 		$(DISTRIB_CONTRIBS)	\
 		$(DISTRIB_DRIVER)	\
-
-DISTRIBSRC	=			\
-		Makefile		\
-		*.mak			\
-		*.cpp			\
-		*.h			\
-		*.rc			\
-		doc++-header.html	\
-		doc++.conf		\
-					\
-		s\Makefile		\
-		s\*.mak			\
-		s\*.cpp			\
-		s\*.h			\
-		s\*.rc			\
-		s\*.lib 		\
-					\
-		r\*			\
-					\
-		d\Makefile		\
-		d\SOURCES		\
-		d\*.c			\
-		d\README.txt		\
-		d\test.reg 		\
-		d\nt4\Makefile		\
-		d\nt4\SOURCES		\
-		d\nt4\*.c		\
-					\
-		d_win9x\Makefile	\
-		d_win9x\mayud.asm	\
-		d_win9x\mayud.def	\
-		d_win9x\mayud.vxd	\
-					\
-		tools\checkversion	\
-		tools\dos2unix		\
-		tools\makedepend	\
-		tools\makefunc		\
-		tools\unix2dos		\
 
 
 # tools		###############################################################

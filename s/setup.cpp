@@ -41,47 +41,56 @@ const SetupFile::Data g_setupFiles[] =
   { i_kind, i_os, _T(i_from), i_destination, _T(i_to) }
   
   // executables
-  SN(Dll , ALL, "mayu.dll"	    , ToDest),
-  SN(File, ALL, "mayu.exe"	    , ToDest),
-  SN(File, ALL, "setup.exe"	    , ToDest),
+  SN(Dll , ALL, "mayu.dll"	     , ToDest),
+  SN(File, ALL, "mayu.exe"	     , ToDest),
+  SN(File, ALL, "setup.exe"	     , ToDest),
 				    
   // drivers
 #if defined(_WINNT)
-  SN(File, NT , "mayud.sys"	    , ToDest),
-  SN(File, NT , "mayudnt4.sys"	    , ToDest),
-  DN(File, W2k, "mayud.sys"	    , ToDriver, "mayud.sys"),
-  DN(File, NT4, "mayudnt4.sys"	    , ToDriver, "mayud.sys"),
+  SN(File, NT , "mayud.sys"	     , ToDest),
+  SN(File, NT , "mayudnt4.sys"	     , ToDest),
+  DN(File, W2k, "mayud.sys"	     , ToDriver, "mayud.sys"),
+  DN(File, NT4, "mayudnt4.sys"	     , ToDriver, "mayud.sys"),
 #elif defined(_WIN95)
-  SN(File, W9x, "mayud.vxd"	    , ToDest),
+  SN(File, W9x, "mayud.vxd"	     , ToDest),
 #else
 #  error
 #endif
 
   // setting files		    
-  SN(File, ALL, "104.mayu"	    , ToDest),
-  SN(File, ALL, "104on109.mayu"	    , ToDest),
-  SN(File, ALL, "109.mayu"	    , ToDest),
-  SN(File, ALL, "109on104.mayu"	    , ToDest),
-  SN(File, ALL, "default.mayu"	    , ToDest),
-  SN(File, ALL, "dot.mayu"	    , ToDest),
-  SN(File, ALL, "emacsedit.mayu"    , ToDest),
+  SN(File, ALL, "104.mayu"	     , ToDest),
+  SN(File, ALL, "104on109.mayu"	     , ToDest),
+  SN(File, ALL, "109.mayu"	     , ToDest),
+  SN(File, ALL, "109on104.mayu"	     , ToDest),
+  SN(File, ALL, "default.mayu"	     , ToDest),
+  SN(File, ALL, "dot.mayu"	     , ToDest),
+  SN(File, ALL, "emacsedit.mayu"     , ToDest),
 				    
   // documents				    
-  SN(File, ALL, "CONTENTS.html"	    , ToDest),
-  SN(File, ALL, "CUSTOMIZE.html"    , ToDest),
-  SN(File, ALL, "MANUAL.html"	    , ToDest),
-  SN(File, ALL, "README.css"	    , ToDest),
-  SN(File, ALL, "README.html"	    , ToDest),
-  SN(File, ALL, "mayu-banner.png"   , ToDest),
-  SN(File, ALL, "syntax.txt"	    , ToDest),
-  SN(File, ALL, "mayu-mode.el"	    , ToDest),
+  SN(Dir , ALL, "doc"	 	     , ToDest), // mkdir
+  SN(File, ALL, "banner-ja.png"	     , ToDest, "contrib\\banner-ja.png"	     );
+  SN(File, ALL, "edit-setting-ja.png", ToDest, "contrib\\edit-setting-ja.png");
+  SN(File, ALL, "investigate-ja.png" , ToDest, "contrib\\investigate-ja.png" );
+  SN(File, ALL, "log-ja.png"	     , ToDest, "contrib\\log-ja.png"	     );
+  SN(File, ALL, "menu-ja.png"	     , ToDest, "contrib\\menu-ja.png"	     );
+  SN(File, ALL, "pause-ja.png"	     , ToDest, "contrib\\pause-ja.png"	     );
+  SN(File, ALL, "setting-ja.png"     , ToDest, "contrib\\setting-ja.png"     );
+  SN(File, ALL, "target.png"	     , ToDest, "contrib\\target.png"	     );
+  SN(File, ALL, "version-ja.png"     , ToDest, "contrib\\version-ja.png"     );
+  SN(File, ALL, "CONTENTS-ja.html"   , ToDest, "contrib\\CONTENTS-ja.html"   );
+  SN(File, ALL, "CUSTOMIZE-ja.html"  , ToDest, "contrib\\CUSTOMIZE-ja.html"  );
+  SN(File, ALL, "MANUAL-ja.html"     , ToDest, "contrib\\MANUAL-ja.html"     );
+  SN(File, ALL, "README-ja.html"     , ToDest, "contrib\\README-ja.html"     );
+  SN(File, ALL, "README.css"	     , ToDest, "contrib\\README.css"	     );
+  
+  SN(File, ALL, "mayu-mode.el"	     , ToDest),
 				    
-  SN(Dir , ALL, "contrib"	    , ToDest), // mkdir
-  DN(File, ALL, "mayu-settings.txt" , ToDest, "contrib\\mayu-settings.txt"),
-  DN(File, ALL, "dvorak.mayu"	    , ToDest, "contrib\\dvorak.mayu"      ),
-  DN(File, ALL, "keitai.mayu"	    , ToDest, "contrib\\keitai.mayu"      ),
-  DN(File, ALL, "ax.mayu"	    , ToDest, "contrib\\ax.mayu"          ),
-  DN(File, ALL, "98x1.mayu"	    , ToDest, "contrib\\98x1.mayu"        ),
+  SN(Dir , ALL, "contrib"	     , ToDest), // mkdir
+  DN(File, ALL, "mayu-settings.txt"  , ToDest, "contrib\\mayu-settings.txt"),
+  DN(File, ALL, "dvorak.mayu"	     , ToDest, "contrib\\dvorak.mayu"      ),
+  DN(File, ALL, "keitai.mayu"	     , ToDest, "contrib\\keitai.mayu"      ),
+  DN(File, ALL, "ax.mayu"	     , ToDest, "contrib\\ax.mayu"          ),
+  DN(File, ALL, "98x1.mayu"	     , ToDest, "contrib\\98x1.mayu"        ),
 };
 
 
