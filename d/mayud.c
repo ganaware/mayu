@@ -247,9 +247,9 @@ NTSTATUS mayuAddDevice(IN PDRIVER_OBJECT driverObject,
     detourDevExt->filterDevObj = filterDevObj;
   }
 
-  filterDevExt->kbdClassDevObj = kbdClassDevObj;
-  status = IoAttachDeviceByPointer(filterDevObj, kbdClassDevObj);
-  if (!NT_SUCCESS(status)) goto error;
+  filterDevExt->kbdClassDevObj =
+    IoAttachDeviceToDeviceStack(filterDevObj, kbdClassDevObj);
+  if (!filterDevExt->kbdClassDevObj) goto error;
 
   for (i = 0; i < IRP_MJ_MAXIMUM_FUNCTION; i++) {
     filterDevExt->MajorFunction[i] =
