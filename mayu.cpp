@@ -454,6 +454,10 @@ private:
 			    << std::endl;
 	      }
 	      break;
+	    case EngineNotify_clearLog:
+	      SendMessage(This->m_hwndLog, WM_COMMAND,
+			  MAKELONG(IDC_BUTTON_clearLog, 0), 0);
+	      break;
 	    default:
 	      break;
 	  }

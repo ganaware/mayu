@@ -95,6 +95,7 @@
        "\\|ClipboardCopy"
        "\\|EmacsEditKillLinePred"
        "\\|EmacsEditKillLineFunc"
+       "\\|LogClear"
        "\\)\\>"
        ) . font-lock-builtin-face)
     "Default font-lock-keywords for mayu mode."))
