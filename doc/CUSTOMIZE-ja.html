@@ -1418,21 +1418,15 @@
 		    <dt class="h3"><a name="compile_tool">必要なもの</a>
 		    <dd class="d3">
 			<div>
-			  <p>マイクロソフトが DDK 以外の開発環境一式を無償で提供してくれていますので、それを利用するのが一番お手軽です。</p>
+			  <p>Visual C++ を所有していない場合、マイクロソフトから無償で提供されているコンパイラを利用することでビルド可能です。</p>
 			  <dl>
-			    <dt class="h4">コンパイラ - Visual C++ を使用する場合 (推奨)
+			    <dt class="h4">Visual C++
 			    <dd class="d4">
 				<div>
 				  <p>商用の Visual C++ 6.0 SP5 以降、又はマイクロソフトから無償で提供されている <a href="http://www.microsoft.com/downloads/details.aspx?FamilyID=272be09d-40bb-49fd-9cb0-4bfa122fa91b&DisplayLang=en">Visual C++ Toolkit 2003</a> をダウンロードして使用することが可能です。</p>
 				</div>
 
-			    <dt class="h4">コンパイラ - Borland C++ 5.5.1 を使用する場合
-			    <dd class="d4">
-				<div>
-				  <a href="http://www.borland.co.jp/cppbuilder/freecompiler/index.html">Borland C++ 5.5.1</a> をダウンロードして無償で使用することが可能です。
-				</div>
-
-			    <dt class="h4">(Visual C++ を利用する場合のみ) Platform SDK 
+			    <dt class="h4">Platform SDK 
 			    <dd class="d4">
 				<div>
 				  <p>Windows XP に対応したものが必要です。MSDN で配布されていますし、マイクロソフトのから無償で提供されている <a href="http://www.microsoft.com/msdownload/platformsdk/sdkupdate/XPSP2FULLInstall.htm" target="_top">XPSP2 PSDK</a> を利用することもできます。</p>
@@ -1443,7 +1437,7 @@
 				<div>
 				  <p>Visual C++ Toolkit 2003 のパッケージには nmake と cvtres が含まれていないので、<a href="http://www.microsoft.com/downloads/details.aspx?FamilyId=9B3A2CA6-3647-4070-9F41-A333C6B9181D&displaylang=ja">.NET Framework SDK Version 1.1</a> をインストール(無償)する必要があります。</p>
 
-				  <p><code>...\Microsoft.NET\SDK\v1.1\Bin\nmake.exe</code> と <code>C:\WINDOWS\Microsoft.NET\Framework\v1.1.4322\cvtres.exe</code> を Visual C++ Toolkit 2003 の <code>bin/</code> ディレクトリへコピーします。(cvtres.exe は必ず link.exe と同じディレクトリに置いてください。nmake.exe はパスが通っていれば使用可能です。)</p>
+				  <p><code>C:\Program Files\Microsoft.NET\SDK\v1.1\Bin\nmake.exe</code> と <code>C:\WINDOWS\Microsoft.NET\Framework\v1.1.4322\cvtres.exe</code> を Visual C++ Toolkit 2003 の <code>bin/</code> ディレクトリへコピーします。(cvtres.exe は必ず link.exe と同じディレクトリに置いてください。nmake.exe はパスが通っていれば使用可能です。)</p>
 
 				  <p>商用パッケージの Visual C++ には最初から含まれているので、入れる必要はありません。</p>
 				</div>
@@ -1456,7 +1450,7 @@
 			    <dt class="h4">正規表現ライブラリ
 			    <dd class="d4">
 				<div>
-				  <p><a href="http://www.boost.org/libs/regex/doc/index.html" target="_top">Boost.Regex</a> が必要です。<a href="http://www.boost.org/" target="_top">Boost ライブラリ</a> に同梱されています。現在、「窓使いの憂鬱」のビルドが確認されている Boost のバージョンは Visual C++ では 1.32.0、Borland C++ Compiler 5.5.1 では 1.31.0 です。</p>
+				  <p><a href="http://www.boost.org/libs/regex/doc/index.html" target="_top">Boost.Regex</a> が必要です。<a href="http://www.boost.org/" target="_top">Boost ライブラリ</a> に同梱されています。現在、「窓使いの憂鬱」のビルドが確認されている Boost のバージョンは 1.32.0 のみです。</p>
 				</div>
 			    <dt class="h4">Perl</a>
 			    <dd class="d4">
@@ -1558,24 +1552,8 @@
 				  
 				  <hr>
 				  
-				  <p>Visual C++ Toolkit 2003 を使用する場合は、<code>libcpmtd.lib</code> が提供されていないため、デバッグバージョンの mayu はビルドしないようになっています。</p>
+				  <p>Visual C++ Toolkit 2003 を使用する場合は、<code>libcpmtd.lib</code> が提供されていないため、デバッグバージョンの mayu はビルドできません。</p>
 				  
-				</div>
-				
-			    <dt class="h4">Borland C++ Compiler 5.5.1 の場合
-			    <dd class="d4">
-				<div>
-				  <p>ビルドが確認されている Boost はバージョン 1.31.0 のみです。また、<code>boost_1_31_0/boost/config/auto_link.hpp</code> の 235 行目、
-				  <p class="sample">
-				  #pragma defineonoption BOOST_BORLAND_DEBUG -v
-				  </p>
-				  をコメントアウトして下さい。</p>
-				  <p>Borland C++ 5.5.1 のコンパイラなどにパスを通しておいて、さらに <code>bcc.mak</code> の冒頭の注意に従ってライブラリパスに <code>lib/psdk</code> を含めてください。</p>
-				  <p class="sample">
-				  mayu-3.??&gt; set INCLUDE=C:\borland\bcc55\include<br>
-				  mayu-3.??&gt; make -f mayu-bcc.mak batch
-				  </p>
-				  <p><code>s</code> ディレクトリ以下のインストーラをコンパイルすることはできますが、<code>d</code> ディレクトリ以下のドライバをコンパイルする方法は不明です。</p>
 				</div>
 			  </dl>
 			</div>
