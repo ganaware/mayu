@@ -686,6 +686,10 @@ void Engine::keyboardHandler()
     
     DWORD len;
 #if defined(_WINNT)
+    {
+      Acquire a(&m_log, 1);
+      m_log << _T("begin ReadFile();") << std::endl;
+    }
     if (!ReadFile(m_device, &kid, sizeof(kid), &len, &m_ol))
     {
       if (GetLastError() != ERROR_IO_PENDING)
@@ -706,6 +710,10 @@ void Engine::keyboardHandler()
 	  ASSERT( false );
 	  continue;
       }
+    }
+    {
+      Acquire a(&m_log, 1);
+      m_log << _T("end ReadFile();") << std::endl;
     }
 #elif defined(_WIN95)
     if (!DeviceIoControl(m_device, 1, NULL, 0, &kid, sizeof(kid), &len, NULL))

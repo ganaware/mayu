@@ -127,8 +127,10 @@ DISTRIB_MANUAL	=				\
 		mayu-mode.el			\
 
 DISTRIB_CONTRIBS =				\
+		contrib\109onAX.mayu		\
 		contrib\mayu-settings.txt	\
 		contrib\dvorak.mayu		\
+		contrib\dvorak109.mayu		\
 		contrib\keitai.mayu		\
 		contrib\ax.mayu			\
 		contrib\98x1.mayu		\

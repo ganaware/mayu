@@ -7,10 +7,10 @@ if ( !KBD109 ) and ( !KBD104 )
   include "109.mayu"
 endif
 if ( KBD104 )
-  def alias ª	= Up
-  def alias «	= Down
-  def alias ©	= Left
-  def alias ¨	= Right
+#  def alias ª	= Up
+#  def alias «	= Down
+#  def alias ©	= Left
+#  def alias ¨	= Right
   def alias Yen	= BackSlash
 endif
 
@@ -96,10 +96,14 @@ keymap Global
      key *IC-•ÏŠ·	= $ToggleIME		# IME ON/OFF ‚ğ‚·‚éƒL[‚Ìw’è
    endif
    key *ScrollLock	= $CapsLock		# ScrollLock ‚ğ CapsLock ‚É
-   key C-ª		= C-A-S-ª		# for VD
-   key C-«		= C-A-S-«		#	V
-   key C-©		= C-A-S-©		#	V
-   key C-¨		= C-A-S-¨		#	V
+#   key C-ª		= C-A-S-ª		# for VD
+   key C-Up		= C-A-S-Up		# for VD
+#   key C-«		= C-A-S-«		#	V
+   key C-Down		= C-A-S-Down		#	V
+#   key C-©		= C-A-S-©		#	V
+   key C-Left		= C-A-S-Left		#	V
+#   key C-¨		= C-A-S-¨		#	V
+   key C-Right		= C-A-S-Right		#	V
    key C-S-Y		= &WindowResizeTo(0, -64) &WindowMoveVisibly \
 			  &Wait(100) &WindowClingToBottom
  endif
