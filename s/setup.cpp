@@ -363,6 +363,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
   Resource resource(strres);
   ::resource = &resource;
 
+  // check OS
+  if (!checkOs(SetupFile::NT))
+  {
+    message(IDS_invalidOS, MB_OK | MB_ICONSTOP);
+    return 1;
+  }
+
   // keyboard kind
   keyboardKind =
     (resource.getLocale() == Locale_Japanese_Japan_932) ?

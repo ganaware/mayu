@@ -13,6 +13,7 @@
 #define IDS_error                       9
 #define IDS_alreadyUninstalled          10
 #define IDS_notAdministrator            11
+#define IDS_invalidOS                   12
 #define IDS_mayuFile                    13
 #define IDS_mayuShellOpen               14
 #define IDS_mayu                        15
