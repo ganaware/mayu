@@ -248,7 +248,7 @@ void editInsertTextAtLast(HWND i_hwnd, const tstring &i_text,
   Edit_SetSel(i_hwnd, len, len);
   
   // \n -> \r\n
-  std::auto_ptr<_TCHAR> buf(new _TCHAR[i_text.size() * 2 + 1]);
+  Array<_TCHAR> buf(i_text.size() * 2 + 1);
   _TCHAR *d = buf.get();
   const _TCHAR *str = i_text.c_str();
   for (const _TCHAR *s = str; s < str + i_text.size(); ++ s)

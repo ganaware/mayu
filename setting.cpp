@@ -1131,7 +1131,7 @@ bool readFile(tstring *o_data, const tstringi &i_filename)
     return false;
   
   // read file
-  std::auto_ptr<BYTE> buf(new BYTE[sbuf.st_size + 1]);
+  Array<BYTE> buf(sbuf.st_size + 1);
   if (fread(buf.get(), sbuf.st_size, 1, fp) != 1)
   {
     fclose(fp);
@@ -1181,7 +1181,7 @@ bool readFile(tstring *o_data, const tstringi &i_filename)
   size_t wsize = mbstowcs(NULL, reinterpret_cast<char *>(buf.get()), 0);
   if (wsize != size_t(-1))
   {
-    std::auto_ptr<wchar_t> wbuf(new wchar_t[wsize]);
+    Array<wchar_t> wbuf(wsize);
     mbstowcs(wbuf.get(), reinterpret_cast<char *>(buf.get()), wsize);
     o_data->assign(wbuf.get(), wbuf.get() + wsize);
     fclose(fp);
@@ -1190,7 +1190,7 @@ bool readFile(tstring *o_data, const tstringi &i_filename)
   
   // try UTF-8
   {
-    std::auto_ptr<wchar_t> wbuf(new wchar_t[sbuf.st_size]);
+    Array<wchar_t> wbuf(sbuf.st_size);
     BYTE *f = buf.get();
     BYTE *end = buf.get() + sbuf.st_size;
     wchar_t *d = wbuf.get();

@@ -88,7 +88,7 @@ bool Registry::read(HKEY i_root, const tstring &i_path, const tstring &i_name,
     if (ERROR_MORE_DATA ==
 	RegQueryValueEx(hkey, i_name.c_str(), NULL, &type, &dummy, &size))
     {
-      std::auto_ptr<BYTE> buf(new BYTE[size]);
+      Array<BYTE> buf(size);
       if (ERROR_SUCCESS ==
 	  RegQueryValueEx(hkey, i_name.c_str(), NULL, &type, buf.get(), &size))
       {

@@ -119,10 +119,25 @@ keymap Global
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 全てデフォルトのキーマップの定義
+# 全て(ではないがだいたい)デフォルトのキーマップの定義
 #
 
 keymap	KeymapDefault => &Default
+ if ( KBD109 )
+   mod control += 英数				# 英数を Control に
+   key *英数		=> *LControl		#	〃
+ else
+   mod control += CapsLock			# CapsLock を Control に
+   key *CapsLock	=> *LControl		#	〃
+ endif
+ if ( GANA )
+   if ( KBD109 )
+     mod alt += !!無変換			# 無変換を Alt に
+     key *無変換	=> *無変換		#	〃
+     key A-無変換	=> 無変換		#	〃
+     key IC-A-K		=> 無変換		# IME で変換中の A-K は無変換
+   endif
+ endif
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

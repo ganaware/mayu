@@ -193,7 +193,7 @@ tstring interpretMetaCharacters(const _TCHAR *i_str, size_t i_len,
 				bool i_doesUseRegexpBackReference)
 {
   // interpreted string is always less than i_len
-  std::auto_ptr<_TCHAR> result(new _TCHAR[i_len + 1]);
+  Array<_TCHAR> result(i_len + 1);
   // destination
   _TCHAR *d = result.get();
   // end pointer
@@ -310,7 +310,7 @@ tstring interpretMetaCharacters(const _TCHAR *i_str, size_t i_len,
 std::string guardRegexpFromMbcs(const char *i_str)
 {
   size_t len = strlen(i_str);
-  std::auto_ptr<char> buf(new char[len * 2 + 1]);
+  Array<char> buf(len * 2 + 1);
   char *p = buf.get();
   while (*i_str)
   {
@@ -333,7 +333,7 @@ std::wstring to_wstring(const std::string &i_str)
   size_t size = mbstowcs(NULL, i_str.c_str(), i_str.size() + 1);
   if (size == (size_t)-1)
     return std::wstring();
-  std::auto_ptr<wchar_t> result(new wchar_t[size + 1]);
+  Array<wchar_t> result(size + 1);
   mbstowcs(result.get(), i_str.c_str(), i_str.size() + 1);
   return std::wstring(result.get());
 }
@@ -345,7 +345,7 @@ std::string to_string(const std::wstring &i_str)
   size_t size = wcstombs(NULL, i_str.c_str(), i_str.size() + 1);
   if (size == (size_t)-1)
     return std::string();
-  std::auto_ptr<char> result(new char[size + 1]);
+  Array<char> result(size + 1);
   wcstombs(result.get(), i_str.c_str(), i_str.size() + 1);
   return std::string(result.get());
 }
