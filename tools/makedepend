@@ -201,7 +201,7 @@ $isCygwin = $^O eq "cygwin";
 $isWindows = $isActivePerlWindows || $isCygwin;
 
 # Does ignore case of filename ?
-$ignoreCase = $isActivePerlWindows;
+$ignoreCase = $isWindows;
 
 # null device filename
 if ( $isActivePerlWindows ) {
@@ -458,7 +458,7 @@ sub parseIgnore {
   my($i);
   for ( $i = 0; $i < @OPTION_IGNORE; $i ++ ) {
     # DOS-style-path to UNIX path
-    $OPTION_IGNORE[$i] =~ s:\\:/:g if ( $isActivePerlWindows );
+    $OPTION_IGNORE[$i] =~ s:\\:/:g if ( $isWindows );
     $OPTION_IGNORE[$i] =~ s/^\s*(\S.*\S)\s*$/$1/;
   }
 }
@@ -566,16 +566,24 @@ sub reduceDirectory {
 sub getRelativeDirectory {
   my($path) = @_;
   $path = &reduceDirectory($path);
-  my($cwd) = getcwd();
-  $cwd =~ s:\\:/:g if ( $isActivePerlWindows );
+  my($cwd) = getcwd() . "/";
+  $cwd =~ s:\\:/:g if ( $isWindows );
   $cwd = &reduceDirectory($cwd);
+  my($cwd2) = $cwd;
+  $cwd2 =~ s@^/cygdrive/([a-z])@$1:@i if ( $isCygwin );
   
   if ( ( $ignoreCase  && "$path\n$cwd" =~ m:^(.*)/(.*)\n\1/(.*)$:i ) ||
-       ( !$ignoreCase && "$path\n$cwd" =~ m:^(.*)/(.*)\n\1/(.*)$:  ) ) {
+       ( !$ignoreCase && "$path\n$cwd" =~ m:^(.*)/(.*)\n\1/(.*)$:  ) ||
+       ( $ignoreCase  && "$path\n$cwd2" =~ m:^(.*)/(.*)\n\1/(.*)$:i ) ||
+       ( !$ignoreCase && "$path\n$cwd2" =~ m:^(.*)/(.*)\n\1/(.*)$:  )) {
     my($path) = $2;
     my($dir) = $3;
-    $dir =~ s:[^/]+:..:g;
-    return "$dir/$path";
+    if (0 < length($dir)) {
+      $dir =~ s:[^/]+:..:g;
+      return "$dir/$path";
+    } else {
+      return $path;
+    }
   }
   return $path;
 }

@@ -55,7 +55,8 @@ DEBUG_FLAG	=
 conxlibsmt	= $(conlibsmt) libcpmt.lib libcmt.lib
 guixlibsmt	= $(guilibsmt) libcpmt.lib libcmt.lib
 
-DEPENDFLAGS	= --cpp=vc --ignore="$(INCLUDE)" -p"$$(OUT_DIR)\\"	\
+DEPENDFLAGS	= --cpp=vc --ignore='$(INCLUDE)' -p"$$(OUT_DIR)\\"	\
+		--path-delimiter=dos --newline=unix			\
 		$(DEPENDIGNORE) -GX $(cdebug) $(cflags) $(cvarsmt)	\
 		$(DEFINES) $(INCLUDES) $(DEBUG_FLAG)
 

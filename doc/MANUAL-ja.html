@@ -23,7 +23,7 @@
       <p>いかんともしがたい理由により UN*X Wizard が窓使いにジョブチェンジする時、その操作体系の違いにより憂鬱な日々を送らざるを得ないことは想像に難くありません。「窓使いの憂鬱」は、その憂鬱を少しだけ和らげることができるアイテムです。</p>
       
       <ul>
-	<li>WindowsNT4.0 SP4 以降や、Windows2000, Windows9x で動く汎用キーバインディング変更ソフトです。
+	<li>Windows2000, WindowsXP で動く汎用キーバインディング変更ソフトです。
 	<li>2 ストロークキーを設定できます。
 	<li>個々のウィンドウに別々のキーバインディングを割り当てることができます。
 	<li>Control などのモディファイヤキーを自由に作成することができます。
@@ -570,7 +570,6 @@
       <ul>
 	<li><span class="bug">[仕様]</span> コマンドプロンプトではロックキーとIMEの状態を区別することができません。また、コマンドプロンプトのプロパティに対しては無力です。
 	<li><span class="bug">[バグ]</span> <a href="http://www.pgpi.org/products/pgp/versions/freeware/win32/7.0.3/" target="_top">PGPi</a> を利用しているとうまく動かないようです。
-	<li><span class="bug">[バグ]</span> Windows XP では、「窓使いの憂鬱」を動作させたまま新しいユーザーに切り替えると、不思議な動作をします。
 	<li><a href="http://www.microsoft.com/japan/support/kb/articles/J054/8/50.htm" target="_top">USB キーボードデバイス接続後に英語 101 キーボード配列になる</a>
 	    
       </ul>
@@ -740,6 +739,7 @@
 		    <ul>
 		      <li>カナロックを表すモディファイヤ <a href="CUSTOMIZE-ja.html#modifier"><code>KL-</code></a> を追加。
 		      <li>モディファイヤ <a href="CUSTOMIZE-ja.html#modifier"><code>MAX-, MIN-, MMAX-, MMIN-</code></a> を追加。(Thanks to 小林)
+		      <li>Java アプリケーションなどで <a href="CUSTOMIZE-ja.html#modifier"><code>IL-</code></a> が検出されないことがあるバグを修正。
 		    </ul>
 		</dd>
 		    
@@ -771,7 +771,7 @@
 		<dt>ビルド
 		<dd>
 		    <ul>
-		      <li>Windows9x/Me 非対応になりました。
+		      <li>Windows9x/Me/NT4.0 非対応になりました。
 		      <li>Borland C++ 5.5.1 でビルド不可能になりました。
 		      <li>Visual C++ Toolkit 2003 で<a href="CUSTOMIZE-ja.html#compile">ビルド</a>するための様々な注意事項を記載。(Thanks to 小林)
 		    </ul>
