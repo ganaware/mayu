@@ -115,6 +115,8 @@
 	 "\\|EmacsEditKillLineFunc"
 	 "\\|LogClear"
 	 "\\|DirectSSTP"
+	 "\\|PlugIn"
+	 "\\|Recenter"
 	 "\\)\\>"
 	 ) . ,function-name-face)
       "Default font-lock-keywords for mayu mode.")))

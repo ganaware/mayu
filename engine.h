@@ -135,7 +135,7 @@ private:
       : m_hwnd(i_hwnd), m_rc(i_rc), m_mode(i_mode) { }
   };
   typedef std::list<WindowPosition> WindowPositions;
-  
+
   typedef std::list<HWND> WindowsWithAlpha; /// windows for &amp;WindowSetAlpha
 
 private:
@@ -213,7 +213,7 @@ private:
   tstring m_helpTitle;				/// for &amp;HelpMessage
   int m_variable;				/// for &amp;Variable,
 						///  &amp;Repeat
-  
+
 public:
   tomsgstream &m_log;				/** log stream (output to log
                                                     dialog's edit) */
@@ -425,11 +425,19 @@ private:
   void funcEmacsEditKillLineFunc(FunctionParam *i_param);
   /// clear log
   void funcLogClear(FunctionParam *i_param);
+  /// recenter
+  void funcRecenter(FunctionParam *i_param);
   /// Direct SSTP
   void funcDirectSSTP(FunctionParam *i_param,
 		      const tregex &i_name,
 		      const tstringq &i_protocol,
 		      const std::list<tstringq> &i_headers);
+  /// PlugIn
+  void funcPlugIn(FunctionParam *i_param,
+		  const tstringq &i_dllName,
+		  const tstringq &i_funcName = _T(""),
+		  const tstringq &i_funcParam = _T(""),
+		  BooleanType i_doesCreateThread = BooleanType_false);
   // END OF FUNCTION DEFINITION
 #  define FUNCTION_FRIEND
 #  include "functions.h"

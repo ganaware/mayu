@@ -896,7 +896,9 @@ void Engine::keyboardHandler()
     key.initialize();
     updateLastPressedKey(isPhysicallyPressed ? c.m_mkey.m_key : NULL);
   }
+#if defined(_WINNT)
   break_while:
+#endif
   CHECK_TRUE( SetEvent(m_threadEvent) );
 }
   
@@ -1055,7 +1057,6 @@ Engine::~Engine()
   // close m_device
   CHECK_TRUE( CloseHandle(m_device) );
 }
-
 
 // set m_setting
 bool Engine::setSetting(Setting *i_setting)

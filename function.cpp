@@ -11,7 +11,7 @@
 #include "vkeytable.h"
 #include "windowstool.h"
 #include <algorithm>
-
+#include <process.h>
 
 #define FUNCTION_DATA
 #include "functions.h"
@@ -1701,6 +1701,17 @@ void Engine::funcLogClear(FunctionParam *i_param)
 	      EngineNotify_clearLog, 0);
 }
 
+// recenter
+void Engine::funcRecenter(FunctionParam *i_param)
+{
+  if (!i_param->m_isPressed)
+    return;
+  if (m_hwndFocus)
+  {
+    UINT WM_MAYU_MESSAGE = RegisterWindowMessage(WM_MAYU_MESSAGE_NAME);
+    PostMessage(m_hwndFocus, WM_MAYU_MESSAGE, MayuMessage_funcRecenter, 0);
+  }
+}
 
 // Direct SSTP Server
 class DirectSSTPServer
@@ -1877,4 +1888,145 @@ void Engine::funcDirectSSTP(FunctionParam *i_param,
   
   UnmapViewOfFile(data);
   CloseHandle(hfm);
+}
+
+
+namespace shu
+{
+  class PlugIn
+  {
+    enum Type
+    {
+      Type_A,
+      Type_W
+    };
+    
+  private:
+    HMODULE m_dll;
+    FARPROC m_func;
+    Type m_type;
+    tstringq m_funcParam;
+    
+  public:
+    PlugIn() : m_dll(NULL)
+    {
+    }
+    
+    ~PlugIn()
+    {
+      FreeLibrary(m_dll);
+    }
+
+    bool load(const tstringq &i_dllName, const tstringq &i_funcName,
+	      const tstringq &i_funcParam, tomsgstream &i_log)
+    {
+      m_dll = LoadLibrary((_T("Plugins\\") + i_dllName).c_str());
+      if (!m_dll)
+      {
+	m_dll = LoadLibrary((_T("Plugin\\") + i_dllName).c_str());
+	if (!m_dll)
+	{
+	  m_dll = LoadLibrary(i_dllName.c_str());
+	  if (!m_dll)
+	  {
+	    Acquire a(&i_log);
+	    i_log << std::endl;
+	    i_log << _T("error: &PlugIn() failed to load ") << i_dllName << std::endl;
+	  }
+	  return false;
+	}
+      }
+
+      // get function
+#ifdef UNICODE
+#  define to_wstring
+#else
+#  define to_string
+#endif
+      m_type = Type_W;
+      m_func = GetProcAddress(m_dll, to_string(_T("mayu") + i_funcName + _T("W")).c_str());
+      if (!m_func)
+      {
+	m_type = Type_A;
+	m_func
+	  = GetProcAddress(m_dll, to_string(_T("mayu") + i_funcName + _T("A")).c_str());
+	if (!m_func)
+	{
+	  m_func = GetProcAddress(m_dll, to_string(_T("mayu") + i_funcName).c_str());
+	  if (!m_func)
+	  {
+	    m_func = GetProcAddress(m_dll, to_string(i_funcName).c_str());
+	    if (!m_func)
+	    {
+	      Acquire a(&i_log);
+	      i_log << std::endl;
+	      i_log << _T("error: &PlugIn() failed to find function: ")
+		    << i_funcName << std::endl;
+	      return false;
+	    }
+	  }
+	}
+      }
+      
+      m_funcParam = i_funcParam;
+      return true;
+    }
+
+    void exec()
+    {
+      ASSERT( m_dll );
+      ASSERT( m_func );
+      
+      typedef void (WINAPI * PLUGIN_FUNCTION_A)(const char *i_arg);
+      typedef void (WINAPI * PLUGIN_FUNCTION_W)(const wchar_t *i_arg);
+      switch (m_type)
+      {
+	case Type_A:
+	  reinterpret_cast<PLUGIN_FUNCTION_A>(m_func)(to_string(m_funcParam).c_str());
+	  break;
+	case Type_W:
+	  reinterpret_cast<PLUGIN_FUNCTION_W>(m_func)(to_wstring(m_funcParam).c_str());
+	  break;
+      }
+    }
+#undef to_string
+#undef to_wstring
+  };
+
+  static void plugInThread(void *i_plugin)
+  {
+    PlugIn *plugin = static_cast<PlugIn *>(i_plugin);
+    plugin->exec();
+    delete plugin;
+  }
+}
+
+void Engine::funcPlugIn(FunctionParam *i_param,
+			const tstringq &i_dllName,
+			const tstringq &i_funcName,
+			const tstringq &i_funcParam,
+			BooleanType i_doesCreateThread)
+{
+  if (!i_param->m_isPressed)
+    return;
+
+  shu::PlugIn *plugin = new shu::PlugIn();
+  if (!plugin->load(i_dllName, i_funcName, i_funcParam, m_log))
+  {
+    delete plugin;
+    return;
+  }
+  if (i_doesCreateThread)
+  {
+    if (_beginthread(shu::plugInThread, 0, plugin) == -1)
+    {
+      delete plugin;
+      Acquire a(&m_log);
+      m_log << std::endl;
+      m_log << _T("error: &PlugIn() failed to create thread.");
+    }
+    return;
+  }
+  else
+    plugin->exec();
 }

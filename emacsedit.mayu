@@ -19,7 +19,7 @@ keymap	EmacsMove : Global
  key C-F		= Right			# →
  key M-F		= C-Right		# →(単語)
  key C-G		= Escape		# CANCEL
- key C-L		= &WindowRedraw		# 再描画
+ key C-L		= &WindowRedraw &Recenter # 再描画
  key C-N		= Down			# ↓
  key C-P		= Up			# ↑
  key C-Q		= &Prefix(KeymapDefault) # mayu に左右されないキー入力

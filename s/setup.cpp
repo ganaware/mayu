@@ -103,6 +103,8 @@ const SetupFile::Data g_setupFiles[] =
   DN(File, ALL, "ax.mayu"	     , ToDest, "contrib\\ax.mayu"          ),
   DN(File, ALL, "98x1.mayu"	     , ToDest, "contrib\\98x1.mayu"        ),
   DN(File, ALL, "109onAX.mayu"	     , ToDest, "contrib\\109onAX.mayu"     ),
+
+  SN(Dir , ALL, "Plugins"	     , ToDest), // mkdir
 };
 
 

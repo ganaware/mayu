@@ -11,6 +11,7 @@
 
 #include <locale.h>
 #include <imm.h>
+#include <richedit.h>
 
 
 ///
@@ -255,6 +256,41 @@ static void notifyCommand(
 }
 
 
+/// &Recenter
+static void funcRecenter(HWND i_hwnd)
+{
+  _TCHAR buf[MAX(GANA_MAX_PATH, GANA_MAX_ATOM_LENGTH)];
+  GetClassName(i_hwnd, buf, NUMBER_OF(buf));
+  bool isEdit;
+  if (_tcsicmp(buf, _T("Edit")) == 0)
+    isEdit = true;
+  else if (_tcsnicmp(buf, _T("RichEdit"), 8) == 0)
+    isEdit = false;
+  else
+    return;	// this function only works for Edit control
+
+  LONG style = GetWindowLong(i_hwnd, GWL_STYLE);
+  if (!(style & ES_MULTILINE))
+    return;	// this function only works for multi line Edit control
+
+  RECT rc;
+  GetClientRect(i_hwnd, &rc);
+  POINTL p = { (rc.right + rc.left) / 2, (rc.top + rc.bottom) / 2 };
+  int line;
+  if (isEdit)
+  {
+    line = SendMessage(i_hwnd, EM_CHARFROMPOS, 0, MAKELPARAM(p.x, p.y));
+    line = HIWORD(line);
+  }
+  else
+  {
+    int ci = SendMessage(i_hwnd, EM_CHARFROMPOS, 0, (LPARAM)&p);
+    line = SendMessage(i_hwnd, EM_EXLINEFROMCHAR, 0, ci);
+  }
+  int caretLine = SendMessage(i_hwnd, EM_LINEFROMCHAR, -1, 0);
+  SendMessage(i_hwnd, EM_LINESCROLL, 0, caretLine - line);
+}
+
 /// notify lock state
 DllExport void notifyLockState()
 {
@@ -319,6 +355,9 @@ LRESULT CALLBACK getMessageProc(int i_nCode, WPARAM i_wParam, LPARAM i_lParam)
 	{
 	  case MayuMessage_notifyName:
 	    notifyName(msg.hwnd);
+	    break;
+	  case MayuMessage_funcRecenter:
+	    funcRecenter(msg.hwnd);
 	    break;
 	}
       }
