@@ -5,7 +5,9 @@
 ###############################################################################
 
 
+!if "$(VERSION)" == ""
 VERSION		= 3.29
+!endif
 
 !if "$(TARGETOS)" == "WINNT"
 OS_SPECIFIC_DEFINES	=  -DUNICODE -D_UNICODE
