@@ -15,7 +15,8 @@ TARGETOS	= WINNT
 !endif	# TARGETOS
 
 !if "$(TARGETOS)" == "WINNT"
-APPVER		= 5.0
+APPVER		= 5.01
+#APPVER		= 5.0
 !ifdef nodebug
 OUT_DIR		= out$(MAYU_VC)_winnt
 !else	# nodebug
@@ -36,9 +37,9 @@ OUT_DIR		= out$(MAYU_VC)_win9x_debug
 !error Must specify TARGETOS=WIN95 or TARGETOS=WINNT
 !endif	# TARGETOS
 
-_WIN32_IE	= 0x0500
+#_WIN32_IE	= 0x0500
 !include <win32.mak>
-NMAKE_WINVER	= 0x0500	# trick for WS_EX_LAYERED
+#NMAKE_WINVER	= 0x0500	# trick for WS_EX_LAYERED
 
 !ifdef nodebug
 DEBUG_FLAG	= -DNDEBUG
