@@ -234,7 +234,7 @@ p.noindent {
   margin-left:0pt;
 }
 
-.manual .sample {
+.manual .sample, .manual p.sample {
   white-space:nowrap;
   text-indent:0em;
   padding-left:8pt; padding-right:8pt;

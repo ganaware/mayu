@@ -139,10 +139,24 @@
 		  <p>デフォルトでは、左側のキーには <code>~C-~M-~S-*NL-*CL-*SL-*IL-~IC-</code> が指定されていますが、これを変更することができます。例えば、</p>
 		  
 		  <p class="sample">
-		  key IC-* =
+		  key *IC- =
 		  </p>
 
 		  <p class="continue">と記述すると、この文以降のデフォルトモディファイヤは <code>~C-~M-~S-*NL-*CL-*SL-*IL-*IC-</code> となります。</p>
+
+		  <p>デフォルトモディファイヤの変更を複数行うときには、例えば、</p>
+		  
+		  <p class="sample">
+		  key L0-*IC-~C- =
+		  </p>
+		  
+		  <p class="continue">のようにしなければなりません。以下のように指定するのは間違いです。最後のものしか有効になりません。</p>
+		  
+		  <p class="sample">
+		  key L0- =<br>
+		  key *IC- =<br>
+		  key ~C- = # この行しか有効にならない<br>
+		  </p>
 		  </div>
 	    </dl>
 	    </div>
