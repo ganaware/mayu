@@ -196,19 +196,14 @@ static void getClassNameTitleName(HWND i_hwnd, bool i_isInMenu,
 static void updateShow(HWND i_hwnd, WPARAM i_show)
 {
   bool isMDI = false;
-  _TCHAR className[MAX(GANA_MAX_PATH, GANA_MAX_ATOM_LENGTH)];
 
   if (!i_hwnd)
     return;
 
-  // check class name to avoid invalid notify
-  GetClassName(i_hwnd, className, NUMBER_OF(className));
-  className[NUMBER_OF(className) - 1] = _T('\0');
-  if (_tcsicmp(className, _T("SysShadow")) == 0 ||
-      _tcsicmp(className, _T("UserEventWindow")) == 0)
-    return;
-
   LONG style = GetWindowLong(i_hwnd, GWL_STYLE);
+  if (!(style & WS_MAXIMIZEBOX) && !(style & WS_MAXIMIZEBOX))
+    return; // ignore window that has neither maximize or minimize button
+
   if (style & WS_CHILD)
   {
     LONG exStyle = GetWindowLong(i_hwnd, GWL_EXSTYLE);
