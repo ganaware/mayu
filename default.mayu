@@ -546,7 +546,7 @@ window EdMax-edit /edmax\.exe:.*Afx:400000:b:0:1900010:0$/ : EmacsEdit
 window VBTextBox /:ThunderRT6FormDC:(ThunderRT6TextBox|RichTextWndClass)$/ \
 	: EmacsEdit
 
-## StarOffice/StarSuite .......................................................
+## StarOffice/StarSuite/OpenOffice ............................................
 
 window StarOffice /soffice\.exe:SALFRAME$/ : EmacsEdit
 
