@@ -815,6 +815,7 @@ NTSTATUS detourDeviceControl(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
     (DetourDeviceExtension*)deviceObject->DeviceExtension;
   
   irp->IoStatus.Information = 0;
+  status = STATUS_INVALID_DEVICE_REQUEST;
   switch (irpSp->Parameters.DeviceIoControl.IoControlCode)
   {
     case IOCTL_MAYU_DETOUR_CANCEL:
@@ -853,7 +854,7 @@ NTSTATUS detourDeviceControl(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
   irp->IoStatus.Status = status;
   IoCompleteRequest(irp, IO_NO_INCREMENT);
   
-  return STATUS_SUCCESS;
+  return status;
 }
 
 
