@@ -839,6 +839,21 @@ void SettingLoader::load_ARGUMENT(const KeySeq **o_arg)
 }
 
 
+// &lt;ARGUMENT&gt;
+void SettingLoader::load_ARGUMENT(StrExprArg *o_arg)
+{
+  Token *t = getToken();
+  StrExprArg::Type type = StrExprArg::Literal;
+  if (*t == _T("$") && t->isQuoted() == false
+      && lookToken()->getType() == Token::Type_string)
+  {
+    type = StrExprArg::Builtin;
+    t = getToken();
+  }
+  *o_arg = StrExprArg(t->getString(), type);
+}
+
+
 // <KEY_SEQUENCE>
 KeySeq *SettingLoader::load_KEY_SEQUENCE(
   const tstringi &i_name, bool i_isInParen, Modifier::Type i_mode)

@@ -308,9 +308,9 @@ private:
   void funcPostMessage(FunctionParam *i_param, ToWindowType i_window,
 		       UINT i_message, WPARAM i_wParam, LPARAM i_lParam);
   /// ShellExecute
-  void funcShellExecute(FunctionParam *i_param, const tstringq &i_operation,
-			const tstringq &i_file, const tstringq &i_parameters,
-			const tstringq &i_directory,
+  void funcShellExecute(FunctionParam *i_param, const StrExprArg &i_operation,
+			const StrExprArg &i_file, const StrExprArg &i_parameters,
+			const StrExprArg &i_directory,
 			ShowCommandType i_showCommand);
   /// SetForegroundWindow
   void funcSetForegroundWindow(FunctionParam *i_param,
@@ -321,7 +321,7 @@ private:
 			       = tregex(_T(".*")));
   /// load setting
   void funcLoadSetting(FunctionParam *i_param,
-		       const tstringq &i_name = _T(""));
+		       const StrExprArg &i_name = StrExprArg());
   /// virtual key
   void funcVK(FunctionParam *i_param, VKey i_vkey);
   /// wait
@@ -335,10 +335,10 @@ private:
   void funcDescribeBindings(FunctionParam *i_param);
   /// show help message
   void funcHelpMessage(FunctionParam *i_param,
-		       const tstringq &i_title = _T(""),
-		       const tstringq &i_message = _T(""));
+		       const StrExprArg &i_title = StrExprArg(),
+		       const StrExprArg &i_message = StrExprArg());
   /// show variable
-  void funcHelpVariable(FunctionParam *i_param, const tstringq &i_title);
+  void funcHelpVariable(FunctionParam *i_param, const StrExprArg &i_title);
   /// raise window
   void funcWindowRaise(FunctionParam *i_param,
 		       TargetWindowType i_twt = TargetWindowType_overlapped);
@@ -416,7 +416,7 @@ private:
   /// convert the contents of the Clipboard to lower case
   void funcClipboardDowncaseWord(FunctionParam *i_param);
   /// set the contents of the Clipboard to the string
-  void funcClipboardCopy(FunctionParam *i_param, const tstringq &i_text);
+  void funcClipboardCopy(FunctionParam *i_param, const StrExprArg &i_text);
   ///
   void funcEmacsEditKillLinePred(FunctionParam *i_param,
 				 const KeySeq *i_keySeq1,
@@ -430,13 +430,13 @@ private:
   /// Direct SSTP
   void funcDirectSSTP(FunctionParam *i_param,
 		      const tregex &i_name,
-		      const tstringq &i_protocol,
+		      const StrExprArg &i_protocol,
 		      const std::list<tstringq> &i_headers);
   /// PlugIn
   void funcPlugIn(FunctionParam *i_param,
-		  const tstringq &i_dllName,
-		  const tstringq &i_funcName = _T(""),
-		  const tstringq &i_funcParam = _T(""),
+		  const StrExprArg &i_dllName,
+		  const StrExprArg &i_funcName = StrExprArg(),
+		  const StrExprArg &i_funcParam = StrExprArg(),
 		  BooleanType i_doesCreateThread = BooleanType_false);
   /// set IME open status
   void funcSetImeStatus(FunctionParam *i_param, ToggleType i_toggle = ToggleType_toggle);

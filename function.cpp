@@ -929,10 +929,10 @@ void Engine::funcPostMessage(FunctionParam *i_param, ToWindowType i_window,
 
 // ShellExecute
 void Engine::funcShellExecute(FunctionParam *i_param,
-			      const tstringq &/*i_operation*/,
-			      const tstringq &/*i_file*/,
-			      const tstringq &/*i_parameters*/,
-			      const tstringq &/*i_directory*/,
+			      const StrExprArg &/*i_operation*/,
+			      const StrExprArg &/*i_file*/,
+			      const StrExprArg &/*i_parameters*/,
+			      const StrExprArg &/*i_directory*/,
 			      ShowCommandType /*i_showCommand*/)
 {
   if (!i_param->m_isPressed)
@@ -954,10 +954,10 @@ void Engine::shellExecute()
   
   int r = (int)ShellExecute(
     NULL,
-    fd->m_operation.empty() ? _T("open") : fd->m_operation.c_str(),
-    fd->m_file.empty() ? NULL : fd->m_file.c_str(),
-    fd->m_parameters.empty() ? NULL : fd->m_parameters.c_str(),
-    fd->m_directory.empty() ? NULL : fd->m_directory.c_str(),
+    fd->m_operation.eval().empty() ? _T("open") : fd->m_operation.eval().c_str(),
+    fd->m_file.eval().empty() ? NULL : fd->m_file.eval().c_str(),
+    fd->m_parameters.eval().empty() ? NULL : fd->m_parameters.eval().c_str(),
+    fd->m_directory.eval().empty() ? NULL : fd->m_directory.eval().c_str(),
     fd->m_showCommand);
   if (32 < r)
     return; // success
@@ -1063,11 +1063,11 @@ void Engine::funcSetForegroundWindow(FunctionParam *i_param, const tregex &,
 
 
 // load setting
-void Engine::funcLoadSetting(FunctionParam *i_param, const tstringq &i_name)
+void Engine::funcLoadSetting(FunctionParam *i_param, const StrExprArg &i_name)
 {
   if (!i_param->m_isPressed)
     return;
-  if (!i_name.empty())
+  if (!i_name.eval().empty())
   {
     // set MAYU_REGISTRY_ROOT\.mayuIndex which name is same with i_name
     Registry reg(MAYU_REGISTRY_ROOT);
@@ -1083,7 +1083,7 @@ void Engine::funcLoadSetting(FunctionParam *i_param, const tstringq &i_name)
       
       tcmatch_results what;
       if (boost::regex_match(dot_mayu, what, split) &&
-	  what.str(1) == i_name)
+	  what.str(1) == i_name.eval())
       {	
 	reg.write(_T(".mayuIndex"), i);
 	goto success;
@@ -1182,21 +1182,21 @@ void Engine::funcDescribeBindings(FunctionParam *i_param)
 }
 
 // show help message
-void Engine::funcHelpMessage(FunctionParam *i_param, const tstringq &i_title,
-			     const tstringq &i_message)
+void Engine::funcHelpMessage(FunctionParam *i_param, const StrExprArg &i_title,
+			     const StrExprArg &i_message)
 {
   if (!i_param->m_isPressed)
     return;
 
-  m_helpTitle = i_title;
-  m_helpMessage = i_message;
-  bool doesShow = !(i_title.size() == 0 && i_message.size() == 0);
+  m_helpTitle = i_title.eval();
+  m_helpMessage = i_message.eval();
+  bool doesShow = !(i_title.eval().size() == 0 && i_message.eval().size() == 0);
   PostMessage(getAssociatedWndow(), WM_APP_engineNotify,
 	      EngineNotify_helpMessage, doesShow);
 }
 
 // show variable
-void Engine::funcHelpVariable(FunctionParam *i_param, const tstringq &i_title)
+void Engine::funcHelpVariable(FunctionParam *i_param, const StrExprArg &i_title)
 {
   if (!i_param->m_isPressed)
     return;
@@ -1204,7 +1204,7 @@ void Engine::funcHelpVariable(FunctionParam *i_param, const tstringq &i_title)
   _TCHAR buf[20];
   _sntprintf(buf, NUMBER_OF(buf), _T("%d"), m_variable);
 
-  m_helpTitle = i_title;
+  m_helpTitle = i_title.eval();
   m_helpMessage = buf;
   PostMessage(getAssociatedWndow(), WM_APP_engineNotify,
 	      EngineNotify_helpMessage, true);
@@ -1645,7 +1645,7 @@ void Engine::funcClipboardDowncaseWord(FunctionParam *i_param)
 }
 
 // set the contents of the Clipboard to the string
-void Engine::funcClipboardCopy(FunctionParam *i_param, const tstringq &i_text)
+void Engine::funcClipboardCopy(FunctionParam *i_param, const StrExprArg &i_text)
 {
   if (!i_param->m_isPressed)
     return;
@@ -1654,11 +1654,11 @@ void Engine::funcClipboardCopy(FunctionParam *i_param, const tstringq &i_text)
   
   HGLOBAL hdataNew =
     GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
-		(i_text.size() + 1) * sizeof(_TCHAR));
+		(i_text.eval().size() + 1) * sizeof(_TCHAR));
   if (!hdataNew)
     return;
   _TCHAR *dataNew = reinterpret_cast<_TCHAR *>(GlobalLock(hdataNew));
-  _tcscpy(dataNew, i_text.c_str());
+  _tcscpy(dataNew, i_text.eval().c_str());
   GlobalUnlock(hdataNew);
   closeClipboard(NULL, hdataNew);
 }
@@ -1801,7 +1801,7 @@ public:
 // Direct SSTP
 void Engine::funcDirectSSTP(FunctionParam *i_param,
 			    const tregex &i_name,
-			    const tstringq &i_protocol,
+			    const StrExprArg &i_protocol,
 			    const std::list<tstringq> &i_headers)
 {
   if (!i_param->m_isPressed)
@@ -1845,10 +1845,10 @@ void Engine::funcDirectSSTP(FunctionParam *i_param,
 
   // make request
   tstring request;
-  if (!i_protocol.size())
+  if (!i_protocol.eval().size())
     request += _T("NOTIFY SSTP/1.1");
   else
-    request += i_protocol;
+    request += i_protocol.eval();
   request += _T("\r\n");
 
   bool hasSender = false;
@@ -2027,16 +2027,16 @@ namespace shu
 }
 
 void Engine::funcPlugIn(FunctionParam *i_param,
-			const tstringq &i_dllName,
-			const tstringq &i_funcName,
-			const tstringq &i_funcParam,
+			const StrExprArg &i_dllName,
+			const StrExprArg &i_funcName,
+			const StrExprArg &i_funcParam,
 			BooleanType i_doesCreateThread)
 {
   if (!i_param->m_isPressed)
     return;
 
   shu::PlugIn *plugin = new shu::PlugIn();
-  if (!plugin->load(i_dllName, i_funcName, i_funcParam, m_log))
+  if (!plugin->load(i_dllName.eval(), i_funcName.eval(), i_funcParam.eval(), m_log))
   {
     delete plugin;
     return;
@@ -2054,4 +2054,120 @@ void Engine::funcPlugIn(FunctionParam *i_param,
   }
   else
     plugin->exec();
+}
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// StrExpr
+class StrExpr
+{
+private:
+  tstringq symbol;
+public:
+  StrExpr(const tstringq &i_symbol) : symbol(i_symbol) {};
+
+  virtual ~StrExpr() {};
+
+  virtual StrExpr *clone() const
+  {
+    return new StrExpr(*this);
+  }
+
+  virtual tstringq eval() const
+  {
+    return symbol;
+  };
+};
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// StrExprClipboard
+class StrExprClipboard : public StrExpr
+{
+public:
+  StrExprClipboard(const tstringq &i_symbol) : StrExpr(i_symbol) {};
+
+  ~StrExprClipboard() {};
+
+  StrExpr *clone() const
+  {
+    return new StrExprClipboard(*this);
+  }
+
+  tstringq eval() const
+  {
+    HGLOBAL g;
+    const _TCHAR *text = getTextFromClipboard(&g);
+    const tstring value(text == NULL ? _T("") : text);
+    closeClipboard(g);
+    return value;
+  };
+};
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// StrExprArg
+
+
+// default constructor
+StrExprArg::StrExprArg()
+{
+  expr = new StrExpr(_T(""));
+}
+
+
+// copy contructor
+StrExprArg::StrExprArg(const StrExprArg &i_data)
+{
+  expr = i_data.expr->clone();
+}
+
+
+StrExprArg &StrExprArg::operator=(const StrExprArg &i_data)
+{
+  if (i_data.expr == expr)
+    return *this;
+
+  delete expr;
+  expr = i_data.expr->clone();
+
+  return *this;
+}
+
+
+// initializer
+StrExprArg::StrExprArg(const tstringq &i_symbol, Type i_type)
+{
+  switch (i_type)
+  {
+    case Literal:
+      expr = new StrExpr(i_symbol);
+      break;
+    case Builtin:
+      if (i_symbol == _T("Clipboard"))
+	expr = new StrExprClipboard(i_symbol);
+      else;
+      break;
+    default:
+      break;
+  }
+}
+
+
+StrExprArg::~StrExprArg()
+{
+  delete expr;
+}
+
+
+tstringq StrExprArg::eval() const
+{
+  return expr->eval();
+}
+
+// stream output
+tostream &operator<<(tostream &i_ost, const StrExprArg &i_data)
+{
+  i_ost << i_data.eval();
+  return i_ost;
 }
