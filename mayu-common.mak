@@ -139,8 +139,7 @@ DISTRIB_CONTRIBS =				\
 !if "$(TARGETOS)" == "WINNT"
 DISTRIB_DRIVER	=				\
 		d\i386\mayud.sys		\
-		d\nt4\i386\mayudnt4.sys		\
-		d\test\mayudusb.sys
+		d\nt4\i386\mayudnt4.sys
 !endif
 !if "$(TARGETOS)" == "WIN95"
 DISTRIB_DRIVER	= d_win9x\mayud.vxd

@@ -55,10 +55,8 @@ const SetupFile::Data g_setupFiles[] =
   // drivers
 #if defined(_WINNT)
   SN(File, NT , "mayud.sys"	     , ToDest),
-  SN(File, NT , "mayudusb.sys"	     , ToDest),
   SN(File, NT , "mayudnt4.sys"	     , ToDest),
-  { File, W2k, Normal,	 _T("mayud.sys"),    ToDriver, _T("mayud.sys") },
-  { File, W2k, Flag_Usb, _T("mayudusb.sys"), ToDriver, _T("mayud.sys") },
+  SN(File, W2k, "mayud.sys"	     , ToDriver),
   DN(File, NT4, "mayudnt4.sys"	     , ToDriver, "mayud.sys"),
 #elif defined(_WIN95)
   SN(File, W9x, "mayud.vxd"	     , ToDest),
@@ -155,54 +153,6 @@ void driverServiceError(DWORD i_err)
   }
 }
 
-
-#if defined(_WINNT)
-
-#  define MAYUD_DRIVER_KEY _T("System\\CurrentControlSet\\Services\\mayud")
-#  define MAYUD_FILTER_KEY _T("System\\CurrentControlSet\\Control\\Class\\{4D36E96B-E325-11CE-BFC1-08002BE10318}")
-
-bool createUsbDriverService()
-{
-  {
-    Registry reg(HKEY_LOCAL_MACHINE, MAYUD_DRIVER_KEY);
-    reg.write(_T("Type"), DWORD(1));
-    reg.write(_T("ErrorControl"), DWORD(1));
-    reg.write(_T("Start"), DWORD(3));
-  }
-  {
-    Registry reg(HKEY_LOCAL_MACHINE, MAYUD_FILTER_KEY);
-    std::list<tstring> filters;
-    if (!reg.read(_T("UpperFilters"), &filters))
-      return false;
-    filters.push_back(_T("mayud"));
-    if (!reg.write(_T("UpperFilters"), filters))
-      return false;
-  }
-  return true;
-}
-
-void removeUsbDriverService()
-{
-  Registry::remove(HKEY_LOCAL_MACHINE, MAYUD_DRIVER_KEY _T("\\Security"));
-  Registry::remove(HKEY_LOCAL_MACHINE, MAYUD_DRIVER_KEY _T("\\Enum"));
-  Registry::remove(HKEY_LOCAL_MACHINE, MAYUD_DRIVER_KEY);
-  
-  Registry reg(HKEY_LOCAL_MACHINE, MAYUD_FILTER_KEY);
-  std::list<tstring> filters;
-  if (!reg.read(_T("UpperFilters"), &filters))
-    return;
-  for (std::list<tstring>::iterator
-	 i = filters.begin(); i != filters.end(); ++ i)
-    if (*i == _T("mayud"))
-    {
-      filters.erase(i);
-      break;
-    }
-  reg.write(_T("UpperFilters"), filters);
-}
-#endif
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // dialogue
 
@@ -234,30 +184,22 @@ private:
       removeSrcFiles(g_setupFiles, NUMBER_OF(g_setupFiles), g_flags, srcDir);
 
 #if defined(_WINNT)
-    // driver
+    DWORD err =
+      createDriverService(_T("mayud"),
+			  g_resource->loadString(IDS_mayud),
+			  getDriverDirectory() + _T("\\mayud.sys"),
+			  _T("+Keyboard Class\0"),
+			  g_flags & Flag_Usb ? true : false);
+
+    if (err != ERROR_SUCCESS)
+    {
+      driverServiceError(err);
+      removeFiles(g_setupFiles, NUMBER_OF(g_setupFiles), g_flags, g_destDir);
+      return 1;
+    }
+
     if (g_flags == Flag_Usb)
-    {
-      if (!createUsbDriverService())
-      {
-	removeFiles(g_setupFiles, NUMBER_OF(g_setupFiles), g_flags, g_destDir);
-	return 1;
-      }
       CHECK_TRUE( reg.write(_T("isUsbDriver"), DWORD(1)) );
-    }
-    else
-    {
-      DWORD err =
-	createDriverService(_T("mayud"),
-			    g_resource->loadString(IDS_mayud),
-			    getDriverDirectory() + _T("\\mayud.sys"),
-			    _T("+Keyboard Class\0"));
-      if (err != ERROR_SUCCESS)
-      {
-	driverServiceError(err);
-	removeFiles(g_setupFiles, NUMBER_OF(g_setupFiles), g_flags, g_destDir);
-	return 1;
-      }
-    }
 #endif // _WINNT
     
     // create shortcut
@@ -514,20 +456,11 @@ int uninstall()
     return 1;
 
 #if defined(_WINNT)
-  int isUsbDriver;
-  Registry::read(DIR_REGISTRY_ROOT, _T("isUsbDriver"), &isUsbDriver, 0);
-  if (isUsbDriver)
-    g_flags = Flag_Usb;
-  if (g_flags == Flag_Usb)
-    removeUsbDriverService();
-  else
+  DWORD err = removeDriverService(_T("mayud"));
+  if (err != ERROR_SUCCESS)
   {
-    DWORD err = removeDriverService(_T("mayud"));
-    if (err != ERROR_SUCCESS)
-    {
-      driverServiceError(err);
-      return 1;
-    }
+    driverServiceError(err);
+    return 1;
   }
 #endif // _WINNT
 

@@ -134,7 +134,8 @@ namespace Installer
   DWORD createDriverService(const tstringi &i_serviceName,
 			    const tstring &i_serviceDescription,
 			    const tstringi &i_driverPath,
-			    const _TCHAR *i_preloadedGroups);
+			    const _TCHAR *i_preloadedGroups,
+			    bool forUsb);
 
   // remove driver service
   DWORD removeDriverService(const tstringi &i_serviceName);

@@ -241,11 +241,15 @@ namespace Installer
 
 
 #if defined(_WINNT)
+
+#  define MAYUD_FILTER_KEY _T("System\\CurrentControlSet\\Control\\Class\\{4D36E96B-E325-11CE-BFC1-08002BE10318}")
+
   // create driver service
   DWORD createDriverService(const tstringi &i_serviceName,
 			    const tstring &i_serviceDescription,
 			    const tstringi &i_driverPath,
-			    const _TCHAR *i_preloadedGroups)
+			    const _TCHAR *i_preloadedGroups,
+			    bool forUsb)
   {
     SC_HANDLE hscm =
       OpenSCManager(NULL, NULL,
@@ -256,7 +260,8 @@ namespace Installer
     SC_HANDLE hs =
       CreateService(hscm, i_serviceName.c_str(), i_serviceDescription.c_str(),
 		    SERVICE_START | SERVICE_STOP, SERVICE_KERNEL_DRIVER,
-		    SERVICE_AUTO_START, SERVICE_ERROR_IGNORE,
+		    forUsb == true ? SERVICE_DEMAND_START : SERVICE_AUTO_START,
+		    SERVICE_ERROR_IGNORE,
 		    i_driverPath.c_str(), NULL, NULL,
 		    i_preloadedGroups, NULL, NULL);
     if (hs == NULL)
@@ -272,6 +277,17 @@ namespace Installer
     }
     CloseServiceHandle(hs);
     CloseServiceHandle(hscm);
+
+    if (forUsb == true) {
+      Registry reg(HKEY_LOCAL_MACHINE, MAYUD_FILTER_KEY);
+      std::list<tstring> filters;
+      if (!reg.read(_T("UpperFilters"), &filters))
+	return false;
+      filters.push_back(_T("mayud"));
+      if (!reg.write(_T("UpperFilters"), filters))
+	return false;
+    }
+
     return ERROR_SUCCESS;
   }
 #endif // _WINNT
@@ -283,6 +299,14 @@ namespace Installer
   {
     DWORD err = ERROR_SUCCESS;
     
+    Registry reg(HKEY_LOCAL_MACHINE, MAYUD_FILTER_KEY);
+    std::list<tstring> filters;
+    if (reg.read(_T("UpperFilters"), &filters))
+    {
+      filters.remove(_T("mayud"));
+      reg.write(_T("UpperFilters"), filters);
+    }
+
     SC_HANDLE hscm = OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT);
     SC_HANDLE hs =
       OpenService(hscm, i_serviceName.c_str(),
