@@ -121,10 +121,13 @@ void Engine::checkFocusWindow()
   }
   else
   {
-    Acquire a(&m_log, 1);
-    m_log << _T("GLOBAL FOCUS") << std::endl;
-    m_currentFocusOfThread = &m_globalFocus;
-    setCurrentKeymap(m_globalFocus.m_keymaps.front());
+    if (m_currentFocusOfThread != &m_globalFocus)
+    {
+      Acquire a(&m_log, 1);
+      m_log << _T("GLOBAL FOCUS") << std::endl;
+      m_currentFocusOfThread = &m_globalFocus;
+      setCurrentKeymap(m_globalFocus.m_keymaps.front());
+    }
   }
   m_hwndFocus = NULL;
 }
@@ -1132,7 +1135,10 @@ bool Engine::setFocus(HWND i_hwndFocus, DWORD i_threadId,
   if (i != m_focusOfThreads.end())
   {
     fot = &(*i).second;
-    if (fot->m_hwndFocus == i_hwndFocus)
+    if (fot->m_hwndFocus == i_hwndFocus &&
+	fot->m_isConsole == i_isConsole &&
+	fot->m_className == i_className &&
+	fot->m_titleName == i_titleName)
       return true;
   }
   else
