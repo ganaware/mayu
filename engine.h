@@ -138,6 +138,13 @@ private:
 
   typedef std::list<HWND> WindowsWithAlpha; /// windows for &amp;WindowSetAlpha
 
+  enum InterruptThreadReason
+  {
+    InterruptThreadReason_Terminate,
+    InterruptThreadReason_Pause,
+    InterruptThreadReason_Resume,
+  };
+
 private:
   CriticalSection m_cs;				/// criticalSection
   
@@ -156,7 +163,9 @@ private:
 #if defined(_WINNT)
   HANDLE m_readEvent;				/** reading from mayu device
                                                     has been completed */
-  HANDLE m_terminateThreadEvent;		/// terminate thread event
+  HANDLE m_interruptThreadEvent;		/// interrupt thread event
+  volatile InterruptThreadReason
+  m_interruptThreadReason;			/// interrupt thread reason
   OVERLAPPED m_ol;				/** for async read/write of
 						    mayu device */
   HANDLE m_hookPipe;				/// named pipe for &SetImeString
@@ -271,6 +280,13 @@ private:
   /// set current keymap
   void setCurrentKeymap(const Keymap *i_keymap,
 			bool i_doesAddToHistory = false);
+  /** open mayu device
+      @return true if mayu device successfully is opened
+  */
+  bool open();
+
+  /// close mayu device
+  void close();
 
 private:
   // BEGINING OF FUNCTION DEFINITION
@@ -468,6 +484,12 @@ public:
   void start();
   ///
   void stop();
+
+  /// pause keyboard handler thread and close device
+  bool pause();
+  
+  /// resume keyboard handler thread and re-open device
+  bool resume();
 
   /// logging mode
   void enableLogMode(bool i_isLogMode = true) { m_isLogMode = i_isLogMode; }

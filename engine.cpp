@@ -696,7 +696,7 @@ void Engine::keyboardHandler()
       if (GetLastError() != ERROR_IO_PENDING)
 	continue;
       
-      HANDLE handles[] = { m_readEvent, m_terminateThreadEvent };
+      HANDLE handles[] = { m_readEvent, m_interruptThreadEvent };
       switch (WaitForMultipleObjects(NUMBER_OF(handles), &handles[0],
 				     FALSE, INFINITE))
       {
@@ -704,9 +704,43 @@ void Engine::keyboardHandler()
 	  if (!GetOverlappedResult(m_device, &m_ol, &len, FALSE))
 	    continue;
 	  break;
-	case WAIT_OBJECT_0 + 1:			// m_terminateThreadEvent
+	  
+	case WAIT_OBJECT_0 + 1:			// m_interruptThreadEvent
 	  CancelIo(m_device);
-	  goto break_while;
+	  switch (m_interruptThreadReason) {
+	    default: {
+	      ASSERT( false );
+	      Acquire a(&m_log, 0);
+	      m_log << _T("internal error: m_interruptThreadReason == ")
+		    << m_interruptThreadReason << std::endl;
+	      break;
+	    }
+	      
+	    case InterruptThreadReason_Terminate:
+	      goto break_while;
+	      
+	    case InterruptThreadReason_Pause: {
+	      CHECK_TRUE( SetEvent(m_threadEvent) );
+	      while (WaitForMultipleObjects(1, &m_interruptThreadEvent,
+					    FALSE, INFINITE) != WAIT_OBJECT_0)
+		;
+	      switch (m_interruptThreadReason) {
+		case InterruptThreadReason_Terminate:
+		  goto break_while;
+
+		case InterruptThreadReason_Resume:
+		  break;
+
+		default:
+		  ASSERT( false );
+		  break;
+	      }
+	      CHECK_TRUE( SetEvent(m_threadEvent) );
+	      break;
+	    }
+	  }
+	  break;
+	  
 	default:
 	  ASSERT( false );
 	  continue;
@@ -907,13 +941,13 @@ void Engine::keyboardHandler()
 Engine::Engine(tomsgstream &i_log)
   : m_hwndAssocWindow(NULL),
     m_setting(NULL),
-    m_device(NULL),
+    m_device(INVALID_HANDLE_VALUE),
     m_didMayuStartDevice(false),
     m_threadEvent(NULL),
     m_mayudVersion(_T("unknown")),
 #if defined(_WINNT)
     m_readEvent(NULL),
-    m_terminateThreadEvent(NULL),
+    m_interruptThreadEvent(NULL),
 #endif // _WINNT
     m_doForceTerminate(false),
     m_isLogMode(false),
@@ -940,45 +974,11 @@ Engine::Engine(tomsgstream &i_log)
     m_currentLock.dontcare(static_cast<Modifier::Type>(i));
   for (int i = Modifier::Type_Lock0; i <= Modifier::Type_Lock9; ++ i)
     m_currentLock.release(static_cast<Modifier::Type>(i));
-  
-  // open mayu m_device
-#if defined(_WINNT)
-  m_device = CreateFile(MAYU_DEVICE_FILE_NAME, GENERIC_READ | GENERIC_WRITE,
-			0, NULL, OPEN_EXISTING,
-			FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, NULL);
-#elif defined(_WIN95)
-  m_device = CreateFile(MAYU_DEVICE_FILE_NAME, 0,
-			0, NULL, CREATE_NEW, FILE_FLAG_DELETE_ON_CLOSE, NULL);
-#else
-#  error
-#endif
 
-  if (m_device == INVALID_HANDLE_VALUE)
-  {
-#if defined(_WINNT)
-    // start mayud
-    SC_HANDLE hscm = OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT);
-    if (hscm)
-    {
-      SC_HANDLE hs = OpenService(hscm, MAYU_DRIVER_NAME, SERVICE_START);
-      if (hs)
-      {
-	StartService(hs, 0, NULL);
-	CloseServiceHandle(hs);
-	m_didMayuStartDevice = true;
-      }
-      CloseServiceHandle(hscm);
-    }
-    
-    // open mayu m_device
-    m_device = CreateFile(MAYU_DEVICE_FILE_NAME, GENERIC_READ | GENERIC_WRITE,
-			  0, NULL, OPEN_EXISTING,
-			  FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, NULL);
-    if (m_device == INVALID_HANDLE_VALUE)
-#endif // _WINNT
+  if (!open()) {
       throw ErrorMessage() << loadString(IDS_driverNotInstalled);
   }
-
+  
   {
     TCHAR versionBuf[256];
     DWORD length = 0;
@@ -993,11 +993,65 @@ Engine::Engine(tomsgstream &i_log)
   CHECK_TRUE( m_eSync = CreateEvent(NULL, FALSE, FALSE, NULL) );
 #if defined(_WINNT)
   // create named pipe for &SetImeString
-  m_hookPipe = CreateNamedPipe(HOOK_PIPE_NAME, PIPE_ACCESS_OUTBOUND,
+  m_hookPipe = CreateNamedPipe(addSessionId(HOOK_PIPE_NAME).c_str(),
+			       PIPE_ACCESS_OUTBOUND,
 			       PIPE_TYPE_BYTE, 1,
 			       0, 0, 0, NULL);
 #endif // _WINNT
   StrExprArg::setEngine(this);
+}
+
+
+// open mayu device
+bool Engine::open()
+{
+  // open mayu m_device
+#if defined(_WINNT)
+  m_device = CreateFile(MAYU_DEVICE_FILE_NAME, GENERIC_READ | GENERIC_WRITE,
+			0, NULL, OPEN_EXISTING,
+			FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, NULL);
+#elif defined(_WIN95)
+  m_device = CreateFile(MAYU_DEVICE_FILE_NAME, 0,
+			0, NULL, CREATE_NEW, FILE_FLAG_DELETE_ON_CLOSE, NULL);
+#else
+#  error
+#endif
+
+  if (m_device != INVALID_HANDLE_VALUE) {
+    return true;
+  }
+
+#if defined(_WINNT)
+  // start mayud
+  SC_HANDLE hscm = OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT);
+  if (hscm)
+  {
+    SC_HANDLE hs = OpenService(hscm, MAYU_DRIVER_NAME, SERVICE_START);
+    if (hs)
+    {
+      StartService(hs, 0, NULL);
+      CloseServiceHandle(hs);
+      m_didMayuStartDevice = true;
+    }
+    CloseServiceHandle(hscm);
+  }
+  
+  // open mayu m_device
+  m_device = CreateFile(MAYU_DEVICE_FILE_NAME, GENERIC_READ | GENERIC_WRITE,
+			0, NULL, OPEN_EXISTING,
+			FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, NULL);
+#endif // _WINNT
+  return (m_device != INVALID_HANDLE_VALUE);
+}
+
+
+// close mayu device
+void Engine::close()
+{
+  if (m_device != INVALID_HANDLE_VALUE) {
+    CHECK_TRUE( CloseHandle(m_device) );
+  }
+  m_device = INVALID_HANDLE_VALUE;
 }
 
 
@@ -1008,7 +1062,7 @@ void Engine::start()
   
 #if defined(_WINNT)
   CHECK_TRUE( m_readEvent = CreateEvent(NULL, FALSE, FALSE, NULL) );
-  CHECK_TRUE( m_terminateThreadEvent = CreateEvent(NULL, FALSE, FALSE, NULL) );
+  CHECK_TRUE( m_interruptThreadEvent = CreateEvent(NULL, FALSE, FALSE, NULL) );
   m_ol.Offset = 0;
   m_ol.OffsetHigh = 0;
   m_ol.hEvent = m_readEvent;
@@ -1028,7 +1082,8 @@ void Engine::stop()
     do
     {
 #if defined(_WINNT)
-      SetEvent(m_terminateThreadEvent);
+      m_interruptThreadReason = InterruptThreadReason_Terminate;
+      SetEvent(m_interruptThreadEvent);
 #elif defined(_WIN95)
       DeviceIoControl(m_device, 3, NULL, 0, NULL, 0, NULL, NULL);
 #endif
@@ -1061,10 +1116,41 @@ void Engine::stop()
     
     CHECK_TRUE( CloseHandle(m_readEvent) );
     m_readEvent = NULL;
-    CHECK_TRUE( CloseHandle(m_terminateThreadEvent) );
-    m_terminateThreadEvent = NULL;
+    CHECK_TRUE( CloseHandle(m_interruptThreadEvent) );
+    m_interruptThreadEvent = NULL;
 #endif // _WINNT
   }
+}
+
+bool Engine::pause()
+{
+#if defined(_WINNT)
+  if (m_device != INVALID_HANDLE_VALUE) {
+    do {
+      m_interruptThreadReason = InterruptThreadReason_Pause;
+      SetEvent(m_interruptThreadEvent);
+    } while (WaitForSingleObject(m_threadEvent, 100) != WAIT_OBJECT_0);
+    close();
+  }
+#endif // _WINNT
+  return true;
+}
+
+
+bool Engine::resume()
+{
+#if defined(_WINNT)
+  if (m_device == INVALID_HANDLE_VALUE) {
+    if (!open()) {
+      return false;				// FIXME
+    }
+    do {
+      m_interruptThreadReason = InterruptThreadReason_Resume;
+      SetEvent(m_interruptThreadEvent);
+    } while (WaitForSingleObject(m_threadEvent, 100) != WAIT_OBJECT_0);
+  }
+#endif // _WINNT
+  return true;
 }
 
 
@@ -1074,7 +1160,7 @@ Engine::~Engine()
   CHECK_TRUE( CloseHandle(m_eSync) );
   
   // close m_device
-  CHECK_TRUE( CloseHandle(m_device) );
+  close();
 #if defined(_WINNT)
   // destroy named pipe for &SetImeString
   DisconnectNamedPipe(m_hookPipe);

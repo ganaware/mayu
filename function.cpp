@@ -1652,7 +1652,8 @@ void Engine::funcWindowIdentify(FunctionParam *i_param)
   }
   if (!ok)
   {
-    UINT WM_MAYU_MESSAGE = RegisterWindowMessage(WM_MAYU_MESSAGE_NAME);
+    UINT WM_MAYU_MESSAGE = RegisterWindowMessage(
+		addSessionId(WM_MAYU_MESSAGE_NAME).c_str());
     CHECK_TRUE( PostMessage(i_param->m_hwnd, WM_MAYU_MESSAGE,
 			    MayuMessage_notifyName, 0) );
   }
@@ -1877,7 +1878,8 @@ void Engine::funcRecenter(FunctionParam *i_param)
     return;
   if (m_hwndFocus)
   {
-    UINT WM_MAYU_MESSAGE = RegisterWindowMessage(WM_MAYU_MESSAGE_NAME);
+    UINT WM_MAYU_MESSAGE = RegisterWindowMessage(
+		addSessionId(WM_MAYU_MESSAGE_NAME).c_str());
     PostMessage(m_hwndFocus, WM_MAYU_MESSAGE, MayuMessage_funcRecenter, 0);
   }
 }
@@ -1889,7 +1891,8 @@ void Engine::funcSetImeStatus(FunctionParam *i_param, ToggleType i_toggle)
     return;
   if (m_hwndFocus)
   {
-    UINT WM_MAYU_MESSAGE = RegisterWindowMessage(WM_MAYU_MESSAGE_NAME);
+    UINT WM_MAYU_MESSAGE = RegisterWindowMessage(
+		addSessionId(WM_MAYU_MESSAGE_NAME).c_str());
     int status = -1;
     switch (i_toggle)
     {
@@ -1915,7 +1918,8 @@ void Engine::funcSetImeString(FunctionParam *i_param, const StrExprArg &i_data)
     return;
   if (m_hwndFocus)
   {
-    UINT WM_MAYU_MESSAGE = RegisterWindowMessage(WM_MAYU_MESSAGE_NAME);
+    UINT WM_MAYU_MESSAGE = RegisterWindowMessage(
+		addSessionId(WM_MAYU_MESSAGE_NAME).c_str());
     PostMessage(m_hwndFocus, WM_MAYU_MESSAGE, MayuMessage_funcSetImeString, i_data.eval().size() * sizeof(_TCHAR));
 
     DWORD len = 0;

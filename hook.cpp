@@ -70,7 +70,8 @@ BOOL WINAPI DllMain(HINSTANCE i_hInstDLL, DWORD i_fdwReason,
 	return FALSE;
       g.m_hInstDLL = i_hInstDLL;
       _tsetlocale(LC_ALL, _T(""));
-      g.m_WM_MAYU_MESSAGE = RegisterWindowMessage(WM_MAYU_MESSAGE_NAME);
+      g.m_WM_MAYU_MESSAGE = RegisterWindowMessage(
+	addSessionId(WM_MAYU_MESSAGE_NAME).c_str());
       break;
     }
     case DLL_THREAD_ATTACH:
@@ -93,7 +94,8 @@ BOOL WINAPI DllMain(HINSTANCE i_hInstDLL, DWORD i_fdwReason,
 static bool mapHookData()
 {
   g.m_hHookData = CreateFileMapping((HANDLE)0xffffffff, NULL, PAGE_READWRITE,
-				    0, sizeof(HookData), HOOK_DATA_NAME);
+				    0, sizeof(HookData),
+				    addSessionId(HOOK_DATA_NAME).c_str());
   if (!g.m_hHookData)
     return false;
   
@@ -376,7 +378,7 @@ static void funcSetImeString(HWND i_hwnd, int i_size)
   DWORD error;
   DWORD denom = 1;
   HANDLE hPipe
-    = CreateFile(HOOK_PIPE_NAME, GENERIC_READ,
+    = CreateFile(addSessionId(HOOK_PIPE_NAME).c_str(), GENERIC_READ,
 		 FILE_SHARE_READ, (SECURITY_ATTRIBUTES *)NULL,
 		 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, (HANDLE)NULL);
   error = ReadFile(hPipe, buf, i_size, &len, NULL);

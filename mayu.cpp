@@ -4,7 +4,6 @@
 
 #define APSTUDIO_INVOKED
 
-
 #include "misc.h"
 #include "compiler_specific_func.h"
 #include "dlginvestigate.h"
@@ -237,6 +236,48 @@ private:
         case WM_QUERYENDSESSION:
 	  PostQuitMessage(0);
 	  return TRUE;
+
+#ifndef WM_WTSSESSION_CHANGE			// WinUser.h
+#  define WM_WTSSESSION_CHANGE            0x02B1
+#endif
+	case WM_WTSSESSION_CHANGE:
+	{
+	  const char *m = "";
+	  switch (i_wParam)
+	  {
+#ifndef WTS_CONSOLE_CONNECT			// WinUser.h
+#  define WTS_CONSOLE_CONNECT                0x1
+#  define WTS_CONSOLE_DISCONNECT             0x2
+#  define WTS_REMOTE_CONNECT                 0x3
+#  define WTS_REMOTE_DISCONNECT              0x4
+#  define WTS_SESSION_LOGON                  0x5
+#  define WTS_SESSION_LOGOFF                 0x6
+#  define WTS_SESSION_LOCK                   0x7
+#  define WTS_SESSION_UNLOCK                 0x8
+#endif
+	    case WTS_CONSOLE_CONNECT:
+	      m = "WTS_CONSOLE_CONNECT";
+	      if (!This->m_engine.resume()) {
+		PostQuitMessage(0);
+	      }
+	      break;
+	    case WTS_CONSOLE_DISCONNECT:
+	      m = "WTS_CONSOLE_DISCONNECT";
+	      This->m_engine.pause();
+	      break;
+	    case WTS_REMOTE_CONNECT: m = "WTS_REMOTE_CONNECT"; break;
+	    case WTS_REMOTE_DISCONNECT: m = "WTS_REMOTE_DISCONNECT"; break;
+	    case WTS_SESSION_LOGON:  m = "WTS_SESSION_LOGON"; break;
+	    case WTS_SESSION_LOGOFF: m = "WTS_SESSION_LOGOFF"; break;
+	    case WTS_SESSION_LOCK: m = "WTS_SESSION_LOCK"; break;
+	    case WTS_SESSION_UNLOCK: m = "WTS_SESSION_UNLOCK"; break;
+	      //case WTS_SESSION_REMOTE_CONTROL: m = "WTS_SESSION_REMOTE_CONTROL"; break;
+	  }
+	  This->m_log << _T("WM_WTSESSION_CHANGE(")
+		      << i_wParam << ", " << i_lParam << "): "
+		      << m << std::endl;
+	  return TRUE;
+	}
 	case WM_APP_msgStreamNotify:
 	{
 	  tomsgstream::StreamBuf *log =
@@ -832,12 +873,24 @@ int WINAPI _tWinMain(HINSTANCE i_hInstance, HINSTANCE /* i_hPrevInstance */,
   convertRegistry();
   
   // is another mayu running ?
-  HANDLE mutex = CreateMutex((SECURITY_ATTRIBUTES *)NULL,
-			     TRUE, MUTEX_MAYU_EXCLUSIVE_RUNNING);
+  HANDLE mutex = CreateMutex(
+      (SECURITY_ATTRIBUTES *)NULL, TRUE,
+      addSessionId(MUTEX_MAYU_EXCLUSIVE_RUNNING).c_str());
   if (GetLastError() == ERROR_ALREADY_EXISTS)
   {
     // another mayu already running
     tstring text = loadString(IDS_mayuAlreadyExists);
+    tstring title = loadString(IDS_mayu);
+    MessageBox((HWND)NULL, text.c_str(), title.c_str(), MB_OK | MB_ICONSTOP);
+    return 1;
+  }
+
+  // check remote desktop
+  DWORD sessionId;
+  if (!ProcessIdToSessionId(GetCurrentProcessId(), &sessionId) ||
+      WTSGetActiveConsoleSessionId() != sessionId)
+  {
+    tstring text = loadString(IDS_executedInRemoteDesktop);
     tstring title = loadString(IDS_mayu);
     MessageBox((HWND)NULL, text.c_str(), title.c_str(), MB_OK | MB_ICONSTOP);
     return 1;

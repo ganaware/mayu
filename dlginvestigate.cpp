@@ -26,7 +26,8 @@ public:
   ///
   DlgInvestigate(HWND i_hwnd)
     : m_hwnd(i_hwnd),
-      m_WM_MAYU_MESSAGE(RegisterWindowMessage(WM_MAYU_MESSAGE_NAME))
+      m_WM_MAYU_MESSAGE(RegisterWindowMessage(
+			    addSessionId(WM_MAYU_MESSAGE_NAME).c_str()))
   {
     m_data.m_engine = NULL;
     m_data.m_hwndLog = NULL;

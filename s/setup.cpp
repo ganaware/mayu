@@ -527,7 +527,9 @@ int WINAPI _tWinMain(HINSTANCE i_hInstance, HINSTANCE /* hPrevInstance */,
   else
   {
     // is mayu running ?
-    HANDLE mutex = CreateMutex(NULL, TRUE, MUTEX_MAYU_EXCLUSIVE_RUNNING);
+    HANDLE mutex = CreateMutex(
+      (SECURITY_ATTRIBUTES *)NULL, TRUE,
+      addSessionId(MUTEX_MAYU_EXCLUSIVE_RUNNING).c_str());
     if (GetLastError() == ERROR_ALREADY_EXISTS) // mayu is running
       message(IDS_mayuRunning, MB_OK | MB_ICONSTOP);
     else if (__argc == 3 && _tcsicmp(__targv[1], _T("-u")) == 0)
