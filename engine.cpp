@@ -73,6 +73,7 @@ void Engine::checkFocusWindow()
 	  else
 	    setCurrentKeymap(*m_currentFocusOfThread->m_keymaps.begin());
 	  m_hwndFocus = m_currentFocusOfThread->m_hwndFocus;
+	  checkShow(m_hwndFocus);
 	
 	  Acquire a(&m_log, 1);
 	  m_log << _T("FocusChanged") << std::endl;
@@ -1135,6 +1136,68 @@ bool Engine::setSetting(Setting *i_setting)
 }
 
 
+void Engine::checkShow(HWND i_hwnd)
+{
+  // update show style of window
+  // this update should be done in hook DLL, but to
+  // avoid update-loss for some applications(such as
+  // cmd.exe), we update here.
+  bool isMaximized = false;
+  bool isMinimized = false;
+  bool isMDIMaximized = false;
+  bool isMDIMinimized = false;
+  while (i_hwnd)
+  {
+    LONG exStyle = GetWindowLong(i_hwnd, GWL_EXSTYLE);
+    if (exStyle & WS_EX_MDICHILD)
+    {
+      WINDOWPLACEMENT placement;
+      placement.length = sizeof(WINDOWPLACEMENT);
+      if (GetWindowPlacement(i_hwnd, &placement))
+      {
+	 switch (placement.showCmd)
+	 {
+	   case SW_SHOWMAXIMIZED:
+	     isMDIMaximized = true;
+	     break;
+	   case SW_SHOWMINIMIZED:
+	     isMDIMinimized = true;
+	     break;
+	   case SW_SHOWNORMAL:
+	   default:
+	     break;
+	 }
+      }
+    }
+
+    LONG style = GetWindowLong(i_hwnd, GWL_STYLE);
+    if ((style & WS_CHILD) == 0)
+    {
+      WINDOWPLACEMENT placement;
+      placement.length = sizeof(WINDOWPLACEMENT);
+      if (GetWindowPlacement(i_hwnd, &placement))
+      {
+	 switch (placement.showCmd)
+	 {
+	   case SW_SHOWMAXIMIZED:
+	     isMaximized = true;
+	     break;
+	   case SW_SHOWMINIMIZED:
+	     isMinimized = true;
+	     break;
+	   case SW_SHOWNORMAL:
+	   default:
+	     break;
+	 }
+      }
+    }  
+    i_hwnd = GetParent(i_hwnd);
+  }
+  setShow(isMDIMaximized, isMDIMinimized, true);
+  setShow(isMaximized, isMinimized, false);
+}
+
+
 // focus
 bool Engine::setFocus(HWND i_hwndFocus, DWORD i_threadId, 
 		      const tstringi &i_className, const tstringi &i_titleName,
@@ -1193,6 +1256,7 @@ bool Engine::setFocus(HWND i_hwndFocus, DWORD i_threadId,
   }
   else
     fot->m_keymaps.clear();
+  checkShow(i_hwndFocus);
   return true;
 }
 

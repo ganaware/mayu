@@ -238,60 +238,6 @@ static void notifyName(HWND i_hwnd, Notify::Type i_type = Notify::Type_name)
   tcslcpy(nfc->m_className, className.c_str(), NUMBER_OF(nfc->m_className));
   tcslcpy(nfc->m_titleName, titleName.c_str(), NUMBER_OF(nfc->m_titleName));
 
-  NotifyShow::Show show = NotifyShow::Show_Normal;
-  NotifyShow::Show showMDI = NotifyShow::Show_Normal;
-  while (i_hwnd)
-  {
-    LONG exStyle = GetWindowLong(i_hwnd, GWL_EXSTYLE);
-    if (exStyle & WS_EX_MDICHILD)
-    {
-      WINDOWPLACEMENT placement;
-      placement.length = sizeof(WINDOWPLACEMENT);
-      if (GetWindowPlacement(i_hwnd, &placement))
-      {
-	 switch (placement.showCmd)
-	 {
-	   case SW_SHOWMAXIMIZED:
-	     showMDI = NotifyShow::Show_Maximized;
-	     break;
-	   case SW_SHOWMINIMIZED:
-	     showMDI = NotifyShow::Show_Minimized;
-	     break;
-	   case SW_SHOWNORMAL:
-	   default:
-	     showMDI = NotifyShow::Show_Normal;
-	     break;
-	 }
-      }
-    }
-
-    LONG style = GetWindowLong(i_hwnd, GWL_STYLE);
-    if ((style & WS_CHILD) == 0)
-    {
-      WINDOWPLACEMENT placement;
-      placement.length = sizeof(WINDOWPLACEMENT);
-      if (GetWindowPlacement(i_hwnd, &placement))
-      {
-	 switch (placement.showCmd)
-	 {
-	   case SW_SHOWMAXIMIZED:
-	     show = NotifyShow::Show_Maximized;
-	     break;
-	   case SW_SHOWMINIMIZED:
-	     show = NotifyShow::Show_Minimized;
-	     break;
-	   case SW_SHOWNORMAL:
-	   default:
-	     show = NotifyShow::Show_Normal;
-	     break;
-	 }
-      }
-    }  
-    i_hwnd = GetParent(i_hwnd);
-  }
-  notifyShow(showMDI, true);
-  notifyShow(show, false);
-
   notify(nfc, sizeof(*nfc));
   delete nfc;
 }

@@ -501,6 +501,7 @@ public:
 		    bool i_isImeCompToggled);
 
   /// show
+  void checkShow(HWND i_hwnd);
   bool setShow(bool i_isMaximized, bool i_isMinimized, bool i_isMDI);
 
   /// sync
