@@ -318,7 +318,7 @@ bool Keymap::doesSameWindow(const tstringi i_className,
 // adjust modifier
 void Keymap::adjustModifier(Keyboard &i_keyboard)
 {
-  for (int i = 0; i < Modifier::Type_end; ++ i)
+  for (size_t i = 0; i < NUMBER_OF(m_modAssignments); ++ i)
   {
     ModAssignments mos;
     if (m_parentKeymap)
@@ -367,7 +367,7 @@ void Keymap::adjustModifier(Keyboard &i_keyboard)
 	    if ((*j).m_key == ma.m_key)
 	    {
 	      mos.erase(j);
-	      goto break_for;
+	      break;
 	    }
 	  break;
 	}
