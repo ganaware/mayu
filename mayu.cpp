@@ -27,6 +27,7 @@
 #include <process.h>
 #include <time.h>
 #include <commctrl.h>
+#include <wtsapi32.h>
 
 
 ///
@@ -60,6 +61,8 @@ class Mayu
   bool m_isSettingDialogOpened;			/// is setting dialog opened ?
   
   Engine m_engine;				/// engine
+
+  bool m_usingSN;		   /// using WTSRegisterSessionNotification() ?
 
   enum
   { 
@@ -452,6 +455,14 @@ private:
 	  }
 	  return 0;
 	}
+
+	case WM_DESTROY:
+	  if (This->m_usingSN)
+	  {
+	    WTSUnRegisterSessionNotification(i_hwnd);
+	    This->m_usingSN = false;
+	  }
+	  return 0;
 	
 	default:
 	  if (i_message == This->m_WM_TaskbarRestart)
@@ -555,6 +566,8 @@ public:
     
     // set window handle of tasktray to hooks
     g_hookData->m_hwndTaskTray = m_hwndTaskTray;
+    m_usingSN = WTSRegisterSessionNotification(m_hwndTaskTray,
+					       NOTIFY_FOR_THIS_SESSION);
     
     m_hwndLog =
       CreateDialogParam(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_log), NULL,
