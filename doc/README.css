@@ -208,6 +208,12 @@ p.noindent {
 .manual .function .h3 em {
   font-weight:normal;
 }
+.manual .d3 blockquote {
+  margin-left:2em;
+  margin-right:2em;
+  padding:1em;
+  background-color: #ddd;
+}
 .manual .h4 {
   font-weight:bold;
 }
