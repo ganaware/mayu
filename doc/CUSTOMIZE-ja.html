@@ -1086,6 +1086,14 @@
 			  <p><a href="#keymap2"><code>keymap2</code></a> を利用しているときには、デフォルトキーが <a href="#function_Undefined"><code>&amp;Undefined</code></a> になっているので、モディファイヤを入力した時にもベルが鳴るはずですが、このように <code>true</code> を指定しておけば鳴らなくなります。(<a href="#mod"><code>mod</code></a> を参照)</p>
 			</div>
 			
+		    <dt class="h3"><a name="function_SetImeStatus"><code>&amp;SetImeStatus(<em>status</em>)</code></a>
+			
+		    <dd class="d3">
+			<div>
+			  <p>IMEのON/OFFを切り替えます。<code><em>status</em></code>は<code>on</code>, <code>off</code>, <code>toggle</code>のいずれかで、省略時は<code>toggle</code>として扱われます。</p>
+			  <p>MSーIME2002/2003と一部のアプリケーション(例えばMS Word2002/2003)の組み合わせでは「詳細なテキストサービス」を無効にしない限り機能しません。</p>
+			</div>
+			
 		    <dt class="h3"><a name="function_ShellExecute"><code>&amp;ShellExecute(<em>operation</em>, <em>file</em>, <em>parameters</em>, <em>directory</em>, <em>show_command</em>)</code></a>
 			
 		    <dd class="d3">
