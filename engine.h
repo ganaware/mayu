@@ -148,8 +148,12 @@ private:
   HANDLE m_device;				/// mayu device
   bool m_didMayuStartDevice;			/** Did the mayu start the
                                                     mayu-device ? */
-  HANDLE m_eEvent;				/// event for engine thread
+  HANDLE m_threadEvent;				/** 1. thread has been started
+						    2. thread is about to end*/
 #if defined(_WINNT)
+  HANDLE m_readEvent;				/** reading from mayu device
+                                                    has been completed */
+  HANDLE m_terminateThreadEvent;		/// terminate thread event
   OVERLAPPED m_ol;				/** for async read/write of
 						    mayu device */
 #endif // _WINNT

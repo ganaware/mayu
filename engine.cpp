@@ -645,13 +645,8 @@ void Engine::keyboardHandler(void *i_this)
 }
 void Engine::keyboardHandler()
 {
-#if defined(_WINNT)
-  m_ol.Offset = 0;
-  m_ol.OffsetHigh = 0;
-  m_ol.hEvent = m_eEvent;
-#endif // _WINNT
   // initialize ok
-  CHECK_TRUE( SetEvent(m_eEvent) );
+  CHECK_TRUE( SetEvent(m_threadEvent) );
     
   // loop
   Key key;
@@ -663,20 +658,22 @@ void Engine::keyboardHandler()
 #if defined(_WINNT)
     if (!ReadFile(m_device, &kid, sizeof(kid), &len, &m_ol))
     {
-      switch (GetLastError())
+      if (GetLastError() != ERROR_IO_PENDING)
+	continue;
+      
+      HANDLE handles[] = { m_readEvent, m_terminateThreadEvent };
+      switch (WaitForMultipleObjects(NUMBER_OF(handles), &handles[0],
+				     FALSE, INFINITE))
       {
-        case ERROR_IO_PENDING:
-	  // m_eEvent is signaled when either key input or Engine::stop
-	  if (WaitForSingleObject(m_eEvent, INFINITE) == WAIT_OBJECT_0)
-	    if (m_doForceTerminate)
-	    {
-	      CancelIo(m_device);
-	      continue;
-	    }
+	case WAIT_OBJECT_0:			// m_readEvent
 	  if (!GetOverlappedResult(m_device, &m_ol, &len, FALSE))
 	    continue;
 	  break;
-        default:
+	case WAIT_OBJECT_0 + 1:			// m_terminateThreadEvent
+	  CancelIo(m_device);
+	  goto break_while;
+	default:
+	  ASSERT( false );
 	  continue;
       }
     }
@@ -866,7 +863,8 @@ void Engine::keyboardHandler()
     key.initialize();
     updateLastPressedKey(isPhysicallyPressed ? c.m_mkey.m_key : NULL);
   }
-  CHECK_TRUE( SetEvent(m_eEvent) );
+  break_while:
+  CHECK_TRUE( SetEvent(m_threadEvent) );
 }
   
 
@@ -875,7 +873,11 @@ Engine::Engine(tomsgstream &i_log)
     m_setting(NULL),
     m_device(NULL),
     m_didMayuStartDevice(false),
-    m_eEvent(NULL),
+    m_threadEvent(NULL),
+#if defined(_WINNT)
+    m_readEvent(NULL),
+    m_terminateThreadEvent(NULL),
+#endif // _WINNT
     m_doForceTerminate(false),
     m_isLogMode(false),
     m_isEnabled(true),
@@ -948,22 +950,31 @@ Engine::Engine(tomsgstream &i_log)
 // start keyboard handler thread
 void Engine::start()
 {
-  CHECK_TRUE( m_eEvent = CreateEvent(NULL, FALSE, FALSE, NULL) );
+  CHECK_TRUE( m_threadEvent = CreateEvent(NULL, FALSE, FALSE, NULL) );
+  
+#if defined(_WINNT)
+  CHECK_TRUE( m_readEvent = CreateEvent(NULL, FALSE, FALSE, NULL) );
+  CHECK_TRUE( m_terminateThreadEvent = CreateEvent(NULL, FALSE, FALSE, NULL) );
+  m_ol.Offset = 0;
+  m_ol.OffsetHigh = 0;
+  m_ol.hEvent = m_readEvent;
+#endif // _WINNT
+  
   CHECK_TRUE( 0 <= _beginthread(keyboardHandler, 0, this) );
-  CHECK( WAIT_OBJECT_0 ==, WaitForSingleObject(m_eEvent, INFINITE) );
+  CHECK( WAIT_OBJECT_0 ==, WaitForSingleObject(m_threadEvent, INFINITE) );
 }
 
 
 // stop keyboard handler thread
 void Engine::stop()
 {
-  if (m_eEvent)
+  if (m_threadEvent)
   {
     m_doForceTerminate = true;
     do
     {
 #if defined(_WINNT)
-      SetEvent(m_eEvent);
+      SetEvent(m_terminateThreadEvent);
 #elif defined(_WIN95)
       DeviceIoControl(m_device, 3, NULL, 0, NULL, 0, NULL, NULL);
 #endif
@@ -972,9 +983,9 @@ void Engine::stop()
       //                &buf, sizeof(buf), &buf, sizeof(buf), &buf, NULL);
       
       // wait for message handler thread terminate
-    } while (WaitForSingleObject(m_eEvent, 100) != WAIT_OBJECT_0);
-    CHECK_TRUE( CloseHandle(m_eEvent) );
-    m_eEvent = NULL;
+    } while (WaitForSingleObject(m_threadEvent, 100) != WAIT_OBJECT_0);
+    CHECK_TRUE( CloseHandle(m_threadEvent) );
+    m_threadEvent = NULL;
 
 #if defined(_WINNT)
     // stop mayud
@@ -993,6 +1004,11 @@ void Engine::stop()
 	CloseServiceHandle(hscm);
       }
     }
+    
+    CHECK_TRUE( CloseHandle(m_readEvent) );
+    m_readEvent = NULL;
+    CHECK_TRUE( CloseHandle(m_terminateThreadEvent) );
+    m_terminateThreadEvent = NULL;
 #endif // _WINNT
   }
 }
