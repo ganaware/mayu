@@ -365,7 +365,7 @@ LRESULT CALLBACK getMessageProc(int i_nCode, WPARAM i_wParam, LPARAM i_lParam)
       notifyLockState();
       break;
     default:
-      if (msg.message == g.m_WM_MAYU_MESSAGE)
+      if (i_wParam == PM_REMOVE && msg.message == g.m_WM_MAYU_MESSAGE)
       {
 	switch (msg.wParam)
 	{
