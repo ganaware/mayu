@@ -289,7 +289,7 @@ void editInsertTextAtLast(HWND i_hwnd, const tstring &i_text,
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Windows2000 specific API
+// Windows2000/XP specific API
 
 
 // initialize layerd window
@@ -297,21 +297,23 @@ static BOOL WINAPI initalizeLayerdWindow(
   HWND i_hwnd, COLORREF i_crKey, BYTE i_bAlpha, DWORD i_dwFlags)
 {
   HMODULE hModule = GetModuleHandle(_T("user32.dll"));
-  if (!hModule)
+  if (!hModule) {
     return FALSE;
-  setLayeredWindowAttributes =
-    reinterpret_cast<BOOL (WINAPI *)(HWND, COLORREF, BYTE, DWORD)>(
+  }
+  SetLayeredWindowAttributes_t proc = 
+    reinterpret_cast<SetLayeredWindowAttributes_t>(
       GetProcAddress(hModule, "SetLayeredWindowAttributes"));
-  if (setLayeredWindowAttributes)
+  if (setLayeredWindowAttributes) {
+    setLayeredWindowAttributes = proc;
     return setLayeredWindowAttributes(i_hwnd, i_crKey, i_bAlpha, i_dwFlags);
-  else
+  } else {
     return FALSE;
+  }
 }
 
 
 // SetLayeredWindowAttributes API
-BOOL (WINAPI *setLayeredWindowAttributes)
-  (HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags)
+SetLayeredWindowAttributes_t setLayeredWindowAttributes
   = initalizeLayerdWindow;
 
 
@@ -414,6 +416,77 @@ static BOOL WINAPI initializeEnumDisplayMonitors(
 BOOL (WINAPI *enumDisplayMonitors)
     (HDC hdc, LPRECT lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData)
   = initializeEnumDisplayMonitors;
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Windows2000/XP specific API
+
+
+static BOOL WINAPI
+initializeWTSRegisterSessionNotification(HWND hWnd, DWORD dwFlags)
+{
+  HMODULE hModule = GetModuleHandle(_T("wtsapi32.dll"));
+  if (!hModule) {
+    return FALSE;
+  }
+  WTSRegisterSessionNotification_t proc = 
+    reinterpret_cast<WTSRegisterSessionNotification_t>(
+      GetProcAddress(hModule, "WTSRegisterSessionNotification"));
+  if (proc) {
+    wtsRegisterSessionNotification = proc;
+    return wtsRegisterSessionNotification(hWnd, dwFlags);
+  } else {
+    return 0;
+  }
+}
+
+// WTSRegisterSessionNotification API
+WTSRegisterSessionNotification_t wtsRegisterSessionNotification
+  = initializeWTSRegisterSessionNotification;
+
+
+static BOOL WINAPI initializeWTSUnRegisterSessionNotification(HWND hWnd)
+{
+  HMODULE hModule = GetModuleHandle(_T("wtsapi32.dll"));
+  if (!hModule) {
+    return FALSE;
+  }
+  WTSUnRegisterSessionNotification_t proc = 
+    reinterpret_cast<WTSUnRegisterSessionNotification_t>(
+      GetProcAddress(hModule, "WTSUnRegisterSessionNotification"));
+  if (proc) {
+    wtsUnRegisterSessionNotification = proc;
+    return wtsUnRegisterSessionNotification(hWnd);
+  } else {
+    return 0;
+  }
+}
+
+// WTSUnRegisterSessionNotification API
+WTSUnRegisterSessionNotification_t wtsUnRegisterSessionNotification
+  = initializeWTSUnRegisterSessionNotification;
+
+
+static DWORD WINAPI initializeWTSGetActiveConsoleSessionId(void)
+{
+  HMODULE hModule = GetModuleHandle(_T("kernel32.dll"));
+  if (!hModule) {
+    return FALSE;
+  }
+  WTSGetActiveConsoleSessionId_t proc = 
+    reinterpret_cast<WTSGetActiveConsoleSessionId_t>(
+      GetProcAddress(hModule, "WTSGetActiveConsoleSessionId"));
+  if (proc) {
+    wtsGetActiveConsoleSessionId = proc;
+    return wtsGetActiveConsoleSessionId();
+  } else {
+    return 0;
+  }
+}
+
+// WTSGetActiveConsoleSessionId API
+WTSGetActiveConsoleSessionId_t wtsGetActiveConsoleSessionId
+  = initializeWTSGetActiveConsoleSessionId;
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -515,7 +515,7 @@ private:
 	case WM_DESTROY:
 	  if (This->m_usingSN)
 	  {
-	    WTSUnRegisterSessionNotification(i_hwnd);
+	    wtsUnRegisterSessionNotification(i_hwnd);
 	    This->m_usingSN = false;
 	  }
 	  return 0;
@@ -686,7 +686,7 @@ public:
     
     // set window handle of tasktray to hooks
     g_hookData->m_hwndTaskTray = m_hwndTaskTray;
-    m_usingSN = WTSRegisterSessionNotification(m_hwndTaskTray,
+    m_usingSN = wtsRegisterSessionNotification(m_hwndTaskTray,
 					       NOTIFY_FOR_THIS_SESSION);
 
     DlgLogData dld;
@@ -902,7 +902,7 @@ int WINAPI _tWinMain(HINSTANCE i_hInstance, HINSTANCE /* i_hPrevInstance */,
   // check remote desktop
   DWORD sessionId;
   if (!ProcessIdToSessionId(GetCurrentProcessId(), &sessionId) ||
-      WTSGetActiveConsoleSessionId() != sessionId)
+      wtsGetActiveConsoleSessionId() != sessionId)
   {
     tstring text = loadString(IDS_executedInRemoteDesktop);
     tstring title = loadString(IDS_mayu);

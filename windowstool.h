@@ -121,11 +121,12 @@ extern void editInsertTextAtLast(HWND i_hwnd, const tstring &i_text,
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Windows2000 specific API
+// Windows2000/XP specific API
 
 /// SetLayeredWindowAttributes API
-extern BOOL (WINAPI *setLayeredWindowAttributes)
+typedef BOOL (WINAPI *SetLayeredWindowAttributes_t)
   (HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags);
+extern SetLayeredWindowAttributes_t setLayeredWindowAttributes;
 
 /// MonitorFromWindow API
 extern HMONITOR (WINAPI *monitorFromWindow)(HWND hwnd, DWORD dwFlags);
@@ -137,6 +138,22 @@ extern BOOL (WINAPI *getMonitorInfo)(HMONITOR hMonitor, LPMONITORINFO lpmi);
 extern BOOL (WINAPI *enumDisplayMonitors)
   (HDC hdc, LPRECT lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData);
 
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// WindowsXP specific API
+
+/// WTSRegisterSessionNotification API
+typedef BOOL (WINAPI *WTSRegisterSessionNotification_t)
+  (HWND hWnd, DWORD dwFlags);
+extern WTSRegisterSessionNotification_t wtsRegisterSessionNotification;
+
+/// WTSUnRegisterSessionNotification API
+typedef BOOL (WINAPI *WTSUnRegisterSessionNotification_t)(HWND hWnd);
+extern WTSUnRegisterSessionNotification_t wtsUnRegisterSessionNotification;
+
+/// WTSGetActiveConsoleSessionId API
+typedef DWORD (WINAPI *WTSGetActiveConsoleSessionId_t)(void);
+extern WTSGetActiveConsoleSessionId_t wtsGetActiveConsoleSessionId;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Utility
