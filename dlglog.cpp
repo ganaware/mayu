@@ -74,6 +74,12 @@ public:
 	    LM::ORIGIN_LEFT_EDGE, LM::ORIGIN_BOTTOM_EDGE,
 	    LM::ORIGIN_LEFT_EDGE, LM::ORIGIN_BOTTOM_EDGE);
     restrictSmallestSize();
+
+    // enlarge window
+    GetWindowRect(m_hwnd, &rc);
+    rc.bottom += (rc.bottom - rc.top) * 3;
+    MoveWindow(m_hwnd, rc.left, rc.top,
+	       rc.right - rc.left, rc.bottom - rc.top, true);
     return TRUE;
   }
 
