@@ -695,7 +695,7 @@ Regexp::regexp::regexp(const R_char *exp, bool doesIgnoreCase)
   }
   else
     regcomp(exp);
-#if 1
+#if 0
   dump(exp, program + 1, lengthof_program);
 #endif
 }
@@ -770,9 +770,7 @@ void Regexp::regexp::regcomp(const R_char *exp)
   
   // Second pass: emit code. 
   CRegCompiler comp(exp, program);
-  printf("<---honban\n");
   _true( comp.reg(false, &flags) );
-  printf("honban--->\n");
 
   PROGRAM *scan = program + 1;		// First BRANCH.
   assert(OP(scan) == BRANCH);

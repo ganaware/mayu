@@ -30,7 +30,8 @@ keymap Global
  key *IC-C-Yen		=> $ToggleIME		# IME ON/OFF をするキーの指定
  key C-S-M     C-A-M	=> Applications		# アプリケーションキー
  key C-S-L     C-A-L	=> &WindowLower		# ウィンドウを一番下へ
- key C-S-R     C-A-R	=> &WindowRaise		# ウィンドウを一番上へ
+#key C-S-R     C-A-R	=> &WindowRaise		# ウィンドウを一番上へ
+ key C-S-R     C-A-R	=> &WindowToggleTopMost &Wait(200) &WindowToggleTopMost
  key C-S-Z     C-A-Z	=> &WindowMaximize	# ウィンドウの最大化 (IE全画面)
  key C-S-I     C-A-I	=> &WindowMinimize	# ウィンドウの最小化
  key C-S-X     C-A-X	=> &WindowVMaximize	# ウィンドウの縦最大化
@@ -174,12 +175,20 @@ window  ConsoleWindowClass /^ConsoleWindowClass$/ : Global
 
 ## Explorer, Internet Explorer ................................................
 
-window	Explorer \
-	/SHELLDLL_DefView:(Internet Explorer_Server:ATL Shell Embedding:)?SysListView32$/ \
-	: SysListView32
+ keyseq $Explorer/show-folder-bar = &PostMessage(ToMainWindow, 273, 41525, 0)
+
+window	ExplorerList /EXPLORER.*:SHELLDLL_DefView:.*SysListView32$/ \
+			: SysListView32
  key S-R		=> F2			# 名前の変更
  key C-S-Z		=> &Sync&WindowMaximize	# ウィンドウの最大化
  key C-A-Z		=> C-&WindowMaximize	# ウィンドウの全画面化
+ key M-E		=> $Explorer/show-folder-bar # フォルダを表示
+
+window	ExplorerTree /EXPLORER.*:BaseBar:.*SysTreeView32$/ : SysTreeView32
+ key S-R		=> F2			# 名前の変更
+ key C-S-Z		=> &Sync&WindowMaximize	# ウィンドウの最大化
+ key C-A-Z		=> C-&WindowMaximize	# ウィンドウの全画面化
+ key M-E		=> $Explorer/show-folder-bar # フォルダを表示
 
 window	InternetExplorer /:Internet Explorer_Server$/ : EmacsEdit
  key C-S-Z		=> &Sync&WindowMaximize	# ウィンドウの最大化
