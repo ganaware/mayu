@@ -36,17 +36,17 @@ struct Notify
     Type_sync,					/// Notify
     Type_threadDetach,				/// NotifyThreadDetach
     Type_command,				/// NotifyThreadDetach
-    Type_show,				/// NotifyShow
+    Type_show,					/// NotifyShow
     Type_log,					/// NotifyLog
   };
   Type m_type;					///
+  DWORD m_debugParam;				/// (for debug)
 };
 
 
 ///
-struct NotifySetFocus
+struct NotifySetFocus : public Notify
 {
-  Notify::Type m_type;				///
   DWORD m_threadId;				///
   HWND m_hwnd;					///
   _TCHAR m_className[GANA_MAX_PATH];		///
@@ -55,9 +55,8 @@ struct NotifySetFocus
 
 
 ///
-struct NotifyLockState
+struct NotifyLockState : public Notify
 {
-  Notify::Type m_type;				///
   bool m_isNumLockToggled;			///
   bool m_isCapsLockToggled;			///
   bool m_isScrollLockToggled;			///
@@ -68,18 +67,15 @@ struct NotifyLockState
 
 
 ///
-struct NotifyThreadDetach
+struct NotifyThreadDetach : public Notify
 {
-  Notify::Type m_type;				///
   DWORD m_threadId;				///
 };
 
 
 ///
-class NotifyCommand
+struct NotifyCommand : public Notify
 {
-public:
-  Notify::Type m_type;				///
   HWND m_hwnd;					///
   UINT m_message;				///
   WPARAM m_wParam;				///
@@ -94,9 +90,8 @@ enum
 
 
 ///
-class NotifyShow
+struct NotifyShow : public Notify
 {
-public:
   ///
   enum Show
   {
@@ -104,17 +99,14 @@ public:
     Show_Maximized,
     Show_Minimized,
   };
-  Notify::Type m_type;				///
   Show m_show;					///
   bool m_isMDI;					///
 };
 
 
 ///
-class NotifyLog
+struct NotifyLog : public Notify
 {
-public:
-  Notify::Type m_type;				///
   _TCHAR m_msg[GANA_MAX_PATH];			///
 };
 
@@ -129,6 +121,7 @@ public:
   bool m_syncKeyIsExtended;			///
   bool m_doesNotifyCommand;			///
   HWND m_hwndTaskTray;				///
+  bool m_correctKanaLockHandling;		/// does use KL- ?
 };
 
 

@@ -403,9 +403,8 @@ static void funcSetImeString(HWND i_hwnd, int i_size)
 #endif // _WINNT
 }
 
-
 /// notify lock state
-DllExport void notifyLockState()
+/*DllExport*/ void notifyLockState(int i_cause)
 {
   NotifyLockState n;
   n.m_type = Notify::Type_lockState;
@@ -415,7 +414,13 @@ DllExport void notifyLockState()
   n.m_isKanaLockToggled = !!(GetKeyState(VK_KANA) & 1);
   n.m_isImeLockToggled = g.m_isImeLock;
   n.m_isImeCompToggled = g.m_isImeCompositioning;
+  n.m_debugParam = i_cause;
   notify(&n, sizeof(n));
+}
+
+DllExport void notifyLockState()
+{
+  notifyLockState(9);
 }
 
 
@@ -444,7 +449,7 @@ LRESULT CALLBACK getMessageProc(int i_nCode, WPARAM i_wParam, LPARAM i_lParam)
 	g.m_isImeLock = !!ImmGetOpenStatus(hIMC);
 	ImmReleaseContext(msg.hwnd, hIMC);
 	if (prev != g.m_isImeLock) {
-	  notifyLockState();
+	  notifyLockState(1);
 	}
       }
       int nVirtKey = (int)msg.wParam;
@@ -456,8 +461,9 @@ LRESULT CALLBACK getMessageProc(int i_nCode, WPARAM i_wParam, LPARAM i_lParam)
       
       if (nVirtKey == VK_CAPITAL ||
 	  nVirtKey == VK_NUMLOCK ||
+	  nVirtKey == VK_KANA ||
 	  nVirtKey == VK_SCROLL)
-	notifyLockState();
+	notifyLockState(2);
       else if (scanCode == g_hookData->m_syncKey &&
 	       isExtended == g_hookData->m_syncKeyIsExtended)
 	notifySync();
@@ -465,11 +471,11 @@ LRESULT CALLBACK getMessageProc(int i_nCode, WPARAM i_wParam, LPARAM i_lParam)
     }
     case WM_IME_STARTCOMPOSITION:
       g.m_isImeCompositioning = true;
-      notifyLockState();
+      notifyLockState(3);
       break;
     case WM_IME_ENDCOMPOSITION:
       g.m_isImeCompositioning = false;
-      notifyLockState();
+      notifyLockState(4);
       break;
     default:
       if (i_wParam == PM_REMOVE && msg.message == g.m_WM_MAYU_MESSAGE)
@@ -577,16 +583,26 @@ LRESULT CALLBACK callWndProc(int i_nCode, WPARAM i_wParam, LPARAM i_lParam)
 	break;
       case WM_SETFOCUS:
 	g.m_isInMenu = false;
+	// for kana
+	if (g_hookData->m_correctKanaLockHandling) {
+	  if (HIMC hIMC = ImmGetContext(cwps.hwnd)) {
+	    bool status = !!ImmGetOpenStatus(hIMC);
+	    // this code set the VK_KANA state correctly.
+	    ImmSetOpenStatus(hIMC, !status);
+	    ImmSetOpenStatus(hIMC, status);
+	    ImmReleaseContext(cwps.hwnd, hIMC);
+	  }
+	}
 	notifySetFocus();
-	notifyLockState();
+	notifyLockState(5);
 	break;
       case WM_IME_STARTCOMPOSITION:
 	g.m_isImeCompositioning = true;
-	notifyLockState();
+	notifyLockState(6);
 	break;
       case WM_IME_ENDCOMPOSITION:
 	g.m_isImeCompositioning = false;
-	notifyLockState();
+	notifyLockState(7);
 	break;
       case WM_IME_NOTIFY:
 	if (cwps.wParam == IMN_SETOPENSTATUS)
@@ -594,7 +610,7 @@ LRESULT CALLBACK callWndProc(int i_nCode, WPARAM i_wParam, LPARAM i_lParam)
 	  {
 	    g.m_isImeLock = !!ImmGetOpenStatus(hIMC);
 	    ImmReleaseContext(cwps.hwnd, hIMC);
-	    notifyLockState();
+	    notifyLockState(8);
 	  }
 	break;
     }

@@ -155,6 +155,16 @@ private:
 				n->m_isKanaLockToggled,
 				n->m_isImeLockToggled,
 				n->m_isImeCompToggled);
+#if 0
+	  Acquire a(&m_log, 0);
+	  if (n->m_isKanaLockToggled) {
+	    m_log << _T("Notify::Type_lockState Kana on  : ");
+	  } else {
+	    m_log << _T("Notify::Type_lockState Kana off : ");
+	  }
+	  m_log << n->m_debugParam << ", "
+		<< g_hookData->m_correctKanaLockHandling << std::endl;
+#endif
 	  break;
 	}
 

@@ -1198,6 +1198,7 @@ bool Engine::setSetting(Setting *i_setting)
   }
   
   m_setting = i_setting;
+  g_hookData->m_correctKanaLockHandling = m_setting->m_correctKanaLockHandling;
   if (m_currentFocusOfThread)
   {
     for (FocusOfThreads::iterator i = m_focusOfThreads.begin();

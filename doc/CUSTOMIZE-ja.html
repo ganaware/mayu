@@ -53,6 +53,7 @@
 			    <li><code>CL-</code> は、<kbd>[CapsLock]</kbd> がロック状態であることを表します。
 			    <li><code>SL-</code> は、<kbd>[ScrollLock]</kbd> がロック状態であることを表します。
 			    <li><code>KL-</code> は、<kbd>[カナ]</kbd> がロック状態であることを表します。<br>
+				(<a href="CUSTOMIZE-ja.html#def_option" target="MANUAL">オプション</a>をよく読んでください)<br>
 				109 キーボードなら、<kbd>[Control]</kbd> + <kbd>[Shift]</kbd> + <kbd>[ひらがな]</kbd>。<br>
 				104 キーボードなら、<kbd>[Control]</kbd> + <kbd>[Shift]</kbd> + <kbd>[CapsLock]</kbd>。
 			    <li><code>IL-</code> は、IME が on になっていることを表します
@@ -671,6 +672,43 @@
 			  </p>
 			  
 			  <p>上記の例では <kbd>[Shift]</kbd> + <kbd>[;]</kbd> を入力すると、<kbd>[:]</kbd> になり、<kbd>[Control]</kbd> + <kbd>[Shift]</kbd> + <kbd>[;]</kbd> を入力すると、<kbd>[Control]</kbd> + <kbd>[:]</kbd> になります。</p>
+			</div>
+
+		    <dt class="h3"><a name="def_option">オプション</a>
+			
+		    <dd class="d3">
+			<div>
+			  <p>カナロック <code>KL-</code> を正しく設定するようにします。</p>
+			  
+			  <p class="sample">
+			  def option KL- = enable
+			  </p>
+
+			  <p>このオプションを設定しない場合、特定の場合にカナロックの状態が正しく取得できません。</p>
+
+			  <p>このオプションを設定すれば、カナロックの状態は正しく取得できますが、IME で文字列を変換中に別のウィンドウへフォーカスを切り替え、元のウィンドウへフォーカスを戻した時に、IME に入力中の文字列は失われます。</p>
+
+			  <blockquote>
+			  <ol>
+			    <li><a href="MANUAL-ja.html#menu-l">ログウインドウ</a>を表示して、「□詳細(<u>D</u>)」をチェックしておきます。
+			    <li>「メモ帳」を 2 つ起動し左右に並べます。
+			    <li>左のメモ帳でカナをロックして何文字か入力してください。<br>
+				109 キーボードなら、<kbd>[Control]</kbd> + <kbd>[Shift]</kbd> + <kbd>[ひらがな]</kbd>。<br>
+				104 キーボードなら、<kbd>[Control]</kbd> + <kbd>[Shift]</kbd> + <kbd>[CapsLock]</kbd>。<br>
+				(左のメモ帳には半角カタカナが表示されます)
+			    <li>右のメモ帳に何文字が入力してください。<br>
+				(右のメモ帳には半角カタカナが表示されます)
+			    <li>IME をオンにしてローマ字入力にして右のメモ帳に何文字か入力してください。
+			    <li>左のメモ帳に何文字か入力してください。<br>
+				(左のメモ帳には半角カタカナが表示されます)
+			    <li>ここで、<a href="MANUAL-ja.html#menu-l">ログウインドウ</a>を見ると <code>KL-</code> が付いていません。
+			  </ol>
+			  <p>カナロックの状態は、IME がオンの時とオフの時で、べつべつに記憶されているようです。</p>
+			  <p>しかし、IME がオンのウィンドウから IME がオフのウィンドウへフォーカスが移ったときに、カナロックの状態は正しく反映されないようです。</p>
+			  <p>その後 IME をオンオフするタイミングで、カナロックの状態が正しく反映されます。</p>
+			  <p>そこで、このオプションを設定すると、フォーカスが変化した時に IME オンオフを自動的に行い、カナロック状態を反映します。</p>
+			  </blockquote>
+			  
 			</div>
 		  </dl>
 		</div>

@@ -333,6 +333,20 @@ void SettingLoader::load_DEFINE_SUBSTITUTE()
 }
 
 
+// <DEFINE_OPTION>
+void SettingLoader::load_DEFINE_OPTION()
+{
+  if (*getToken() != _T("KL-"))
+    throw ErrorMessage() << _T("there must be `KL-' after `option'.");
+  
+  if (*getToken() != _T("="))
+    throw ErrorMessage() << _T("there must be `=' after `KL-'.");
+
+  load_ARGUMENT(&m_setting->m_correctKanaLockHandling);
+}
+
+
+
 // <KEYBOARD_DEFINITION>
 void SettingLoader::load_KEYBOARD_DEFINITION()
 {
@@ -352,6 +366,9 @@ void SettingLoader::load_KEYBOARD_DEFINITION()
   
   // <DEFINE_SUBSTITUTE>
   else if (*t == _T("subst")) load_DEFINE_SUBSTITUTE();
+
+  // <DEFINE_OPTION>
+  else if (*t == _T("option")) load_DEFINE_OPTION();
   
   //
   else throw ErrorMessage() << _T("syntax error `") << *t << _T("'.");

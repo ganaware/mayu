@@ -24,6 +24,10 @@ public:
   Keymaps m_keymaps;				///
   KeySeqs m_keySeqs;				///
   Symbols m_symbols;				///
+  bool m_correctKanaLockHandling;		///
+
+public:
+  Setting() : m_correctKanaLockHandling(false) { }
 };
 
 
@@ -107,6 +111,7 @@ private:
   void load_DEFINE_SYNC_KEY();			/// &lt;DEFINE_SYNC_KEY&gt;
   void load_DEFINE_ALIAS();			/// &lt;DEFINE_ALIAS&gt;
   void load_DEFINE_SUBSTITUTE();		/// &lt;DEFINE_SUBSTITUTE&gt;
+  void load_DEFINE_OPTION();			/// &lt;DEFINE_OPTION&gt;
   void load_KEYBOARD_DEFINITION();		/// &lt;KEYBOARD_DEFINITION&gt;
   Modifier load_MODIFIER(Modifier::Type i_mode, Modifier i_modifier,
 			 Modifier::Type *o_mode = NULL);
