@@ -845,7 +845,7 @@ void Engine::funcSync(FunctionParam *i_param)
   if (r == WAIT_TIMEOUT)
   {
     Acquire a(&m_log, 0);
-    m_log << _T(" *FAILED*");
+    m_log << _T(" *FAILED*") << std::endl;
   }
   m_cs.acquire();
   m_isSynchronizing = false;
