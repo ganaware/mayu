@@ -113,7 +113,7 @@ PDRIVER_DISPATCH _IopInvalidDeviceRequest; // Default dispatch function
 
 // Ioctl value
 #define IOCTL_MAYU_DETOUR_CANCEL					 \
-CTL_CODE(FILE_DEVICE_KEYBOARD, 0x0001, METHOD_BUFFERED, FILE_ANY_ACCESS)
+CTL_CODE(FILE_DEVICE_KEYBOARD, 0x801, METHOD_BUFFERED, FILE_ANY_ACCESS)
 
 
 ///////////////////////////////////////////////////////////////////////////////
