@@ -85,7 +85,7 @@ BOOL WINAPI DllMain(HINSTANCE i_hInstDLL, DWORD i_fdwReason,
 static bool mapHookData()
 {
   g.m_hHookData = CreateFileMapping((HANDLE)0xffffffff, NULL, PAGE_READWRITE,
-				  0, sizeof(HookData), HOOK_DATA_NAME);
+				    0, sizeof(HookData), HOOK_DATA_NAME);
   if (!g.m_hHookData)
     return false;
   
@@ -208,10 +208,10 @@ static void notifyName(HWND i_hwnd, Notify::Type i_type = Notify::Type_name)
 
 
 /// notify WM_SETFOCUS
-static void notifySetFocus()
+static void notifySetFocus(bool i_doesForce = false)
 {
   HWND hwnd = GetFocus();
-  if (hwnd != g.m_hwndFocus)
+  if (i_doesForce || hwnd != g.m_hwndFocus)
   {
     g.m_hwndFocus = hwnd;
     notifyName(hwnd, Notify::Type_setFocus);
@@ -359,11 +359,11 @@ LRESULT CALLBACK callWndProc(int i_nCode, WPARAM i_wParam, LPARAM i_lParam)
 	break;
       case WM_ENTERMENULOOP:
 	g.m_isInMenu = true;
-	notifySetFocus();
+	notifySetFocus(true);
 	break;
       case WM_EXITMENULOOP:
 	g.m_isInMenu = false;
-	notifySetFocus();
+	notifySetFocus(true);
 	break;
       case WM_SETFOCUS:
 	g.m_isInMenu = false;
