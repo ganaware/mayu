@@ -101,6 +101,11 @@ static bool mapHookData()
 // unmap hook data
 static void unmapHookData()
 {
+  // Windows sometimes seems to call callWndProc() even after
+  // DLL_PROCESS_DETACH, so we cannot unmap the data.  But this mapped
+  // data will released at the end of the process, so it will not
+  // cause any memory leak.
+#if 0
   if (hookData)
     if (!UnmapViewOfFile(hookData))
       return;
@@ -108,6 +113,7 @@ static void unmapHookData()
   if (hHookData)
     CloseHandle(hHookData);
   hHookData = NULL;
+#endif
 }
 
 
