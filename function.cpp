@@ -1943,8 +1943,7 @@ public:
 
 class ParseDirectSSTPData
 {
-  typedef boost::match_results<boost::regex::const_iterator,
-  					    boost::regex::alloc_type> MR;
+  typedef boost::match_results<boost::regex::const_iterator> MR;
 
 public:
   typedef std::map<tstring, DirectSSTPServer> DirectSSTPServers;
@@ -2027,7 +2026,10 @@ void Engine::funcDirectSSTP(FunctionParam *i_param,
   boost::regex getSakura("([0-9a-fA-F]{32})\\.([^\x01]+)\x01(.*?)\r\n");
   
   ParseDirectSSTPData::DirectSSTPServers servers;
-  boost::regex_grep(ParseDirectSSTPData(&servers), begin, end, getSakura);
+  boost::regex_iterator<boost::regex::const_iterator>
+    it(begin, end, getSakura), last;
+  for (; it != last; ++it)
+    ((ParseDirectSSTPData)(&servers))(*it);
 
   // make request
   tstring request;

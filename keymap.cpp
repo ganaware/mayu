@@ -227,9 +227,9 @@ Keymap::Keymap(Type i_type,
   if (i_type == Type_windowAnd || i_type == Type_windowOr)
     try
     {
-      boost::regbase::flag_type f = (boost::regbase::normal | 
-				     boost::regbase::icase |
-				     boost::regbase::use_except);
+      tregex::flag_type f = (tregex::normal | 
+			     tregex::icase |
+			     tregex::use_except);
       if (!i_windowClass.empty())
 	m_windowClass.assign(i_windowClass, f);
       if (!i_windowTitle.empty())

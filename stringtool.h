@@ -26,8 +26,8 @@ typedef std::basic_streambuf<_TCHAR> tstreambuf;
 typedef std::basic_stringstream<_TCHAR> tstringstream;
 /// ifstream for generic international text
 typedef std::basic_ifstream<_TCHAR> tifstream;
-/// reg_expression for generic international text
-typedef boost::reg_expression<_TCHAR> tregex;
+/// basic_regex for generic international text
+typedef boost::basic_regex<_TCHAR> tregex;
 /// match_results for generic international text
 typedef boost::match_results<tstring::const_iterator> tcmatch;
 

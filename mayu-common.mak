@@ -25,7 +25,7 @@ DISTRIB_OS	= 9x
 
 
 COMMON_DEFINES	= -DSTRICT -D_WIN32_IE=0x0500 $(OS_SPECIFIC_DEFINES)
-BOOST_DIR	= ../boost
+BOOST_DIR	= ../boost_$(BOOST_VER)_0
 
 
 # mayu.exe	###############################################################

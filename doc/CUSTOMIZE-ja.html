@@ -239,7 +239,7 @@
 			<div>
 			  <p><code><em>ウィンドウクラス名</em></code>と<code><em>ウィンドウタイトル名</em></code>には正規表現が使用できます。正規表現は <code>/.../</code> で囲むか、<code>\m@...@</code>で囲みます (ただし<code>@</code>はどんな文字でもよし)。</p>
 			  
-			  <p>正規表現エンジンには <a href="http://ourworld.compuserve.com/homepages/John_Maddock/regexpp.htm" target="_top">Regex++</a> を使用しています。このエンジンでは <a href="http://www.kt.rim.or.jp/~kbk/perl5.005/perlre.html" target="_top">Perl で使用できる正規表現</a>がほぼカバーされています。よく使いそうなものを挙げておきます。</p>
+			  <p>正規表現エンジンには <a href="http://www.boost.org/libs/regex/doc/index.html" target="_top">Boost.Regex</a> を使用しています。このエンジンでは <a href="http://www.kt.rim.or.jp/~kbk/perl5.005/perlre.html" target="_top">Perl で使用できる正規表現</a>がほぼカバーされています。よく使いそうなものを挙げておきます。</p>
 			  
 			  <ul>
 			    <li>"<code>|</code>" Alternation
@@ -1424,7 +1424,7 @@
 			    <dt class="h4">正規表現ライブラリ
 			    <dd class="d4">
 				<div>
-				  <p><a href="http://ourworld.compuserve.com/homepages/John_Maddock/regexpp.htm" target="_top">Regex++</a> が必要です。<a href="http://ourworld.compuserve.com/homepages/John_Maddock/regexpp3.zip" target="_top"><code>regexpp3.zip</code></a> 又は <a href="http://ourworld.compuserve.com/homepages/John_Maddock/regexpp3.tar.gz" target="_top"><code>regexpp3.tar.gz</code></a> をダウンロードしてください。</p>
+				  <p><a href="http://www.boost.org/libs/regex/doc/index.html" target="_top">Boost.Regex</a> が必要です。<a href="http://www.boost.org/" target="_top">Boost ライブラリ</a> に同梱されています。現在、「窓使いの憂鬱」のビルドが確認されている Boost のバージョンは Visual C++ では 1.32.0、Borland C++ Compiler 5.5.1 では 1.31.0 です。</p>
 				</div>
 			    <dt class="h4">Perl</a>
 			    <dd class="d4">
@@ -1459,18 +1459,18 @@
 			    <dt class="h4">ディレクトリ構成
 			    <dd class="d4">
 				<div>
-				  <p>上記のどちらかの方法で「窓使いの憂鬱」本体のソースコードを展開後、Regex++ を展開します。最終的なディレクトリ構成が以下のようになるように展開してください。</p>
+				  <p>上記のどちらかの方法で「窓使いの憂鬱」本体のソースコードを展開後、Boost を展開します。最終的なディレクトリ構成が以下のようになるように展開してください。</p>
 				  <p class="tree">
 				  ./<br>
 				  <code>&nbsp;&nbsp;&nbsp;|</code><br>
-				  <code>&nbsp;&nbsp;&nbsp;+---</code>boost/ ... <span>このディレクトリは手動で作成する</span><br>
+				  <code>&nbsp;&nbsp;&nbsp;+---</code>boost_1_??_?/ ... <span>Boost の展開により作成される</span><br>
 				  <code>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;|</code><br>
-				  <code>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;+---</code>boost/ ... <span>Regex++ の展開により作成される</span><br>
+				  <code>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;+---</code>boost/ ... <span>Boost の展開により作成される</span><br>
 				  <code>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;|</code><br>
 				  <code>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;+---</code>detail/ ...<br>
 				  <code>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;+---</code>re_detail/ ...<br>
 				  <code>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;|</code><br>
-				  <code>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;+---</code>libs/ ... <span>Regex++ の展開により作成される</span><br>
+				  <code>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;+---</code>libs/ ... <span>Boost の展開により作成される</span><br>
 				  <code>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|</code><br>
 				  <code>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---</code>regex/ ...<br>
 				  <code>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---</code>timer/ ...<br>
@@ -1526,13 +1526,6 @@
 				  
 				  <hr>
 				  
-				  <p>正規表現ライブラリのバージョンによっては、<code>boost/libs/regex/src/c_regex_traits.cpp</code> の冒頭に以下の 3 行を付け加えないとコンパイルが成功しません</p>
-				  <p class="sample">#if !defined(NDEBUG) && defined(_MSC_VER)<br>
-				  #  define _WCTYPE_INLINE_DEFINED<br>
-				  #endif</p>
-				  
-				  <hr>
-
 				  <p>Visual C++ Toolkit 2003 を使用する場合は、<code>libcpmtd.lib</code> が提供されていないため、デバッグバージョンの mayu はビルドしないようになっています。</p>
 				  
 				</div>
@@ -1540,6 +1533,11 @@
 			    <dt class="h4">Borland C++ Compiler 5.5.1 の場合
 			    <dd class="d4">
 				<div>
+				  <p>ビルドが確認されている Boost はバージョン 1.31.0 のみです。また、<code>boost_1_31_0/boost/config/auto_link.hpp</code> の 235 行目、
+				  <p class="sample">
+				  #pragma defineonoption BOOST_BORLAND_DEBUG -v
+				  </p>
+				  をコメントアウトして下さい。</p>
 				  <p>Borland C++ 5.5.1 のコンパイラなどにパスを通しておいて、さらに <code>bcc.mak</code> の冒頭の注意に従ってライブラリパスに <code>lib/psdk</code> を含めてください。</p>
 				  <p class="sample">
 				  mayu-3.??&gt; set INCLUDE=C:\borland\bcc55\include<br>

@@ -8,6 +8,9 @@
 ###############################################################################
 
 
+!if "$(BOOST_VER)" == ""
+BOOST_VER	= 1_31
+!endif
 INCLUDES	= -I$(BOOST_DIR)
 DEPENDIGNORE	= --ignore=$(BOOST_DIR)
 
@@ -17,8 +20,8 @@ DEPENDIGNORE	= --ignore=$(BOOST_DIR)
 DEFINES		= $(COMMON_DEFINES) -DVERSION="\"$(VERSION)\"" \
 		-DLOGNAME="\"$(LOGNAME)\"" -DCOMPUTERNAME="\"$(COMPUTERNAME)\""
 
-LDFLAGS_1	= $(guilflags) $(guiobjs) -L..\boost\libs\regex\build\bcb5
-LDFLAGS_2	= $(dlllflags) $(dllobjs) -L..\boost\libs\regex\build\bcb5
+LDFLAGS_1	= $(guilflags) $(guiobjs) -L"$(BOOST_DIR)\libs\regex\build\bcb"
+LDFLAGS_2	= $(dlllflags) $(dllobjs) -L"$(BOOST_DIR)\libs\regex\build\bcb"
 
 $(TARGET_1):	$(OBJS_1) $(RES_1) $(EXTRADEP_1)
 	$(LD) $(LDFLAGS_1) $(OBJS_1),$(TARGET_1),,$(LIBS_1),,$(RES_1)
@@ -30,12 +33,12 @@ $(TARGET_3):	$(DLL_3)
 
 boost:
 		cd $(BOOST_DIR)/libs/regex/build/
-		$(MAKE) -i -f bcb5.mak bcb5 bcb5\boost_regex_bcb5_mss bcb5\boost_regex_bcb5_mss.lib
+		$(MAKE) -i -f bcb6.mak bcb bcb\libboost_regex-bcb-mt-s-$(BOOST_VER) bcb\libboost_regex-bcb-mt-s-$(BOOST_VER).lib
 		cd ../../../../mayu
 
 distclean::	clean
 		cd $(BOOST_DIR)/libs/regex/build/
-		-$(MAKE) -i -f bcb5.mak clean
+		-$(MAKE) -i -f bcb6.mak clean
 		cd ../../../../mayu
 
 batch:
