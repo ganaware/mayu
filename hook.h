@@ -9,10 +9,6 @@
 #  include <tchar.h>
 
 ///
-#  define NOTIFY_MAILSLOT_NAME						      \
-_T("\\\\.\\mailslot\\GANAware\\mayu\\{330F7914-EB5B-49be-ACCE-D2B8DF585B32}") \
-_T(VERSION)
-///
 #  define WM_MAYU_MESSAGE_NAME _T("GANAware\\mayu\\WM_MAYU_MESSAGE")
 
 ///
