@@ -102,9 +102,9 @@ namespace RegexpUtil
 }
 
 
-/** * Note (see "regexp.html" about this library).
+/** Note (see "regexp.html" about this library).
 We should retrieve matched string (\1 \2 etc...) as soon as possible.
-\begin{verbatim}
+<pre>
 Regexp re(L"e.o");
 {
   MChar *text = L"hogehogetext";
@@ -112,7 +112,7 @@ Regexp re(L"e.o");
   printf("%S\n", re[0].c_str());
 }
 printf("%S\n", re[0].c_str());
-\end{verbatim}
+</pre>
 The first printf prints "eho", but
 I dont know what is printed by the second.
 */

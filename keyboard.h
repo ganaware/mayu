@@ -27,9 +27,9 @@ public:
   enum
   {
     BREAK = KEYBOARD_INPUT_DATA::BREAK,	/// BREAK is key release
-    E0    = KEYBOARD_INPUT_DATA::E0,	/// E0, E1 are for extended key,
-    E1    = KEYBOARD_INPUT_DATA::E1,	///
-    E0E1  = KEYBOARD_INPUT_DATA::E0E1	///
+    E0    = KEYBOARD_INPUT_DATA::E0,	/// E0 is for extended key,
+    E1    = KEYBOARD_INPUT_DATA::E1,	/// E1 is for extended key,
+    E0E1  = KEYBOARD_INPUT_DATA::E0E1,	/// E0, E1 are for extended key,
   };
   u_char scan;		///
   u_char flags;		///
@@ -127,78 +127,42 @@ public:
   ///
   enum Type
   {
-    ///
-    begin = 0,
-    /// <BASIC_MODIFIER>
-    Shift = begin,
-    /// <BASIC_MODIFIER>
-    Alt,
-    /// <BASIC_MODIFIER>
-    Control,
-    /// <BASIC_MODIFIER>
-    Windows,
-    /// <BASIC_MODIFIER>
-    BASIC,
-    /// <KEYSEQ_MODIFIER>
-    Up = BASIC,
-    /// <KEYSEQ_MODIFIER>
-    Down,
-    /// <KEYSEQ_MODIFIER>
-    KEYSEQ,
-    /// <ASSIGN_MODIFIER>
-    ImeLock = KEYSEQ,
-    /// <ASSIGN_MODIFIER>
-    ImeComp,
-    /// <ASSIGN_MODIFIER>
-    NumLock,
-    /// <ASSIGN_MODIFIER>
-    CapsLock,
-    /// <ASSIGN_MODIFIER>
-    ScrollLock,
-    /// <ASSIGN_MODIFIER>
-    Mod0,
-    /// <ASSIGN_MODIFIER>
-    Mod1,
-    /// <ASSIGN_MODIFIER>
-    Mod2,
-    /// <ASSIGN_MODIFIER>
-    Mod3,
-    /// <ASSIGN_MODIFIER>
-    Mod4,
-    /// <ASSIGN_MODIFIER>
-    Mod5,
-    /// <ASSIGN_MODIFIER>
-    Mod6,
-    /// <ASSIGN_MODIFIER>
-    Mod7,
-    /// <ASSIGN_MODIFIER>
-    Mod8,
-    /// <ASSIGN_MODIFIER>
-    Mod9,
-    /// <ASSIGN_MODIFIER>
-    Lock0,
-    /// <ASSIGN_MODIFIER>
-    Lock1,
-    /// <ASSIGN_MODIFIER>
-    Lock2,
-    /// <ASSIGN_MODIFIER>
-    Lock3,
-    /// <ASSIGN_MODIFIER>
-    Lock4,
-    /// <ASSIGN_MODIFIER>
-    Lock5,
-    /// <ASSIGN_MODIFIER>
-    Lock6,
-    /// <ASSIGN_MODIFIER>
-    Lock7,
-    /// <ASSIGN_MODIFIER>
-    Lock8,
-    /// <ASSIGN_MODIFIER>
-    Lock9,
-    /// <ASSIGN_MODIFIER>
-    ASSIGN,
-    ///
-    end = ASSIGN
+    begin = 0,    	///
+    Shift = begin,	/// &lt;BASIC_MODIFIER&gt;
+    Alt,		/// &lt;BASIC_MODIFIER&gt;
+    Control,		/// &lt;BASIC_MODIFIER&gt;
+    Windows,		/// &lt;BASIC_MODIFIER&gt;
+    BASIC,		///
+    Up = BASIC,		/// &lt;KEYSEQ_MODIFIER&gt;
+    Down,		/// &lt;KEYSEQ_MODIFIER&gt;
+    KEYSEQ,		///
+    ImeLock = KEYSEQ,	/// &lt;ASSIGN_MODIFIER&gt;
+    ImeComp,		/// &lt;ASSIGN_MODIFIER&gt;
+    NumLock,		/// &lt;ASSIGN_MODIFIER&gt;
+    CapsLock,		/// &lt;ASSIGN_MODIFIER&gt;
+    ScrollLock,		/// &lt;ASSIGN_MODIFIER&gt;
+    Mod0,		/// &lt;ASSIGN_MODIFIER&gt;
+    Mod1,		/// &lt;ASSIGN_MODIFIER&gt;
+    Mod2,		/// &lt;ASSIGN_MODIFIER&gt;
+    Mod3,		/// &lt;ASSIGN_MODIFIER&gt;
+    Mod4,		/// &lt;ASSIGN_MODIFIER&gt;
+    Mod5,		/// &lt;ASSIGN_MODIFIER&gt;
+    Mod6,		/// &lt;ASSIGN_MODIFIER&gt;
+    Mod7,		/// &lt;ASSIGN_MODIFIER&gt;
+    Mod8,		/// &lt;ASSIGN_MODIFIER&gt;
+    Mod9,		/// &lt;ASSIGN_MODIFIER&gt;
+    Lock0,		/// &lt;ASSIGN_MODIFIER&gt;
+    Lock1,		/// &lt;ASSIGN_MODIFIER&gt;
+    Lock2,		/// &lt;ASSIGN_MODIFIER&gt;
+    Lock3,		/// &lt;ASSIGN_MODIFIER&gt;
+    Lock4,		/// &lt;ASSIGN_MODIFIER&gt;
+    Lock5,		/// &lt;ASSIGN_MODIFIER&gt;
+    Lock6,		/// &lt;ASSIGN_MODIFIER&gt;
+    Lock7,		/// &lt;ASSIGN_MODIFIER&gt;
+    Lock8,		/// &lt;ASSIGN_MODIFIER&gt;
+    Lock9,		/// &lt;ASSIGN_MODIFIER&gt;
+    ASSIGN,		/// &lt;ASSIGN_MODIFIER&gt;
+    end = ASSIGN	///
   };
   
 public:
@@ -233,8 +197,8 @@ public:
   /// add m's modifiers where this dontcare
   Modifier &operator+=(const Modifier &m);
 
-  // does match (except dontcare modifiers)
-  /// (is the m included *this set ?)
+  /** does match. (except dontcare modifiers) (is the m included *this
+      set ?) */
   bool doesMatch(const Modifier &m) const
   { return ((modifiers | dontcares) == (m.modifiers | dontcares)); }
   
@@ -251,10 +215,8 @@ public:
 class ModifiedKey
 {
 public:
-  ///
-  Modifier modifier;
-  ///
-  Key *key;
+  Modifier modifier;	///
+  Key *key;		///
   
 public:
   ///
@@ -278,21 +240,15 @@ class Keyboard
       @name ANONYMOUS
   */
   enum {
-    ///
-    lengthof_hashedKeys = 128,
+    lengthof_hashedKeys = 128,			///
   };
-  ///
-  typedef std::list<Key> Keys;
-  ///
-  Keys hashedKeys[lengthof_hashedKeys];
+  typedef std::list<Key> Keys;			///
+  Keys hashedKeys[lengthof_hashedKeys];		///
 
-  /// key name aliases
-  typedef std::map<istring, Key *> Aliases;
-  ///
-  Aliases aliases;
+  typedef std::map<istring, Key *> Aliases;	/// key name aliases
+  Aliases aliases;				///
   
-  /// key used to synchronize
-  Key syncKey;
+  Key syncKey;					/// key used to synchronize
 
 public:
   /// keyboard modifiers (pointer into Keys)

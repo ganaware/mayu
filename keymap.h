@@ -107,7 +107,7 @@ public:
   enum Type
   {
     TypeKeymap,		/// this is keymap
-    TypeWindowAnd,	/// this is window &&
+    TypeWindowAnd,	/// this is window &amp;&amp;
     TypeWindowOr,	/// this is window ||
   };
   ///

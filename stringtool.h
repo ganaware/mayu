@@ -172,7 +172,7 @@ namespace StringTool
   /** */inline bool operator<(CIS_ &i , CS_  &s )  { return i.compare(s) < 0; }
   /** */inline bool operator<(CS_  &s , CIS_ &i )  { return 0 < i.compare(s); }
   /** */inline bool operator<(CIS_ &i1, CIS_ &i2)  { return i1.compare(i2)<0; }
-  /** */
+  
   /** */inline bool operator==(CC_  *s , CIS_ &i ) { return i.compare(s) == 0;}
   /** */inline bool operator==(CIS_ &i , CC_  *s ) { return i.compare(s) == 0;}
   /** */inline bool operator==(CS_  &s , CIS_ &i ) { return i.compare(s) == 0;}

@@ -168,10 +168,17 @@ public:
   Id id;	/// function id
   char *name;	/// function name
   /** argument's type.
-      'K':keymap, 'S':keyseq, 'l':/lock\d/, 's':string,
-      'd':digit, 'V':vkey, 'W':showWindow, 'w':window,
-      'M':modifier, 'b':bool,
-      '&':rest is optional
+      '<code>K</code>':keymap,
+      '<code>S</code>':keyseq,
+      '<code>l</code>':/lock\d/,
+      '<code>s</code>':string,
+      '<code>d</code>':digit,
+      '<code>V</code>':vkey,
+      '<code>W</code>':showWindow,
+      '<code>w</code>':window,
+      '<code>M</code>':modifier,
+      '<code>b</code>':bool,
+      '<code>&amp;</code>':rest is optional
   */
   char *argType;
   Func func;	///

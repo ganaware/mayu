@@ -85,7 +85,7 @@ public:
   ///
   bool operator!=(const char *str) const { return !(*this == str); }
   
-  /// paren equal c is '(' or ')'
+  /// paren equal c is '<code>(</code>' or '<code>)</code>'
   bool operator==(const char c) const;
   ///
   bool operator!=(const char c) const { return !(*this == c); }
@@ -98,7 +98,7 @@ public:
 ///
 class Parser
 {
-  size_t lineNumber;	/// current line number
+  size_t lineNumber;		/// current line number
   const std::vector<istring> *prefix; /// string that may be prefix of a token
   
   size_t internalLineNumber;	/// next line number
@@ -111,17 +111,14 @@ public:
   ///
   Parser(std::istream &ist_);
 
-  /** get a parsed line.
-      if no more lines exist, returns false
-  */
+  /** get a parsed line.  if no more lines exist, returns false */
   bool getLine(std::vector<Token> *tokens_r);
   
-  //// get current line number
+  /// get current line number
   size_t getLineNumber() const { return lineNumber; }
   
-  /** set string that may be prefix of a token.
-      prefix_ is not copied, so it must be preserved after setPrefix()
-  */
+  /** set string that may be prefix of a token.  prefix_ is not
+      copied, so it must be preserved after setPrefix() */
   void setPrefix(const std::vector<istring> *prefix_);
 };
 

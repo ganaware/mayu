@@ -19,14 +19,16 @@
 /** msgstream.
 
     <p>Before writing to omsgstream, you must acquire lock by calling
-    acquire().  Then after completion of writing, you must call
-    release().</p>
+    <code>acquire()</code>.  Then after completion of writing, you
+    must call <code>release()</code>.</p>
+    
+    <p>Omsgbuf calls <code>PostMessage(hwnd, messageid, 0,
+    (LPARAM)omsgbuf)</code> to notify that string is ready to get.
+    When the window (<code>hwnd</code>) get the message, you can get
+    the string containd in the omsgbuf by calling
+    <code>acquireString()</code>.  After calling
+    <code>acquireString()</code>, you must / call releaseString().</p>
 
-    <p>Omsgbuf calls PostMessage(hwnd, messageid, 0, (LPARAM)omsgbuf)
-    to notify that string is ready to get .  When the window (hwnd)
-    get the message, you can get the string containd in the omsgbuf by
-    calling acquireString().  After calling acquireString(), you must
-    / call releaseString().</p>
 */
 class omsgbuf : public std::streambuf, public SyncObject
 {
@@ -43,7 +45,7 @@ class omsgbuf : public std::streambuf, public SyncObject
   CriticalSection cs;	/// lock
 
   /** debug level.
-      if ( msgDebugLevel <= debugLevel ), message is displayed
+      if ( msgDebugLevel &lt;= debugLevel ), message is displayed
   */
   int debugLevel;
   int msgDebugLevel;	///

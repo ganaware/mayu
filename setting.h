@@ -44,38 +44,39 @@ class SettingLoader
 
   Keymap *currentKeymap;		/// current keymap
 
-  std::vector<bool> canRead;		/// for <COND_SYMBOL>
+  std::vector<bool> canRead;		/// for &lt;COND_SYMBOL&gt;
 
-  Modifier defaultAssignModifier;	/// default <ASSIGN_MODIFIER>
-  Modifier defaultKeySeqModifier;	/// default <KEYSEQ_MODIFIER>
+  Modifier defaultAssignModifier;	/// default &lt;ASSIGN_MODIFIER&gt;
+  Modifier defaultKeySeqModifier;	/// default &lt;KEYSEQ_MODIFIER&gt;
 
 private:
   bool isEOL();					/// is there no more tokens ?
   Token *getToken();				/// get next token
   Token *lookToken();				/// look next token
   
-  void load_LINE();				/// <LINE>
-  void load_DEFINE();				/// <DEFINE>
-  void load_IF();				/// <IF>
-  void load_ELSE(bool isElseIf, const istring &t); /// <ELSE> <ELSEIF>
-  bool load_ENDIF(const istring &t);		/// <ENDIF>
-  void load_INCLUDE();				/// <INCLUDE>
-  void load_SCAN_CODES(Key *key_r);		/// <SCAN_CODES>
-  void load_DEFINE_KEY();			/// <DEFINE_KEY>
-  void load_DEFINE_MODIFIER();			/// <DEFINE_MODIFIER>
-  void load_DEFINE_SYNC_KEY();			/// <DEFINE_SYNC_KEY>
-  void load_DEFINE_ALIAS();			/// <DEFINE_ALIAS>
-  void load_KEYBOARD_DEFINITION();		/// <KEYBOARD_DEFINITION>
+  void load_LINE();				/// &lt;LINE&gt;
+  void load_DEFINE();				/// &lt;DEFINE&gt;
+  void load_IF();				/// &lt;IF&gt;
+  void load_ELSE(bool isElseIf,
+		 const istring &t);		/// &lt;ELSE&gt; &lt;ELSEIF&gt;
+  bool load_ENDIF(const istring &t);		/// &lt;ENDIF&gt;
+  void load_INCLUDE();				/// &lt;INCLUDE&gt;
+  void load_SCAN_CODES(Key *key_r);		/// &lt;SCAN_CODES&gt;
+  void load_DEFINE_KEY();			/// &lt;DEFINE_KEY&gt;
+  void load_DEFINE_MODIFIER();			/// &lt;DEFINE_MODIFIER&gt;
+  void load_DEFINE_SYNC_KEY();			/// &lt;DEFINE_SYNC_KEY&gt;
+  void load_DEFINE_ALIAS();			/// &lt;DEFINE_ALIAS&gt;
+  void load_KEYBOARD_DEFINITION();		/// &lt;KEYBOARD_DEFINITION&gt;
   Modifier load_MODIFIER(Modifier::Type mode,
-			 Modifier modifier);	/// <..._MODIFIER>
-  Key *load_KEY_NAME();				/// <KEY_NAME>
-  void load_KEYMAP_DEFINITION(Token *which);	/// <KEYMAP_DEFINITION>
+			 Modifier modifier);	/// &lt;..._MODIFIER&gt;
+  Key *load_KEY_NAME();				/// &lt;KEY_NAME&gt;
+  void load_KEYMAP_DEFINITION(Token *which);	/// &lt;KEYMAP_DEFINITION&gt;
   KeySeq *load_KEY_SEQUENCE(const istring &name = "",
-			    bool isInParen = false);	/// <KEY_SEQUENCE>
-  void load_KEY_ASSIGN();			/// <KEY_ASSIGN>
-  void load_MODIFIER_ASSIGNMENT();		/// <MODIFIER_ASSIGN>
-  void load_LOCK_ASSIGNMENT();			/// <LOCK_ASSIGN>
-  void load_KEYSEQ_DEFINITION();		/// <KEYSEQ_DEFINITION>
+			    bool isInParen = false); /// &lt;KEY_SEQUENCE&gt;
+  void load_KEY_ASSIGN();			/// &lt;KEY_ASSIGN&gt;
+  void load_MODIFIER_ASSIGNMENT();		/// &lt;MODIFIER_ASSIGN&gt;
+  void load_LOCK_ASSIGNMENT();			/// &lt;LOCK_ASSIGN&gt;
+  void load_KEYSEQ_DEFINITION();		/// &lt;KEYSEQ_DEFINITION&gt;
 
   /// load
   void load(const istring &filename);

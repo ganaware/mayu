@@ -57,14 +57,14 @@ class Engine
   Modifier modifierForNextKey;	/// modifier for next key if above is true
 
   /** current keymaps.
-      \begin{description}
-      \item[when &OtherWindowClass]
-      currentKeymap becoms currentKeymaps[++ Current::i]
-      \item[when &KeymapParent]
-      currentKeymap becoms currentKeyamp->parentKeymap
-      \item[other]
-      currentKeyamp becoms *Current::i
-      \end{description}
+      <dl>
+      <dt>when &amp;OtherWindowClass
+      <dd>currentKeymap becoms currentKeymaps[++ Current::i]
+      <dt>when &amp;KeymapParent
+      <dd>currentKeymap becoms currentKeyamp-&gt;parentKeymap
+      <dt>other
+      <dd>currentKeyamp becoms *Current::i
+      </dl>
   */
   Keymap * volatile currentKeymap; // current keymap
   
@@ -72,12 +72,12 @@ class Engine
   class FocusOfThread
   {
   public:
-    DWORD threadId;		/// thread id
-    HWND hwndFocus;		/// window that has focus on the thread
-    istring className;		/// class name of hwndFocus
-    istring titleName;		/// title name of hwndFocus
-    bool isConsole;		/// is hwndFocus console ?
-    std::list<Keymap *> keymaps;		/// keymaps
+    DWORD threadId;			/// thread id
+    HWND hwndFocus;			/// window that has focus on the thread
+    istring className;			/// class name of hwndFocus
+    istring titleName;			/// title name of hwndFocus
+    bool isConsole;			/// is hwndFocus console ?
+    std::list<Keymap *> keymaps;	/// keymaps
     ///
     FocusOfThread() : threadId(0), hwndFocus(NULL), isConsole(false) { }
   };
@@ -90,8 +90,8 @@ class Engine
   DetachedThreadIds detachedThreadIds;				///
   
   // for functions
-  EmacsEditKillLine emacsEditKillLine;		/// for &EmacsEditKillLine
-  ActionFunction *afShellExecute;		/// for &ShellExecute
+  EmacsEditKillLine emacsEditKillLine;		/// for &amp;EmacsEditKillLine
+  ActionFunction *afShellExecute;		/// for &amp;ShellExecute
   
   /// current status in generateKeyboardEvents
   class Current
@@ -99,7 +99,8 @@ class Engine
   public:
     Keymap *keymap;		/// current keymap
     ModifiedKey mkey;		/// current processing key that user inputed
-    std::list<Keymap *>::iterator i; /// index in currentFocusOfThread->keymaps
+    				/// index in currentFocusOfThread-&gt;keymaps
+    std::list<Keymap *>::iterator i;
     ///
     bool isPressed() const { return mkey.modifier.isOn(Modifier::Down); }
   };
@@ -113,7 +114,7 @@ class Engine
   };
 
 public:
-  /// window positon for &WindowHMaximize, &WindowVMaximize
+  /// window positon for &amp;WindowHMaximize, &amp;WindowVMaximize
   class WindowPosition
   {
   public:
@@ -131,10 +132,10 @@ public:
     WindowPosition(HWND hwnd_, const RECT &rc_, Mode mode_)
       : hwnd(hwnd_), rc(rc_), mode(mode_) { }
   };
-  std::list<WindowPosition> windowPositions;	///
+  std::list<WindowPosition> windowPositions; ///
   
-  typedef std::list<HWND> WindowsWithAlpha;	/// windows for &WindowSetAlpha
-  WindowsWithAlpha windowsWithAlpha;		///
+  typedef std::list<HWND> WindowsWithAlpha; /// windows for &amp;WindowSetAlpha
+  WindowsWithAlpha windowsWithAlpha; ///
 
 private:
   /// keyboard handler thread

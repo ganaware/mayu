@@ -33,18 +33,15 @@ extern HICON loadBigIcon(UINT id);
 /// resize the window (it does not move the window)
 extern bool resizeWindow(HWND hwnd, int w, int h, bool doRepaint);
 
-/** get rect of the window in client coordinates
-   @return rect of the window in client coordinates
- */
+/** get rect of the window in client coordinates.
+    @return rect of the window in client coordinates */
 extern bool getChildWindowRect(HWND hwnd, RECT *rc);
 
 /** set small icon to the specified window.
-    @return handle of previous icon or NULL
-*/
+    @return handle of previous icon or NULL */
 extern HICON setSmallIcon(HWND hwnd, UINT id);
 /** set big icon to the specified window.
-    @return handle of previous icon or NULL
-*/
+    @return handle of previous icon or NULL */
 extern HICON setBigIcon(HWND hwnd, UINT id);
 
 /// remove icon from a window that is set by setSmallIcon/setBigIcon

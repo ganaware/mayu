@@ -645,13 +645,13 @@ void EmacsEditKillLine::func()
 
 /** if the text of the clipboard is
 @doc
-\begin{verbatim}
-1: EDIT Control (at EOL C-K): ""            => buf + "\r\n", Delete   
-0: EDIT Control (other  C-K): "(.+)"        => buf + "\1"             
-0: IE FORM TEXTAREA (at EOL C-K): "\r\n"    => buf + "\r\n"           
-2: IE FORM TEXTAREA (other C-K): "(.+)\r\n" => buf + "\1", Return Left
+<pre>
+1: EDIT Control (at EOL C-K): ""            =&gt; buf + "\r\n", Delete   
+0: EDIT Control (other  C-K): "(.+)"        =&gt; buf + "\1"             
+0: IE FORM TEXTAREA (at EOL C-K): "\r\n"    =&gt; buf + "\r\n"           
+2: IE FORM TEXTAREA (other C-K): "(.+)\r\n" =&gt; buf + "\1", Return Left
 ^retval
-\end{verbatim}
+</pre>
 */
 HGLOBAL EmacsEditKillLine::makeNewKillLineBuf(const char *data, int *retval)
 {
