@@ -120,6 +120,7 @@
 	 "\\|PlugIn"
 	 "\\|Recenter"
 	 "\\|SetImeStatus"
+	 "\\|SetImeString"
 	 "\\)\\>"
 	 ) . ,function-name-face)
       "Default font-lock-keywords for mayu mode.")))
