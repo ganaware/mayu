@@ -401,6 +401,10 @@ Modifier SettingLoader::load_MODIFIER(
       { _T("NL-"), Modifier::Type_NumLock },
       { _T("CL-"), Modifier::Type_CapsLock },
       { _T("SL-"), Modifier::Type_ScrollLock },
+      { _T("MAX-"), Modifier::Type_Maximized },
+      { _T("MIN-"), Modifier::Type_Minimized },
+      { _T("MMAX-"), Modifier::Type_MdiMaximized },
+      { _T("MMIN-"), Modifier::Type_MdiMinimized },
       { _T("M0-"), Modifier::Type_Mod0 },
       { _T("M1-"), Modifier::Type_Mod1 },
       { _T("M2-"), Modifier::Type_Mod2 },
@@ -896,7 +900,7 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(
       if (!ks->isCorrectMode(i_mode))
 	throw ErrorMessage()
 	  << _T("`$") << *t
-	  << _T("': Some of R-, IL-, IC-, NL-, CL-, SL-, M0...M9- and L0...L9- are used in the keyseq.  They are prohibited in this context.");
+	  << _T("': Some of R-, IL-, IC-, NL-, CL-, SL-, MAX-, MIN-, MMAX-, MMIN-, M0...M9- and L0...L9- are used in the keyseq.  They are prohibited in this context.");
       keySeq.setMode(ks->getMode());
       keySeq.add(ActionKeySeq(ks));
     }
@@ -1393,6 +1397,7 @@ void SettingLoader::load(const tstringi &i_filename)
       _T("U-"), _T("D-"),			// <KEYSEQ_MODIFIER>
       _T("R-"), _T("IL-"), _T("IC-"), _T("I-"),	// <ASSIGN_MODIFIER>
       _T("NL-"), _T("CL-"), _T("SL-"),
+      _T("MAX-"), _T("MIN-"), _T("MMAX-"), _T("MMIN-"),
       _T("M0-"), _T("M1-"), _T("M2-"), _T("M3-"), _T("M4-"),
       _T("M5-"), _T("M6-"), _T("M7-"), _T("M8-"), _T("M9-"), 
       _T("L0-"), _T("L1-"), _T("L2-"), _T("L3-"), _T("L4-"),

@@ -43,6 +43,7 @@ static Globals g;
 
 
 static void notifyThreadDetach();
+static void notifyShow(NotifyShow::Show i_show, bool i_isMDI);
 static bool mapHookData();
 static void unmapHookData();
 
@@ -190,6 +191,50 @@ static void getClassNameTitleName(HWND i_hwnd, bool i_isInMenu,
 }
 
 
+/// update show
+static void updateShow(HWND i_hwnd, WPARAM i_show)
+{
+  bool isMDI = false;
+  _TCHAR className[MAX(GANA_MAX_PATH, GANA_MAX_ATOM_LENGTH)];
+
+  if (!i_hwnd)
+    return;
+
+  // check class name to avoid invalid notify
+  GetClassName(i_hwnd, className, NUMBER_OF(className));
+  if (_tcsicmp(className, _T("SysShadow")) == 0 ||
+      _tcsicmp(className, _T("UserEventWindow")) == 0)
+    return;
+
+  LONG style = GetWindowLong(i_hwnd, GWL_STYLE);
+  if (style & WS_CHILD)
+  {
+    LONG exStyle = GetWindowLong(i_hwnd, GWL_EXSTYLE);
+    if (exStyle & WS_EX_MDICHILD)
+    {
+      isMDI = true;
+    }
+    else
+      return; // ignore non-MDI child window case
+  }
+
+  switch (i_show)
+  {
+    case SIZE_MAXIMIZED:
+      notifyShow(NotifyShow::Show_Maximized, isMDI);
+      break;
+    case SIZE_MINIMIZED:
+      notifyShow(NotifyShow::Show_Minimized, isMDI);
+      break;
+    case SIZE_RESTORED:
+      notifyShow(NotifyShow::Show_Normal, isMDI);
+      break;
+    default:
+      break;
+  }
+}
+
+
 /// notify WM_Targetted
 static void notifyName(HWND i_hwnd, Notify::Type i_type = Notify::Type_name)
 {
@@ -203,6 +248,61 @@ static void notifyName(HWND i_hwnd, Notify::Type i_type = Notify::Type_name)
   nfc->m_hwnd = i_hwnd;
   tcslcpy(nfc->m_className, className.c_str(), NUMBER_OF(nfc->m_className));
   tcslcpy(nfc->m_titleName, titleName.c_str(), NUMBER_OF(nfc->m_titleName));
+
+  NotifyShow::Show show = NotifyShow::Show_Normal;
+  NotifyShow::Show showMDI = NotifyShow::Show_Normal;
+  while (i_hwnd)
+  {
+    LONG exStyle = GetWindowLong(i_hwnd, GWL_EXSTYLE);
+    if (exStyle & WS_EX_MDICHILD)
+    {
+      WINDOWPLACEMENT placement;
+      placement.length = sizeof(WINDOWPLACEMENT);
+      if (GetWindowPlacement(i_hwnd, &placement))
+      {
+	 switch (placement.showCmd)
+	 {
+	   case SW_SHOWMAXIMIZED:
+	     showMDI = NotifyShow::Show_Maximized;
+	     break;
+	   case SW_SHOWMINIMIZED:
+	     showMDI = NotifyShow::Show_Minimized;
+	     break;
+	   case SW_SHOWNORMAL:
+	   default:
+	     showMDI = NotifyShow::Show_Normal;
+	     break;
+	 }
+      }
+    }
+
+    LONG style = GetWindowLong(i_hwnd, GWL_STYLE);
+    if ((style & WS_CHILD) == 0)
+    {
+      WINDOWPLACEMENT placement;
+      placement.length = sizeof(WINDOWPLACEMENT);
+      if (GetWindowPlacement(i_hwnd, &placement))
+      {
+	 switch (placement.showCmd)
+	 {
+	   case SW_SHOWMAXIMIZED:
+	     show = NotifyShow::Show_Maximized;
+	     break;
+	   case SW_SHOWMINIMIZED:
+	     show = NotifyShow::Show_Minimized;
+	     break;
+	   case SW_SHOWNORMAL:
+	   default:
+	     show = NotifyShow::Show_Normal;
+	     break;
+	 }
+      }
+    }  
+    i_hwnd = GetParent(i_hwnd);
+  }
+  notifyShow(showMDI, true);
+  notifyShow(show, false);
+
   notify(nfc, sizeof(*nfc));
   delete nfc;
 }
@@ -253,6 +353,17 @@ static void notifyCommand(
     ntc.m_lParam = i_lParam;
     notify(&ntc, sizeof(ntc));
   }
+}
+
+
+/// notify show of current window
+static void notifyShow(NotifyShow::Show i_show, bool i_isMDI)
+{
+  NotifyShow ns;
+  ns.m_type = Notify::Type_show;
+  ns.m_show = i_show;
+  ns.m_isMDI = i_isMDI;
+  notify(&ns, sizeof(ns));
 }
 
 
@@ -449,6 +560,9 @@ LRESULT CALLBACK callWndProc(int i_nCode, WPARAM i_wParam, LPARAM i_lParam)
       case WM_COMMAND:
       case WM_SYSCOMMAND:
 	notifyCommand(cwps.hwnd, cwps.message, cwps.wParam, cwps.lParam);
+	break;
+      case WM_SIZE:
+	updateShow(cwps.hwnd, cwps.wParam);
 	break;
       case WM_MOUSEACTIVATE:
 	notifySetFocus();

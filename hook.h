@@ -36,6 +36,7 @@ struct Notify
     Type_sync,					/// Notify
     Type_threadDetach,				/// NotifyThreadDetach
     Type_command,				/// NotifyThreadDetach
+    Type_show,				/// NotifyShow
   };
   Type m_type;					///
 };
@@ -87,6 +88,23 @@ public:
 enum
 {
   NOTIFY_MESSAGE_SIZE = sizeof(NotifySetFocus),	///
+};
+
+
+///
+class NotifyShow
+{
+public:
+  ///
+  enum Show
+  {
+    Show_Normal,
+    Show_Maximized,
+    Show_Minimized,
+  };
+  Notify::Type m_type;				///
+  Show m_show;					///
+  bool m_isMDI;					///
 };
 
 

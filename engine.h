@@ -499,6 +499,9 @@ public:
 		    bool i_isScrollLockToggled, bool i_isImeLockToggled,
 		    bool i_isImeCompToggled);
 
+  /// show
+  bool setShow(bool i_isMaximized, bool i_isMinimized, bool i_isMDI);
+
   /// sync
   bool syncNotify();
 

@@ -174,6 +174,25 @@ private:
 				 n->m_wParam, n->m_lParam);
 	  break;
 	}
+
+	case Notify::Type_show:
+	{
+	  NotifyShow *n = (NotifyShow *)cd->lpData;
+	  switch (n->m_show)
+	  {
+	    case NotifyShow::Show_Maximized:
+	      m_engine.setShow(true, false, n->m_isMDI);
+	      break;
+	    case NotifyShow::Show_Minimized:
+	      m_engine.setShow(false, true, n->m_isMDI);
+	      break;
+	    case NotifyShow::Show_Normal:
+	    default:
+	      m_engine.setShow(false, false, n->m_isMDI);
+	      break;
+	  }	  
+	  break;
+	}
       }
       return true;
   }

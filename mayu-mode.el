@@ -34,6 +34,10 @@
 	 "\\|D-"
 	 "\\|R-"
 	 "\\|E[01]-"
+	 "\\|MAX-"
+	 "\\|MIN-"
+	 "\\|MMAX-"
+	 "\\|MMIN-"
 	 "\\)"
 	 ) . font-lock-keyword-face)
       ("#.*$" . font-lock-comment-face)

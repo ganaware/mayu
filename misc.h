@@ -20,6 +20,7 @@ typedef long int32;				/// signed 32bit
 typedef unsigned char u_int8;			/// unsigned 8bit
 typedef unsigned short u_int16;			/// unsigned 16bit
 typedef unsigned long u_int32;			/// unsigned 32bit
+typedef unsigned long long u_int64;			/// unsigned 64bit
 
 
 #  ifdef NDEBUG

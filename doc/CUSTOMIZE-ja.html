@@ -54,6 +54,10 @@
 			    <li><code>SL-</code> は、<kbd>[ScrollLock]</kbd> がロック状態であることを表します
 			    <li><code>IL-</code> は、IME が on になっていることを表します
 			    <li><code>IC-</code> は、IME で変換中であることを表します
+			    <li><code>MAX-</code> は、ウィンドウが最大化されていることを表します。
+			    <li><code>MIN-</code> は、ウィンドウが最小化されていることを表します。
+			    <li><code>MMAX-</code> は、MDI 子ウィンドウが最大化されていることを表します。
+			    <li><code>MMIN-</code> は、MDI 子ウィンドウが最小化されていることを表します。
 			  </ul>
 			  
 			  <p>以下のように記述すると、<kbd>[Control]</kbd> + <kbd>[A]</kbd> を押した時に、Windows へは <kbd>[HOME]</kbd> キーが入力されます。</p>
@@ -76,7 +80,7 @@
 			  
 			  <p class="continue">このように記述すると、<kbd>[F9]</kbd> 又は <kbd>[Shift]</kbd> + <kbd>[F9]</kbd> でウィンドウを最小化することができますが、例えば、<kbd>[Control]</kbd> + <kbd>[F9]</kbd> ではできません。</p>
 			  
-			  <p>デフォルトでは、暗黙に <code>~C-~M-~S-*NL-*CL-*SL-*IL-~IC-</code> が指定されていることになっていますが、<a href="#defaultModifier">変更</a>できます。</p>
+			  <p>デフォルトでは、暗黙に <code>~C-~M-~S-*NL-*CL-*SL-*IL-~IC-*MAX-*MIN-*MMAX-*MMIN-</code> が指定されていることになっていますが、<a href="#defaultModifier">変更</a>できます。</p>
 			  
 			  <p>また、<kbd>[Shift]</kbd> は必ず押されていてほしいがほかのモディファイヤはどうでもいいという場合は、</p>
 			  
@@ -155,7 +159,7 @@
 		    <dt class="h3"><a name="defaultModifier">デフォルトモディファイヤの変更</a>
 		    <dd class="d3">
 			<div>
-			  <p>デフォルトでは、左側のキーには <code>~C-~M-~S-*NL-*CL-*SL-*IL-~IC-</code> が指定されていますが、これを変更することができます。例えば、</p>
+			  <p>デフォルトでは、左側のキーには <code>~C-~M-~S-*NL-*CL-*SL-*IL-~IC-*MAX-*MIN-*MMAX-*MMIN-</code> が指定されていますが、これを変更することができます。例えば、</p>
 			  
 			  <p class="sample">
 			  key *IC- =

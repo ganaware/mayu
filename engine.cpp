@@ -1205,6 +1205,37 @@ bool Engine::setLockState(bool i_isNumLockToggled,
 }
 
 
+// show
+bool Engine::setShow(bool i_isMaximized, bool i_isMinimized,
+		     bool i_isMDI)
+{
+  Acquire a(&m_cs);
+  if (m_isSynchronizing)
+    return false;
+  Acquire b(&m_log, 1);
+  Modifier::Type max, min;
+  if (i_isMDI == true) {
+    max = Modifier::Type_MdiMaximized;
+    min = Modifier::Type_MdiMinimized;
+  }
+  else
+  {
+    max = Modifier::Type_Maximized;
+    min = Modifier::Type_Minimized;
+  }
+  m_currentLock.on(max, i_isMaximized);
+  m_currentLock.on(min, i_isMinimized);
+  m_log << _T("Set show to ") << (i_isMaximized ? _T("Maximized") :
+				  i_isMinimized ? _T("Minimized") : _T("Normal"));
+  if (i_isMDI == true)
+  {
+    m_log << _T(" (MDI)");
+  }
+  m_log << std::endl;
+  return true;
+}
+
+
 // sync
 bool Engine::syncNotify()
 {

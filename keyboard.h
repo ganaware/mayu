@@ -139,7 +139,7 @@ public:
 class Modifier
 {
   ///
-  typedef u_long MODIFIERS;
+  typedef u_int64 MODIFIERS;
   ///
   MODIFIERS m_modifiers;
   ///
@@ -167,6 +167,10 @@ public:
     Type_NumLock,				/// &lt;ASSIGN_MODIFIER&gt;
     Type_CapsLock,				/// &lt;ASSIGN_MODIFIER&gt;
     Type_ScrollLock,				/// &lt;ASSIGN_MODIFIER&gt;
+    Type_Maximized,				/// &lt;ASSIGN_MODIFIER&gt;
+    Type_Minimized,				/// &lt;ASSIGN_MODIFIER&gt;
+    Type_MdiMaximized,			/// &lt;ASSIGN_MODIFIER&gt;
+    Type_MdiMinimized,			/// &lt;ASSIGN_MODIFIER&gt;
     Type_Mod0,					/// &lt;ASSIGN_MODIFIER&gt;
     Type_Mod1,					/// &lt;ASSIGN_MODIFIER&gt;
     Type_Mod2,					/// &lt;ASSIGN_MODIFIER&gt;
