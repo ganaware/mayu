@@ -984,8 +984,9 @@ Engine::Engine(tomsgstream &i_log)
 
     if (DeviceIoControl(m_device, IOCTL_MAYU_GET_VERSION, NULL, 0,
 			versionBuf, sizeof(versionBuf), &length, NULL)
-	&& length)
-      m_mayudVersion = tstring(versionBuf, length / 2);
+	&& length
+	&& length < sizeof(versionBuf))			// fail safe
+	m_mayudVersion = tstring(versionBuf, length / 2);
   }
   // create event for sync
   CHECK_TRUE( m_eSync = CreateEvent(NULL, FALSE, FALSE, NULL) );
