@@ -62,6 +62,8 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL_, DWORD fdwReason,
       WM_Targetted = RegisterWindowMessage(WM_Targetted_name);
       break;
     }
+    case DLL_THREAD_ATTACH:
+      break;
     case DLL_PROCESS_DETACH:
       notifyThreadDetach();
       unmapHookData();
@@ -69,7 +71,6 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL_, DWORD fdwReason,
     case DLL_THREAD_DETACH:
       notifyThreadDetach();
       break;
-    case DLL_THREAD_ATTACH:
     default:
       break;
   }
@@ -101,7 +102,8 @@ static bool mapHookData()
 static void unmapHookData()
 {
   if (hookData)
-    UnmapViewOfFile(hookData);
+    if (!UnmapViewOfFile(hookData))
+      return;
   hookData = NULL;
   if (hHookData)
     CloseHandle(hHookData);

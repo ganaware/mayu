@@ -223,7 +223,133 @@ enum
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// classes
+
+
+class CRegExecutor;
+class CRegCompilerBase;
+class CRegValidator;
+class CRegCompiler;
+typedef R_char PROGRAM;
+
+
+///////////////////////////////////////////////////////////////////////////////
+// All of the functions required to directly access the 'program'
+
+
+#if sizeof_R_char == 1
+static inline short short_le(PROGRAM *p)
+{
+  return (short)(((short)p[0] & 0x00ff) |
+		 ((short)p[1] << 8));
+}
+#endif
+static inline PROGRAM OP(PROGRAM *p) { return *p; }
+static inline PROGRAM *OPERAND(PROGRAM *p) { return p + lengthof_OP; }
+static inline PROGRAM *regnext(PROGRAM *p)
+{
+#if sizeof_R_char == 1
+  const short offset = short_le(p + 1);
+#else
+  const PROGRAM offset = *(p + 1);
+#endif
+  if (offset == 0)
+    return NULL;
+  return (OP(p) == BACK) ? p - offset : p + offset;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // function
+
+
+// for debugging
+void dump(const R_char *exp, PROGRAM *program, size_t lengthof_program)
+{
+  if (!*exp)
+    return;
+  
+  printf("regexp: %s\n", exp);
+  
+  PROGRAM *p = program;
+  PROGRAM *end = program + lengthof_program - 1;
+
+  while (p < end)
+  {
+#if sizeof_R_char == 1
+    const short offset = short_le(p + 1);
+#else
+    const PROGRAM offset = *(p + 1);
+#endif
+
+    printf("\t%d:\t", (p - program));
+    printf("(%d)", (p - program) + ((OP(p) == BACK) ? -offset : offset));
+    
+    switch (*p)
+    {
+      case END: printf("END"); p += lengthof_OP; break;
+      case BOL: printf("BOL"); p += lengthof_OP; break;
+      case EOL: printf("EOL"); p += lengthof_OP; break;
+      case ANY: printf("ANY"); p += lengthof_OP; break;
+      case ANYOF:
+	printf("ANYOF %s", OPERAND(p));
+	p = OPERAND(p) + R_strlen(OPERAND(p)) + 1;
+	break;
+      case ANYBUT:
+	printf("ANYBUT %s", OPERAND(p));
+	p = OPERAND(p) + R_strlen(OPERAND(p)) + 1;
+	break;
+      case BRANCH: printf("BRANCH"); p += lengthof_OP; break;
+      case BACK: printf("BACK"); p += lengthof_OP; break;
+      case EXACTLY:
+	printf("EXACTLY %s", OPERAND(p));
+	p = OPERAND(p) + R_strlen(OPERAND(p)) + 1;
+	break;
+      case NOTHING: printf("NOTHING"); p += lengthof_OP; break;
+      case STAR: printf("STAR"); p += lengthof_OP; break;
+      case PLUS: printf("PLUS"); p += lengthof_OP; break;
+      case WORDC: printf("WORDC"); p += lengthof_OP; break;
+      case NONWORDC: printf("NONWORDC"); p += lengthof_OP; break;
+      case WS: printf("WS"); p += lengthof_OP; break;
+      case NONWS: printf("NONWS"); p += lengthof_OP; break;
+      case DIGIT: printf("DIGIT"); p += lengthof_OP; break;
+      case NONDIGIT: printf("NONDIGIT"); p += lengthof_OP; break;
+      case WORDB: printf("WORDB"); p += lengthof_OP; break;
+      case NONWORDB: printf("NONWORDB"); p += lengthof_OP; break;
+      case ANYOFC:
+	printf("ANYOFC %s ", OPERAND(p));
+	p = OPERAND(p) + R_strlen(OPERAND(p)) + 1;
+	printf("%s", p);
+	p += R_strlen(p) + 1;
+	break;
+      case ANYBUTC:
+	printf("ANYBUT %s ", OPERAND(p));
+	p = OPERAND(p) + R_strlen(OPERAND(p)) + 1;
+	printf("%s", p);
+	p += R_strlen(p) + 1;
+	break;
+      default:
+	if (OPEN <= *p && *p <= CLOSE)
+	{
+	  printf("OPEN+%d", *p - OPEN);
+	  p += lengthof_OP;
+	}
+	else if (CLOSE <= *p)
+	{
+	  printf("CLOSE+%d", *p - CLOSE);
+	  p += lengthof_OP;
+	}
+	else
+	{
+	  printf("error");
+	  p = end;
+	}
+	break;
+    }
+
+    printf("\n");
+  }
+}
 
 
 #ifndef R_strrange
@@ -315,36 +441,6 @@ R_char *R_strmchr(R_char *s, const R_char *c)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// classes
-
-
-class CRegExecutor;
-class CRegCompilerBase;
-class CRegValidator;
-class CRegCompiler;
-typedef R_char PROGRAM;
-
-
-///////////////////////////////////////////////////////////////////////////////
-// All of the functions required to directly access the 'program'
-
-
-static inline PROGRAM OP(PROGRAM *p) { return *p; }
-static inline PROGRAM *OPERAND(PROGRAM *p) { return p + lengthof_OP; }
-static inline PROGRAM *regnext(PROGRAM *p)
-{
-#if sizeof_R_char == 1
-  const short offset = ((short)p[1] | (short)((short)p[2] << 8));
-#else
-  const PROGRAM offset = *(p + 1);
-#endif
-  if (offset == 0)
-    return NULL;
-  return (OP(p) == BACK) ? p - offset : p + offset;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // The internal interface to the regexp,  wrapping the compilation as
 // well as the execution of the regexp (matching)
 
@@ -406,9 +502,6 @@ public:
   const R_char *getEndp(size_t i) const throw (std::out_of_range)
   { checkSubStringIndex(i); return endp[i]; }
   size_t getNumSubs() const { return numSubs - 1; }
-
-  // for debugging
-  void dump(const R_char *exp);
 };
 
 
@@ -554,11 +647,13 @@ void CRegCompiler::regtail(PROGRAM *p, const PROGRAM *val)
   for (scan = p; (temp = regnext(scan)) != NULL; scan = temp)
     continue;
 
-  short offset = (short)((OP(scan) == BACK) ? scan - val : val - scan);
 #if sizeof_R_char == 1
+  short offset = (short)((OP(scan) == BACK) ? scan - val : val - scan);
+  assert(0 <= offset);
   scan[1] = (PROGRAM)offset;
   scan[2] = (PROGRAM)(offset >> 8);
 #else
+  PROGRAM offset = (PROGRAM)((OP(scan) == BACK) ? scan - val : val - scan);
   *(scan + 1) = offset;
 #endif
 }
@@ -600,8 +695,8 @@ Regexp::regexp::regexp(const R_char *exp, bool doesIgnoreCase)
   }
   else
     regcomp(exp);
-#if 0
-  dump(exp);
+#if 1
+  dump(exp, program + 1, lengthof_program);
 #endif
 }
 
@@ -661,7 +756,7 @@ void Regexp::regexp::regcomp(const R_char *exp)
 #if sizeof_R_char == 1
     0x7fffL  // Probably could be 0xffffL.
 #else
-    (((R_char)1 << (sizeof_R_char * 8 - 1)) - 1)
+    (((R_char)1 << (sizeof(R_char) * 8 - 1)) - 1)
 #endif
     <= tester.getSize())
     throw InvalidRegexp("regexp too big");
@@ -669,10 +764,15 @@ void Regexp::regexp::regcomp(const R_char *exp)
   // Allocate space.
   lengthof_program = tester.getSize();
   program = new R_char[lengthof_program];
+#ifndef NDEBUG
+  memset(program, 0, sizeof(R_char) * lengthof_program);
+#endif
   
   // Second pass: emit code. 
   CRegCompiler comp(exp, program);
+  printf("<---honban\n");
   _true( comp.reg(false, &flags) );
+  printf("honban--->\n");
 
   PROGRAM *scan = program + 1;		// First BRANCH.
   assert(OP(scan) == BRANCH);
@@ -1889,92 +1989,3 @@ R_string Regexp::regexp::replace(const R_char *sReplaceExp) const
   buf[replacelen] = R_char_0;
   return R_string(buf);
 }
-
-// for debugging
-void Regexp::regexp::dump(const R_char *exp)
-{
-  if (!*exp)
-    return;
-  
-  printf("regexp: %s\n", exp);
-  
-  PROGRAM *p = program + 1;	// skip magic
-  PROGRAM *end = program + lengthof_program - 1;
-
-  while (p < end)
-  {
-#if sizeof_R_char == 1
-    const short offset = ((short)p[1] | (short)((short)p[2] << 8));
-#else
-    const PROGRAM offset = *(p + 1);
-#endif
-
-    printf("\t%d:\t", (p - program));
-    printf("(%d)", (p - program) + ((OP(p) == BACK) ? -offset : offset));
-    
-    switch (*p)
-    {
-      case END: printf("END"); p += lengthof_OP; break;
-      case BOL: printf("BOL"); p += lengthof_OP; break;
-      case EOL: printf("EOL"); p += lengthof_OP; break;
-      case ANY: printf("ANY"); p += lengthof_OP; break;
-      case ANYOF:
-	printf("ANYOF %s", OPERAND(p));
-	p = OPERAND(p) + R_strlen(OPERAND(p)) + 1;
-	break;
-      case ANYBUT:
-	printf("ANYBUT %s", OPERAND(p));
-	p = OPERAND(p) + R_strlen(OPERAND(p)) + 1;
-	break;
-      case BRANCH: printf("BRANCH"); p += lengthof_OP; break;
-      case BACK: printf("BACK"); p += lengthof_OP; break;
-      case EXACTLY:
-	printf("EXACTLY %s", OPERAND(p));
-	p = OPERAND(p) + R_strlen(OPERAND(p)) + 1;
-	break;
-      case NOTHING: printf("NOTHING"); p += lengthof_OP; break;
-      case STAR: printf("STAR"); p += lengthof_OP; break;
-      case PLUS: printf("PLUS"); p += lengthof_OP; break;
-      case WORDC: printf("WORDC"); p += lengthof_OP; break;
-      case NONWORDC: printf("NONWORDC"); p += lengthof_OP; break;
-      case WS: printf("WS"); p += lengthof_OP; break;
-      case NONWS: printf("NONWS"); p += lengthof_OP; break;
-      case DIGIT: printf("DIGIT"); p += lengthof_OP; break;
-      case NONDIGIT: printf("NONDIGIT"); p += lengthof_OP; break;
-      case WORDB: printf("WORDB"); p += lengthof_OP; break;
-      case NONWORDB: printf("NONWORDB"); p += lengthof_OP; break;
-      case ANYOFC:
-	printf("ANYOFC %s ", OPERAND(p));
-	p = OPERAND(p) + R_strlen(OPERAND(p)) + 1;
-	printf("%s", p);
-	p += R_strlen(p) + 1;
-	break;
-      case ANYBUTC:
-	printf("ANYBUT %s ", OPERAND(p));
-	p = OPERAND(p) + R_strlen(OPERAND(p)) + 1;
-	printf("%s", p);
-	p += R_strlen(p) + 1;
-	break;
-      default:
-	if (OPEN <= *p && *p <= CLOSE)
-	{
-	  printf("OPEN+%d", *p - OPEN);
-	  p += lengthof_OP;
-	}
-	else if (CLOSE <= *p)
-	{
-	  printf("CLOSE+%d", *p - CLOSE);
-	  p += lengthof_OP;
-	}
-	else
-	{
-	  printf("error");
-	  p = end;
-	}
-	break;
-    }
-
-    printf("\n");
-  }
-}
-
