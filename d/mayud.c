@@ -8,7 +8,25 @@
 
 #pragma warning(3 : 4061 4100 4132 4701 4706)
 
+#include "ioctl.h"
 #include "keyque.c"
+
+#if DBG
+// Enable debug logging only on checked build:
+// We use macro to avoid function call overhead
+// in non-logging case, and use double paren such
+// as DEBUG_LOG((...)) because of va_list in macro.
+#include "log.h"
+#define DEBUG_LOG_INIT(x) mayuLogInit x
+#define DEBUG_LOG_TERM(x) mayuLogTerm x
+#define DEBUG_LOG(x) mayuLogEnque x
+#define DEBUG_LOG_RETRIEVE(x) mayuLogDeque x
+#else
+#define DEBUG_LOG_INIT(x)
+#define DEBUG_LOG_TERM(x)
+#define DEBUG_LOG(x)
+#define DEBUG_LOG_RETRIEVE(x) STATUS_INVALID_DEVICE_REQUEST
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // Device Extensions
@@ -111,13 +129,6 @@ UnicodeString(L"\\Driver\\kbdclass");
 // Global Variables
 PDRIVER_DISPATCH _IopInvalidDeviceRequest; // Default dispatch function
 
-// Ioctl value
-#define IOCTL_MAYU_DETOUR_CANCEL					 \
-CTL_CODE(FILE_DEVICE_KEYBOARD, 0x801, METHOD_BUFFERED, FILE_ANY_ACCESS)
-
-#define IOCTL_MAYU_GET_VERSION					 \
-CTL_CODE(FILE_DEVICE_KEYBOARD, 0x802, METHOD_BUFFERED, FILE_ANY_ACCESS)
-
 
 #define MAYUD_MODE L""
 static UNICODE_STRING MayuDriverVersion =
@@ -127,6 +138,21 @@ UnicodeString(L"$Revision$" MAYUD_MODE);
 ///////////////////////////////////////////////////////////////////////////////
 // Entry / Unload
 
+void DEBUG_LOGChain(PDRIVER_OBJECT driverObject)
+{
+  PDEVICE_OBJECT deviceObject = driverObject->DeviceObject;
+
+  if (deviceObject)
+  {
+    while (deviceObject->NextDevice)
+    {
+      DEBUG_LOG(("%x->", deviceObject));
+      deviceObject = deviceObject->NextDevice;
+    }
+    DEBUG_LOG(("%x", deviceObject));
+  }
+  return;
+}
 
 // initialize driver
 NTSTATUS DriverEntry(IN PDRIVER_OBJECT driverObject,
@@ -142,6 +168,7 @@ NTSTATUS DriverEntry(IN PDRIVER_OBJECT driverObject,
   
   UNREFERENCED_PARAMETER(registryPath);
 
+  DEBUG_LOG_INIT(("mayud: start logging"));
 
   // Environment specific initialize
   RtlZeroMemory(query, sizeof(query));
@@ -151,8 +178,10 @@ NTSTATUS DriverEntry(IN PDRIVER_OBJECT driverObject,
   RtlQueryRegistryValues(RTL_REGISTRY_SERVICES, L"mayud", query, NULL, NULL);
   if (start == 0x03) {
     g_isPnP = TRUE;
+    DEBUG_LOG(("is PnP"));
   } else {
     g_isPnP = FALSE;
+    DEBUG_LOG(("is not PnP"));
   }
 #ifdef MAYUD_NT4
   g_isXp = FALSE;
@@ -160,14 +189,17 @@ NTSTATUS DriverEntry(IN PDRIVER_OBJECT driverObject,
   g_RequestIsPending_offset = 0;
 #else /* !MAYUD_NT4 */
   if (IoIsWdmVersionAvailable(1, 0x20)) { // is WindowsXP
+    DEBUG_LOG(("is WindowsXp"));
     g_isXp = TRUE;
     g_SpinLock_offset = 108;
     g_RequestIsPending_offset = 0;
   } else if (IoIsWdmVersionAvailable(1, 0x10)) { // is Windows2000
+    DEBUG_LOG(("is Windows2000"));
     g_isXp =FALSE;
     g_SpinLock_offset = 116;
     g_RequestIsPending_offset = 48;
   } else { // Unknown version
+    DEBUG_LOG(("unknown Windows"));
     status = STATUS_UNKNOWN_REVISION;
     goto error;
   }
@@ -198,6 +230,8 @@ NTSTATUS DriverEntry(IN PDRIVER_OBJECT driverObject,
 			    0, FALSE, &detourDevObj);
     
     if (!NT_SUCCESS(status)) goto error;
+    DEBUG_LOG(("create detour device: %x", detourDevObj));
+    DEBUG_LOGChain(driverObject);
     detourDevObj->Flags |= DO_BUFFERED_IO;
 #ifndef MAYUD_NT4
     detourDevObj->Flags |= DO_POWER_PAGABLE;
@@ -288,11 +322,16 @@ NTSTATUS mayuAddDevice(IN PDRIVER_OBJECT driverObject,
   FilterDeviceExtension *filterDevExt;
   ULONG i;
 
+  DEBUG_LOG(("attach to device: %x", kbdClassDevObj));
+  DEBUG_LOG(("type of device: %x", kbdClassDevObj->DeviceType));
+  DEBUG_LOG(("name of driver: %T", &(kbdClassDevObj->DriverObject->DriverName)));
 
   // create filter device
   status = IoCreateDevice(driverObject, sizeof(FilterDeviceExtension),
 			  NULL, FILE_DEVICE_KEYBOARD,
 			  0, FALSE, &filterDevObj);
+  DEBUG_LOG(("add filter device: %x", filterDevObj));
+  DEBUG_LOGChain(driverObject);
   if (!NT_SUCCESS(status)) return status;
   filterDevObj->Flags |= DO_BUFFERED_IO;
 #ifndef MAYUD_NT4
@@ -313,6 +352,8 @@ NTSTATUS mayuAddDevice(IN PDRIVER_OBJECT driverObject,
   attachedDevObj = kbdClassDevObj->AttachedDevice;
   while (attachedDevObj)
   {
+    DEBUG_LOG(("attached to %T", &(attachedDevObj->DriverObject->DriverName)));
+    DEBUG_LOG(("type of attched device: %x", attachedDevObj->DeviceType));
     if (RtlCompareUnicodeString(&KeyboardClassDriverName, &attachedDevObj->DriverObject->DriverName, TRUE) == 0)
       filterDevExt->isKeyboard = TRUE;
     attachedDevObj = attachedDevObj->AttachedDevice;
@@ -340,10 +381,13 @@ NTSTATUS mayuAddDevice(IN PDRIVER_OBJECT driverObject,
   }
   if (filterDevExt->isKeyboard == FALSE)
   {
+    DEBUG_LOG(("filter read: GlidePoint"));
+    filterDevObj->DeviceType = FILE_DEVICE_MOUSE;
     filterDevExt->MajorFunction[IRP_MJ_INTERNAL_DEVICE_CONTROL] = filterTouchpad;
   }
   else
   {
+    DEBUG_LOG(("filter read: Keyboard"));
     filterDevExt->MajorFunction[IRP_MJ_READ] = filterRead;
   }
 #ifndef MAYUD_NT4
@@ -357,6 +401,7 @@ NTSTATUS mayuAddDevice(IN PDRIVER_OBJECT driverObject,
   return STATUS_SUCCESS;
 
  error:
+  DEBUG_LOG(("mayuAddDevice: error"));
   if (filterDevObj) {
       KqFinalize(&filterDevExt->readQue);
       IoDeleteDevice(filterDevObj);
@@ -383,6 +428,7 @@ VOID CancelKeyboardClassRead(PIRP cancelIrp, PDEVICE_OBJECT kbdClassDevObj)
     KeReleaseSpinLock(SpinLock, currentIrql);
     IoCancelIrp(cancelIrp);
   } else {
+    DEBUG_LOG(("cancel irp not pending"));
     KeReleaseSpinLock(SpinLock, currentIrql);
   }
   return;
@@ -439,6 +485,7 @@ VOID mayuUnloadDriver(IN PDRIVER_OBJECT driverObject)
 
   // delete symbolic link
   IoDeleteSymbolicLink(&MayuDetourWin32DeviceName);
+  DEBUG_LOG_TERM(());
 }
 
 
@@ -454,6 +501,7 @@ VOID mayuDetourReadCancel(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
   KIRQL currentIrql;
 
   IoReleaseCancelSpinLock(irp->CancelIrql);
+  DEBUG_LOG(("detourReadCancel:"));
 #if 0
   KeAcquireSpinLock(&devExt->lock, &currentIrql);
   if (devExt->irpq && irp == deviceObject->CurrentIrp)
@@ -597,6 +645,10 @@ NTSTATUS mayuGenericDispatch(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
     FilterDeviceExtension *filterDevExt =
       (FilterDeviceExtension *)deviceObject->DeviceExtension;
 
+    if (filterDevExt->isKeyboard == FALSE)
+    {
+      DEBUG_LOG(("MajorFunction: %x", irpSp->MajorFunction));
+    }
     return filterDevExt->MajorFunction[irpSp->MajorFunction](deviceObject, irp);
   } else {
     DetourDeviceExtension *detourDevExt = 
@@ -662,6 +714,7 @@ NTSTATUS detourClose(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
   irp->IoStatus.Status = STATUS_SUCCESS;
   irp->IoStatus.Information = 0;
   IoCompleteRequest(irp, IO_NO_INCREMENT);
+  DEBUG_LOG_TERM(());
   return STATUS_SUCCESS;
 }
 
@@ -815,6 +868,7 @@ NTSTATUS detourDeviceControl(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
     (DetourDeviceExtension*)deviceObject->DeviceExtension;
   
   irp->IoStatus.Information = 0;
+  if (irpSp->Parameters.DeviceIoControl.IoControlCode != IOCTL_MAYU_GET_LOG) DEBUG_LOG(("DeviceIoControl: %x", irpSp->Parameters.DeviceIoControl.IoControlCode));
   status = STATUS_INVALID_DEVICE_REQUEST;
   switch (irpSp->Parameters.DeviceIoControl.IoControlCode)
   {
@@ -844,15 +898,20 @@ NTSTATUS detourDeviceControl(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
       RtlCopyMemory(irp->AssociatedIrp.SystemBuffer,
 		    MayuDriverVersion.Buffer, MayuDriverVersion.Length);
       irp->IoStatus.Information = MayuDriverVersion.Length;
+      DEBUG_LOG(("Version: %T", &MayuDriverVersion));
       status = STATUS_SUCCESS;
       break;
     }
+    case IOCTL_MAYU_GET_LOG:
+      status = DEBUG_LOG_RETRIEVE((irp));
+      break;
     default:
       status = STATUS_INVALID_DEVICE_REQUEST;
       break;
   }
   irp->IoStatus.Status = status;
-  IoCompleteRequest(irp, IO_NO_INCREMENT);
+  if (status != STATUS_PENDING)
+    IoCompleteRequest(irp, IO_NO_INCREMENT);
   
   return status;
 }
@@ -950,10 +1009,12 @@ NTSTATUS filterPnP(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
   NTSTATUS status;
   ULONG minor;
   PIRP cancelIrp;
+  PDRIVER_OBJECT driverObject = deviceObject->DriverObject;
 
   minor = irpSp->MinorFunction;
   IoSkipCurrentIrpStackLocation(irp);
   status = IoCallDriver(filterDevExt->kbdClassDevObj, irp);
+  DEBUG_LOG(("filterPnP: minor=%d(%x)", minor, minor));
   switch (minor) {
   case IRP_MN_SURPRISE_REMOVAL:
   case IRP_MN_REMOVE_DEVICE:
@@ -961,6 +1022,7 @@ NTSTATUS filterPnP(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
     if (detourDevExt->filterDevObj == deviceObject) {
       PDEVICE_OBJECT devObj = deviceObject->DriverObject->DeviceObject;
 
+      DEBUG_LOG(("filterPnP: current filter(%x) was removed", deviceObject));
       detourDevExt->filterDevObj = NULL;
       while (devObj->NextDevice) {
 	if (devObj != deviceObject) {
@@ -969,6 +1031,7 @@ NTSTATUS filterPnP(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
 	}
 	devObj = devObj->NextDevice;
       }
+      DEBUG_LOG(("filterPnP: current filter was changed to %x", detourDevExt->filterDevObj));
     }
     KeReleaseSpinLock(&detourDevExt->lock, currentIrql);
     // detach
@@ -984,6 +1047,8 @@ NTSTATUS filterPnP(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
       IoCancelIrp(cancelIrp);
     }
     IoDeleteDevice(deviceObject);
+    DEBUG_LOG(("delete filter device: %x", deviceObject));
+    DEBUG_LOGChain(driverObject);
     break;
   default:
     break;
@@ -999,6 +1064,8 @@ NTSTATUS filterTouchpadCompletion(IN PDEVICE_OBJECT deviceObject,
   KIRQL currentIrql;
   FilterDeviceExtension *filterDevExt =
     (FilterDeviceExtension*)deviceObject->DeviceExtension;
+  PIO_STACK_LOCATION irpSp = IoGetCurrentIrpStackLocation(irp);
+  //PIO_STACK_LOCATION irpSp = IoGetNextIrpStackLocation(irp);
   UCHAR *data = irp->UserBuffer;
   UCHAR pressure;
 
@@ -1012,6 +1079,12 @@ NTSTATUS filterTouchpadCompletion(IN PDEVICE_OBJECT deviceObject,
   else
     pressure = 0;
 
+  if (data)
+  {
+    ULONG *p = (ULONG*)data;
+    //DEBUG_LOG(("UserBuffer: %2x %2x %2x %2x", data[4], data[5], data[6], data[7]));
+    //DEBUG_LOG(("UserBuffer: %x %x %x %x %x %x %x %x", p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]));
+  }
   KeAcquireSpinLock(&filterDevExt->lock, &currentIrql);
   if (filterDevExt->isTouched == FALSE && pressure)
   {
@@ -1072,6 +1145,7 @@ NTSTATUS filterTouchpadCompletion(IN PDEVICE_OBJECT deviceObject,
       filterDevExt->isTouched = FALSE;
     }
   }
+  //DEBUG_LOG(("touchpad pressed: out=%u in=%u code=%u status=%x SystemBuffer=%x UserBuffer=%x", irpSp->Parameters.DeviceIoControl.OutputBufferLength, irpSp->Parameters.DeviceIoControl.InputBufferLength, irpSp->Parameters.DeviceIoControl.IoControlCode, irp->IoStatus.Status, irp->AssociatedIrp.SystemBuffer, irp->UserBuffer));
   KeReleaseSpinLock(&filterDevExt->lock, currentIrql);
   return STATUS_SUCCESS;
 }

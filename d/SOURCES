@@ -4,4 +4,4 @@ TARGETPATH=	.
 
 INCLUDES=	$(BASEDIR)\inc;.
 
-SOURCES=	mayud.c
+SOURCES=	mayud.c log.c
