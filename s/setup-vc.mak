@@ -15,7 +15,7 @@ DEPENDIGNORE	= --ignore=$(BOOST_DIR)
 MAYU_VC	= vc6
 !endif
 
-!if "$(MAYU_VC)" == "vc71"
+!if ( "$(MAYU_VC)" == "vct" ) || ( "$(MAYU_VC)" == "vc71" )
 MAYU_REGEX_VC	= vc7
 !else
 MAYU_REGEX_VC	= $(MAYU_VC)
@@ -38,10 +38,12 @@ strres.h:	setup.rc
 	sed "s/""""/"") _T(""/g" > strres.h
 
 batch:
-		-$(MAKE) -k -f setup-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WINNT nodebug=1
+!if "$(MAYU_VC)" != "vct"
 		-$(MAKE) -k -f setup-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WINNT
-		-$(MAKE) -k -f setup-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WIN95 nodebug=1
 		-$(MAKE) -k -f setup-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WIN95
+!endif
+		-$(MAKE) -k -f setup-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WINNT nodebug=1
+		-$(MAKE) -k -f setup-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WIN95 nodebug=1
 
 batch_clean:
 		-$(MAKE) -k -f setup-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WINNT nodebug=1 clean

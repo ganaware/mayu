@@ -1386,21 +1386,40 @@
 		    <dt class="h3"><a name="compile_tool">必要なもの</a>
 		    <dd class="d3">
 			<div>
+			  <p>マイクロソフトが DDK 以外の開発環境一式を無償で提供してくれていますので、それを利用するのが一番お手軽です。</p>
 			  <dl>
-			    <dt class="h4">コンパイラ
+			    <dt class="h4">コンパイラ - Visual C++ を使用する場合 (推奨)
 			    <dd class="d4">
 				<div>
-				  <p>現在対応しているコンパイラは Visual C++ 6.0 SP5 又は <a href="http://www.borland.co.jp/cppbuilder/freecompiler/index.html">Borland C++ 5.5.1</a> です。</p>
+				  <p>商用の Visual C++ 6.0 SP5 以降、又はマイクロソフトから無償で提供されている <a href="http://www.microsoft.com/downloads/details.aspx?FamilyID=272be09d-40bb-49fd-9cb0-4bfa122fa91b&DisplayLang=en">Visual C++ Toolkit 2003</a> をダウンロードして使用することが可能です。</p>
 				</div>
-			    <dt class="h4">Platform SDK (Visual C++ を利用する場合)
+
+			    <dt class="h4">コンパイラ - Borland C++ 5.5.1 を使用する場合
 			    <dd class="d4">
 				<div>
-				  <p>Windows 2000 に対応したものが必要です。MSDN で配布されていますし、マイクロソフトの<a href="http://www.microsoft.com/msdownload/platformsdk/sdkupdate/" target="_top">サイト</a>でも配布されています。</p>
+				  <a href="http://www.borland.co.jp/cppbuilder/freecompiler/index.html">Borland C++ 5.5.1</a> をダウンロードして無償で使用することが可能です。
 				</div>
+
+			    <dt class="h4">(Visual C++ を利用する場合のみ) Platform SDK 
+			    <dd class="d4">
+				<div>
+				  <p>Windows XP に対応したものが必要です。MSDN で配布されていますし、マイクロソフトのから無償で提供されている <a href="http://www.microsoft.com/msdownload/platformsdk/sdkupdate/XPSP2FULLInstall.htm" target="_top">XPSP2 PSDK</a> を利用することもできます。</p>
+				</div>
+				
+			    <dt class="h4">(Visual C++ Toolkit 2003 を利用する場合のみ) .NET Framework SDK Version 1.1
+			    <dd class="d4">
+				<div>
+				  <p>Visual C++ Toolkit 2003 のパッケージには nmake と cvtres が含まれていないので、<a href="http://www.microsoft.com/downloads/details.aspx?FamilyId=9B3A2CA6-3647-4070-9F41-A333C6B9181D&displaylang=ja">.NET Framework SDK Version 1.1</a> をインストール(無償)する必要があります。</p>
+
+				  <p><code>...\Microsoft.NET\SDK\v1.1\Bin\nmake.exe</code> と <code>C:\WINDOWS\Microsoft.NET\Framework\v1.1.4322\cvtres.exe</code> を Visual C++ Toolkit 2003 の <code>bin/</code> ディレクトリへコピーします。(cvtres.exe は必ず link.exe と同じディレクトリに置いてください。nmake.exe はパスが通っていれば使用可能です。)</p>
+
+				  <p>商用パッケージの Visual C++ には最初から含まれているので、入れる必要はありません。</p>
+				</div>
+				
 			    <dt class="h4">DDK
 			    <dd class="d4">
 				<div>
-				  <p>デバイスドライバをビルドする場合のみ必要になります。MSDN で配布されていますし、マイクロソフトの<a href="http://www.microsoft.com/whdc/ddk/winddk.mspx" target="_top">サイト</a>でも配布されています。</p>
+				  <p>デバイスドライバをビルドする場合のみ必要になります。MSDN で配布されていますし、マイクロソフトの<a href="http://www.microsoft.com/whdc/ddk/winddk.mspx" target="_top">サイト</a>から注文することもできます。</p>
 				</div>
 			    <dt class="h4">正規表現ライブラリ
 			    <dd class="d4">
@@ -1472,23 +1491,53 @@
 		    <dd class="d3">
 			<div>
 			  <dl>
-			    <dt class="h4">Visual C++ 6.0 の場合
+			    <dt class="h4">Visual C++ の場合
 			    <dd class="d4">
 				<div>
-				  <p>Visual C++ 6.0 のコンパイラなどにパスを通しておいて、以下のようにします。
-				  </p>
+				  <p>まず、いくつかの環境変数を設定します。</p>
+				  <p> <code>vcvars32.bat</code> を利用すると設定してくれるはずですが、以下の環境変数の設定が必要になります。</p>
+				  <ul>
+				    <li><code>PATH</code> … コンパイラと nmake にパスを通します。
+				    <li><code>INCLUDE</code> … コンパイラと PSDK の include ディレクトリパスを設定します。
+				    <li><code>LIB</code> … コンパイラと PSDK の lib ディレクトリパスを設定します。
+				    <li><code>MSVCDIR</code> … Visual C++ Toolkit 2003 を使用する場合は設定されていないので、環境変数 <code>VCTOOLKITINSTALLDIR</code> と同じ内容に設定します。
+				  </ul>
+				  
+				  <p>次にコンパイルを行います。</p>
+
+				  <p>Visual C++ Toolkit 2003 の場合は、以下のようにします。</p>
 				  <p class="sample">
-				  mayu-3.??&gt; nmake
+				  mayu-3.??&gt; nmake MAYU_VC=vct
 				  </p>
-				  <p><code>out_win9x/</code>, <code>out_win9x_debug/</code>, <code>out_winnt/</code>, <code>out_winnt_debug/</code> の各ディレクトリに実行ファイルが作成されます。</p>
+				  <p>Visual C++ 7.1 の場合は、以下のようにします。</p>
+				  <p class="sample">
+				  mayu-3.??&gt; nmake MAYU_VC=vc71
+				  </p>
+				  <p>Visual C++ 7.0 の場合は、以下のようにします。</p>
+				  <p class="sample">
+				  mayu-3.??&gt; nmake MAYU_VC=vc7
+				  </p>
+				  <p>Visual C++ 6.0 の場合は、以下のようにします。</p>
+				  <p class="sample">
+				  mayu-3.??&gt; nmake MAYU_VC=vc6
+				  </p>
+				  <p><code>out$(MAYU_VC)_win9x/</code>, <code>out$(MAYU_VC)_win9x_debug/</code>, <code>out$(MAYU_VC)_winnt/</code>, <code>out$(MAYU_VC)_winnt_debug/</code> の各ディレクトリに実行ファイルが作成されます。</p>
 				  <p><code>d/</code>, <code>d_win9x/</code> ディレクトリ以下にはドライバのソースが入っているので、必要なら適当にコンパイルしてください。</p>
+				  
+				  <hr>
+				  
 				  <p>正規表現ライブラリのバージョンによっては、<code>boost/libs/regex/src/c_regex_traits.cpp</code> の冒頭に以下の 3 行を付け加えないとコンパイルが成功しません</p>
 				  <p class="sample">#if !defined(NDEBUG) && defined(_MSC_VER)<br>
 				  #  define _WCTYPE_INLINE_DEFINED<br>
 				  #endif</p>
+				  
+				  <hr>
+
+				  <p>Visual C++ Toolkit 2003 を使用する場合は、<code>libcpmtd.lib</code> が提供されていないため、デバッグバージョンの mayu はビルドしないようになっています。</p>
+				  
 				</div>
 				
-			    <dt class="h4"><a href="http://www.borland.co.jp/cppbuilder/freecompiler/index.html" target="_top">Borland C++ Compiler 5.5.1</a> の場合
+			    <dt class="h4">Borland C++ Compiler 5.5.1 の場合
 			    <dd class="d4">
 				<div>
 				  <p>Borland C++ 5.5.1 のコンパイラなどにパスを通しておいて、さらに <code>bcc.mak</code> の冒頭の注意に従ってライブラリパスに <code>lib/psdk</code> を含めてください。</p>
@@ -1496,7 +1545,7 @@
 				  mayu-3.??&gt; set INCLUDE=C:\borland\bcc55\include<br>
 				  mayu-3.??&gt; make -f mayu-bcc.mak batch
 				  </p>
-				  <p><code>s</code> ディレクトリ以下のインストーラをコンパイルすることはできますが、<code>d</code> ディレクトリ以下にのドライバをコンパイルする方法は不明です。</p>
+				  <p><code>s</code> ディレクトリ以下のインストーラをコンパイルすることはできますが、<code>d</code> ディレクトリ以下のドライバをコンパイルする方法は不明です。</p>
 				</div>
 			  </dl>
 			</div>
