@@ -63,6 +63,7 @@ class Mayu
   Engine m_engine;				/// engine
 
   bool m_usingSN;		   /// using WTSRegisterSessionNotification() ?
+  time_t m_startTime;				/// mayu started at ...
 
   enum
   { 
@@ -455,6 +456,19 @@ private:
 	  }
 	  return 0;
 	}
+	
+	case WM_APP_dlglogNotify:
+	{
+	  switch (i_wParam)
+	  {
+	    case DlgLogNotify_logCleared:
+	      This->showBanner(true);
+	      break;
+	    default:
+	      break;
+	  }
+	  return 0;
+	}
 
 	case WM_DESTROY:
 	  if (This->m_usingSN)
@@ -495,6 +509,7 @@ private:
       m_log << _T("error: failed to load.") << std::endl;
       return;
     }
+    m_log << _T("successfully loaded.") << std::endl;
     while (!m_engine.setSetting(newSetting))
       Sleep(1000);
     delete m_setting;
@@ -529,6 +544,58 @@ private:
     CHECK_TRUE( Shell_NotifyIcon(i_doesAdd ? NIM_ADD : NIM_MODIFY, &m_ni) );
   }
 
+  void showBanner(bool i_isCleared)
+  {
+    time_t now;
+    time(&now);
+      
+    _TCHAR starttimebuf[1024];
+    _TCHAR timebuf[1024];
+
+#ifdef __BORLANDC__
+#pragma message("\t\t****\tAfter std::ostream() is called,  ")
+#pragma message("\t\t****\tstrftime(... \"%%#c\" ...) fails.")
+#pragma message("\t\t****\tWhy ? Bug of Borland C++ 5.5.1 ? ")
+#pragma message("\t\t****\t                         - nayuta")
+    _tcsftime(timebuf, NUMBER_OF(timebuf), _T("%Y/%m/%d %H:%M:%S"),
+	      localtime(&now));
+    _tcsftime(starttimebuf, NUMBER_OF(starttimebuf), _T("%Y/%m/%d %H:%M:%S"),
+	      localtime(&m_startTime));
+#else
+    _tcsftime(timebuf, NUMBER_OF(timebuf), _T("%#c"), localtime(&now));
+    _tcsftime(starttimebuf, NUMBER_OF(starttimebuf), _T("%#c"),
+	      localtime(&m_startTime));
+#endif
+      
+    Acquire a(&m_log, 0);
+    m_log << _T("------------------------------------------------------------") << std::endl;
+    m_log << loadString(IDS_mayu) << _T(" ") _T(VERSION);
+#ifndef NDEBUG
+    m_log << _T(" (DEBUG)");
+#endif
+#ifdef _UNICODE
+    m_log << _T(" (UNICODE)");
+#endif
+    m_log << std::endl;
+    m_log << _T("  built by ")
+	  << _T(LOGNAME) << _T("@") << toLower(_T(COMPUTERNAME))
+	  << _T(" (") << _T(__DATE__) <<  _T(" ")
+	  << _T(__TIME__) << _T(", ")
+	  << getCompilerVersionString() << _T(")") << std::endl;
+    _TCHAR modulebuf[1024];
+    CHECK_TRUE( GetModuleFileName(g_hInst, modulebuf,
+				  NUMBER_OF(modulebuf)) );
+    m_log << _T("started at ") << starttimebuf << std::endl;
+    m_log << modulebuf << std::endl;
+    m_log << _T("------------------------------------------------------------") << std::endl;
+
+    if (i_isCleared) {
+      m_log << _T("log was cleared at ") << timebuf << std::endl;
+    } else {
+      m_log << _T("log begins at ") << timebuf << std::endl;
+    }
+  }
+
 public:
   ///
   Mayu()
@@ -542,6 +609,8 @@ public:
       m_isSettingDialogOpened(false),
       m_engine(m_log)
   {
+    time(&m_startTime);
+
     CHECK_TRUE( Register_focus() );
     CHECK_TRUE( Register_target() );
     CHECK_TRUE( Register_tasktray() );
@@ -568,10 +637,13 @@ public:
     g_hookData->m_hwndTaskTray = m_hwndTaskTray;
     m_usingSN = WTSRegisterSessionNotification(m_hwndTaskTray,
 					       NOTIFY_FOR_THIS_SESSION);
-    
+
+    DlgLogData dld;
+    dld.m_log = &m_log;
+    dld.m_hwndTaskTray = m_hwndTaskTray;
     m_hwndLog =
       CreateDialogParam(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_log), NULL,
-			dlgLog_dlgProc, (LPARAM)&m_log);
+			dlgLog_dlgProc, (LPARAM)&dld);
     CHECK_TRUE( m_hwndLog );
 
     DlgInvestigateData did;
@@ -657,47 +729,7 @@ public:
   /// message loop
   WPARAM messageLoop()
   {
-    // banner
-    {
-      time_t now;
-      time(&now);
-      
-      _TCHAR timebuf[1024];
-
-#ifdef __BORLANDC__
-#pragma message("\t\t****\tAfter std::ostream() is called,  ")
-#pragma message("\t\t****\tstrftime(... \"%%#c\" ...) fails.")
-#pragma message("\t\t****\tWhy ? Bug of Borland C++ 5.5.1 ? ")
-#pragma message("\t\t****\t                         - nayuta")
-      _tcsftime(timebuf, NUMBER_OF(timebuf), _T("%Y/%m/%d %H:%M:%S"),
-		localtime(&now));
-#else
-      _tcsftime(timebuf, NUMBER_OF(timebuf), _T("%#c"), localtime(&now));
-#endif
-      
-      Acquire a(&m_log, 0);
-      m_log << _T("------------------------------------------------------------") << std::endl;
-      m_log << loadString(IDS_mayu) << _T(" ") _T(VERSION);
-#ifndef NDEBUG
-      m_log << _T(" (DEBUG)");
-#endif
-#ifdef _UNICODE
-      m_log << _T(" (UNICODE)");
-#endif
-      m_log << std::endl;
-      m_log << _T("  built by ")
-	    << _T(LOGNAME) << _T("@") << toLower(_T(COMPUTERNAME))
-	    << _T(" (") << _T(__DATE__) <<  _T(" ")
-	    << _T(__TIME__) << _T(", ")
-	    << getCompilerVersionString() << _T(")") << std::endl;
-      _TCHAR modulebuf[1024];
-      CHECK_TRUE( GetModuleFileName(g_hInst, modulebuf,
-				    NUMBER_OF(modulebuf)) );
-      m_log << modulebuf << std::endl;
-      m_log << _T("------------------------------------------------------------") << std::endl;
-
-      m_log << _T("log begins ") << timebuf << std::endl;
-    }
+    showBanner(false);
     load();
     
     MSG msg;

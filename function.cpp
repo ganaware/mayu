@@ -1034,7 +1034,7 @@ void Engine::shellExecute()
   getTypeName(&errorMessage, r, errorTable, NUMBER_OF(errorTable));
   
   Acquire b(&m_log, 0);
-  m_log << _T("internal error: ") << fd << _T(": ") << errorMessage;
+  m_log << _T("error: ") << fd << _T(": ") << errorMessage << std::endl;
 }
 
 

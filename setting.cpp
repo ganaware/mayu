@@ -1493,7 +1493,7 @@ bool SettingLoader::isReadable(const tstringi &i_filename,
   {
     if (m_log && m_soLog)
     {
-      Acquire a(m_soLog, i_debugLevel);
+		Acquire a(m_soLog, 0);
       *m_log << _T("  loading: ") << i_filename << std::endl;
     }
     return true;

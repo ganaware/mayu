@@ -9,6 +9,7 @@
 #include "windowstool.h"
 #include "msgstream.h"
 #include "layoutmanager.h"
+#include "dlglog.h"
 #include <windowsx.h>
 
 
@@ -16,6 +17,7 @@
 class DlgLog : public LayoutManager
 {
   HWND m_hwndEdit;				///
+  HWND m_hwndTaskTray;				/// tasktray window
   LOGFONT m_lf;					///
   HFONT m_hfontOriginal;			///
   HFONT m_hfont;				///
@@ -26,6 +28,7 @@ public:
   DlgLog(HWND i_hwnd)
     : LayoutManager(i_hwnd),
       m_hwndEdit(GetDlgItem(m_hwnd, IDC_EDIT_log)),
+      m_hwndTaskTray(NULL),
       m_hfontOriginal(GetWindowFont(m_hwnd)),
       m_hfont(NULL)
   {
@@ -34,7 +37,9 @@ public:
   /// WM_INITDIALOG
   BOOL wmInitDialog(HWND /* i_focus */, LPARAM i_lParam)
   {
-    m_log = reinterpret_cast<tomsgstream *>(i_lParam);
+    DlgLogData *dld = reinterpret_cast<DlgLogData *>(i_lParam);
+    m_log = dld->m_log;
+    m_hwndTaskTray = dld->m_hwndTaskTray;
     
     // set icons
     setSmallIcon(m_hwnd, IDI_ICON_mayu);
@@ -118,6 +123,8 @@ public:
       {
 	Edit_SetSel(m_hwndEdit, 0, Edit_GetTextLength(m_hwndEdit));
 	Edit_ReplaceSel(m_hwndEdit, _T(""));
+	SendMessage(m_hwndTaskTray, WM_APP_dlglogNotify,
+		    DlgLogNotify_logCleared, 0);
 	return TRUE;
       }
       
