@@ -157,7 +157,7 @@ keymap2	GeneralC-X : EmacsC-X
 # MDI 上のウィンドウの設定
 #
 
-keymap2 MDI-WindowOperation
+keymap2 MDI-WindowOperation : Global
  key C-S-L     C-A-L	=> &WindowLower(MDI)		# ウィンドウを一番下へ
  key C-S-R     C-A-R	=> &WindowRaise(MDI)		# ウィンドウを一番上へ
  key C-S-Z     C-A-Z	=> &WindowMaximize(MDI)		# ウィンドウの最大化

@@ -66,7 +66,7 @@ keymap2	EmacsMark : EmacsEdit => $EmacsMark/cancel &KeymapWindow
 keymap2	EmacsC-X : EmacsEdit
  key *U			=> C-Z					# UNDO
 
-keymap2 EmacsC-U0_9C-U \
+keymap2 EmacsC-U0_9C-U : Global \
 		=> &Repeat((&KeymapWindow), 100) &HelpMessage &Variable(0, 0)
  key C-G	=> &HelpMessage &Variable(0, 0) &Ignore
  
