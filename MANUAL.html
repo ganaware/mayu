@@ -119,11 +119,27 @@ Copyright &copy; 1999-2001, <a href="http://www.ganaware.org" target="_top">TAGA
 	    </ol>
 	    <p class="noindent">【注意】Windows2000ではアンインストールボタンを使用せずに <code>\winnt\system32\drivers\altime.sys</code> を削除すると Windows が起動できなくなることがあります。</p>
 
-	<dt class="h2">Q4. ウインドウのクラス名はどうやって調べるんですか？
+	<dt class="h2">Q4. explorerで、表示(V)をalt+v で選べません。(2chの某スレより)
+	<dt class="h2">Q5. PowerPointで、C-x,C-c,C-vなどでコピペできません。
+	<dd class="d2"><p>あなたはおそらくdefault.mayuを使っています。
+これを利用するとかなり色々な操作をemacs風にされてしまいますので、
+あなたのwindows汚染度が高かったり、
+emacs汚染度が低かったりすると戸惑うことでしょう。<a
+ href="contrib/mayu-settings.txt"><code>contrib/mayu-settings.txt</code
+></a> を参考に、自分好みにカスタマイズしてください。</p>
+
+<p>
+ちなみに、WindowsなんだしC-z,C-x,C-c,C-vだけは使わせろ、
+という人のために、ZXCVというシンボルが定義されています。
+-DZXCVするなりdefine ZXCVすれば、
+それだけはWindowsっぽく動きます。
+</p>
+
+	<dt class="h2">Q6. ウインドウのクラス名はどうやって調べるんですか？
 	<dd class="d2"><p>タスクトレイの「窓使いの憂鬱」のアイコンでマウスの右ボタンを押して「<a href="#CLASSNAME">調査(I)...</a>」を選びます。</p>
-	<dt class="h2">Q5. アクティブな時にしか見えない窓などの場合、上記の方法では調査できないですが？
+	<dt class="h2">Q7. アクティブな時にしか見えない窓などの場合、上記の方法では調査できないですが？
 	<dd class="d2"><p><a href="CUSTOMIZE.html#function_WindowIdentify"><code>&amp;WindowIdentify</code></a> を使ってください。<a href="default.mayu"><code>default.mayu</code></a> では <kbd>[Ctrl]</kbd> +<kbd>[Shift]</kbd> + <kbd>[D]</kbd> に割り振ってあります。</p>
-	<dt class="h2">Q6. インストール時には 109 キーボードだったのですが、今度 104 キーボードを購入しました。しかし、タスクトレイメニューの「選択」には 109 しか出てきません。どうすればいいですか。
+	<dt class="h2">Q8. インストール時には 109 キーボードだったのですが、今度 104 キーボードを購入しました。しかし、タスクトレイメニューの「選択」には 109 しか出てきません。どうすればいいですか。
 	<dd class="d2">
 	    <p>インストール時の選択により、以下の表の上 4 つまたは下 4 つが選ばれます。「設定」ダイアログボックスで適切に設定してください。(<code>%MAYU_DIR%</code> は mayu をインストールしたディレクトリです)</p>
 	    
@@ -153,11 +169,13 @@ Copyright &copy; 1999-2001, <a href="http://www.ganaware.org" target="_top">TAGA
 	      <tr class="filename"><th>設定ファイル名</th><td><code>%MAYU_DIR%\dot.mayu</code></td></tr>
 	      <tr class="symbol"><th>シンボル</th><td><code>-DUSE104;-DUSE109on104</code></td></tr>
 	    </table>
-	<dt class="h2">Q7. 「窓使いの憂鬱」では USB キーボードは使えないのですか。
+	<dt class="h2">Q9. 「窓使いの憂鬱」では USB キーボードは使えないのですか。
 	<dd class="d2"><p>現在のところ使えません。対応するつもりではありますが、いつになるかはわかりません。</p>
-	<dt class="h2">Q8. 「窓使いの憂鬱」は Windows95/98/ME では使えないのですか。
+	<dt class="h2">Q10. 「窓使いの憂鬱」は Windows95/98/ME では使えないのですか。
 	<dd class="d2"><p>小林義明さんがドライバを書いてくれたので、バージョン 3.19 から使用できるようになりました。</p>
-	<dt class="h2">Q9. mayu は<a href="http://www.tactics.co.jp/qtactics/one.htm" target="_top">椎名繭</a>なのですか。
+	<dt class="h2">Q11. Win9xで終了できません。そういうもんですか。
+	<dd class="d2"><p>そういうもんです。Shiftでも連打すれば終わります。</p>
+	<dt class="h2">Q12. mayu は<a href="http://www.tactics.co.jp/qtactics/one.htm" target="_top">椎名繭</a>なのですか。
 	<dd class="d2"><p>違います。ぜんぜん違います。GTO の繭君でもないです。</p>
       </dl>
       </div>
