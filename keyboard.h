@@ -231,7 +231,7 @@ public:
   void add(const Modifier &i_m);
   //Modifier &operator+=(const Modifier &i_m);
 
-  /** does match. (except dontcare modifiers) (is the m included *this
+  /** does match. (except dontcare modifiers) (is the m included in the *this
       set ?) */
   bool doesMatch(const Modifier &i_m) const
   { return ((m_modifiers | m_dontcares) == (i_m.m_modifiers | m_dontcares)); }
@@ -252,7 +252,7 @@ public:
   bool operator<(const Modifier &i_m) const
   {
     return m_modifiers < i_m.m_modifiers ||
-      (m_modifiers == i_m.m_modifiers && m_dontcares < i_m.m_dontcares );
+      (m_modifiers == i_m.m_modifiers && m_dontcares < i_m.m_dontcares);
   }
 };
 
