@@ -14,7 +14,7 @@
 #include <mbstring.h>
 
 
-///
+/// string tool
 namespace StringTool
 {
   using std::string;

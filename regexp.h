@@ -11,7 +11,7 @@
 #undef REGEXP_SPEC
 
 
-///
+/// regexp utility
 namespace RegexpUtil
 {
   ///
