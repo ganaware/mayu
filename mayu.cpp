@@ -654,7 +654,21 @@ public:
   {
     // banner
     {
-      _TCHAR buf[1024];
+      time_t now;
+      time(&now);
+      
+      _TCHAR timebuf[1024];
+
+#ifdef __BORLANDC__
+#pragma message("\t\t****\tAfter std::ostream() is called,  ")
+#pragma message("\t\t****\tstrftime(... \"%%#c\" ...) fails.")
+#pragma message("\t\t****\tWhy ? Bug of Borland C++ 5.5.1 ? ")
+#pragma message("\t\t****\t                         - nayuta")
+      _tcsftime(timebuf, NUMBER_OF(timebuf), _T("%Y/%m/%d %H:%M:%S"),
+		localtime(&now));
+#else
+      _tcsftime(timebuf, NUMBER_OF(timebuf), _T("%#c"), localtime(&now));
+#endif
       
       Acquire a(&m_log, 0);
       m_log << _T("------------------------------------------------------------") << std::endl;
@@ -671,14 +685,13 @@ public:
 	    << _T(" (") << _T(__DATE__) <<  _T(" ")
 	    << _T(__TIME__) << _T(", ")
 	    << getCompilerVersionString() << _T(")") << std::endl;
-      CHECK_TRUE( GetModuleFileName(g_hInst, buf, NUMBER_OF(buf)) );
-      m_log << buf << std::endl;
+      _TCHAR modulebuf[1024];
+      CHECK_TRUE( GetModuleFileName(g_hInst, modulebuf,
+				    NUMBER_OF(modulebuf)) );
+      m_log << modulebuf << std::endl;
       m_log << _T("------------------------------------------------------------") << std::endl;
 
-      time_t now;
-      time(&now);
-      _tcsftime(buf, NUMBER_OF(buf), _T("%#c"), localtime(&now));
-      m_log << _T("log begins ") << buf << std::endl;
+      m_log << _T("log begins ") << timebuf << std::endl;
     }
     load();
     

@@ -11,10 +11,10 @@
 <body class="manual">
 
 <div class="copyright">
-Copyright &copy; 1999-2001, <a href="http://www.ganaware.org" target="_top">TAGA Nayuta</a> &lt;nayuta&#64;users.sourceforge.net&gt;
+  Copyright &copy; 1999-2001, <a href="http://www.ganaware.org" target="_top">TAGA Nayuta</a> &lt;nayuta&#64;users.sourceforge.net&gt;
 </div>
 <div class="title">
-<a href="http://mayu.sourceforge.net" target="_top" class="title"><img src="mayu-banner.png" alt="窓使いの憂鬱" width="468" height="60"></a>
+  <a href="http://mayu.sourceforge.net" target="_top" class="title"><img src="mayu-banner.png" alt="窓使いの憂鬱" width="468" height="60"></a>
 </div>
 <dl>
   <dt class="h1"><a name="ABSTRACT">1. abstract</a>
@@ -100,87 +100,87 @@ Copyright &copy; 1999-2001, <a href="http://www.ganaware.org" target="_top">TAGA
 
   <dd class="d1">
       <div>
-      <dl>
-	<dt class="h2">Q1. 「窓使いの憂鬱」を使っていると勝手にキーリピートしてしまいます。
-	<dt class="h2">Q2. 「窓使いの憂鬱」を終了後に Windows が異常終了します。
-	<dt class="h2">Q3. 「窓使いの憂鬱」を使っているといろいろ変になります。
-	<dd class="d2">
-	    <p>あなたは以前 AltIME を使用していたはずです。これらの症状は AltIME が正しくアンインストールされていない時に出ます。</p>
-	    
-	    <p>AltIME 2.27 の README によれば以下のようにするそうですので、そのようにしてください。</p>
-	    
-	    <ol>
-	      <li><p>AltIME の設定で常駐させているなら一旦常駐のオプションをはずしてください。</p>
-		  <p>スタートアップで起動しているときはスタートアップから削除してください。</p>
-		  <p>サウンドを使用している場合は設定を外し、設定を完全に削除してください。</p>
-	      <li><p>タスクトレイ上のアイコンを左クリックして AltIME のオプションダイアログを表示させ、アンインストールボタンを押してください。</p>
-	      <li><p>いったん再起動後、<code>ALTIME*.*</code> のファイルを削除してください。</p>
-	    </ol>
-	    <p class="noindent">【注意】Windows2000ではアンインストールボタンを使用せずに <code>\winnt\system32\drivers\altime.sys</code> を削除すると Windows が起動できなくなることがあります。</p>
+	<dl>
+	  <dt class="h2">Q1. 「窓使いの憂鬱」を使っていると勝手にキーリピートしてしまいます。
+	  <dt class="h2">Q2. 「窓使いの憂鬱」を終了後に Windows が異常終了します。
+	  <dt class="h2">Q3. 「窓使いの憂鬱」を使っているといろいろ変になります。
+	  <dd class="d2">
+	      <p>あなたは以前 AltIME を使用していたはずです。これらの症状は AltIME が正しくアンインストールされていない時に出ます。</p>
+	      
+	      <p>AltIME 2.27 の README によれば以下のようにするそうですので、そのようにしてください。</p>
+	      
+	      <ol>
+		<li><p>AltIME の設定で常駐させているなら一旦常駐のオプションをはずしてください。</p>
+		    <p>スタートアップで起動しているときはスタートアップから削除してください。</p>
+		    <p>サウンドを使用している場合は設定を外し、設定を完全に削除してください。</p>
+		<li><p>タスクトレイ上のアイコンを左クリックして AltIME のオプションダイアログを表示させ、アンインストールボタンを押してください。</p>
+		<li><p>いったん再起動後、<code>ALTIME*.*</code> のファイルを削除してください。</p>
+	      </ol>
+	      <p class="noindent">【注意】Windows2000ではアンインストールボタンを使用せずに <code>\winnt\system32\drivers\altime.sys</code> を削除すると Windows が起動できなくなることがあります。</p>
 
-	<dt class="h2">Q4. explorerで、表示(V)をalt+v で選べません。(2chの某スレより)
-	<dt class="h2">Q5. PowerPointで、C-x,C-c,C-vなどでコピペできません。
-	<dd class="d2"><p>あなたはおそらくdefault.mayuを使っています。
-これを利用するとかなり色々な操作をEmacs風にされてしまいますので、
-あなたのWindows汚染度が高かったり、
-Emacs汚染度が低かったりすると戸惑うことでしょう。<a
- href="contrib/mayu-settings.txt"><code>contrib/mayu-settings.txt</code
-></a> を参考に、自分好みにカスタマイズしてください。</p>
+	  <dt class="h2">Q4. explorerで、表示(V)をalt+v で選べません。(2chの某スレより)
+	  <dt class="h2">Q5. PowerPointで、C-x,C-c,C-vなどでコピペできません。
+	  <dd class="d2"><p>あなたはおそらくdefault.mayuを使っています。
+	      これを利用するとかなり色々な操作をEmacs風にされてしまいますので、
+	      あなたのWindows汚染度が高かったり、
+	      Emacs汚染度が低かったりすると戸惑うことでしょう。<a
+	      href="contrib/mayu-settings.txt"><code>contrib/mayu-settings.txt</code
+	      ></a> を参考に、自分好みにカスタマイズしてください。</p>
 
-<p>
-ちなみに、WindowsなんだしC-z,C-x,C-c,C-vだけは使わせろ、
-という人のために、ZXCVというシンボルが定義されています。
--DZXCVするなりdefine ZXCVすれば、
-それだけはWindowsっぽく動きます。
-</p>
+	      <p>
+	      ちなみに、WindowsなんだしC-z,C-x,C-c,C-vだけは使わせろ、
+	      という人のために、ZXCVというシンボルが定義されています。
+	      -DZXCVするなりdefine ZXCVすれば、
+	      それだけはWindowsっぽく動きます。
+	      </p>
 
-	<dt class="h2">Q6. ウインドウのクラス名はどうやって調べるんですか？
-	<dd class="d2"><p>タスクトレイの「窓使いの憂鬱」のアイコンでマウスの右ボタンを押して「<a href="#CLASSNAME">調査(I)...</a>」を選びます。</p>
-	<dt class="h2">Q7. アクティブな時にしか見えない窓などの場合、上記の方法では調査できないですが？
-	<dd class="d2"><p><a href="CUSTOMIZE.html#function_WindowIdentify"><code>&amp;WindowIdentify</code></a> を使ってください。<a href="default.mayu"><code>default.mayu</code></a> では <kbd>[Ctrl]</kbd> +<kbd>[Shift]</kbd> + <kbd>[D]</kbd> に割り振ってあります。</p>
-	<dt class="h2">Q8. インストール時には 109 キーボードだったのですが、今度 104 キーボードを購入しました。しかし、タスクトレイメニューの「選択」には 109 しか出てきません。どうすればいいですか。
-	<dd class="d2">
-	    <p>インストール時の選択により、以下の表の上 4 つまたは下 4 つが選ばれます。「設定」ダイアログボックスで適切に設定してください。(<code>%MAYU_DIR%</code> は mayu をインストールしたディレクトリです)</p>
-	    
-	    <table class="default-settings">
-	      <tr class="name-japanese"><th>名前</th><td>日本語 109 キーボード (Emacs 風)</td></tr>
-	      <tr class="filename"><th>設定ファイル名</th><td><code>%MAYU_DIR%\dot.mayu</code></td></tr>
-	      <tr class="symbol"><th>シンボル</th><td><code>-DUSE109;-DUSEdefault</code></td></tr>
-	      <tr class="name"><th>名前</th><td>日本語 109 キーボード (104 風, Emacs 風)</td></tr>
-	      <tr class="filename"><th>設定ファイル名</th><td><code>%MAYU_DIR%\dot.mayu</code></td></tr>
-	      <tr class="symbol"><th>シンボル</th><td><code>-DUSE109;-DUSEdefault;-DUSE104on109</code></td></tr>
-	      <tr class="name"><th>名前</th><td>日本語 109 キーボード</td></tr>
-	      <tr class="filename"><th>設定ファイル名</th><td><code>%MAYU_DIR%\dot.mayu</code></td></tr>
-	      <tr class="symbol"><th>シンボル</th><td><code>-DUSE109</code></td></tr>
-	      <tr class="name"><th>名前</th><td>日本語 109 キーボード (104 風)</td></tr>
-	      <tr class="filename"><th>設定ファイル名</th><td><code>%MAYU_DIR%\dot.mayu</code></td></tr>
-	      <tr class="symbol"><th>シンボル</th><td><code>-DUSE109;-DUSE104on109</code></td></tr>
-	      <tr class="name-english"><th>名前</th><td>英語 104 キーボード (Emacs 風)</td></tr>
-	      <tr class="filename"><th>設定ファイル名</th><td><code>%MAYU_DIR%\dot.mayu</code></td></tr>
-	      <tr class="symbol"><th>シンボル</th><td><code>-DUSE104;-DUSEdefault</code></td></tr>
-	      <tr class="name"><th>名前</th><td>英語 104 キーボード (109 風, Emacs 風)</td></tr>
-	      <tr class="filename"><th>設定ファイル名</th><td><code>%MAYU_DIR%\dot.mayu</code></td></tr>
-	      <tr class="symbol"><th>シンボル</th><td><code>-DUSE104;-DUSEdefault;-DUSE109on104</code></td></tr>
-	      <tr class="name"><th>名前</th><td>英語 104 キーボード</td></tr>
-	      <tr class="filename"><th>設定ファイル名</th><td><code>%MAYU_DIR%\dot.mayu</code></td></tr>
-	      <tr class="symbol"><th>シンボル</th><td><code>-DUSE104</code></td></tr>
-	      <tr class="name"><th>名前</th><td>英語 104 キーボード (109 風)</td></tr>
-	      <tr class="filename"><th>設定ファイル名</th><td><code>%MAYU_DIR%\dot.mayu</code></td></tr>
-	      <tr class="symbol"><th>シンボル</th><td><code>-DUSE104;-DUSE109on104</code></td></tr>
-	    </table>
-	<dt class="h2">Q9. 「窓使いの憂鬱」では USB キーボードは使えないのですか。
-	<dd class="d2"><p>小林義明さんが Windows2000 用のドライバを書いてくださったので、USB 用の mayu ドライバを利用すれば使用することができます。現在はまだテスト中なので <a href="#SUPPORT">メーリングリスト</a> で問い合わせてください。又 Win9x では普通に使用できます。</p>
-	<dt class="h2">Q10. 「窓使いの憂鬱」は Windows95/98/ME では使えないのですか。
-	<dd class="d2"><p>小林義明さんがドライバを書いてくださったので、バージョン 3.19 から使用できるようになりました。</p>
-	<dt class="h2">Q11. Win9xで終了できません。そういうもんですか。
-	<dd class="d2"><p>そういうもんです。Shiftでも連打すれば終わります。</p>
+	  <dt class="h2">Q6. ウインドウのクラス名はどうやって調べるんですか？
+	  <dd class="d2"><p>タスクトレイの「窓使いの憂鬱」のアイコンでマウスの右ボタンを押して「<a href="#CLASSNAME">調査(I)...</a>」を選びます。</p>
+	  <dt class="h2">Q7. アクティブな時にしか見えない窓などの場合、上記の方法では調査できないですが？
+	  <dd class="d2"><p><a href="CUSTOMIZE.html#function_WindowIdentify"><code>&amp;WindowIdentify</code></a> を使ってください。<a href="default.mayu"><code>default.mayu</code></a> では <kbd>[Ctrl]</kbd> +<kbd>[Shift]</kbd> + <kbd>[D]</kbd> に割り振ってあります。</p>
+	  <dt class="h2">Q8. インストール時には 109 キーボードだったのですが、今度 104 キーボードを購入しました。しかし、タスクトレイメニューの「選択」には 109 しか出てきません。どうすればいいですか。
+	  <dd class="d2">
+	      <p>インストール時の選択により、以下の表の上 4 つまたは下 4 つが選ばれます。「設定」ダイアログボックスで適切に設定してください。(<code>%MAYU_DIR%</code> は mayu をインストールしたディレクトリです)</p>
+	      
+	      <table class="default-settings">
+		<tr class="name-japanese"><th>名前</th><td>日本語 109 キーボード (Emacs 風)</td></tr>
+		<tr class="filename"><th>設定ファイル名</th><td><code>%MAYU_DIR%\dot.mayu</code></td></tr>
+		<tr class="symbol"><th>シンボル</th><td><code>-DUSE109;-DUSEdefault</code></td></tr>
+		<tr class="name"><th>名前</th><td>日本語 109 キーボード (104 風, Emacs 風)</td></tr>
+		<tr class="filename"><th>設定ファイル名</th><td><code>%MAYU_DIR%\dot.mayu</code></td></tr>
+		<tr class="symbol"><th>シンボル</th><td><code>-DUSE109;-DUSEdefault;-DUSE104on109</code></td></tr>
+		<tr class="name"><th>名前</th><td>日本語 109 キーボード</td></tr>
+		<tr class="filename"><th>設定ファイル名</th><td><code>%MAYU_DIR%\dot.mayu</code></td></tr>
+		<tr class="symbol"><th>シンボル</th><td><code>-DUSE109</code></td></tr>
+		<tr class="name"><th>名前</th><td>日本語 109 キーボード (104 風)</td></tr>
+		<tr class="filename"><th>設定ファイル名</th><td><code>%MAYU_DIR%\dot.mayu</code></td></tr>
+		<tr class="symbol"><th>シンボル</th><td><code>-DUSE109;-DUSE104on109</code></td></tr>
+		<tr class="name-english"><th>名前</th><td>英語 104 キーボード (Emacs 風)</td></tr>
+		<tr class="filename"><th>設定ファイル名</th><td><code>%MAYU_DIR%\dot.mayu</code></td></tr>
+		<tr class="symbol"><th>シンボル</th><td><code>-DUSE104;-DUSEdefault</code></td></tr>
+		<tr class="name"><th>名前</th><td>英語 104 キーボード (109 風, Emacs 風)</td></tr>
+		<tr class="filename"><th>設定ファイル名</th><td><code>%MAYU_DIR%\dot.mayu</code></td></tr>
+		<tr class="symbol"><th>シンボル</th><td><code>-DUSE104;-DUSEdefault;-DUSE109on104</code></td></tr>
+		<tr class="name"><th>名前</th><td>英語 104 キーボード</td></tr>
+		<tr class="filename"><th>設定ファイル名</th><td><code>%MAYU_DIR%\dot.mayu</code></td></tr>
+		<tr class="symbol"><th>シンボル</th><td><code>-DUSE104</code></td></tr>
+		<tr class="name"><th>名前</th><td>英語 104 キーボード (109 風)</td></tr>
+		<tr class="filename"><th>設定ファイル名</th><td><code>%MAYU_DIR%\dot.mayu</code></td></tr>
+		<tr class="symbol"><th>シンボル</th><td><code>-DUSE104;-DUSE109on104</code></td></tr>
+	      </table>
+	  <dt class="h2">Q9. 「窓使いの憂鬱」では USB キーボードは使えないのですか。
+	  <dd class="d2"><p>小林義明さんが Windows2000 用のドライバを書いてくださったので、USB 用の mayu ドライバを利用すれば使用することができます。現在はまだテスト中なので <a href="#SUPPORT">メーリングリスト</a> で問い合わせてください。又 Win9x では普通に使用できます。</p>
+	  <dt class="h2">Q10. 「窓使いの憂鬱」は Windows95/98/ME では使えないのですか。
+	  <dd class="d2"><p>小林義明さんがドライバを書いてくださったので、バージョン 3.19 から使用できるようになりました。</p>
+	  <dt class="h2">Q11. Win9xで終了できません。そういうもんですか。
+	  <dd class="d2"><p>そういうもんです。Shiftでも連打すれば終わります。</p>
 
-	<dt class="h2">Q12. このマニュアルをNetscape4で見るとぐちゃぐちゃなんですけど、そういうもんですか。
-	<dd class="d2"><p>そういうもんです。Netscape4のcssサポートが腐っているせいです。cssをオフにすればまだましになりますけど、やっぱり見にくいです。</p>
+	  <dt class="h2">Q12. このマニュアルをNetscape4で見るとぐちゃぐちゃなんですけど、そういうもんですか。
+	  <dd class="d2"><p>そういうもんです。Netscape4のcssサポートが腐っているせいです。cssをオフにすればまだましになりますけど、やっぱり見にくいです。</p>
 
-	<dt class="h2">Q13. mayu は<a href="http://www.tactics.co.jp/qtactics/one.htm" target="_top">椎名繭</a>なのですか。
-	<dd class="d2"><p>違います。ぜんぜん違います。GTO の繭君でもないです。</p>
-      </dl>
+	  <dt class="h2">Q13. mayu は<a href="http://www.tactics.co.jp/qtactics/one.htm" target="_top">椎名繭</a>なのですか。
+	  <dd class="d2"><p>違います。ぜんぜん違います。GTO の繭君でもないです。</p>
+	</dl>
       </div>
       
   <dt class="h1"><a name="BUGS">8. bugs</a>
@@ -201,418 +201,419 @@ Emacs汚染度が低かったりすると戸惑うことでしょう。<a
       
   <dd class="d1">
       <div>
-      <p>以下のソフトと同時には使わないようにしてください。そもそも使えないものもありますし、使えたとしてもきっとわけのわからないことになるでしょう。</p>
-      
-      <dl>
-	<dt class="h2"><a href="http://www.remus.dti.ne.jp/~kurotora/" target="_top">猫まねき</a> (for Windows 95/98/Me/2000)
-	<dd class="d2">わたくしが勝手にライバルだと思っているソフトです。「窓使いの憂鬱」のほうがカスタマイズの自由度は高いのですが、猫まねきには GUI がついていて初心者にもやさしいかもしれません。「窓使いの憂鬱」にない機能も存在します。シェアウェア。
-	<dt class="h2"><a href="http://www.microsoft.com/windows2000/techinfo/reskit/rktour/pro/Pro_tools.asp#R" target="_top">RemapKey</a> (for WindowsNT)
-	<dd class="d2">キーボードのスキャンコードを入れ替えます。「窓使いの憂鬱」を使えばほぼ必要ありません (窓使いの憂鬱ではログイン画面でのキーを変更することができませんが RemapKey ではできます) 。現在は Windows2000 のリソースキットに収録されています。
+	<p>以下のソフトと同時には使わないようにしてください。そもそも使えないものもありますし、使えたとしてもきっとわけのわからないことになるでしょう。</p>
+	
+	<dl>
+	  <dt class="h2"><a href="http://www.remus.dti.ne.jp/~kurotora/" target="_top">猫まねき</a> (for Windows 95/98/Me/2000)
+	  <dd class="d2">わたくしが勝手にライバルだと思っているソフトです。「窓使いの憂鬱」のほうがカスタマイズの自由度は高いのですが、猫まねきには GUI がついていて初心者にもやさしいかもしれません。「窓使いの憂鬱」にない機能も存在します。シェアウェア。
+	  <dt class="h2"><a href="http://www.microsoft.com/windows2000/techinfo/reskit/rktour/pro/Pro_tools.asp#R" target="_top">RemapKey</a> (for WindowsNT)
+	  <dd class="d2">キーボードのスキャンコードを入れ替えます。「窓使いの憂鬱」を使えばほぼ必要ありません (窓使いの憂鬱ではログイン画面でのキーを変更することができませんが RemapKey ではできます) 。現在は Windows2000 のリソースキットに収録されています。
 
-	<dt class="h2"><a href="http://www.geocities.co.jp/SiliconValley-PaloAlto/4205/MetaX.html" target="_top">MetaX</a>
-	<dd class="d2">cmkey + α みたいな感じのソフトです。コンセプト的に「窓使いの憂鬱」や cmkey と非常によく似ていますが、より Emacs 的な設定ファイルを書き、ミニバッファのようなものが存在します。プログラム中で cmkey と同様の方法をとっていると思われるため、例えば、CTRL/CAPS 入替の機能を持っていないといった限界が存在します。
-	    
-	<dt class="h2">
-	    <a href="http://www.vector.co.jp/soft/win95/util/se026760.html" target="_top">Easy Punch</a> / 
-	    <a href="http://hp.vector.co.jp/authors/VA008030/" target="_top">IME Start</a> / 
-	    <a href="http://www.kinet.or.jp/naka/tomo/fsoft.html" target="_top">WinKey</a> / 
-	    <a href="http://homepage2.nifty.com/mamao2/down/Mmkbd/Mmkbd.htm" target="_top">Max Min Keybord</a> / 
-	    <a href="http://homepage1.nifty.com/chombo/" target="_top">AltIME</a> / 
-	    <a href="http://hidemaru.xaxon.co.jp/software/hidecaps.html" target="_top">秀CAPS</a> / 
-	    <a href="http://www.vector.co.jp/soft/win95/util/se042027.html" target="_top">ねこぽい</a> / 
-	    <a href="http://michiko.shiratori.riec.tohoku.ac.jp/~jir/windows/keymacs+/" target="_top">Keymacs+</a> / 
-	    <a href="http://www.jomon.ne.jp/~yukihiro/" target="_top">Keylay</a> / 
-	    <a href="http://www.bugclub.gr.jp/masuda/software/killgates.html" target="_top">KillGates</a> / 
-	    <a href="http://www.tcct.zaq.ne.jp/kaname/software/pt.htm" target="_top">Pastel Touch</a> / 
-	    <a href="http://www.nn.iij4u.or.jp/~dorenp/software/keymap.html" target="_top">KeyMap</a> / 
-	    <a href="http://hp.vector.co.jp/authors/VA009883/" target="_top">dvorak kr, swap2k</a> / 
-	    <a href="http://www2.airnet.ne.jp/pak04955/download.htm#nicolatter" target="_top">Q's Nicolatter</a> (<a href="http://www.forest.impress.co.jp/article/2000/08/28/qsnicolatter.html" target="_top">紹介記事</a>)
-	<dd class="d2">キーボードによる操作を改善しようとさまざまなソフトが開発されています。
-      </dl>
+	  <dt class="h2"><a href="http://www.geocities.co.jp/SiliconValley-PaloAlto/4205/MetaX.html" target="_top">MetaX</a>
+	  <dd class="d2">cmkey + α みたいな感じのソフトです。コンセプト的に「窓使いの憂鬱」や cmkey と非常によく似ていますが、より Emacs 的な設定ファイルを書き、ミニバッファのようなものが存在します。プログラム中で cmkey と同様の方法をとっていると思われるため、例えば、CTRL/CAPS 入替の機能を持っていないといった限界が存在します。
+	      
+	  <dt class="h2">
+	      <a href="http://www.vector.co.jp/soft/win95/util/se026760.html" target="_top">Easy Punch</a> / 
+	      <a href="http://hp.vector.co.jp/authors/VA008030/" target="_top">IME Start</a> / 
+	      <a href="http://www.kinet.or.jp/naka/tomo/fsoft.html" target="_top">WinKey</a> / 
+	      <a href="http://homepage2.nifty.com/mamao2/down/Mmkbd/Mmkbd.htm" target="_top">Max Min Keybord</a> / 
+	      <a href="http://homepage1.nifty.com/chombo/" target="_top">AltIME</a> / 
+	      <a href="http://hidemaru.xaxon.co.jp/software/hidecaps.html" target="_top">秀CAPS</a> / 
+	      <a href="http://www.vector.co.jp/soft/win95/util/se042027.html" target="_top">ねこぽい</a> / 
+	      <a href="http://michiko.shiratori.riec.tohoku.ac.jp/~jir/windows/keymacs+/" target="_top">Keymacs+</a> / 
+	      <a href="http://www.jomon.ne.jp/~yukihiro/" target="_top">Keylay</a> / 
+	      <a href="http://www.bugclub.gr.jp/masuda/software/killgates.html" target="_top">KillGates</a> / 
+	      <a href="http://www.tcct.zaq.ne.jp/kaname/software/pt.htm" target="_top">Pastel Touch</a> / 
+	      <a href="http://www.nn.iij4u.or.jp/~dorenp/software/keymap.html" target="_top">KeyMap</a> / 
+	      <a href="http://hp.vector.co.jp/authors/VA009883/" target="_top">dvorak kr, swap2k</a> / 
+	      <a href="http://www2.airnet.ne.jp/pak04955/download.htm#nicolatter" target="_top">Q's Nicolatter</a> (<a href="http://www.forest.impress.co.jp/article/2000/08/28/qsnicolatter.html" target="_top">紹介記事</a>)
+	  <dd class="d2">キーボードによる操作を改善しようとさまざまなソフトが開発されています。
+	</dl>
       </div>
       
   <dt class="h1"><a name="COPYRIGHT">10. copyright</a>
 
   <dd class="d1">
       <div>
-      <dl>
-	<dt class="h2">窓使いの憂鬱
-	<dd class="d2">
-	    <p class="noindent">
-	    Copyright (C) 1999-2001, <a href="http://www.ganaware.org" target="_top">TAGA Nayuta</a> &lt;nayuta&#64;users.sourceforge.net&gt;<br>
-	    All rights reserved.</p>
-	    
-	    <p class="noindent">Redistribution and use in source and binary
-	    forms, with or without modification, are permitted provided that
-	    the following conditions are met:</p>
-	    
-	    <ol>
-	      <li>Redistributions of source code must retain the above
-		  copyright notice, this list of conditions and the following
-		  disclaimer.
-	      <li>Redistributions in binary form must reproduce the
-		  above copyright notice, this list of conditions and
-		  the following disclaimer in the documentation and/or
-		  other materials provided with the distribution.
-	      <li>The name of the author may not be used to endorse or
-		  promote products derived from this software without
-		  specific prior written permission.
-	    </ol>
+	<dl>
+	  <dt class="h2">窓使いの憂鬱
+	  <dd class="d2">
+	      <p class="noindent">
+	      Copyright (C) 1999-2001, <a href="http://www.ganaware.org" target="_top">TAGA Nayuta</a> &lt;nayuta&#64;users.sourceforge.net&gt;<br>
+	      All rights reserved.</p>
+	      
+	      <p class="noindent">Redistribution and use in source and binary
+	      forms, with or without modification, are permitted provided that
+	      the following conditions are met:</p>
+	      
+	      <ol>
+		<li>Redistributions of source code must retain the above
+		    copyright notice, this list of conditions and the following
+		    disclaimer.
+		<li>Redistributions in binary form must reproduce the
+		    above copyright notice, this list of conditions and
+		    the following disclaimer in the documentation and/or
+		    other materials provided with the distribution.
+		<li>The name of the author may not be used to endorse or
+		    promote products derived from this software without
+		    specific prior written permission.
+	      </ol>
 
-	    <p class="noindent">
-	    THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY
-	    EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
-	    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-	    FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT
-	    SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-	    INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-	    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
-	    GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
-	    BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-	    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-	    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
-	    OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-	    POSSIBILITY OF SUCH DAMAGE.</p>
-	    
-	<dt class="h2">Regex ++
-	<dd class="d2">
-	    <p class="noindent">Copyright (c) 1998-2000 Dr John Maddock</p>
-	    
-	    <p class="noindent">Permission to use, copy, modify,
-	    distribute and sell this software and its documentation
-	    for any purpose is hereby granted without fee, provided
-	    that the above copyright notice appear in all copies and
-	    that both that copyright notice and this permission notice
-	    appear in supporting documentation.  Dr John Maddock makes
-	    no representations about the suitability of this software
-	    for any purpose.  It is provided "as is" without express
-	    or implied warranty.</p>
-      </dl>
+	      <p class="noindent">
+	      THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY
+	      EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+	      TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+	      FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT
+	      SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+	      INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	      (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+	      GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+	      BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+	      LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	      (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+	      OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	      POSSIBILITY OF SUCH DAMAGE.</p>
+	      
+	  <dt class="h2">Regex ++
+	  <dd class="d2">
+	      <p class="noindent">Copyright (c) 1998-2000 Dr John Maddock</p>
+	      
+	      <p class="noindent">Permission to use, copy, modify,
+	      distribute and sell this software and its documentation
+	      for any purpose is hereby granted without fee, provided
+	      that the above copyright notice appear in all copies and
+	      that both that copyright notice and this permission notice
+	      appear in supporting documentation.  Dr John Maddock makes
+	      no representations about the suitability of this software
+	      for any purpose.  It is provided "as is" without express
+	      or implied warranty.</p>
+	</dl>
       </div>
       
   <dt class="h1"><a name="SUPPORT">11. support</a>
       
   <dd class="d1">
       <div>
-      <dl>
-	<dt class="h2">「窓使いの憂鬱」ホームページ
-	<dd class="d2"><p><a href="http://mayu.sourceforge.net" target="_top">http://mayu.sourceforge.net</a></p>
-	<dt class="h2">「窓使いの憂鬱」メーリングリスト
-	<dd class="d2">
-	    <p><a href="http://lists.sourceforge.net/mailman/listinfo/mayu-support" target="_top">Mayu-support Info Page</a> の Subscribing to Mayu-support のフォームに、自分のメールアドレスと、Mayu-support メーリングリストの為のパスワードを入れて Subscribe してください。</p>
-	<dt class="h2">「窓使いの憂鬱」TO DO
-	<dd class="d2">
-	    <p>SourceForge の <a href="http://sourceforge.net/pm/task.php?group_id=5403&group_project_id=7606&func=browse&set=open&order=priority" target="_top">TO DO</a> によって要望や Known Bug などが管理されています。(End Date はいいかげんに入力してあるので信用しないでください)</p>
-	<dt class="h2">「窓使いの憂鬱」2ch スレ
-	<dd class="d2">
-	    <p><a href="http://yasai.2ch.net/test/read.cgi?bbs=win&key=986748944" target="_top">2ch にスレ</a>がたってしまったようなので適当に活用しましょう。作者も時々見ています。</p>
-      </dl>
+	<dl>
+	  <dt class="h2">「窓使いの憂鬱」ホームページ
+	  <dd class="d2"><p><a href="http://mayu.sourceforge.net" target="_top">http://mayu.sourceforge.net</a></p>
+	  <dt class="h2">「窓使いの憂鬱」メーリングリスト
+	  <dd class="d2">
+	      <p><a href="http://lists.sourceforge.net/mailman/listinfo/mayu-support" target="_top">Mayu-support Info Page</a> の Subscribing to Mayu-support のフォームに、自分のメールアドレスと、Mayu-support メーリングリストの為のパスワードを入れて Subscribe してください。</p>
+	  <dt class="h2">「窓使いの憂鬱」TO DO
+	  <dd class="d2">
+	      <p>SourceForge の <a href="http://sourceforge.net/pm/task.php?group_id=5403&group_project_id=7606&func=browse&set=open&order=priority" target="_top">TO DO</a> によって要望や Known Bug などが管理されています。(End Date はいいかげんに入力してあるので信用しないでください)</p>
+	  <dt class="h2">「窓使いの憂鬱」2ch スレ
+	  <dd class="d2">
+	      <p><a href="http://yasai.2ch.net/test/read.cgi?bbs=win&key=986748944" target="_top">2ch にスレ</a>がたってしまったようなので適当に活用しましょう。作者も時々見ています。</p>
+	</dl>
       </div>
       
   <dt class="h1"><a name="ACKNOWLEDGEMENT">12. acknowledgements</a>
 
   <dd class="d1">
       <div>
-      <p>Windows9x 用の<a href="http://www.bb.wakwak.com/~gimy/mayu/" target="_top">ドライバ</a>を作成してくださった小林義明さん、ありがとうございます。長い間の懸案であった Windows9x で動かない問題に解決を与えてくれました。</p>
-      
-      <p>最も身近なユーザーであり、数多くの助言をしてくれた塙与志夫さんに感謝します。何より彼の粘り強い要求は怠惰な作者に新規リリースへの活力を与えてくれました。</p>
-      
-      <p>河部修和さん、KANAI Makoto さん、HAJANO Na&ograve;qui さんには設定ファイルを提供していただきました。お礼を申し上げます。</p>
-      
-      <p>「窓使いの憂鬱」はたくさんの人の貢献の上に成り立っています。ここに名前を挙げていない方にも心から感謝します。</p>
+	<p>Windows9x 用の<a href="http://www.bb.wakwak.com/~gimy/mayu/" target="_top">ドライバ</a>を作成してくださった小林義明さん、ありがとうございます。長い間の懸案であった Windows9x で動かない問題に解決を与えてくれました。</p>
+	
+	<p>最も身近なユーザーであり、数多くの助言をしてくれた塙与志夫さんに感謝します。何より彼の粘り強い要求は怠惰な作者に新規リリースへの活力を与えてくれました。</p>
+	
+	<p>河部修和さん、KANAI Makoto さん、HAJANO Na&ograve;qui さんには設定ファイルを提供していただきました。お礼を申し上げます。</p>
+	
+	<p>「窓使いの憂鬱」はたくさんの人の貢献の上に成り立っています。ここに名前を挙げていない方にも心から感謝します。</p>
       </div>
 
   <dt class="h1"><a name="HISTORY">13. history</a>
       
   <dd class="d1">
       <div>
-      <dl class="history">
-	<dt>2001/08/05 3.24
-	<dd>
-	    <ul>
-	      <li><a href="default.mayu"><code>default.mayu</code></a> で、<kbd>[英数]</kbd> を <kbd>[Control]</kbd> として使用している場合に <code>C-Q</code> が正しく働かない問題を修正。version 3.19 で修正したものと原因は同じ。(Thanks to hanawa)
-	      <li>Windows9x のドライバを更新。青画面でも操作できるようになりました。(Thanks to 小林)
-	      <li><a href="CUSTOMIZE.html#oneShotModifier">One Shot モディファイヤ</a>であると宣言したキーが押されている間にキーが押された時のみ、モディファイヤとして扱われるようにした。今までは、離された時にもモディファイヤ扱いになっていた。
-	      <li>一時停止にしたときにタスクトレイのアイコンを変化させるようにした。
-	      <li><a href="CUSTOMIZE.html#keyRepeat"><code>R-</code></a> を新設。(Thanks to hanawa)
-	      <li><a href="http://www.borland.co.jp/cppbuilder/freecompiler/index.html" target="_top">Borland C++ 5.5.1</a> で<a href="CUSTOMIZE.html#compile">ビルド</a>できるようにした。
-	      <li><a href="CUSTOMIZE.html#oneShotModifier">One Shot モディファイヤ</a>を離したときに有効なモディファイヤは押したときと同じになるようにした。
-	      <li>USB 対応ドライバは今回は収録していません。
-	      <li>BETA ではないです。
-	    </ul>
-	<dt>2001/07/06 3.23 (BETA)
-	<dd>
-	    <ul>
-	      <li><a href="104on109.mayu"><code>104on109.mayu</code></a> で「`」が入力できなかったバグを直した。(Thanks to Oiwa)
-	      <li><a href="CUSTOMIZE.html#oneShotRepeatableModifier">One Shot (キーリピート有)</a> を追加。
-	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_Toggle"><code>&amp;Toggle</code></a> で、強制的にオンオフできるようにした。
-	      <li><a href="109.mayu"><code>109.mayu</code></a> に VAIO タワー用の特殊キーを追加。
-	      <li>WindowsNT4.0 でインストールできなくなっていた問題を修正。(Makefile の書き方のミス)
-	      <li>Windows9x のドライバを更新。
-	      <li>新規インストールした時に「ホームディレクトリから」が選択されていてキー入力ができなくなってしまう問題を修正。
-	      <li><a href="#SUPPORT">support</a> に 2ch を追加。
-	    </ul>
-	<dt>2001/03/24 3.22 (BETA)
-	<dd>
-	    <ul>
-	      <li><a href="CUSTOMIZE.html#def_subst">代用定義</a>を追加した。おかげで <a href="104on109.mayu"><code>104on109.mayu</code></a> などがスマートに定義できるようになった。
-	      <li><a href="mayu-mode.el" target="MANUAL"><code>mayu-mode.el</code></a> で代用定義にも色がつくようにした。
-	      <li>間違ってデバッグビルドしたものを収録していたのをリリースビルドを収録するようにした。
-	      <li>間違って壊れた Windows9x のドライバを収録してしまったので正しいドライバを入れた。
-	    </ul>
-	<dt>2001/03/23 version 3.21 (BETA)
-	<dd>
-	    <ul>
-	      <li>Windows95 で CPU 時間を 100% 占めてしまう問題がなおった。(Thanks to 小林義明)
-	      <li>NEC PC-98x1 で動作しない問題がなおった。(Thanks to 小林義明)
-	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_LoadSetting"><code>&amp;LoadSetting</code></a> で、どの設定をロードするか指定できるようになった。
-	      <li><a href="contrib/98x1.mayu"><code>contrib/98x1.mayu</code></a> を追加。(Thanks to HAJANO Na&ograve;qui)
-	      <li><a href="CUSTOMIZE.html#HOME">ホームディレクトリ</a> に、<code>mayu.exe</code> のカレントディレクトリを追加。		  
-	    </ul>
-	<dt>2001/03/10 version 3.20 (BETA)
-	<dd>
-	    <ul>
-	      <li>Windows95 でも動作するようになった。
-	      <li><a href="#ACKNOWLEDGEMENT">acknowledgements</a> 更新。
-	      <li><code>cab32.dll</code> ではなく <code>iexpress</code> を使用してパッケージを作成するようにした。
-	      <li>ソースをパッケージから分離した。
-	    </ul>
-	<dt>2001/03/05 version 3.19 (BETA)
-	<dd>
-	    <ul>
-	      <li>このバージョンは内部構造を大幅に変えたので不安定である可能性が高いです。どうしてもこのバージョンが必要な人のみ使用してください。
-	      <li><kbd>[Control]</kbd> + <kbd>[U]</kbd> 操作の改良。
-	      <li><a href="default.mayu"><code>default.mayu</code></a> を使っている場合は、<code>Global</code> キーマップで <kbd>[英数]</kbd> を <kbd>[Control]</kbd> にしているが、<code>Global</code> キーマップを親キーマップとして持たない <a href="CUSTOMIZE.html#keymap2"><code>keymap2</code></a> の中では (当然ながら) <kbd>[英数]</kbd> を <kbd>[Control]</kbd> として使用できないので、ちゃんと <code>Global</code> キーマップを親キーマップとして持つように設定ファイルを修正。
-	      <li><a href="default.mayu"><code>default.mayu</code></a> で、<code>-DMAP-ESCAPE-TO-META</code> とすると <kbd>[Alt]</kbd> + <kbd>[X]</kbd> などを <kbd>[ESCAPE] [X]</kbd> で代用するようにした。
-	      <li>WindowsNT/2000 版のプログラム内部では全て UNICODE で処理するようにした。
-	      <li>WindowsNT/2000 版では、設定ファイルの文字コードに、shift_jis だけでなく UTF-16LE/BE や UTF-8 を使用できるようになった。「メモ帳」で、「Unicode」や「Unicode big endien」や「UTF-8」を選んでセーブすれば、日本語だけでなくハングルなどの UNICODE で扱える文字が全て設定ファイルに書けるようになる。現在は文字コードは自動判別され、自動判別に失敗した場合の救済措置はない。自動判別に失敗するようなら自動判別できそうな文字をコメントにでも書いておくこと。
-	      <li>正規表現ライブラリを <a href="http://ourworld.compuserve.com/homepages/John_Maddock/regexpp.htm" target="_top">Regex++</a> に変更した。
-	      <li>いろいろ変えた結果多分 bcc32 ではコンパイルできなくなった。少し修正するだけだと思うが。
-	      <li><a href="contrib/ax.mayu"><code>contrib/ax.mayu</code></a> を追加。(Thanks to KAWABE Nobukazu)
-	      <li><a href="#RELATEDWORK">related work</a> に MetaX を追加。
-	      <li><a href="CUSTOMIZE.html#defaultModifier">デフォルトモディファイヤの変更</a>のサンプルが間違っていたので直した。(<code>key IC-* =</code> ではなく <code>key *IC- =</code> が正しい) (Thanks to Hirotaka Kasaki)
-	      <li><a href="CUSTOMIZE.html#defaultKey">デフォルトキー</a>の中で定義中のキーマップ名を参照できなかったバグを修正した。つまり、<code>keymap Hoge =&gt; &amp;Prefix(Hoge)</code> などができるようになった。(Thanks to HANAWA Yoshio)
-	      <li>Windows9x 用のドライバを作成されたので、このバージョンから WindowsNT/2000 用のパッケージと Windows9x 用のパッケージが存在します。(Thanks to 小林義明)
-	      <li>現在、Windows9x では、<a href="CUSTOMIZE.html#function_HelpMessage"><code>&amp;HelpMessage</code></a>、<a href="CUSTOMIZE.html#function_HelpVariable"><code>&amp;HelpVariable</code></a>、<a href="CUSTOMIZE.html#function_WindowSetAlpha"><code>&amp;WindowSetAlpha</code></a> は使用できません。
-	      <li><a href="default.mayu"><code>default.mayu</code></a> を使用している場合、シンボル <code>ZXCV</code> を定義しておくと、<kbd>[Control]</kbd> + <kbd>[Z]</kbd>, <kbd>[Control]</kbd> + <kbd>[X]</kbd>, <kbd>[Control]</kbd> + <kbd>[C]</kbd>, <kbd>[Control]</kbd> + <kbd>[V]</kbd> が Windows と同じ動きをするようになります。(Thanks to HANAWA Yoshio)
-	    </ul>
-	<dt>2000/12/17 version 3.18
-	<dd>
-	    <ul>
-	      <li>ヘルプが開けないバグの修正。
-	      <li><a href="mayu-mode.el" target="MANUAL"><code>mayu-mode.el</code></a> が展開されていなかったのを直した。ついでに少しだけ修正。
-	      <li><code>IC-</code> が時々無視されるバグが直ったはず。
-	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_HelpMessage"><code>&amp;HelpMessage</code></a> を追加。<a href="default.mayu"><code>default.mayu</code></a> を使っている場合はメモ帳で <kbd>[Control]</kbd> + <kbd>[X]</kbd> を押してみよう (ただし IE5.0 以上を使っている場合のみ)。
-	      <li><a href="CUSTOMIZE.html#event"><code>event</code></a> を追加。
-	      <li>これらの追加により、プレフィックスキーが押された時にメッセージを表示することが可能になった。
-	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_KeymapWindow"><code>&amp;KeymapWindow</code></a> を追加。
-	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_Variable"><code>&amp;Variable</code></a> を追加。
-	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_Repeat"><code>&amp;Repeat</code></a> を追加。
-	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_HelpVariable"><code>&amp;HelpVariable</code></a> を追加。
-	      <li>これらの追加により Emacs の <kbd>[Control]</kbd> + <kbd>[U]</kbd> が可能になった。私にメールを送るために 1000000000000000000000000000000000000000000000000000000000000@tsg.ne.jp と入力するのもらくらくです。
-	      <li>チュートリアル・FAQ の充実は次回に延期。
-	    </ul>
-	<dt>2000/12/03 version 3.17
-	<dd>
-	    <ul>
-	      <li>メーリングリストを <a href="http://lists.sourceforge.net/mailman/listinfo/mayu-support" target="_top">Source Forge</a> へ移動。
-	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_WindowMoveTo"><code>&amp;WindowMoveTo</code></a> を追加。
-	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_WindowResizeTo"><code>&amp;WindowResizeTo</code></a> を追加。
-	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_MayuDialog"><code>&amp;MayuDialog</code></a> を追加。
-	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_DescribeBindings"><code>&amp;DescribeBindings</code></a> を追加。表示形式がいまいち分かりにくいのでどうしようか思案中。
-	      <li><a href="#RELATEDWORK">related work</a> に Pastel Touch を追加。
-	      <li><a href="#RELATEDWORK">related work</a> に KeyMap を追加。
-	      <li><a href="#RELATEDWORK">related work</a> に dvorak kr, swap2k を追加。
-	      <li><a href="#RELATEDWORK">related work</a> に Q's Nicolatter を追加。
-	      <li><a href="#FAQ">FAQ</a> を追加。
-	      <li><code>mailto:</code> をドキュメントから削除。
-	      <li><a href="http://www.linuxsupportline.com/~doc++/" target="_top">DOC++</a> で表示できるようにソースのコメントを書き換えた。
-	      <li>Emacs で設定ファイルを編集する人のために <a href="mayu-mode.el"><code>mayu-mode.el</code></a> を追加。ただし、色がつくだけです。
-	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_WindowIdentify"><code>&amp;WindowIdentify</code></a> で、ウィンドウの位置と大きさも表示するようにした。
-	      <li><a href="contrib/keitai.mayu"><code>contrib/keitai.mayu</code></a> を追加。テンキーで携帯電話式ひらがな入力をしようという画期的設定ファイル (注:Joke)。(Thanks to HANAWA Yoshio)
-	      <li>設定ファイルが見つからなかったときはエラーを出すようになった。
-	      <li>設定ファイルを更新。
-	      <li>調査ダイアログを動かすとログウィンドウも動くようにした。
-	      <li>設定ダイアログ
-		  <ul>
-		    <li>タスクトレイのメニューから沢山開けるバグを修正。
-		    <li>「編集」を押して編集ダイアログが出ている最中にもう一度「編集」を押せるバグの修正。
-		    <li>「編集」で、ファイル名を空にできないバグの修正。
-		    <li>サイズ変更できるようにした。
-		  </ul>
-	    </ul>
-	<dt>2000/05/28 version 3.16
-	<dd>
-	    <ul>
-	      <li>インストーラがテンポラリフォルダに作った contrib を削除しないバグを直した。
-	      <li>アンインストーラが「窓使いの憂鬱」関連のレジストリを全て消すように変更。
-	      <li>バージョンダイアログの「最新バージョンのダウンロード」ボタンが利かなくなっていたバグを直した。
-	    </ul>
-	<dt>2000/05/23 version 3.15
-	<dd>
-	    <ul>
-	      <li>ドライバを起動時にスタートさせることにした。ので、Administrator じゃなくても窓使いの憂鬱を起動できるようになったはず。ただしこれを有効にするには、窓使いの憂鬱を一旦アンインストールして、コンピュータをリセットしてから再びインストールすること。
-	      <li>アプリケーション終了時に時々エラーが起きていたバグを退治。
-	      <li>「窓使いの憂鬱の設定」ダイアログの改良。
-	      <li>version 3.10 あたりから、<a href="CUSTOMIZE.html#HOME">ホームディレクトリ</a>のうち「設定(S)... で指定したファイルのあるディレクトリ」が検索されなくなっていたバグを修正。
-	      <li>以下の <code><em>FUNCTION</em></code> の最後の引数に <code>MDI</code> を指定すると、MDI 子ウィンドウを操作できるようにした。
-<a href="CUSTOMIZE.html#function_WindowCling"><code>&amp;WindowClingToBottom</code></a>,
-<a href="CUSTOMIZE.html#function_WindowCling"><code>&amp;WindowClingToLeft</code></a>,
-<a href="CUSTOMIZE.html#function_WindowCling"><code>&amp;WindowClingToRight</code></a>,
-<a href="CUSTOMIZE.html#function_WindowCling"><code>&amp;WindowClingToTop</code></a>,
-<a href="CUSTOMIZE.html#function_WindowClose"><code>&amp;WindowClose</code></a>,
-<a href="CUSTOMIZE.html#function_WindowMaxMinHVMax"><code>&amp;WindowHMaximize</code></a>,
-<a href="CUSTOMIZE.html#function_WindowRiseLower"><code>&amp;WindowLower</code></a>,
-<a href="CUSTOMIZE.html#function_WindowMaxMinHVMax"><code>&amp;WindowMaximize</code></a>,
-<a href="CUSTOMIZE.html#function_WindowMaxMinHVMax"><code>&amp;WindowMinimize</code></a>,
-<a href="CUSTOMIZE.html#function_WindowMove"><code>&amp;WindowMove</code></a>,
-<a href="CUSTOMIZE.html#function_WindowMoveVisibly"><code>&amp;WindowMoveVisibly</code></a>,
-<a href="CUSTOMIZE.html#function_WindowRiseLower"><code>&amp;WindowRaise</code></a>,
-<a href="CUSTOMIZE.html#function_WindowMaxMinHVMax"><code>&amp;WindowVMaximize</code></a>
-	      <li>設定ファイルを更新。
-	    </ul>
-	<dt>2000/05/19 version 3.14
-	<dd>
-	    <ul>
-	      <li>正規表現ライブラリを再び BUG FIX。
-	      <li>設定ファイルを更新。
-	    </ul>
-	<dt>2000/05/13 version 3.13
-	<dd>
-	    <ul>
-	      <li>正規表現ライブラリの BUG FIX。
-	    </ul>
-	<dt>2000/05/08 version 3.12
-	<dd>
-	    <ul>
-	      <li>正規表現ライブラリの BUG FIX。「マインスイーパ」にマッチさせることができるようになった。
-	    </ul>
-	<dt>2000/05/06 version 3.11
-	<dd>
-	    <ul>
-	      <li><a href="contrib/dvorak.mayu"><code>contrib/dvorak.mayu</code></a> を更新。(Thanks to KANAI Makoto)
-	      <li><a href="contrib/mayu-settings.txt"><code>contrib/mayu-settings.txt</code></a> を更新。(Thanks to HANAWA Yoshio)
-	    </ul>
-	<dt>2000/05/05 version 3.10
-	<dd>
-	    <ul>
-	      <li><a href="http://www.inprise.com/bcppbuilder/freecompiler" target="_top">Borland C++ Compiler 5.5</a> で<a href="CUSTOMIZE.html#compile">ビルド</a>できるようにした。(Thanks to HANAWA Yoshio)
-	      <li><a href="CUSTOMIZE.html#inputModifier">入力されたキーと同じモディファイヤの指定</a> ができるようにした。
-	      <li>複数のキー設定をメニューで切り替え可能にした。
-	      <li>設定ファイルを更新。
-	      <li><a href="#INSTALL">DLL 更新</a>。
-	      <li>(非公開)
-	    </ul>
-	<dt>2000/04/24 version 3.09
-	<dd>
-	    <ul>
-	      <li><a href="contrib/dvorak.mayu"><code>contrib/dvorak.mayu</code></a> を追加。(Thanks to KANAI Makoto)
-	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_InvestigateCommand"><code>&amp;InvestigateCommand</code></a> を追加。<a href="CUSTOMIZE.html#function_PostMessage"><code>&amp;PostMessage</code></a> の為の調査用。
-	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_EditNextModifier"><code>&amp;EditNextModifier</code></a> を追加。<kbd>[Alt]</kbd> + <kbd>[X]</kbd> などを <kbd>[ESCAPE] [X]</kbd> などで代用することが可能に。
-	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_Prefix"><code>&amp;Prefix</code></a> を変更。<a href="CUSTOMIZE.html#keymap2"><code>keymap2</code></a> を使うときのお約束 (<code>mod !shift !alt !control !windows</code>) が不要に。
-	      <li>設定ファイルを更新。
-	    </ul>
-	<dt>2000/04/15 version 3.08
-	<dd>
-	    <ul>
-	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_WindowSetAlpha"><code>&amp;WindowSetAlpha</code></a> を追加。
-	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_WindowRedraw"><code>&amp;WindowRedraw</code></a> を追加。
-	      <li><a href="#RELATEDWORK">related work</a> に KillGates を追加。
-	      <li><a href="contrib/mayu-settings.txt"><code>contrib/mayu-settings.txt</code></a> を更新。(Thanks to HANAWA Yoshio)
-	      <li>設定ファイルを更新。
-	    </ul>
-	<dt>2000/04/01 version 3.07
-	<dd>
-	    <ul>
-	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_Wait"><code>&amp;Wait</code></a> を追加。
-	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_MouseWheel"><code>&amp;MouseWheel</code></a> を追加。
-	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_VK"><code>&amp;VK</code></a> を拡張してマウスボタンを入力できるようにした。
-	      <li>マニュアルの内容を<a href="#ABSTRACT">い</a> <a href="#INSTALL">く</a> <a href="#BUGS">つ</a>か修正。
-	      <li>設定ファイルを更新。
-	      <li>英語リソースをつけてみた。が、使い方不明。
-	      <li>連絡先の修正。
-	      <li>わたしはエイプリルフールは嫌いです。
-	    </ul>
-	<dt>2000/03/21 version 3.06
-	<dd>
-	    <ul>
-	      <li>いくつかの typo を修正。
-	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_WindowMaxMinHVMax"><code>&amp;WindowHMaximize</code>, <code>&amp;WindowVMaximize</code></a> で、H と V を両方同じウィンドウへ適用した場合の動作を修正。
-	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_ClipboardCopy"><code>&amp;ClipboardCopy</code></a> を追加。
-	      <li>設定ファイルを更新。
-	      <li><a href="CUSTOMIZE.html#modifier"><code>IL-</code></a> を導入し、<code>I-</code> は <code>IC-</code> に名前を変更。ただし、互換性の為 <code>I-</code> も引き続き使用可能です。
-	      <li>コンソールのフォーカスの追跡に時々失敗していたのが直ったかもしれない。(かもしれないばっかだ…)
-	    </ul>
-	<dt>2000/03/10 version 3.05
-	<dd>
-	    <ul>
-	      <li>セットアップを修正。
-	      <li>コンソールのフォーカスの追跡に時々失敗していたのが直ったかもしれない。
-	      <li>(非公開)
-	    </ul>
-	<dt>2000/03/08 version 3.04
-	<dd>
-	    <ul>
-	      <li>設定ファイルを修正。(デフォルトで英数キーを Control に)
-	      <li>マニュアルのバグを直した。
-	      <li>マニュアルを Mozilla でもちゃんと表示できるようにした。(IE で見るときはフォントサイズ「小」にするとかっこいいが、よみにくいのでしなくていいです)
-	    </ul>
-	<dt>2000/03/04 version 3.03
-	<dd>
-	    <ul>
-	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_WindowMaxMinHVMax"><code>&amp;WindowHMaximize</code></a> を追加。
-	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_WindowIdentify"><code>&amp;WindowIdentify</code></a> を追加。
-	      <li>設定ファイルを大幅に更新した。
-	      <li><a href="contrib/mayu-settings.txt"><code>contrib/mayu-settings.txt</code></a> の追加。(Thanks to HANAWA Yoshio)
-	      <li>Windows2000 用のドライバをパワーマネジメント対応にした。
-	      <li>コンソールのフォーカスの追跡に時々失敗していたのが直ったかもしれない。
-	      <li>PlayStation2 の発売日。
-	    </ul>
-	<dt>1999/11/01 version 3.02
-	<dd>
-	    <ul>
-	      <li>setup 時にキーボードの種類を聞くようにした。
-	      <li>KeyboardLayout/ほげほげ の廃止 (日本語の場合はキーボードによらず、IME によって決定されるため)。
-	      <li>設定ファイルを再読み込みした後に、コントロールキーなどが押されっぱなしになることがあるバグを直した。
-	      <li><a href="CUSTOMIZE.html#oneShotModifier">One Shot モディファイヤ</a>の説明が間違っていたので修正。
-	      <li>デフォルトのモディファイヤを<a href="CUSTOMIZE.html#defaultModifier">変更</a>できるようにした。
-	      <li><a href="CUSTOMIZE.html#include">include</a> では、まず、レジストリで指定してある設定ファイルと同じフォルダを検索するようにした。
-	      <li>インストーラを少々変更
-	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_VK"><code>&amp;VK</code></a>  で、<code>U-</code> と <code>D-</code> が逆になっていたバグを修正。
-	    </ul>
-	<dt>1999/10/30 version 3.01
-	<dd>
-	    <ul>
-	      <li><a href="104on109.mayu"><code>104on109.mayu</code></a> と <a href="109on104.mayu"><code>109on104.mayu</code></a> を作った。
-	    </ul>
-	<dt>1999/10/29 version 3.00
-	<dt>1999/09/08 cmkey version 2.21
-	<dt>1999/09/05 cmkey version 2.20
-	<dt>1999/05/31 cmkey version 2.19
-	<dt>1999/05/31 cmkey version 2.18
-	<dt>1999/05/30 cmkey version 2.17
-	<dt>1999/05/29 cmkey version 2.16
-	<dt>1999/05/26 cmkey version 2.15
-	<dt>1999/05/26 cmkey version 2.14
-	<dt>1999/02/10 cmkey version 2.13
-	<dt>1998/12/02 cmkey version 2.12
-	<dt>1998/10/07 cmkey version 2.11
-	<dt>1998/07/23 cmkey version 2.10
-	<dt>1998/07/20 cmkey version 2.09
-	<dt>1998/07/17 cmkey version 2.08
-	<dt>1998/07/12 cmkey version 2.07
-	<dt>1998/07/11 cmkey version 2.06
-	<dt>1998/07/11 cmkey version 2.05
-	<dt>1998/07/05 cmkey version 2.04
-	<dt>1998/06/07 cmkey version 2.03
-	<dt>1998/05/24 cmkey version 2.02
-	<dt>1998/05/19 cmkey version 2.01
-	<dt>1998/05/19 cmkey version 2.00
-	<dt>1996/07/?? WinModMap version 1.03
-	<dt>1996/06/30 WinModMap version 1.02
-	<dt>1996/06/22 WinModMap version 1.01
-	<dt>1996/06/21 WinModMap version 1.00
-      </dl>
+	<dl class="history">
+	  <dt>2001/08/05 3.24
+	  <dd>
+	      <ul>
+		<li><a href="default.mayu"><code>default.mayu</code></a> で、<kbd>[英数]</kbd> を <kbd>[Control]</kbd> として使用している場合に <code>C-Q</code> が正しく働かない問題を修正。version 3.19 で修正したものと原因は同じ。(Thanks to hanawa)
+		<li>Windows9x のドライバを更新。青画面でも操作できるようになりました。(Thanks to 小林)
+		<li><a href="CUSTOMIZE.html#oneShotModifier">One Shot モディファイヤ</a>であると宣言したキーが押されている間にキーが押された時のみ、モディファイヤとして扱われるようにした。今までは、離された時にもモディファイヤ扱いになっていた。
+		<li>一時停止にしたときにタスクトレイのアイコンを変化させるようにした。
+		<li><a href="CUSTOMIZE.html#keyRepeat"><code>R-</code></a> を新設。(Thanks to hanawa)。<a href="mayu-mode.el" target="MANUAL"><code>mayu-mode.el</code></a> で色がつくようにした。
+		<li><a href="http://www.borland.co.jp/cppbuilder/freecompiler/index.html" target="_top">Borland C++ 5.5.1</a> で<a href="CUSTOMIZE.html#compile">ビルド</a>できるようにした。
+		<li><a href="CUSTOMIZE.html#oneShotModifier">One Shot モディファイヤ</a>を離したときに有効なモディファイヤは押したときと同じになるようにした。
+		<li><a href="CUSTOMIZE.html#function_EmacsEditKillLine"><code>&amp;EmacsEditKillLineFunc</code></a>, <a href="CUSTOMIZE.html#function_EmacsEditKillLine"><code>&amp;EmacsEditKillLinePred</code></a> の説明を追加。
+		<li>USB 対応ドライバは今回は収録していません。
+		<li>BETA ではないです。
+	      </ul>
+	  <dt>2001/07/06 3.23 (BETA)
+	  <dd>
+	      <ul>
+		<li><a href="104on109.mayu"><code>104on109.mayu</code></a> で「`」が入力できなかったバグを直した。(Thanks to Oiwa)
+		<li><a href="CUSTOMIZE.html#oneShotRepeatableModifier">One Shot (キーリピート有)</a> を追加。
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_Toggle"><code>&amp;Toggle</code></a> で、強制的にオンオフできるようにした。
+		<li><a href="109.mayu"><code>109.mayu</code></a> に VAIO タワー用の特殊キーを追加。
+		<li>WindowsNT4.0 でインストールできなくなっていた問題を修正。(Makefile の書き方のミス)
+		<li>Windows9x のドライバを更新。
+		<li>新規インストールした時に「ホームディレクトリから」が選択されていてキー入力ができなくなってしまう問題を修正。
+		<li><a href="#SUPPORT">support</a> に 2ch を追加。
+	      </ul>
+	  <dt>2001/03/24 3.22 (BETA)
+	  <dd>
+	      <ul>
+		<li><a href="CUSTOMIZE.html#def_subst">代用定義</a>を追加した。おかげで <a href="104on109.mayu"><code>104on109.mayu</code></a> などがスマートに定義できるようになった。
+		<li><a href="mayu-mode.el" target="MANUAL"><code>mayu-mode.el</code></a> で代用定義にも色がつくようにした。
+		<li>間違ってデバッグビルドしたものを収録していたのをリリースビルドを収録するようにした。
+		<li>間違って壊れた Windows9x のドライバを収録してしまったので正しいドライバを入れた。
+	      </ul>
+	  <dt>2001/03/23 version 3.21 (BETA)
+	  <dd>
+	      <ul>
+		<li>Windows95 で CPU 時間を 100% 占めてしまう問題がなおった。(Thanks to 小林義明)
+		<li>NEC PC-98x1 で動作しない問題がなおった。(Thanks to 小林義明)
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_LoadSetting"><code>&amp;LoadSetting</code></a> で、どの設定をロードするか指定できるようになった。
+		<li><a href="contrib/98x1.mayu"><code>contrib/98x1.mayu</code></a> を追加。(Thanks to HAJANO Na&ograve;qui)
+		<li><a href="CUSTOMIZE.html#HOME">ホームディレクトリ</a> に、<code>mayu.exe</code> のカレントディレクトリを追加。		  
+	      </ul>
+	  <dt>2001/03/10 version 3.20 (BETA)
+	  <dd>
+	      <ul>
+		<li>Windows95 でも動作するようになった。
+		<li><a href="#ACKNOWLEDGEMENT">acknowledgements</a> 更新。
+		<li><code>cab32.dll</code> ではなく <code>iexpress</code> を使用してパッケージを作成するようにした。
+		<li>ソースをパッケージから分離した。
+	      </ul>
+	  <dt>2001/03/05 version 3.19 (BETA)
+	  <dd>
+	      <ul>
+		<li>このバージョンは内部構造を大幅に変えたので不安定である可能性が高いです。どうしてもこのバージョンが必要な人のみ使用してください。
+		<li><kbd>[Control]</kbd> + <kbd>[U]</kbd> 操作の改良。
+		<li><a href="default.mayu"><code>default.mayu</code></a> を使っている場合は、<code>Global</code> キーマップで <kbd>[英数]</kbd> を <kbd>[Control]</kbd> にしているが、<code>Global</code> キーマップを親キーマップとして持たない <a href="CUSTOMIZE.html#keymap2"><code>keymap2</code></a> の中では (当然ながら) <kbd>[英数]</kbd> を <kbd>[Control]</kbd> として使用できないので、ちゃんと <code>Global</code> キーマップを親キーマップとして持つように設定ファイルを修正。
+		<li><a href="default.mayu"><code>default.mayu</code></a> で、<code>-DMAP-ESCAPE-TO-META</code> とすると <kbd>[Alt]</kbd> + <kbd>[X]</kbd> などを <kbd>[ESCAPE] [X]</kbd> で代用するようにした。
+		<li>WindowsNT/2000 版のプログラム内部では全て UNICODE で処理するようにした。
+		<li>WindowsNT/2000 版では、設定ファイルの文字コードに、shift_jis だけでなく UTF-16LE/BE や UTF-8 を使用できるようになった。「メモ帳」で、「Unicode」や「Unicode big endien」や「UTF-8」を選んでセーブすれば、日本語だけでなくハングルなどの UNICODE で扱える文字が全て設定ファイルに書けるようになる。現在は文字コードは自動判別され、自動判別に失敗した場合の救済措置はない。自動判別に失敗するようなら自動判別できそうな文字をコメントにでも書いておくこと。
+		<li>正規表現ライブラリを <a href="http://ourworld.compuserve.com/homepages/John_Maddock/regexpp.htm" target="_top">Regex++</a> に変更した。
+		<li>いろいろ変えた結果多分 bcc32 ではコンパイルできなくなった。少し修正するだけだと思うが。
+		<li><a href="contrib/ax.mayu"><code>contrib/ax.mayu</code></a> を追加。(Thanks to KAWABE Nobukazu)
+		<li><a href="#RELATEDWORK">related work</a> に MetaX を追加。
+		<li><a href="CUSTOMIZE.html#defaultModifier">デフォルトモディファイヤの変更</a>のサンプルが間違っていたので直した。(<code>key IC-* =</code> ではなく <code>key *IC- =</code> が正しい) (Thanks to Hirotaka Kasaki)
+		<li><a href="CUSTOMIZE.html#defaultKey">デフォルトキー</a>の中で定義中のキーマップ名を参照できなかったバグを修正した。つまり、<code>keymap Hoge =&gt; &amp;Prefix(Hoge)</code> などができるようになった。(Thanks to HANAWA Yoshio)
+		<li>Windows9x 用のドライバを作成されたので、このバージョンから WindowsNT/2000 用のパッケージと Windows9x 用のパッケージが存在します。(Thanks to 小林義明)
+		<li>現在、Windows9x では、<a href="CUSTOMIZE.html#function_HelpMessage"><code>&amp;HelpMessage</code></a>、<a href="CUSTOMIZE.html#function_HelpVariable"><code>&amp;HelpVariable</code></a>、<a href="CUSTOMIZE.html#function_WindowSetAlpha"><code>&amp;WindowSetAlpha</code></a> は使用できません。
+		<li><a href="default.mayu"><code>default.mayu</code></a> を使用している場合、シンボル <code>ZXCV</code> を定義しておくと、<kbd>[Control]</kbd> + <kbd>[Z]</kbd>, <kbd>[Control]</kbd> + <kbd>[X]</kbd>, <kbd>[Control]</kbd> + <kbd>[C]</kbd>, <kbd>[Control]</kbd> + <kbd>[V]</kbd> が Windows と同じ動きをするようになります。(Thanks to HANAWA Yoshio)
+	      </ul>
+	  <dt>2000/12/17 version 3.18
+	  <dd>
+	      <ul>
+		<li>ヘルプが開けないバグの修正。
+		<li><a href="mayu-mode.el" target="MANUAL"><code>mayu-mode.el</code></a> が展開されていなかったのを直した。ついでに少しだけ修正。
+		<li><code>IC-</code> が時々無視されるバグが直ったはず。
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_HelpMessage"><code>&amp;HelpMessage</code></a> を追加。<a href="default.mayu"><code>default.mayu</code></a> を使っている場合はメモ帳で <kbd>[Control]</kbd> + <kbd>[X]</kbd> を押してみよう (ただし IE5.0 以上を使っている場合のみ)。
+		<li><a href="CUSTOMIZE.html#event"><code>event</code></a> を追加。
+		<li>これらの追加により、プレフィックスキーが押された時にメッセージを表示することが可能になった。
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_KeymapWindow"><code>&amp;KeymapWindow</code></a> を追加。
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_Variable"><code>&amp;Variable</code></a> を追加。
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_Repeat"><code>&amp;Repeat</code></a> を追加。
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_HelpVariable"><code>&amp;HelpVariable</code></a> を追加。
+		<li>これらの追加により Emacs の <kbd>[Control]</kbd> + <kbd>[U]</kbd> が可能になった。私にメールを送るために 1000000000000000000000000000000000000000000000000000000000000@tsg.ne.jp と入力するのもらくらくです。
+		<li>チュートリアル・FAQ の充実は次回に延期。
+	      </ul>
+	  <dt>2000/12/03 version 3.17
+	  <dd>
+	      <ul>
+		<li>メーリングリストを <a href="http://lists.sourceforge.net/mailman/listinfo/mayu-support" target="_top">Source Forge</a> へ移動。
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_WindowMoveTo"><code>&amp;WindowMoveTo</code></a> を追加。
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_WindowResizeTo"><code>&amp;WindowResizeTo</code></a> を追加。
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_MayuDialog"><code>&amp;MayuDialog</code></a> を追加。
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_DescribeBindings"><code>&amp;DescribeBindings</code></a> を追加。表示形式がいまいち分かりにくいのでどうしようか思案中。
+		<li><a href="#RELATEDWORK">related work</a> に Pastel Touch を追加。
+		<li><a href="#RELATEDWORK">related work</a> に KeyMap を追加。
+		<li><a href="#RELATEDWORK">related work</a> に dvorak kr, swap2k を追加。
+		<li><a href="#RELATEDWORK">related work</a> に Q's Nicolatter を追加。
+		<li><a href="#FAQ">FAQ</a> を追加。
+		<li><code>mailto:</code> をドキュメントから削除。
+		<li><a href="http://www.linuxsupportline.com/~doc++/" target="_top">DOC++</a> で表示できるようにソースのコメントを書き換えた。
+		<li>Emacs で設定ファイルを編集する人のために <a href="mayu-mode.el"><code>mayu-mode.el</code></a> を追加。ただし、色がつくだけです。
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_WindowIdentify"><code>&amp;WindowIdentify</code></a> で、ウィンドウの位置と大きさも表示するようにした。
+		<li><a href="contrib/keitai.mayu"><code>contrib/keitai.mayu</code></a> を追加。テンキーで携帯電話式ひらがな入力をしようという画期的設定ファイル (注:Joke)。(Thanks to HANAWA Yoshio)
+		<li>設定ファイルが見つからなかったときはエラーを出すようになった。
+		<li>設定ファイルを更新。
+		<li>調査ダイアログを動かすとログウィンドウも動くようにした。
+		<li>設定ダイアログ
+		    <ul>
+		      <li>タスクトレイのメニューから沢山開けるバグを修正。
+		      <li>「編集」を押して編集ダイアログが出ている最中にもう一度「編集」を押せるバグの修正。
+		      <li>「編集」で、ファイル名を空にできないバグの修正。
+		      <li>サイズ変更できるようにした。
+		    </ul>
+	      </ul>
+	  <dt>2000/05/28 version 3.16
+	  <dd>
+	      <ul>
+		<li>インストーラがテンポラリフォルダに作った contrib を削除しないバグを直した。
+		<li>アンインストーラが「窓使いの憂鬱」関連のレジストリを全て消すように変更。
+		<li>バージョンダイアログの「最新バージョンのダウンロード」ボタンが利かなくなっていたバグを直した。
+	      </ul>
+	  <dt>2000/05/23 version 3.15
+	  <dd>
+	      <ul>
+		<li>ドライバを起動時にスタートさせることにした。ので、Administrator じゃなくても窓使いの憂鬱を起動できるようになったはず。ただしこれを有効にするには、窓使いの憂鬱を一旦アンインストールして、コンピュータをリセットしてから再びインストールすること。
+		<li>アプリケーション終了時に時々エラーが起きていたバグを退治。
+		<li>「窓使いの憂鬱の設定」ダイアログの改良。
+		<li>version 3.10 あたりから、<a href="CUSTOMIZE.html#HOME">ホームディレクトリ</a>のうち「設定(S)... で指定したファイルのあるディレクトリ」が検索されなくなっていたバグを修正。
+		<li>以下の <code><em>FUNCTION</em></code> の最後の引数に <code>MDI</code> を指定すると、MDI 子ウィンドウを操作できるようにした。
+		    <a href="CUSTOMIZE.html#function_WindowCling"><code>&amp;WindowClingToBottom</code></a>,
+		    <a href="CUSTOMIZE.html#function_WindowCling"><code>&amp;WindowClingToLeft</code></a>,
+		    <a href="CUSTOMIZE.html#function_WindowCling"><code>&amp;WindowClingToRight</code></a>,
+		    <a href="CUSTOMIZE.html#function_WindowCling"><code>&amp;WindowClingToTop</code></a>,
+		    <a href="CUSTOMIZE.html#function_WindowClose"><code>&amp;WindowClose</code></a>,
+		    <a href="CUSTOMIZE.html#function_WindowMaxMinHVMax"><code>&amp;WindowHMaximize</code></a>,
+		    <a href="CUSTOMIZE.html#function_WindowRiseLower"><code>&amp;WindowLower</code></a>,
+		    <a href="CUSTOMIZE.html#function_WindowMaxMinHVMax"><code>&amp;WindowMaximize</code></a>,
+		    <a href="CUSTOMIZE.html#function_WindowMaxMinHVMax"><code>&amp;WindowMinimize</code></a>,
+		    <a href="CUSTOMIZE.html#function_WindowMove"><code>&amp;WindowMove</code></a>,
+		    <a href="CUSTOMIZE.html#function_WindowMoveVisibly"><code>&amp;WindowMoveVisibly</code></a>,
+		    <a href="CUSTOMIZE.html#function_WindowRiseLower"><code>&amp;WindowRaise</code></a>,
+		    <a href="CUSTOMIZE.html#function_WindowMaxMinHVMax"><code>&amp;WindowVMaximize</code></a>
+		<li>設定ファイルを更新。
+	      </ul>
+	  <dt>2000/05/19 version 3.14
+	  <dd>
+	      <ul>
+		<li>正規表現ライブラリを再び BUG FIX。
+		<li>設定ファイルを更新。
+	      </ul>
+	  <dt>2000/05/13 version 3.13
+	  <dd>
+	      <ul>
+		<li>正規表現ライブラリの BUG FIX。
+	      </ul>
+	  <dt>2000/05/08 version 3.12
+	  <dd>
+	      <ul>
+		<li>正規表現ライブラリの BUG FIX。「マインスイーパ」にマッチさせることができるようになった。
+	      </ul>
+	  <dt>2000/05/06 version 3.11
+	  <dd>
+	      <ul>
+		<li><a href="contrib/dvorak.mayu"><code>contrib/dvorak.mayu</code></a> を更新。(Thanks to KANAI Makoto)
+		<li><a href="contrib/mayu-settings.txt"><code>contrib/mayu-settings.txt</code></a> を更新。(Thanks to HANAWA Yoshio)
+	      </ul>
+	  <dt>2000/05/05 version 3.10
+	  <dd>
+	      <ul>
+		<li><a href="http://www.inprise.com/bcppbuilder/freecompiler" target="_top">Borland C++ Compiler 5.5</a> で<a href="CUSTOMIZE.html#compile">ビルド</a>できるようにした。(Thanks to HANAWA Yoshio)
+		<li><a href="CUSTOMIZE.html#inputModifier">入力されたキーと同じモディファイヤの指定</a> ができるようにした。
+		<li>複数のキー設定をメニューで切り替え可能にした。
+		<li>設定ファイルを更新。
+		<li><a href="#INSTALL">DLL 更新</a>。
+		<li>(非公開)
+	      </ul>
+	  <dt>2000/04/24 version 3.09
+	  <dd>
+	      <ul>
+		<li><a href="contrib/dvorak.mayu"><code>contrib/dvorak.mayu</code></a> を追加。(Thanks to KANAI Makoto)
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_InvestigateCommand"><code>&amp;InvestigateCommand</code></a> を追加。<a href="CUSTOMIZE.html#function_PostMessage"><code>&amp;PostMessage</code></a> の為の調査用。
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_EditNextModifier"><code>&amp;EditNextModifier</code></a> を追加。<kbd>[Alt]</kbd> + <kbd>[X]</kbd> などを <kbd>[ESCAPE] [X]</kbd> などで代用することが可能に。
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_Prefix"><code>&amp;Prefix</code></a> を変更。<a href="CUSTOMIZE.html#keymap2"><code>keymap2</code></a> を使うときのお約束 (<code>mod !shift !alt !control !windows</code>) が不要に。
+		<li>設定ファイルを更新。
+	      </ul>
+	  <dt>2000/04/15 version 3.08
+	  <dd>
+	      <ul>
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_WindowSetAlpha"><code>&amp;WindowSetAlpha</code></a> を追加。
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_WindowRedraw"><code>&amp;WindowRedraw</code></a> を追加。
+		<li><a href="#RELATEDWORK">related work</a> に KillGates を追加。
+		<li><a href="contrib/mayu-settings.txt"><code>contrib/mayu-settings.txt</code></a> を更新。(Thanks to HANAWA Yoshio)
+		<li>設定ファイルを更新。
+	      </ul>
+	  <dt>2000/04/01 version 3.07
+	  <dd>
+	      <ul>
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_Wait"><code>&amp;Wait</code></a> を追加。
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_MouseWheel"><code>&amp;MouseWheel</code></a> を追加。
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_VK"><code>&amp;VK</code></a> を拡張してマウスボタンを入力できるようにした。
+		<li>マニュアルの内容を<a href="#ABSTRACT">い</a> <a href="#INSTALL">く</a> <a href="#BUGS">つ</a>か修正。
+		<li>設定ファイルを更新。
+		<li>英語リソースをつけてみた。が、使い方不明。
+		<li>連絡先の修正。
+		<li>わたしはエイプリルフールは嫌いです。
+	      </ul>
+	  <dt>2000/03/21 version 3.06
+	  <dd>
+	      <ul>
+		<li>いくつかの typo を修正。
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_WindowMaxMinHVMax"><code>&amp;WindowHMaximize</code>, <code>&amp;WindowVMaximize</code></a> で、H と V を両方同じウィンドウへ適用した場合の動作を修正。
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_ClipboardCopy"><code>&amp;ClipboardCopy</code></a> を追加。
+		<li>設定ファイルを更新。
+		<li><a href="CUSTOMIZE.html#modifier"><code>IL-</code></a> を導入し、<code>I-</code> は <code>IC-</code> に名前を変更。ただし、互換性の為 <code>I-</code> も引き続き使用可能です。
+		<li>コンソールのフォーカスの追跡に時々失敗していたのが直ったかもしれない。(かもしれないばっかだ…)
+	      </ul>
+	  <dt>2000/03/10 version 3.05
+	  <dd>
+	      <ul>
+		<li>セットアップを修正。
+		<li>コンソールのフォーカスの追跡に時々失敗していたのが直ったかもしれない。
+		<li>(非公開)
+	      </ul>
+	  <dt>2000/03/08 version 3.04
+	  <dd>
+	      <ul>
+		<li>設定ファイルを修正。(デフォルトで英数キーを Control に)
+		<li>マニュアルのバグを直した。
+		<li>マニュアルを Mozilla でもちゃんと表示できるようにした。(IE で見るときはフォントサイズ「小」にするとかっこいいが、よみにくいのでしなくていいです)
+	      </ul>
+	  <dt>2000/03/04 version 3.03
+	  <dd>
+	      <ul>
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_WindowMaxMinHVMax"><code>&amp;WindowHMaximize</code></a> を追加。
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_WindowIdentify"><code>&amp;WindowIdentify</code></a> を追加。
+		<li>設定ファイルを大幅に更新した。
+		<li><a href="contrib/mayu-settings.txt"><code>contrib/mayu-settings.txt</code></a> の追加。(Thanks to HANAWA Yoshio)
+		<li>Windows2000 用のドライバをパワーマネジメント対応にした。
+		<li>コンソールのフォーカスの追跡に時々失敗していたのが直ったかもしれない。
+		<li>PlayStation2 の発売日。
+	      </ul>
+	  <dt>1999/11/01 version 3.02
+	  <dd>
+	      <ul>
+		<li>setup 時にキーボードの種類を聞くようにした。
+		<li>KeyboardLayout/ほげほげ の廃止 (日本語の場合はキーボードによらず、IME によって決定されるため)。
+		<li>設定ファイルを再読み込みした後に、コントロールキーなどが押されっぱなしになることがあるバグを直した。
+		<li><a href="CUSTOMIZE.html#oneShotModifier">One Shot モディファイヤ</a>の説明が間違っていたので修正。
+		<li>デフォルトのモディファイヤを<a href="CUSTOMIZE.html#defaultModifier">変更</a>できるようにした。
+		<li><a href="CUSTOMIZE.html#include">include</a> では、まず、レジストリで指定してある設定ファイルと同じフォルダを検索するようにした。
+		<li>インストーラを少々変更
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_VK"><code>&amp;VK</code></a>  で、<code>U-</code> と <code>D-</code> が逆になっていたバグを修正。
+	      </ul>
+	  <dt>1999/10/30 version 3.01
+	  <dd>
+	      <ul>
+		<li><a href="104on109.mayu"><code>104on109.mayu</code></a> と <a href="109on104.mayu"><code>109on104.mayu</code></a> を作った。
+	      </ul>
+	  <dt>1999/10/29 version 3.00
+	  <dt>1999/09/08 cmkey version 2.21
+	  <dt>1999/09/05 cmkey version 2.20
+	  <dt>1999/05/31 cmkey version 2.19
+	  <dt>1999/05/31 cmkey version 2.18
+	  <dt>1999/05/30 cmkey version 2.17
+	  <dt>1999/05/29 cmkey version 2.16
+	  <dt>1999/05/26 cmkey version 2.15
+	  <dt>1999/05/26 cmkey version 2.14
+	  <dt>1999/02/10 cmkey version 2.13
+	  <dt>1998/12/02 cmkey version 2.12
+	  <dt>1998/10/07 cmkey version 2.11
+	  <dt>1998/07/23 cmkey version 2.10
+	  <dt>1998/07/20 cmkey version 2.09
+	  <dt>1998/07/17 cmkey version 2.08
+	  <dt>1998/07/12 cmkey version 2.07
+	  <dt>1998/07/11 cmkey version 2.06
+	  <dt>1998/07/11 cmkey version 2.05
+	  <dt>1998/07/05 cmkey version 2.04
+	  <dt>1998/06/07 cmkey version 2.03
+	  <dt>1998/05/24 cmkey version 2.02
+	  <dt>1998/05/19 cmkey version 2.01
+	  <dt>1998/05/19 cmkey version 2.00
+	  <dt>1996/07/?? WinModMap version 1.03
+	  <dt>1996/06/30 WinModMap version 1.02
+	  <dt>1996/06/22 WinModMap version 1.01
+	  <dt>1996/06/21 WinModMap version 1.00
+	</dl>
       </div>
 </dl>
 

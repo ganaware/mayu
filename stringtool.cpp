@@ -368,7 +368,7 @@ tstring toLower(const tstring &i_str)
     if (_ismbblead(str[i]))
       ++ i;
     else
-      str[i] = tolower(i);
+      str[i] = tolower(str[i]);
   }
   return str;
 }
