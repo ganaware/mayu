@@ -20,7 +20,7 @@ $(TARGET_1):	$(OBJS_1) $(RES_1) $(EXTRADEP_1)
 	$(LD) $(LDFLAGS_1) $(OBJS_1),$(TARGET_1),,$(LIBS_1),,$(RES_1)
 
 strres.h:	setup.rc
-	cmd /c grep -q- IDS setup.rc | \
+	cmd /c grep IDS setup.rc | \
 	sed "s/\(IDS[a-zA-Z0-9_]*\)[^""]*\("".*\)$$/ \1, _T(\2) ,/" | \
 	sed "s/^File.*$//" > strres.h
 
