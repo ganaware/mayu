@@ -66,6 +66,17 @@
 	<li>インストールが終わったらいったんログアウトしてください。さもないとさまざまなアプリケーションが落ちる可能性があります。
 	<li>お好みにより、スタートアップにショートカットを作るのもいいでしょう。
 	<li><code>mayu.exe</code> を実行することで開始します。
+
+	<hr>
+
+	<p>NT4.0/2000/XP の場合 mayu ドライバは mayu.exe の実行の有無に関わらずロードされます。このため、たとえ mayu を自動起動にしていなくても、ドライバの不具合によって mayu のアンインストールも含めた操作が不能になる場合があります。その場合でも下記の手順によって Windows の再インストールを回避することができる場合があります。
+	<ol class="decimal">
+	  <li>電源ボタンの長押し等によって一旦、強制的に電源を落したあと回復コンソールを起動します。尚、回復コンソールでの起動ができることを<strong>「窓使いの憂鬱」のインストール前に</strong>確認しておくことをお勧めします。</strong>(参考: <a href="http://support.microsoft.com/default.aspx?scid=kb;ja;314058">Windows XP 回復コンソールについて</a>)
+	  <li>%windir%\system32\drivers 内の mayudrsc.sys を mayud.sys の名前で上書きコピーします。(即ち mayud.sys を mayudrsc.sysで置き換える。)
+	  <li>再起動します。
+	  <li>コントロールパネルから「窓使いの憂鬱」をアンインストールします。
+	</ol>
+	</p>
       </ol>
       
   <dt class="h1"><a name="UNINSTALL">3. uninstall</a>
