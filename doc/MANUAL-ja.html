@@ -465,16 +465,27 @@
 
 	      <p>ちなみに、Windows なんだし <code>C-z</code>, <code>C-x</code>, <code>C-c</code>, <code>C-v</code> だけは使わせろ、という人のために、<code>ZXCV</code> というシンボルが定義されています。<code>-DZXCV</code> するなり <code>define ZXCV</code> すれば、それだけは Windows っぽく動きます。</p>
 	      
-	  <dt class="h2">Q6.ノートパソコンの<kbd>[Fn]</kbd>キーに何か機能を割り当てることはできますか？ 
+	  <dt class="h2">Q6. IMEオンのときの「窓使いの憂鬱」のキー入れ替えの挙動が妙です。1つめのキー入力以外うまく入れ替えられません。
+
+	  <dd class="d2"><p>IMEオンの状態では <code>IL-</code>(IMEオン) ですが、1文字入力した時点でさらに <code>IC-</code> （IME変換中）となります。一方で標準のデフォルトモディファイヤは <code>*IL-~IC-</code> です。思い通りにキー入れ替えされていないわけではなく、デフォルトモディファイヤの設定に従って入れ替えを行っていないだけではないでしょうか。</p>
+
+	  <dt class="h2">Q7. デフォルトモディファイヤが上記のような設定になっているのはなぜですか。不便です。
+
+	  <dd class="d2"><p>作者はIME2000を使っており、IME変換中のキーバインディングについては「プロパティ」-「全般」-「設定」でカスタマイズすることを想定しています。むやみにIME変換中のキーバインディングが変更されると、このIMEのカスタマイズがやりにくいのではないかと思います。</p>
+
+	      <p>もし不便すぎて我慢できない、という場合には、 <code>key *IC- =</code> のように<a href="./CUSTOMIZE-ja.html#defaultModifier">デフォルトモディファイヤを変更</a>してもいいかもしれません。逆に不便なこともあるかと思いますので、お薦めしませんけど。</p>
+
+
+	  <dt class="h2">Q8.ノートパソコンの<kbd>[Fn]</kbd>キーに何か機能を割り当てることはできますか？ 
 	  <dd class="d2"><p><kbd>[Fn]</kbd> キーを単体で押しても Windows にキーイベントは来ないはずです (スキャンコードの調査で調べられます)。当然ながら、このようなキーに機能を割り当てることはできません。</p>
 	      
-	  <dt class="h2">Q7. <kbd>[Caps/英数]</kbd> を <kbd>[Ctrl]</kbd> にしています。<kbd>[Ctrl]</kbd> + <kbd>[Shift]</kbd> + <kbd>[x]</kbd> に機能を割り振っており、正常に動いているのですが、<kbd>[Caps/英数]</kbd> + <kbd>[Shift]</kbd> + <kbd>[x]</kbd> を打っても、何も起きません。なぜですか。
-	  <dd class="d2"><p>キーボードによっては、特定の3キーの同時押しを認識できないものがあります。スキャンコードの調査で、どんなキーイベントが発生しているかをチェックしてみてください。</p>
+	  <dt class="h2">Q9. <kbd>[Caps/英数]</kbd> を <kbd>[Ctrl]</kbd> にしています。<kbd>[Ctrl]</kbd> + <kbd>[Shift]</kbd> + <kbd>[x]</kbd> に機能を割り振っており、正常に動いているのですが、<kbd>[Caps/英数]</kbd> + <kbd>[Shift]</kbd> + <kbd>[x]</kbd> を打っても、何も起きません。なぜですか。
+	  <dd class="d2"><p>キーボードによっては、特定の3キーの同時押しを認識できないものがあります。スキャンコードの調査で、どんなキーイベントが発生しているかをチェックしてみてください。モディファイヤ2個を押した状態で、3個目のキーを押したときにキーイベントが発生していないようであれば、そのキーボードでは使えないキーの組み合わせということです。</p>
 
-	  <dt class="h2">Q8. スキャンコードの調査で、例えば <kbd>[Shift]</kbd> + <kbd>[↑]</kbd> を押したときなど、たまに出るはずのない <code>E0-0x2a</code> というキーイベントが出るようですが、これは何ですか？
+	  <dt class="h2">Q10. スキャンコードの調査で、例えば <kbd>[Shift]</kbd> + <kbd>[↑]</kbd> を押したときなど、たまに出るはずのない <code>E0-0x2a</code> というキーイベントが出るようですが、これは何ですか？
 	  <dd class="d2"><p>このスキャンコードに関する情報をお待ちしております。</p>
 
-	  <dt class="h2">Q9. 右 <kbd>[Windows]</kbd> キーを押すと IME のオンオフができるようにしたい。
+	  <dt class="h2">Q11. 右 <kbd>[Windows]</kbd> キーを押すと IME のオンオフができるようにしたい。
 	  <dd class="d2">
 	      <p class="sample">mod windows -= RightWindows # ... (1)<br>
 	      key RightWindows = $ToggleIME<br>
@@ -482,13 +493,13 @@
 	      
 	      <p>右 <kbd>[Windows]</kbd> キーはモディファイヤキーなので特別扱いされます。したがって普通のキーのように動作するようにするには、<code>(1)</code> のようにしてモディファイヤキーとして動作しないようにします。これは <kbd>[Alt]</kbd> や <kbd>[Shift]</kbd> や <kbd>[Control]</kbd> でも同様です。</p>
 	      
-	  <dt class="h2">Q10. ウインドウのクラス名はどうやって調べるんですか？
+	  <dt class="h2">Q12. ウインドウのクラス名はどうやって調べるんですか？
 	  <dd class="d2"><p>タスクトレイの「窓使いの憂鬱」のアイコンでマウスの右ボタンを押して「<a href="#menu-i">調査(I)...</a>」を選びます。</p>
 	      
-	  <dt class="h2">Q11. アクティブな時にしか見えない窓などの場合、上記の方法では調査できないですが？
+	  <dt class="h2">Q13. アクティブな時にしか見えない窓などの場合、上記の方法では調査できないですが？
 	  <dd class="d2"><p><a href="CUSTOMIZE-ja.html#function_WindowIdentify"><code>&amp;WindowIdentify</code></a> を使ってください。<a href="../default.mayu"><code>default.mayu</code></a> では <kbd>[Ctrl]</kbd> +<kbd>[Shift]</kbd> + <kbd>[D]</kbd> に割り振ってあります。</p>
 	      
-	  <dt class="h2">Q12. インストール時には 109 キーボードだったのですが、今度 104 キーボードを購入しました。しかし、タスクトレイメニューの「選択」には 109 しか出てきません。どうすればいいですか。
+	  <dt class="h2">Q14. インストール時には 109 キーボードだったのですが、今度 104 キーボードを購入しました。しかし、タスクトレイメニューの「選択」には 109 しか出てきません。どうすればいいですか。
 	  <dd class="d2">
 	      <p>インストール時の選択により、以下の表の上 4 つまたは下 4 つが選ばれます。「設定」ダイアログボックスで適切に設定してください。(<code>%MAYU_DIR%</code> は mayu をインストールしたディレクトリです)</p>
 	      
@@ -519,18 +530,18 @@
 		<tr class="symbol"><th>シンボル</th><td><code>-DUSE104;-DUSE109on104</code></td></tr>
 	      </table>
 	      
-	  <dt class="h2">Q13. 「窓使いの憂鬱」では USB キーボードは使えないのですか。
+	  <dt class="h2">Q15. 「窓使いの憂鬱」では USB キーボードは使えないのですか。
 	  <dd class="d2"><p>小林義明さんが Windows2000 用のドライバを書いてくださったので、USB 用の mayu ドライバを利用すれば使用することができます。現在はまだテスト中なので <a href="#SUPPORT">メーリングリスト</a> で問い合わせてください。又 Win9x では普通に使用できます。</p>
 	      
-	  <dt class="h2">Q14. 「窓使いの憂鬱」は Windows95/98/ME では使えないのですか。
+	  <dt class="h2">Q16. 「窓使いの憂鬱」は Windows95/98/ME では使えないのですか。
 	  <dd class="d2"><p>小林義明さんがドライバを書いてくださったので、バージョン 3.19 から使用できるようになりました。</p>
 	      
-	  <dt class="h2">Q15. このマニュアルをNetscape4で見るとぐちゃぐちゃなんですけど、そういうもんですか。
+	  <dt class="h2">Q17. このマニュアルをNetscape4で見るとぐちゃぐちゃなんですけど、そういうもんですか。
 	  <dd class="d2">
 	      <p>そういうもんです。Netscape4 の css サポートが腐っているせいです。css をオフにすればまだましになりますけど、やっぱり見にくいです。</p>
 	      <p>ちなみに作者は IE5.5 と Mozilla 0.92 でしか確認していません。IE5.0 では細かい見栄えが少しだけ違ったりします。</p>
 
-	  <dt class="h2">Q16. mayu は<a href="http://www.tactics.co.jp/qtactics/one.htm" target="_top">椎名繭</a>なのですか。
+	  <dt class="h2">Q18. mayu は<a href="http://www.tactics.co.jp/qtactics/one.htm" target="_top">椎名繭</a>なのですか。
 	  <dd class="d2"><p>違います。ぜんぜん違います。GTO の繭君でもないです。</p>
 	</dl>
       </div>
