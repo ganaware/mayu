@@ -65,7 +65,6 @@
 	<li>ダウンロードした実行ファイルを Administrator 権限で実行してください。すると「窓使いの憂鬱」がインストールされます。
 	<li>インストールが終わったらいったんログアウトしてください。さもないとさまざまなアプリケーションが落ちる可能性があります。
 	<li>お好みにより、スタートアップにショートカットを作るのもいいでしょう。
-	<li>標準の設定ファイルの内容は <a href="../contrib/mayu-settings.txt"><code>contrib/mayu-settings.txt</code></a> が参考になります。
 	<li><code>mayu.exe</code> を実行することで開始します。
       </ol>
       
@@ -83,67 +82,84 @@
 	  <p><img src="menu-ja.png"></p>
 
 	  <dl>
-	    <dt>再読み込み(<u>R</u>)
+	    <dt><a name="menu-r">再読み込み(<u>R</u>)</a>
 	    <dd>
 		<div>
-		  <p>設定ファイルを再読み込みします。設定ファイルの変更を反映させるときに使います。<a href="CUSTOMIZE-ja.html#function_LoadSetting"><code>&amp;LoadSetting</code></a> と同じです。</p>
+		  <p>設定ファイルを再読み込みします。<a href="CUSTOMIZE-ja.html#function_LoadSetting"><code>&amp;LoadSetting</code></a> と同じです。</p>
 		</div>
 		
 	    <dt><a name="menu-c"></a>選択(<u>C</u>) &#9658;
 	    <dd>
 		<div>
-		  <p>サブメニューから設定ファイルの切り替えを行います。「窓使いの憂鬱」でデフォルトで用意されている設定は 8 つあります。これは、以下の 3 つの 2 択の組み合わせとなります。</p>
+		  <p>サブメニューから設定ファイルの切り替えを行います。「窓使いの憂鬱」がデフォルトで用意しているサンプル設定は 8 つあります。以下の条件の組み合わせとなります。</p>
 		  
 		  <ol style="list-style-type: lower-alpha;">
-		    <li>キーボードは日本語 109 キーボードか、英語104 キーボードか
-		    <li>キートップの表示の通りに使うのか、109 (または 104) キーボードを使っているものの、104 (または 109) キーボードと同じ配置で使うのか
-		    <li>emacs (UNIX で標準的なエディタの一つ) に似せたバインディングを使うのか、使わないのか
+		    <li>キーボードは日本語 109 キーボードか、英語104 キーボードか。
+		    <li>キートップの表示の通りに使うのか、109 (または 104) キーボードを使っているが、104 (または 109) キーボードと同じ配置で使うのか。
+		    <li>Emacs (UNIX で標準的なエディタの一つ) に似せたバインディングを使うかどうか。
 		  </ol>
 		  
-		  <p>このうち、a はインストール時に決定されるので、サブメニューに表示されるものは b, c の組み合わせ4種類になります。</p>
+		  <p>このうち、a はインストール時に決定されるので、サブメニューに表示されるものは b, c の組み合わせ 4 種類になります。</p>
 		  
-		  <p>デフォルト設定以外に独自の設定が必要な場合は、サブメニューで(ホームディレクトリから)を選び、ホームディレクトリの設定ファイルを記述することでカスタマイズすることになります。<a href="#TUTORIAL">チュートリアル</a>および<a href="CUSTOMIZE-ja.html">カスタマイズ</a>を参照してください。</p>
+		  <p>デフォルト設定以外に独自の設定が必要な場合は、<a href="CUSTOMIZE-ja.html#HOME">ホームディレクトリ</a>に <code>.mayu</code> ファイルを作りそのファイルに設定を記述します。そしてサブメニューで (ホームディレクトリから) を選びます。詳しくは<a href="#TUTORIAL">チュートリアル</a>と<a href="CUSTOMIZE-ja.html">カスタマイズ</a>を参照してください。</p>
 		</div>
 		
 	    <dt>設定(<u>S</u>)...
 	    <dd>
 		<div>
-		  <p>「選択(<u>C</u>) &#9658;」の選択肢となる設定ファイルを決定します。</p>
+		  <p>「選択(<u>C</u>) &#9658;」の選択肢となる設定ファイルを作成します。</p>
+		  
+		  <p class="noindent"><img src="setting-ja.png"></p>
+		  
+		  <p>右側の矢印ボタンでメニューに表示される順序を変更することができます。</p>
+		  
+		  <p>「追加(<u>A</u>)」又は「編集(<u>E</u>)」ボタンを押すか、行をダブルクリックすると編集ダイアログボックスが表示されます。</p>
+		  
+		  <p class="noindent"><img src="edit-setting-ja.png"></p>
+		  
+		  <p>「名前(<u>N</u>)」には、メニューに表示される名前を記述します。「ファイル名(<u>F</u>)」を空欄にすると<a href="CUSTOMIZE-ja.html#HOME">ホームディレクトリ</a>から <code>.mayu</code> を読み込みます。「シンボル(<u>S</u>)」には、<a href="CUSTOMIZE-ja.html#cond">条件分岐</a>で使用されるシンボルを記述します。シンボルの頭に <code>-D</code> をつけ、複数のシンボルは <code>;</code> で区切ります。</p>
 		</div>
 		
 	    <dt>一時停止(<u>T</u>)
 	    <dd>
 		<div>
-		  <p>「窓使いの憂鬱」は常駐したままでキーイベント変換機能を停止させ、キーイベントをそのままスルーさせます (バグがない限り、「窓使いの憂鬱」が常駐していないときの挙動になるはずです)</p>
+		  <p>「窓使いの憂鬱」の機能を一時的に停止します。キーボードからの入力は、「窓使いの憂鬱」が存在しない時と同じ動作をします。このとき、タスクトレイのアイコンは <img src="pause-ja.png" align="top"> になります。</p>
 		</div>
 
-	    <dt><a name="menu-i">調査</a>(<u>I</u>)...
+	    <dt><strong><a name="menu-i">調査</a>(<u>I</u>)...</strong>
 	    <dd>
 		<div>
 		  <p>調査ウインドウとログウインドウを表示します。</p>
-
-      <p>この調査ウインドウで調べたいキーを押せば、キーのスキャンコードや仮想キーコードが分かります。</p>
-
-      <p>また、丸に十字のついたマークを調べたいウィンドウまでドラッグするとウィンドウクラスとタイトルがわかります。ここで調査したウィンドウクラス名とタイトルは、 <code>.mayu</code> の <a href="CUSTOMIZE-ja.html#keymap"><code>window</code></a> に記述することができます。これは、<code><em>FUNCTION</em></code> <a href="CUSTOMIZE-ja.html#function_WindowIdentify"><code>&amp;WindowIdentify</code></a> を利用することもできます。</p>
-
+		  
+		  <p><img src="investigate-ja.png"></p>
+		  
+		  <p>それぞれの場所でキーを押すことにより、キーのスキャンコードや仮想キーコードを調べることができます。</p>
+		  
+		  <p>また、<img src="target.png" alt="ターゲット"> を調べたいウィンドウまでドラッグするとウィンドウクラスとウィンドウタイトルがログに出力されます。ここで調査したウィンドウクラス名とウィンドウタイトルは、設定ファイルで <a href="CUSTOMIZE-ja.html#keymap"><code>window</code></a> に記述することができます。(ここで調査する代わりに、<code><em>FUNCTION</em></code> <a href="CUSTOMIZE-ja.html#function_WindowIdentify"><code>&amp;WindowIdentify</code></a> を利用しても調べることができます)</p>
 		</div>
 		
-	    <dt>ログ(<u>L</u>)...
+	    <dt><a name="menu-l">ログ(<u>L</u>)...</a>
 	    <dd>
 		<div>
 		  <p>ログウインドウを表示します。</p>
+		  
+		  <p><img src="log-ja.png"></p>
+
+		  <p><a href="#menu-i">調査</a>の結果やエラーなどがここに表示されます。(「□詳細(<u>D</u>)」をチェックすると、「窓使いの憂鬱」の内部の変換処理が詳細に表示されますが非常に難解です)</p>
 		</div>
 
 	    <dt>バージョン(<u>V</u>)...
 	    <dd>
 		<div>
-		  <p>バージョン表示のダイアログを出します。</p>
+		  <p>バージョン情報などを表示します。バグレポートをする時にこの内容をコピーすると便利です。</p>
+
+		  <p><img src="version-ja.png"></p>
 		</div>
 
 	    <dt>ヘルプ(<u>H</u>)...
 	    <dd>
 		<div>
-		  <p>ヘルプを表示します。</p>
+		  <p>このマニュアルを表示します。</p>
 		</div>
 		
 	  </dl>
@@ -155,7 +171,7 @@
 	<div>
 	  <!--p>「窓使いの憂鬱」は非常に高機能なキーバインディング変更ツールなのですが、チュートリアルもGUIでの設定ツールもなく、一方でマニュアルは長大なため、初めて使うユーザーには並外れて敷居の高い状態が続いていました。</p-->
 	  
-	  <p>この章では、「窓使いの憂鬱」を初めて使うユーザーが、実際に設定を繰り返しながら、簡単なカスタマイズであれば問題なくできるレベルに到達することを目指します。まずはこの文章に沿って、実際にサンプルの設定を試してみてください。詳細が知りたい場合には、各章のリンク先で詳細を読むことができますので、疑問点があれば2周目以降でリンク先を見ていけばよいでしょう。</p>
+	  <p>この章では、「窓使いの憂鬱」を初めて使うユーザーが、実際に設定を繰り返しながら、簡単なカスタマイズであれば問題なくできるレベルに到達することを目指します。まずはこの文章に沿って、実際にサンプルの設定を試してみてください。詳細が知りたい場合には、各章のリンク先で詳細を読むことができますので、疑問点があれば 2 周目以降でリンク先を見ていけばよいでしょう。</p>
 
 	  <p>さて、<a href="#INSTALL">インストール</a>は済んでいますよね？<a href="#menu-c">デフォルト設定</a>では飽き足らないからこれを読んでいるんですよね？では、「窓使いの憂鬱」の真価を発揮するための、長い道のりの第一歩を踏み出しましょう。</p>
 
@@ -164,7 +180,7 @@
 		
 	    <dd class="d2">
 		<div>
-		  <p>まず、タスクトレイメニューの<a href="#menu-c">「選択」</a>の「 (ホームディレクトリから) 」で使われる自分用の設定ファイル、<code>.mayu</code> ファイルを作ります。(インストールディレクトリの<code>dot.mayu</code>に書き加えていってもカスタマイズは可能ですが、バージョンアップ時に上書きされてしまいますので、お薦めできません。)</p>
+		  <p>まず、タスクトレイメニューの<a href="#menu-c">「選択(<u>C</u>) &#9658;」</a>の「(ホームディレクトリから)」で使われる自分用の設定ファイル、<code>.mayu</code> ファイルを作ります。(インストールしたディレクトリに存在する <code>dot.mayu</code> を編集してはいけません)</p>
 
 		  <p>まず、環境変数 <code>HOME</code> で、<a href="CUSTOMIZE-ja.html#HOME">ホームディレクトリ</a>の位置を指定します。ホームディレクトリは、例えばあなたの名前が mayu であれば、「<code>c:\home\mayu</code>」のようなディレクトリを作るのが UNIX 風でお薦めです。</p>
 
@@ -206,13 +222,13 @@
 		    <dt class="h3">109 日本語キーボードの場合
 		    <dd class="d3">
 			<div>
-			  <p><code>.mayu</code> ファイルの先頭に以下のような1行を作ります。</p>
+			  <p><code>.mayu</code> ファイルの先頭に以下のように記述します。</p>
 			  
 			  <p class="sample">
 			  include "109.mayu"	# 109 キーボード設定
 			  </p>
 			  
-			  <p>好みに応じて、以下の各行を書くか書かないかを決めてください。 (タスクトレイメニュー<a href="#menu-c">「選択」</a>のデフォルト設定に対応しています) </p>
+			  <p>好みに応じて、以下の各行を書くか書かないかを決めてください。(タスクトレイメニュー「<a href="#menu-c">選択(<u>C</u>) &#9658;</a>」 のデフォルト設定に対応しています) </p>
 			  
 			  <p class="sample">
 			  include "104on109.mayu"	# 109 キーボードを 104 キーボード風に<br>
@@ -223,13 +239,13 @@
 		    <dt class="h3">104 英語キーボードの場合
 		    <dd class="d3">
 			<div>
-			  <p><code>.mayu</code> ファイルの先頭に以下のような一行を作ります。</p>
+			  <p><code>.mayu</code> ファイルの先頭に以下のように記述します。</p>
 			  
 			  <p class="sample">
 			  include "104.mayu"	# 104 キーボード設定
 			  </p>
 			  
-			  <p>好みに応じて、以下の各行を書くか書かないかを決めてください。 (タスクトレイメニュー<a href="#menu-c">「選択」</a>のデフォルト設定に対応しています) </p>
+			  <p>好みに応じて、以下の各行を書くか書かないかを決めてください。 (タスクトレイメニュー「<a href="#menu-c">選択(<u>C</u>) &#9658;</a>」のデフォルト設定に対応しています) </p>
 			  
 			  <p class="sample">
 			  include "109on104.mayu"	# 104 キーボードを 109 キーボード風に<br>
@@ -239,11 +255,11 @@
 			
 		  </dl>
 		  
-		  <p>ここまで書き込んだら、タスクトレイメニューの「再読み込み」をしてみてください。ログウインドウにエラーメッセージが出ないようであれば、ここまではうまくいっています。これでカスタマイズの準備ができました。この先に自分好みの設定を書き加えていくことになります。</p>
+		  <p>ここまで書き込んだら、タスクトレイメニューで「選択(<u>C</u>) &#9658;」から「(ホームディレクトリから)」を選んでください。<a href="#menu-l">ログウインドウ</a>にエラーメッセージが出ないようであれば、ここまではうまくいっています。これでカスタマイズの準備ができました。この先に自分好みの設定を書き加えていくことになります。そして書き加えたら「<a href="#menu-r">再読み込み(<u>R</u>)</a>」します。</p>
 
 		  <p>ログウインドウに「error: failed to load.」と出ていた場合、
 設定ファイルの読み込みに失敗しています。設定ファイルのパスと、行数、エラーメッセージが表示されているので、それを参考に修正してください。</p>
-		  <p>「error: failed to load.」以外何も表示されていない場合は、おそらく設定ファイル自体を見つけられていません。「詳細(<u>D</u>)」チェックボックスを押して、もう一度リロードすると参考になることが表示されるかもしれません（このチェックボックスは作者のデバッグ用なので、バージョンアップすると挙動が変わるかもしれないし、ドキュメントもないです）。</p>
+		  <p>「error: failed to load.」以外何も表示されていない場合は、おそらく設定ファイル自体を見つけられていません。ログウィンドウの「□詳細(<u>D</u>)」をチェックしてから、「再読み込み(<u>R</u>)」するとどのファイルを読み込もうとして読み込めなかったのかが表示されます。そこに表示されたいずれかのディレクトリに <code>.mayu</code> が存在するかどうか確かめてください。</p>
 
 		  <p>参照: <a href="../contrib/mayu-settings.txt"><code>contrib/mayu-settings.txt</code></a></p>
 		</div>
@@ -253,19 +269,21 @@
 	    <dd class="d2">
 		<div>
 		  
-		  <p>以下、説明の便宜上 109 キーボードを使っているものとして話をすすめていきます。まず、<kbd>[Esc]</kbd> キーと <kbd>[半角/全角]</kbd> キーを入れ替えたい、と思ったとします。これは、先ほどのファイルの末尾に以下のように書けばOKです。</p>
+		  <p>以下、説明の便宜上 109 キーボードを使っているものとして話をすすめます</p>
+
+		  <p>まず、<kbd>[Esc]</kbd> キーと <kbd>[半角/全角]</kbd> キーを入れ替えてみます。これは、<code>.mayu</code> ファイルの末尾に以下のように追加します。</p>
 
 		  <p class="sample">
 		  keymap Global<br>
-		  key Esc       =&gt; 半角/全角<br>
-		  key 半角/全角 =&gt; Esc<br>
+		  key Esc       = 半角/全角<br>
+		  key 半角/全角 = Esc<br>
 		  </p>
 		  
-		  <p>再読み込みをして確認してみてください。</p>
+		  <p>「<a href="#menu-r">再読み込み(<u>R</u>)</a>」をして確認してみてください。</p>
 
 		  <p>1 行目の <code>keymap Global</code> は、次の <code>keymap</code> までの間の記述は全てのウインドウで有効な設定とする、という指示です。</p>
 
-		  <p>2, 3 行目のように <code>key キー名 =&gt; キー名</code> と書くことで、あるキーを押したときの挙動を変更できます。上の例であれば、<kbd>[Esc]</kbd> が押されたときは <kbd>[半角/全角]</kbd> が押されたように、<kbd>[半角/全角]</kbd> が押されたときは <kbd>[Esc]</kbd> が押されたような動作になります。</p>
+		  <p>2, 3 行目のように <code>key キー名 = キー名</code> と書くことで、あるキーを押したときの挙動を変更できます。上の例であれば、<kbd>[Esc]</kbd> が押されたときは <kbd>[半角/全角]</kbd> が押されたように、<kbd>[半角/全角]</kbd> が押されたときは <kbd>[Esc]</kbd> が押されたような動作になります。</p>
 
 		  <p>キー名は、タスクトレイメニュー「<a href="#menu-i">調査(I)...</a>」の「スキャンコードの調査」で調べたいキーを押すことでわかります。<kbd>[Esc]</kbd> キーと、<kbd>[半角/全角]</kbd> キーを順に押したときのログウインドウには、例えば以下のように表示されているはずです。</p>
 
@@ -276,7 +294,7 @@
 		  0x29   U-半角/全角<br>
 		  </p>
 
-		  <p><code>D-半角/全角</code> のキー名の前の <code>D-</code> というのはキーが押された、<code>U-半角/全角</code> の <code>U-</code> というのはキーが離された、という状態をそれぞれ表します。</p>
+		  <p>キー名の前の <code>D-</code> というのはキーが押された、<code>U-半角/全角</code> の <code>U-</code> というのはキーが離された、という状態をそれぞれ表します。</p>
 		  
 		  <p>参照: <a href="CUSTOMIZE-ja.html#key">キー割り当ての変更</a></p>
 		</div>
@@ -286,28 +304,28 @@
 	    <dd class="d2">
 		<div>
 		  
-		  <p>つぎに、他のアプリケーションでの動きはそのままで、Internet Explorer についてのみ、<kbd>[PageUp]</kbd>/<kbd>[PageDown]</kbd> キーで、<kbd>[Home]</kbd>/<kbd>[End]</kbd> の動きをさせたいとします。<code>.mayu</code> の設定は以下のようになります。</p>
+		  <p>つぎに、Internet Explorer でのみ <kbd>[PageUp]</kbd>/<kbd>[PageDown]</kbd> キーで、<kbd>[Home]</kbd>/<kbd>[End]</kbd> の動きをさせてみます。<code>.mayu</code> の末尾に以下のように追加します。</p>
 		  
 		  <p class="sample">
 		  window	InternetExplorer /iexplore\.exe/ : Global<br>
-		  key     PageUp =&gt; Home<br>
-		  key     PageDown =&gt; End<br>
+		  key     PageUp = Home<br>
+		  key     PageDown = End<br>
 		  </p>
 		  
-		  <p>1 行目の、<code>window キーマップ名 ウィンドウクラス名 : 親キーマップ</code> というのは、以降の指定は特定のウインドウについてのみ有効とする、という指示です。キーマップ名は適当な名前で、親キーマップはデフォルトのキーマップを指定します。(Emacs っぽくするなら <code>EmacsMove</code> や <code>EmacsEdit</code> に、そうでなければ <code>Global</code> にすればよいでしょう)</p>
+		  <p>1 行目の、<code>window キーマップ名 /ウィンドウクラス名/ : 親キーマップ名</code> は、以降の指定は特定のウインドウについてのみ有効とする、という指示です。キーマップ名はわかりやすい適当な名前をつけます。親キーマップ名は Emacs っぽくするなら <code>EmacsMove</code> や <code>EmacsEdit</code> に、そうでなければ <code>Global</code> にすればよいでしょう。</p>
 		  
-		  <p>ウインドウクラス名は、タスクトレイメニュー「調査(I)...」の「ウィンドウの調査」で、調べたい窓やコントロールにターゲットをドラッグすることでわかります。</p>
+		  <p>ウインドウクラス名を調査するには、タスクトレイメニュー「<a href="#menu-i">調査(I)...</a>」の「ウィンドウの調査」で、調べたいウィンドウやコントロールに <img src="target.png" alt="ターゲット"> をドラッグします。</p>
 		  
-		  <p>Internet Explorer にドラッグすると (途中にさわった全てのウインドウやコントロールの情報が出るので、他にもいろいろ出るはずですが)、次のような表示が出るはずです。</p>
+		  <p>Internet Explorer へドラッグすると (途中にさわった全てのウインドウやコントロールの情報が出るので、他にもいろいろ出るはずですが)、次のような表示が出るはずです。</p>
 		  
 		  <p class="sample">
 		  CLASS:	C:\Program Files\Internet Explorer\iexplore.exe:IEFrame<br>
-		  TITLE:	C:\Program Files\Internet Explorer\iexplore.exe:窓使いの憂鬱 - TUTORIAL - Microsoft Internet Explorer<br>
+		  TITLE:	C:\Program Files\Internet Explorer\iexplore.exe:窓使いの憂鬱 - README - Microsoft Internet Explorer<br>
 		  Toplevel Window Position/Size: (-4, -4) / (1032x748)<br>
 		  Desktop Window Position/Size: (0, 0) / (1024x740)<br>
 		  </p>
 		  
-		  <p>この <code>CLASS</code> の部分から特徴的な文字列を抽出し、<a href="CUSTOMIZE-ja.html#regexp">正規表現</a>と呼ばれる記法で <code>/文字列/</code> のように書けば OK です。正規表現がよくわからない場合も、<code>\</code> と <code>.</code> についてはそれぞれ <code>\\</code> と <code>\.</code> と書くことに注意していればそれほど問題はないはずです。</p>
+		  <p>この <code>CLASS</code> の部分から特徴的な文字列を抽出し、<a href="CUSTOMIZE-ja.html#regexp">正規表現</a>と呼ばれる記法で <code>/文字列/</code> のように書けば OK です。正規表現がよくわからない場合には、<code>\</code> は <code>\\</code>、<code>.</code> は <code>\.</code> と書くことに注意すればとりあえずあまり問題はないでしょう。</p>
 		  
 		  <p>参照: <a href="CUSTOMIZE-ja.html#windowClass">ウィンドウクラス/タイトル名</a>・<a href="CUSTOMIZE-ja.html#regexp">正規表現</a></p>
 		</div>
@@ -317,27 +335,21 @@
 	    <dd class="d2">
 		<div>
 		  
-		  <p>
-Internet Explorerの動きを前章のようにしましたが、
-気に入らなかったので、
-<kbd>[Ctrl]</kbd>+<kbd>[PageUp]</kbd>/<kbd>[PageDown]</kbd>で、
-<kbd>[Home]</kbd>/<kbd>[End]</kbd>を押したように動かしたくなったとします。
-<code>.mayu</code>の設定は以下のようになります。
-</p>
+		  <p>つぎに、Internet Explorer での動作さらに変更して、<kbd>[Ctrl]</kbd> + <kbd>[PageUp]</kbd>/<kbd>[PageDown]</kbd> で、<kbd>[Home]</kbd>/<kbd>[End]</kbd> を押したように動かしてみます。前章で追加した内容を変更して以下のように書き換えます。(<code>C-</code> がキー名の前に追加されました)</p>
 		  
 		  <p class="sample">
 		  window	InternetExplorer /iexplore\.exe/ : Global<br>
-		  key     C-PageUp =&gt; Home<br>
-		  key     C-PageDown =&gt; End<br>
+		  key     C-PageUp = Home<br>
+		  key     C-PageDown = End<br>
 		  </p>
 		  
-		  <p>2, 3 行目のキーの指定については、やはりスキャンコードの調査で調べます。<kbd>[Ctrl]</kbd> + <kbd>[↓]</kbd> を打つと、次のようになるはずです。</p>
+		  <p>2, 3 行目のキーの指定については、やはりスキャンコードの調査で調べます。<kbd>[Ctrl]</kbd> + <kbd>[PageDown]</kbd> を入力すると、次のように表示されます。</p>
 		  
 		  <p class="sample">
-   &nbsp;&nbsp;&nbsp;0x1d   D-LeftControl<br>
-                  E0-0x51   D-C-PageDown<br>
+		  &nbsp;&nbsp;&nbsp;0x1d   D-LeftControl<br>
+		  E0-0x51   D-C-PageDown<br>
 		  E0-0x51   U-C-PageDown<br>
-   &nbsp;&nbsp;&nbsp;0x1d   U-LeftControl<br>
+		  &nbsp;&nbsp;&nbsp;0x1d   U-LeftControl<br>
 		  </p>
 		  
 		  <p>1, 4 行目は <kbd>[Ctrl]</kbd> キーの押し/離しです。2, 3 行目から、<code>C-PageDown</code> が書くべきキー名ということになります。ここの <code>C-</code> というのは、<kbd>[Ctrl]</kbd> が押されている、というキーの状態を表す記号です。<kbd>[Ctrl]</kbd> キー以外にも、<kbd>[Windows]</kbd> や <kbd>[Alt]</kbd> や <kbd>[Shift]</kbd> の状態、また <kbd>[CapsLock]</kbd> や <kbd>[NumLock]</kbd> などのキーがロック状態にあるかどうかもやはり同様です。これらの特別なキーを、「窓使いの憂鬱」では、モディファイヤと呼んでいます。
@@ -358,57 +370,28 @@ Internet Explorerの動きを前章のようにしましたが、
 	    <dd class="d2">
 		<div>
 
-		  <p>
-前章のようにしたところ、
-<kbd>[Ctrl]</kbd>+<kbd>[Alt]</kbd>+<kbd>[PageUp]</kbd>/<kbd>[PageDown]</kbd>が、
-そのまま入力されてしまうことに気づきました。
-すでに説明した通り、これは正しい動作です
-（不正確な言い方ですが、モディファイヤが押されていると別のキー名になるので、
-前章の指定では置き換えが起きない、と理解してください）。
+		  <p>前章の設定では、<kbd>[Ctrl]</kbd> + <kbd>[Alt]</kbd> + <kbd>[PageUp]</kbd>/<kbd>[PageDown]</kbd> と入力すた場合、変換さらずにそのまま入力されてしまします。既に説明した通り、これは正しい動作です。(不正確な言い方ですが、モディファイヤが押されていると別のキー名になるので、前章の指定では置き換えが起きない、と理解してください)</p>
 
-しかし、<kbd>[Alt]</kbd>が押されているかどうかに拘わらず
-<kbd>[Ctrl]</kbd>+<kbd>[PageUp]</kbd>/<kbd>[PageDown]</kbd>を
-<kbd>[Home]</kbd>/<kbd>[End]</kbd>のように動かしたい場合には、
-<code>.mayu</code>の設定は以下のようになります。
-</p>
+		  <p><kbd>[Alt]</kbd> が押されているかどうかにかかわらず <kbd>[Ctrl]</kbd> + <kbd>[PageUp]</kbd>/<kbd>[PageDown]</kbd> を <kbd>[Home]</kbd>/<kbd>[End]</kbd> のように動作させるには、前章の設定を変更して以下のように修正します。</p>
 
 		  <p class="sample">
 		  window	InternetExplorer /iexplore\.exe/ : Global<br>
-		  key     *A-C-PageUp =&gt; *A-Home<br>
-		  key     *A-C-PageDown =&gt; *A-End<br>
+		  key     *A-C-PageUp = *A-Home<br>
+		  key     *A-C-PageDown = *A-End<br>
 		  </p>
 
-		  <p>これは、
-<kbd>[Alt]</kbd>が押されているかどうかと無関係に
-<kbd>[Ctrl]</kbd>+<kbd>[PageUp]</kbd>/<kbd>[PageDown]</kbd>を
-<kbd>[Home]</kbd>/<kbd>[End]</kbd>と置き換え、
-その際に<kbd>[Alt]</kbd>の状態は保存したままにする設定です。
-つまり、<kbd>[Alt]</kbd>が押されていなければ前章と同様の置き換えを行い、
-<kbd>[Alt]</kbd>が押されていれば
-<kbd>[Ctrl]</kbd>+<kbd>[Alt]</kbd>+<kbd>[PageUp]</kbd>を
-<kbd>[Alt]</kbd>+<kbd>[Home]</kbd>のように置き換えます。
-</p>
-		  <p>これを押し進めた設定として、
-あらゆるモディファイヤの状態に拘わらずに置き換えをして、
-かつあらゆるモディファイヤの状態を保存して置き換える、という設定が可能です。
-具体的には、<kbd>[PageUp]</kbd>/<kbd>[PageDown]</kbd>を
-<kbd>[Home]</kbd>/<kbd>[End]</kbd>と全く同様に使いたいという場合に、
-以下のような設定ができます。
-</p>
-
+		  <p>これは、<kbd>[Alt]</kbd> が押されているかどうかと無関係に <kbd>[Ctrl]</kbd> + <kbd>[PageUp]</kbd>/<kbd>[PageDown]</kbd> を <kbd>[Home]</kbd>/<kbd>[End]</kbd> と置き換え、その際に <kbd>[Alt]</kbd> の状態は保存したままにする設定です。つまり、<kbd>[Alt]</kbd> が押されていなければ前章と同様の置き換えを行い、<kbd>[Alt]</kbd> が押されていれば <kbd>[Ctrl]</kbd> + <kbd>[Alt]</kbd> + <kbd>[PageUp]</kbd> を <kbd>[Alt]</kbd> + <kbd>[Home]</kbd> のように置き換えます。</p>
+		  
+		  <p>これを押し進めると、あらゆるモディファイヤの状態に拘わらずに置き換えをして、かつあらゆるモディファイヤの状態を保存して置き換える、という設定が可能です。具体的には、<kbd>[PageUp]</kbd>/<kbd>[PageDown]</kbd> を <kbd>[Home]</kbd>/<kbd>[End]</kbd> と全く同様に使いたいという場合に、以下のような設定ができます。</p>
+		  
 		  <p class="sample">
 		  window	InternetExplorer /iexplore\.exe/ : Global<br>
-		  key     *PageUp =&gt; *Home<br>
-		  key     *PageDown =&gt; *End<br>
+		  key     *PageUp = *Home<br>
+		  key     *PageDown = *End<br>
 		  </p>
 
-<p>
-このようにすれば、あらゆるモディファイヤの状態に関係なく、IEでの
-<kbd>[PageUp]</kbd>/<kbd>[PageDown]</kbd>が
-<kbd>[Home]</kbd>/<kbd>[End]</kbd>のように使えます。
-</p>
-
-
+		  <p>このようにすれば、あらゆるモディファイヤの状態に関係なく、Internet Explorer での <kbd>[PageUp]</kbd>/<kbd>[PageDown]</kbd> が <kbd>[Home]</kbd>/<kbd>[End]</kbd> のように働きます。</p>
+		  
 		  <p>参照: <a href="CUSTOMIZE-ja.html#ignoreModifier">モディファイヤキーの無視</a>・<a href="CUSTOMIZE-ja.html#inputModifier">入力されたキーと同じモディファイヤの指定</a></p>
 		</div>
 
@@ -418,31 +401,25 @@ Internet Explorerの動きを前章のようにしましたが、
 		<div>
 		  <p>キー割り当ての変更の際に、モディファイヤキーを置き換えたり、モディファイヤキーに置き換える場合には、特別な設定が必要になります。</p>
 		  
-		  <p>たとえば、<kbd>[無変換]</kbd> キーを左 <kbd>[Alt]</kbd> キーとして使いたいとします。</p>
+		  <p>たとえば、<kbd>[無変換]</kbd> キーを左 <kbd>[Alt]</kbd> キーとして使用するには、</p>
 
 		  <p class="sample">
+		  keymap Global<br>
 		  mod alt += 無変換<br>
-		  key *無変換 =&gt; *LeftAlt<br>
+		  key *無変換 = *LeftAlt<br>
 		  </p>
 
-		  <p>2 行目は今まで通りの指定ですが、1行目のように、<code>mod モディファイヤ名 += キー名</code> という指定により、新たにモディファイヤとして登録する必要があります。</p>
+		  <p>3 行目は今まで通りの指定ですが、2 行目のように、<code>mod モディファイヤ名 += キー名</code> という指定により、新たにモディファイヤとして<kbd>[無変換]</kbd> キーを登録する必要があります。</p>
 
-<p>
-逆に、モディファイヤとなっているキーをモディファイヤではないキーに割り当てたい場合は、
-<code>mod モディファイヤ名 -= キー名</code>により、
-モディファイヤ設定を削除する必要があります。
-</p>
-<p>たとえば、右 <kbd>[Windows]</kbd> キーを押すと IME のオンオフができるようにしたい場合、</p>
-	      <p class="sample">mod windows -= RightWindows<br>
-	      key RightWindows =&gt; $ToggleIME<br>
-	      </p>
+		  <p>逆に、モディファイヤとなっているキーをモディファイヤではないキーに割り当てたい場合は、<code>mod モディファイヤ名 -= キー名</code> により、モディファイヤ設定を削除する必要があります。</p>
+		  
+		  <p>たとえば、右 <kbd>[Windows]</kbd> キーで IME のオンオフをするには、</p>
+		  
+		  <p class="sample">mod windows -= RightWindows<br>
+		  key RightWindows = $ToggleIME<br>
+		  </p>
 
-	      <p>のようにする必要があります。
-ちなみに、 <code>$ToggleIME</code> というのは、
- <code>109.mayu</code> または <code>104.mayu</code>
-で定義されている<a href="CUSTOMIZE-ja.html#keyseq">キーシーケンス</a>で、
-109キーボードであれば <code>A-半角/全角</code> と書くのと同じ意味です。
-</p>
+		  <p>のようにする必要があります。ちなみに、<code>$ToggleIME</code> というのは、<a href="../109.mayu"><code>109.mayu</code></a> または <a href="../104.mayu"><code>104.mayu</code></a> で定義されている<a href="CUSTOMIZE-ja.html#keyseq">キーシーケンス</a>で、109 キーボードならば <code>A-半角/全角</code> と書くのと同じ意味になります。</p>
 
 		  <p>参照: <a href="CUSTOMIZE-ja.html#mod">モディファイヤキー割り当ての変更</a></p>
 		</div>
@@ -488,32 +465,27 @@ Internet Explorerの動きを前章のようにしましたが、
 	      <p>あなたはおそらく <a href="../default.mayu"><code>default.mayu</code></a> を使っています。これを利用するとかなり色々な操作を Emacs 風にされてしまいますので、あなたの Windows 汚染度が高かったり、Emacs 汚染度が低かったりすると戸惑うことでしょう。<a href="../contrib/mayu-settings.txt"><code>contrib/mayu-settings.txt</code></a> を参考に、自分好みにカスタマイズしてください。</p>
 
 	      <p>ちなみに、Windows なんだし <code>C-z</code>, <code>C-x</code>, <code>C-c</code>, <code>C-v</code> だけは使わせろ、という人のために、<code>ZXCV</code> というシンボルが定義されています。<code>-DZXCV</code> するなり <code>define ZXCV</code> すれば、それだけは Windows っぽく動きます。</p>
+	      
 	  <dt class="h2">Q6.ノートパソコンの<kbd>[Fn]</kbd>キーに何か機能を割り当てることはできますか？ 
-	  <dd class="d2"><p>
-<kbd>[Fn]</kbd>キーを単体で押してもWindowsにキーイベントは来ないはずです
-（スキャンコードの調査で調べられます）。
-当然ながら、このようなキーに機能を割り当てることはできません。
-</p>
-	  <dt class="h2">Q7. スキャンコードの調査で、
-例えば<kbd>[Shift]</kbd>+<kbd>[↑]</kbd>を押したときなど、
-たまに出るはずのないE0-0x2aというキーイベントが出るようですが、
-これは何ですか？
-	  <dd class="d2"><p>このキーイベントがどういうタイミングで発生するのか、
-作者にもわかりません。
-なにか情報をお持ちの方は教えてください。
-</p>
+	  <dd class="d2"><p><kbd>[Fn]</kbd> キーを単体で押しても Windows にキーイベントは来ないはずです (スキャンコードの調査で調べられます)。当然ながら、このようなキーに機能を割り当てることはできません。</p>
+	      
+	  <dt class="h2">Q7. スキャンコードの調査で、例えば <kbd>[Shift]</kbd> + <kbd>[↑]</kbd> を押したときなど、たまに出るはずのない <code>E0-0x2a</code> というキーイベントが出るようですが、これは何ですか？
+	  <dd class="d2"><p>このスキャンコードに関する情報をお待ちしております。</p>
 
 	  <dt class="h2">Q8. 右 <kbd>[Windows]</kbd> キーを押すと IME のオンオフができるようにしたい。
 	  <dd class="d2">
 	      <p class="sample">mod windows -= RightWindows # ... (1)<br>
-	      key RightWindows =&gt; $ToggleIME<br>
+	      key RightWindows = $ToggleIME<br>
 	      </p>
 	      
 	      <p>右 <kbd>[Windows]</kbd> キーはモディファイヤキーなので特別扱いされます。したがって普通のキーのように動作するようにするには、<code>(1)</code> のようにしてモディファイヤキーとして動作しないようにします。これは <kbd>[Alt]</kbd> や <kbd>[Shift]</kbd> や <kbd>[Control]</kbd> でも同様です。</p>
+	      
 	  <dt class="h2">Q9. ウインドウのクラス名はどうやって調べるんですか？
 	  <dd class="d2"><p>タスクトレイの「窓使いの憂鬱」のアイコンでマウスの右ボタンを押して「<a href="#menu-i">調査(I)...</a>」を選びます。</p>
+	      
 	  <dt class="h2">Q10. アクティブな時にしか見えない窓などの場合、上記の方法では調査できないですが？
 	  <dd class="d2"><p><a href="CUSTOMIZE-ja.html#function_WindowIdentify"><code>&amp;WindowIdentify</code></a> を使ってください。<a href="../default.mayu"><code>default.mayu</code></a> では <kbd>[Ctrl]</kbd> +<kbd>[Shift]</kbd> + <kbd>[D]</kbd> に割り振ってあります。</p>
+	      
 	  <dt class="h2">Q11. インストール時には 109 キーボードだったのですが、今度 104 キーボードを購入しました。しかし、タスクトレイメニューの「選択」には 109 しか出てきません。どうすればいいですか。
 	  <dd class="d2">
 	      <p>インストール時の選択により、以下の表の上 4 つまたは下 4 つが選ばれます。「設定」ダイアログボックスで適切に設定してください。(<code>%MAYU_DIR%</code> は mayu をインストールしたディレクトリです)</p>
@@ -544,10 +516,13 @@ Internet Explorerの動きを前章のようにしましたが、
 		<tr class="filename"><th>設定ファイル名</th><td><code>%MAYU_DIR%\dot.mayu</code></td></tr>
 		<tr class="symbol"><th>シンボル</th><td><code>-DUSE104;-DUSE109on104</code></td></tr>
 	      </table>
+	      
 	  <dt class="h2">Q12. 「窓使いの憂鬱」では USB キーボードは使えないのですか。
 	  <dd class="d2"><p>小林義明さんが Windows2000 用のドライバを書いてくださったので、USB 用の mayu ドライバを利用すれば使用することができます。現在はまだテスト中なので <a href="#SUPPORT">メーリングリスト</a> で問い合わせてください。又 Win9x では普通に使用できます。</p>
+	      
 	  <dt class="h2">Q13. 「窓使いの憂鬱」は Windows95/98/ME では使えないのですか。
 	  <dd class="d2"><p>小林義明さんがドライバを書いてくださったので、バージョン 3.19 から使用できるようになりました。</p>
+	      
 	  <dt class="h2">Q14. このマニュアルをNetscape4で見るとぐちゃぐちゃなんですけど、そういうもんですか。
 	  <dd class="d2">
 	      <p>そういうもんです。Netscape4 の css サポートが腐っているせいです。css をオフにすればまだましになりますけど、やっぱり見にくいです。</p>
@@ -590,7 +565,7 @@ Internet Explorerの動きを前章のようにしましたが、
 	  <dd class="d2">キーボードのスキャンコードを入れ替えます。「窓使いの憂鬱」を使えばほぼ必要ありません (窓使いの憂鬱ではログイン画面でのキーを変更することができませんが RemapKey ではできます) 。現在は Windows2000 のリソースキットに収録されています。
 
 	  <dt class="h2"><a href="http://www.geocities.co.jp/SiliconValley-PaloAlto/4205/MetaX.html" target="_top">MetaX</a>
-	  <dd class="d2">cmkey + α みたいな感じのソフトです。コンセプト的に「窓使いの憂鬱」や cmkey と非常によく似ていますが、より Emacs 的な設定ファイルを書き、ミニバッファのようなものが存在します。プログラム中で cmkey と同様の方法をとっていると思われるため、例えば、CTRL/CAPS 入替の機能を持っていないといった限界が存在します。
+	  <dd class="d2">cmkey + α みたいな感じのソフトです。コンセプト的に「窓使いの憂鬱」や cmkey と非常によく似ていますが、より Emacs 的な設定ファイルを書き、ミニバッファを利用した補完などが可能です。プログラム中で cmkey と同様の方法をとっていると思われるため、例えば、CTRL/CAPS 入替の機能を持っていないといった限界が存在します。
 	      
 	  <dt class="h2">
 
@@ -711,11 +686,15 @@ Internet Explorerの動きを前章のようにしましたが、
   <dd class="d1">
       <div>
 	<dl class="history">
-	  <dt>2001/10/?? 3.28 (next release)
+	  <dt>2001/10/08 3.28
 	  <dd>
 	      <ul>
+		<li><a href="#TUTORIAL">チュートリアル</a>と<a href="#MENU">タスクトレイメニュー</a>の章を追加。(Thanks to hanawa)
 		<li><a href="#RELATEDWORK">related work</a> に Key Bat を追加。
 		<li>メニューをアクセスしている時のウィンドウクラス名は最後に <code>:MENU</code> がつく。
+		<li><code>=&gt;</code> の代わりに <code>=</code> が使えるようにした。
+		<li><a href="CUSTOMIZE-ja.html#def_subst">subst</a> の右側に <code>M0-</code> などのモディファイヤが指定できないバグを修正。
+		<li>その他修正。(Thanks to 小林)
 	      </ul>
 	  <dt>2001/09/02 3.27
 	  <dd>
@@ -741,7 +720,7 @@ Internet Explorerの動きを前章のようにしましたが、
 		<li>WindowsNT4.0 以外 (9x, Me, 2000) で、「窓使いの憂鬱」を終了させたあとに何かのキーを押さないと終了しないバグの退治。(Thanks to 小林)
 		<li>設定ファイルで隣り合う複数の文字列を一つの文字列として取り扱うようにした。
 		    <p class="sample">
-		    key X =&gt; &HelpMessage("サンプル C-x-", \<br>
+		    key X = &HelpMessage("サンプル C-x-", \<br>
 		    &nbsp;"C-x C-s\t上書き保存\r\n" \<br>
 		    &nbsp;"C-x C-f\t開く\t\r\n" \<br>
 		    &nbsp;"C-x k\t\t新規作成\r\n" \<br>
@@ -815,7 +794,7 @@ Internet Explorerの動きを前章のようにしましたが、
 		<li><a href="../contrib/ax.mayu"><code>contrib/ax.mayu</code></a> を追加。(Thanks to KAWABE Nobukazu)
 		<li><a href="#RELATEDWORK">related work</a> に MetaX を追加。
 		<li><a href="CUSTOMIZE-ja.html#defaultModifier">デフォルトモディファイヤの変更</a>のサンプルが間違っていたので直した。(<code>key IC-* =</code> ではなく <code>key *IC- =</code> が正しい) (Thanks to Hirotaka Kasaki)
-		<li><a href="CUSTOMIZE-ja.html#defaultKey">デフォルトキー</a>の中で定義中のキーマップ名を参照できなかったバグを修正した。つまり、<code>keymap Hoge =&gt; &amp;Prefix(Hoge)</code> などができるようになった。(Thanks to HANAWA Yoshio)
+		<li><a href="CUSTOMIZE-ja.html#defaultKey">デフォルトキー</a>の中で定義中のキーマップ名を参照できなかったバグを修正した。つまり、<code>keymap Hoge = &amp;Prefix(Hoge)</code> などができるようになった。(Thanks to HANAWA Yoshio)
 		<li>Windows9x 用のドライバを作成されたので、このバージョンから WindowsNT/2000 用のパッケージと Windows9x 用のパッケージが存在します。(Thanks to 小林義明)
 		<li>現在、Windows9x では、<a href="CUSTOMIZE-ja.html#function_HelpMessage"><code>&amp;HelpMessage</code></a>、<a href="CUSTOMIZE-ja.html#function_HelpVariable"><code>&amp;HelpVariable</code></a>、<a href="CUSTOMIZE-ja.html#function_WindowSetAlpha"><code>&amp;WindowSetAlpha</code></a> は使用できません。
 		<li><a href="../default.mayu"><code>default.mayu</code></a> を使用している場合、シンボル <code>ZXCV</code> を定義しておくと、<kbd>[Control]</kbd> + <kbd>[Z]</kbd>, <kbd>[Control]</kbd> + <kbd>[X]</kbd>, <kbd>[Control]</kbd> + <kbd>[C]</kbd>, <kbd>[Control]</kbd> + <kbd>[V]</kbd> が Windows と同じ動きをするようになります。(Thanks to HANAWA Yoshio)
