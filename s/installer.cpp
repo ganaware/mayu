@@ -280,9 +280,18 @@ namespace Installer
 
     if (forUsb == true) {
       Registry reg(HKEY_LOCAL_MACHINE, MAYUD_FILTER_KEY);
-      std::list<tstring> filters;
+      typedef std::list<tstring> Filters;
+      Filters filters;
       if (!reg.read(_T("UpperFilters"), &filters))
 	return false;
+      for (Filters::iterator i = filters.begin(); i != filters.end(); ) {
+	  Filters::iterator next = i;
+	  ++ next;
+	  if (*i == _T("mayud")) {
+	      filters.erase(i);
+	  }
+	  i = next;
+      }
       filters.push_back(_T("mayud"));
       if (!reg.write(_T("UpperFilters"), filters))
 	return false;
