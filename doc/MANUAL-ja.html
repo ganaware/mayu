@@ -89,7 +89,7 @@
 		  <p>設定ファイルを再読み込みします。設定ファイルの変更を反映させるときに使います。<a href="CUSTOMIZE-ja.html#function_LoadSetting"><code>&amp;LoadSetting</code></a> と同じです。</p>
 		</div>
 		
-	    <dt><a name="menu-c">選択</a>(<u>C</u>) &#9658;
+	    <dt><a name="menu-c"></a>選択(<u>C</u>) &#9658;
 	    <dd>
 		<div>
 		  <p>サブメニューから設定ファイルの切り替えを行います。「窓使いの憂鬱」でデフォルトで用意されている設定は 8 つあります。これは、以下の 3 つの 2 択の組み合わせとなります。</p>
@@ -117,10 +117,15 @@
 		  <p>「窓使いの憂鬱」は常駐したままでキーイベント変換機能を停止させ、キーイベントをそのままスルーさせます (バグがない限り、「窓使いの憂鬱」が常駐していないときの挙動になるはずです)</p>
 		</div>
 
-	    <dt>調査(<u>I</u>)...
+	    <dt><a name="menu-i">調査</a>(<u>I</u>)...
 	    <dd>
 		<div>
 		  <p>調査ウインドウとログウインドウを表示します。</p>
+
+      <p>この調査ウインドウで調べたいキーを押せば、キーのスキャンコードや仮想キーコードが分かります。</p>
+
+      <p>また、丸に十字のついたマークを調べたいウィンドウまでドラッグするとウィンドウクラスとタイトルがわかります。ここで調査したウィンドウクラス名とタイトルは、 <code>.mayu</code> の <a href="CUSTOMIZE-ja.html#keymap"><code>window</code></a> に記述することができます。これは、<code><em>FUNCTION</em></code> <a href="CUSTOMIZE-ja.html#function_WindowIdentify"><code>&amp;WindowIdentify</code></a> を利用することもできます。</p>
+
 		</div>
 		
 	    <dt>ログ(<u>L</u>)...
@@ -258,7 +263,7 @@
 
 		  <p>2, 3 行目のように <code>key キー名 =&gt; キー名</code> と書くことで、あるキーを押したときの挙動を変更できます。上の例であれば、<kbd>[Esc]</kbd> が押されたときは <kbd>[半角/全角]</kbd> が押されたように、<kbd>[半角/全角]</kbd> が押されたときは <kbd>[Esc]</kbd> が押されたような動作になります。</p>
 
-		  <p>キー名は、タスクトレイメニュー「調査(I)...」の「スキャンコードの調査」で調べたいキーを押すことでわかります。<kbd>[Esc]</kbd> キーと、<kbd>[半角/全角]</kbd> キーを順に押したときのログウインドウには、例えば以下のように表示されているはずです。</p>
+		  <p>キー名は、タスクトレイメニュー「<a href="#menu-i">調査(I)...</a>」の「スキャンコードの調査」で調べたいキーを押すことでわかります。<kbd>[Esc]</kbd> キーと、<kbd>[半角/全角]</kbd> キーを順に押したときのログウインドウには、例えば以下のように表示されているはずです。</p>
 
 		  <p class="sample">
 		  0x01   D-Esc<br>
@@ -394,28 +399,7 @@ Internet Explorerの動きを前章のようにしましたが、
 	  </dl>
 	</div>
 
-  <dt class="h1"><a name="CUSTOMIZE" href="CUSTOMIZE-ja.html">5. customize</a>
-      
-  <dd class="d1">
-      <p><a href="CUSTOMIZE-ja.html">カスタマイズ</a>。</p>
-      
-  <dt class="h1"><a name="KEYNAME">6. key investigation</a>
-
-  <dd class="d1">
-      <p>「窓使いの憂鬱」を起動すると、タスクトレイに「窓使いの憂鬱」のアイコンが出ます。ここで、マウスの右ボタンを押して「調査(I)...」を選びます。</p>
-      
-      <p>ここで調べたいキーを押せば、キーのスキャンコードや仮想キーコードが分かります。</p>
-
-  <dt class="h1"><a name="CLASSNAME">7. window class investigation</a>
-
-  <dd class="d1">
-      <p>「窓使いの憂鬱」を起動すると、タスクトレイに「窓使いの憂鬱」のアイコンが出ます。ここで、マウスの右ボタンを押して「調査(I)...」を選びます。</p>
-      
-      <p>丸に十字のついたマークを調べたいウィンドウまでドラッグするとウィンドウクラスとタイトルがわかります。ここで調査したウィンドウクラス名とタイトルは、 <code>.mayu</code> の <a href="CUSTOMIZE-ja.html#keymap"><code>window</code></a> に記述することができます。</p>
-      
-      <p>また、<code><em>FUNCTION</em></code> <a href="CUSTOMIZE-ja.html#function_WindowIdentify"><code>&amp;WindowIdentify</code></a> を利用することもできます。</p>
-      
-  <dt class="h1"><a name="FAQ">8. frequently asked questions</a>
+  <dt class="h1"><a name="FAQ">6. frequently asked questions</a>
 
   <dd class="d1">
       <div>
@@ -466,7 +450,7 @@ Internet Explorerの動きを前章のようにしましたが、
 	      
 	      <p>右 <kbd>[Windows]</kbd> キーはモディファイヤキーなので特別扱いされます。したがって普通のキーのように動作するようにするには、<code>(1)</code> のようにしてモディファイヤキーとして動作しないようにします。これは <kbd>[Alt]</kbd> や <kbd>[Shift]</kbd> や <kbd>[Control]</kbd> でも同様です。</p>
 	  <dt class="h2">Q9. ウインドウのクラス名はどうやって調べるんですか？
-	  <dd class="d2"><p>タスクトレイの「窓使いの憂鬱」のアイコンでマウスの右ボタンを押して「<a href="#CLASSNAME">調査(I)...</a>」を選びます。</p>
+	  <dd class="d2"><p>タスクトレイの「窓使いの憂鬱」のアイコンでマウスの右ボタンを押して「<a href="#menu-i">調査(I)...</a>」を選びます。</p>
 	  <dt class="h2">Q10. アクティブな時にしか見えない窓などの場合、上記の方法では調査できないですが？
 	  <dd class="d2"><p><a href="CUSTOMIZE-ja.html#function_WindowIdentify"><code>&amp;WindowIdentify</code></a> を使ってください。<a href="../default.mayu"><code>default.mayu</code></a> では <kbd>[Ctrl]</kbd> +<kbd>[Shift]</kbd> + <kbd>[D]</kbd> に割り振ってあります。</p>
 	  <dt class="h2">Q11. インストール時には 109 キーボードだったのですが、今度 104 キーボードを購入しました。しかし、タスクトレイメニューの「選択」には 109 しか出てきません。どうすればいいですか。
@@ -513,7 +497,13 @@ Internet Explorerの動きを前章のようにしましたが、
 	</dl>
       </div>
       
-  <dt class="h1"><a name="BUGS">9. bugs</a>
+  <dt class="h1"><a name="CUSTOMIZE" href="CUSTOMIZE-ja.html">7. customize</a>
+      
+  <dd class="d1">
+      <p><a href="CUSTOMIZE-ja.html">カスタマイズ</a>。</p>
+
+
+  <dt class="h1"><a name="BUGS">8. bugs</a>
 
   <dd class="d1">
       <ul>
@@ -526,7 +516,7 @@ Internet Explorerの動きを前章のようにしましたが、
 	    
       </ul>
 
-  <dt class="h1"><a name="RELATEDWORK">10. related work</a>
+  <dt class="h1"><a name="RELATEDWORK">9. related work</a>
       
   <dd class="d1">
       <div>
@@ -564,7 +554,7 @@ Internet Explorerの動きを前章のようにしましたが、
 	</dl>
       </div>
       
-  <dt class="h1"><a name="COPYRIGHT">11. copyright</a>
+  <dt class="h1"><a name="COPYRIGHT">10. copyright</a>
 
   <dd class="d1">
       <div>
@@ -623,7 +613,7 @@ Internet Explorerの動きを前章のようにしましたが、
 	</dl>
       </div>
       
-  <dt class="h1"><a name="SUPPORT">12. support</a>
+  <dt class="h1"><a name="SUPPORT">11. support</a>
       
   <dd class="d1">
       <div>
@@ -642,7 +632,7 @@ Internet Explorerの動きを前章のようにしましたが、
 	</dl>
       </div>
       
-  <dt class="h1"><a name="ACKNOWLEDGEMENT">13. acknowledgements</a>
+  <dt class="h1"><a name="ACKNOWLEDGEMENT">12. acknowledgements</a>
 
   <dd class="d1">
       <div>
@@ -655,7 +645,7 @@ Internet Explorerの動きを前章のようにしましたが、
 	<p>「窓使いの憂鬱」はたくさんの人の貢献の上に成り立っています。ここに名前を挙げていない方にも心から感謝します。</p>
       </div>
 
-  <dt class="h1"><a name="HISTORY">14. history</a>
+  <dt class="h1"><a name="HISTORY">13. history</a>
       
   <dd class="d1">
       <div>
