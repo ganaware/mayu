@@ -705,6 +705,21 @@ void Engine::funcKeymapWindow(FunctionParam *i_param)
   generateKeyboardEvents(c);
 }
 
+// use a corresponding key of the previous prefixed keymap
+void Engine::funcKeymapPrevPrefix(FunctionParam *i_param, int i_previous)
+{
+  Current c(i_param->m_c);
+  if (0 < i_previous && i_previous <= m_keymapPrefixHistory.size())
+  {
+    int n = i_previous - 1;
+    KeymapPtrList::reverse_iterator i = m_keymapPrefixHistory.rbegin();
+    while (0 < n && i != m_keymapPrefixHistory.rend())
+      --n, ++i;
+    c.m_keymap = *i;
+    generateKeyboardEvents(c);
+  }
+}
+
 // use a corresponding key of an other window class, or use a default key
 void Engine::funcOtherWindowClass(FunctionParam *i_param)
 {
@@ -732,7 +747,7 @@ void Engine::funcPrefix(FunctionParam *i_param, const Keymap *i_keymap,
   if (!i_param->m_isPressed)
     return;
   
-  m_currentKeymap = i_keymap;
+  setCurrentKeymap(i_keymap, true);
   
   // generate prefixed event
   generateEvents(i_param->m_c, m_currentKeymap, &Event::prefixed);

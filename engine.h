@@ -37,6 +37,7 @@ private:
   enum
   {
     MAX_GENERATE_KEYBOARD_EVENTS_RECURSION_COUNT = 64, ///
+    MAX_KEYMAP_PREFIX_HISTORY = 64, ///
   };
 
   typedef Keymaps::KeymapPtrList KeymapPtrList;	/// 
@@ -201,6 +202,7 @@ private:
   DetachedThreadIds m_detachedThreadIds;	///
   
   // for functions
+  KeymapPtrList m_keymapPrefixHistory;		/// for &amp;KeymapPrevPrefix
   EmacsEditKillLine m_emacsEditKillLine;	/// for &amp;EmacsEditKillLine
   const ActionFunction *m_afShellExecute;	/// for &amp;ShellExecute
   
@@ -264,6 +266,10 @@ private:
   /// update m_lastPressedKey
   void updateLastPressedKey(Key *i_key);
 
+  /// set current keymap
+  void setCurrentKeymap(const Keymap *i_keymap,
+			bool i_doesAddToHistory = false);
+
 private:
   // BEGINING OF FUNCTION DEFINITION
   /// send a default key to Windows
@@ -272,6 +278,8 @@ private:
   void funcKeymapParent(FunctionParam *i_param);
   /// use a corresponding key of a current window
   void funcKeymapWindow(FunctionParam *i_param);
+  /// use a corresponding key of the previous prefixed keymap
+  void funcKeymapPrevPrefix(FunctionParam *i_param, int i_previous);
   /// use a corresponding key of an other window class, or use a default key
   void funcOtherWindowClass(FunctionParam *i_param);
   /// prefix key

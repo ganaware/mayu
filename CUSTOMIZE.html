@@ -892,6 +892,33 @@
 				<p><a href="#parentKeymap">親キーマップ</a>参照。</p>
 			      </div>
 			      
+			  <dt class="h3"><a name="function_KeymapPrevPrefix"><code>&amp;KeymapPrevPrefix</code></a>
+			      
+			  <dd class="d3">
+			      <div>
+				<p>現在のキーマップが二段階キーマップの場合、その二段階キーマップを <a href="#function_Prefix"><code>&amp;Prefix</code></a> によって指定したキーマップで定義されているキーを指定します。たとえば、</p>
+				
+				<p class="sample">
+				keymap E<br>
+				key A =&gt; &amp;KeymapPrevPrefix(2)<br>
+				keymap D<br>
+				key X =&gt; &amp;Prefix(E)<br>
+				key A =&gt; D<br>
+				keymap C<br>
+				key X =&gt; &amp;Prefix(D)<br>
+				key A =&gt; C<br>
+				key Y =&gt; &amp;Prefix(E)<br>
+				keymap B<br>
+				key X =&gt; &amp;Prefix(C)<br>
+				key A =&gt; B<br>
+				keymap Global<br>
+				key X =&gt; &amp;Prefix(B)<br>
+				key A =&gt; A
+				</p>
+				
+				<p>ここで <kbd>[X]</kbd> <kbd>[X]</kbd> <kbd>[X]</kbd> <kbd>[X]</kbd> <kbd>[A]</kbd> と入力すると <kbd>[C]</kbd> が、<kbd>[X]</kbd> <kbd>[X]</kbd> <kbd>[Y]</kbd> と入力すると <kbd>[B]</kbd> が入力されます。</p>
+			      </div>
+			      
 			  <dt class="h3"><a name="function_KeymapWindow"><code>&amp;KeymapWindow</code></a>
 			      
 			  <dd class="d3">

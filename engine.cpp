@@ -69,9 +69,9 @@ void Engine::checkFocusWindow()
 	if (!m_currentFocusOfThread->m_isConsole || 2 <= count)
 	{
 	  if (m_currentFocusOfThread->m_keymaps.empty())
-	    m_currentKeymap = NULL;
+	    setCurrentKeymap(NULL);
 	  else
-	    m_currentKeymap = *m_currentFocusOfThread->m_keymaps.begin();
+	    setCurrentKeymap(*m_currentFocusOfThread->m_keymaps.begin());
 	  m_hwndFocus = m_currentFocusOfThread->m_hwndFocus;
 	
 	  Acquire a(&m_log, 1);
@@ -117,14 +117,14 @@ void Engine::checkFocusWindow()
     Acquire a(&m_log, 1);
     m_log << _T("NO GLOBAL FOCUS") << std::endl;
     m_currentFocusOfThread = NULL;
-    m_currentKeymap = NULL;
+    setCurrentKeymap(NULL);
   }
   else
   {
     Acquire a(&m_log, 1);
     m_log << _T("GLOBAL FOCUS") << std::endl;
     m_currentFocusOfThread = &m_globalFocus;
-    m_currentKeymap = m_globalFocus.m_keymaps.front();
+    setCurrentKeymap(m_globalFocus.m_keymaps.front());
   }
   m_hwndFocus = NULL;
 }
@@ -221,6 +221,20 @@ void Engine::updateLastPressedKey(Key *i_key)
   m_lastPressedKey[0] = i_key;
 }
 
+// set current keymap
+void Engine::setCurrentKeymap(const Keymap *i_keymap, bool i_doesAddToHistory)
+{
+  if (i_doesAddToHistory)
+  {
+    m_keymapPrefixHistory.push_back(const_cast<Keymap *>(m_currentKeymap));
+    if (MAX_KEYMAP_PREFIX_HISTORY < m_keymapPrefixHistory.size())
+      m_keymapPrefixHistory.pop_front();
+  }
+  else
+    m_keymapPrefixHistory.clear();
+  m_currentKeymap = i_keymap;
+}
+
 
 // get current modifiers
 Modifier Engine::getCurrentModifiers(Key *i_key, bool i_isPressed)
@@ -266,7 +280,7 @@ void Engine::generateKeyEvent(Key *i_key, bool i_doPress, bool i_isByAssign)
     }
 
   bool isAlreadyReleased = false;
-  
+    
   if (!isEvent)
   {
     if (i_doPress && !i_key->m_isPressedOnWin32)
@@ -283,7 +297,9 @@ void Engine::generateKeyEvent(Key *i_key, bool i_doPress, bool i_isByAssign)
     if (i_isByAssign)
       i_key->m_isPressedByAssign = i_doPress;
 
-    if (!isAlreadyReleased)
+    Key *sync = m_setting->m_keyboard.getSyncKey();
+    
+    if (!isAlreadyReleased || i_key == sync)
     {
       KEYBOARD_INPUT_DATA kid = { 0, 0, 0, 0, 0 };
       const ScanCode *sc = i_key->getScanCodes();
@@ -1078,7 +1094,7 @@ bool Engine::setSetting(Setting *i_setting)
 	  << std::endl;
   }
   m_currentFocusOfThread = &m_globalFocus;
-  m_currentKeymap = m_globalFocus.m_keymaps.front();
+  setCurrentKeymap(m_globalFocus.m_keymaps.front());
   m_hwndFocus = NULL;
   return true;
 }
