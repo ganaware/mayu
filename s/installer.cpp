@@ -199,7 +199,7 @@ namespace Installer
     CHECK_TRUE( GetModuleFileName(g_hInst, buf, NUMBER_OF(buf)) );
     tregex reg(_T("^(.*)\\\\[^\\\\]*$"));
     tcmatch_results what;
-    if (boost::regex_search(buf, what, reg))
+    if (boost::regex_search(tstring(buf), what, reg))
       return what.str(1);
     else
       return buf;

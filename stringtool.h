@@ -29,7 +29,7 @@ typedef std::basic_ifstream<_TCHAR> tifstream;
 /// reg_expression for generic international text
 typedef boost::reg_expression<_TCHAR> tregex;
 /// match_results for generic international text
-typedef boost::match_results<const _TCHAR *> tcmatch;
+typedef boost::match_results<tstring::const_iterator> tcmatch;
 
 
 /// string with custom stream output

@@ -1,6 +1,6 @@
 ############################################################## -*- Makefile -*-
 #
-# Makefile (Visual C++ 6.0)
+# Makefile (Visual C++)
 #
 #	make release version: nmake nodebug=1
 #	make debug version: nmake
@@ -17,18 +17,18 @@ TARGETOS	= WINNT
 !if "$(TARGETOS)" == "WINNT"
 APPVER		= 4.0
 !ifdef nodebug
-OUT_DIR		= out_winnt
+OUT_DIR		= out$(MAYU_VC)_winnt
 !else	# nodebug
-OUT_DIR		= out_winnt_debug
+OUT_DIR		= out$(MAYU_VC)_winnt_debug
 !endif	# nodebug
 !endif	# TARGETOS
 
 !if "$(TARGETOS)" == "WIN95"
 APPVER		= 4.0
 !ifdef nodebug
-OUT_DIR		= out_win9x
+OUT_DIR		= out$(MAYU_VC)_win9x
 !else	# nodebug
-OUT_DIR		= out_win9x_debug
+OUT_DIR		= out$(MAYU_VC)_win9x_debug
 !endif	# nodebug
 !endif	# TARGETOS
 
@@ -52,8 +52,8 @@ DEBUG_FLAG	=
 {}.rc{$(OUT_DIR)}.res:
 	$(rc) $(rcflags) $(rcvars) /fo$@ $(*B).rc
 
-conxlibsmt	= $(conlibsmt) libcpmt.lib
-guixlibsmt	= $(guilibsmt) libcpmt.lib
+conxlibsmt	= $(conlibsmt) libcpmt.lib libcmt.lib
+guixlibsmt	= $(guilibsmt) libcpmt.lib libcmt.lib
 
 DEPENDFLAGS	= --cpp=vc --ignore="$(INCLUDE)" -p"$$(OUT_DIR)\\"	\
 		$(DEPENDIGNORE) -GX $(cdebug) $(cflags) $(cvarsmt)	\

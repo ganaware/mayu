@@ -1025,7 +1025,7 @@ static BOOL CALLBACK enumWindowsForSetForegroundWindow(
   if (!GetClassName(i_hwnd, name, NUMBER_OF(name)))
     return TRUE;
   tcmatch_results what;
-  if (!boost::regex_search(name, what, ep.m_fd->m_windowClassName))
+  if (!boost::regex_search(tstring(name), what, ep.m_fd->m_windowClassName))
     if (ep.m_fd->m_logicalOp == LogicalOperatorType_and)
       return TRUE;				// match failed
 
@@ -1033,7 +1033,7 @@ static BOOL CALLBACK enumWindowsForSetForegroundWindow(
   {
     if (GetWindowText(i_hwnd, name, NUMBER_OF(name)) == 0)
       name[0] = _T('\0');
-    if (!boost::regex_search(name, what,
+    if (!boost::regex_search(tstring(name), what,
 			     ep.m_fd->m_windowTitleName))
       return TRUE;				// match failed
   }
@@ -1732,8 +1732,8 @@ public:
 
 class ParseDirectSSTPData
 {
-  typedef boost::match_results<std::string::const_iterator,
-					    boost::regex::alloc_type> MR;
+  typedef boost::match_results<boost::regex::const_iterator,
+  					    boost::regex::alloc_type> MR;
 
 public:
   typedef std::map<tstring, DirectSSTPServer> DirectSSTPServers;

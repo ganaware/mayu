@@ -34,7 +34,7 @@ public:
   }
 
   /// ios manipulator 
-  template<> ErrorMessage &operator<<(
+  ErrorMessage &operator<<(
     std::ios_base &(*i_manip)(std::ios_base&))
   {
     m_ost << i_manip;

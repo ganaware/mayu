@@ -191,7 +191,7 @@ size_t mbslcpy(unsigned char *o_dest, const unsigned char *i_src,
 /// stream output
 tostream &operator<<(tostream &i_ost, const tstringq &i_data)
 {
-  i_ost << _L("\"");
+  i_ost << _T("\"");
   for (const _TCHAR *s = i_data.c_str(); *s; ++ s)
   {
     switch (*s)
@@ -229,7 +229,7 @@ tostream &operator<<(tostream &i_ost, const tstringq &i_data)
 	break;
     }
   }
-  i_ost << _L("\"");
+  i_ost << _T("\"");
   return i_ost;
 }
 

@@ -124,7 +124,7 @@ public:
   int getDebugLevel() const { return m_debugLevel; }
   
   // for stream
-  Super::int_type overflow(Super::int_type i_c = TR::eof())
+  typename Super::int_type overflow(typename Super::int_type i_c = TR::eof())
   {
     if (sync() == TR::eof()) // sync before new buffer created below
       return TR::eof();

@@ -331,9 +331,9 @@ Key *Keyboard::searchKey(const tstringi &i_name)
 // search a key by non-alias name
 Key *Keyboard::searchKeyByNonAliasName(const tstringi &i_name)
 {
-  for (int i = 0; i < HASHED_KEYS_SIZE; ++ i)
+  for (int j = 0; j < HASHED_KEYS_SIZE; ++ j)
   {
-    Keys &keys = m_hashedKeys[i];
+    Keys &keys = m_hashedKeys[j];
     Keys::iterator i = std::find(keys.begin(), keys.end(), i_name);
     if (i != keys.end())
       return &*i;

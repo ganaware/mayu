@@ -3,5 +3,7 @@ functions.h
 *.opt
 *.tgz
 *.pdb
-out_*
+outvc6_*
+outvc7_*
+outvc71_*
 outbcc_*
