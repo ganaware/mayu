@@ -60,7 +60,6 @@
 	    </ul>
 	<li>以前のバージョンの「窓使いの憂鬱」を利用している場合は、終了させます。
 	    <ul>
-	      <li>WindowsNT4.0 以外 (9x, Me, 2000) の場合は、メニューの終了を選んだ後に何かのキ−を押さないと実際に終了しません。(<a href="#BUGS">BUG</a> です)
 	      <li>終了させるだけでよく、アンインストールする必要はありません。
 	    </ul>
 	<li>ダウンロードした実行ファイルを Administrator 権限で実行してください。すると「窓使いの憂鬱」がインストールされます。
@@ -172,13 +171,10 @@
 	  <dd class="d2"><p>小林義明さんが Windows2000 用のドライバを書いてくださったので、USB 用の mayu ドライバを利用すれば使用することができます。現在はまだテスト中なので <a href="#SUPPORT">メーリングリスト</a> で問い合わせてください。又 Win9x では普通に使用できます。</p>
 	  <dt class="h2">Q10. 「窓使いの憂鬱」は Windows95/98/ME では使えないのですか。
 	  <dd class="d2"><p>小林義明さんがドライバを書いてくださったので、バージョン 3.19 から使用できるようになりました。</p>
-	  <dt class="h2">Q11. Win9xで終了できません。そういうもんですか。
-	  <dd class="d2"><p>そういうもんです。Shiftでも連打すれば終わります。</p>
-
-	  <dt class="h2">Q12. このマニュアルをNetscape4で見るとぐちゃぐちゃなんですけど、そういうもんですか。
+	  <dt class="h2">Q11. このマニュアルをNetscape4で見るとぐちゃぐちゃなんですけど、そういうもんですか。
 	  <dd class="d2"><p>そういうもんです。Netscape4のcssサポートが腐っているせいです。cssをオフにすればまだましになりますけど、やっぱり見にくいです。</p>
 
-	  <dt class="h2">Q13. mayu は<a href="http://www.tactics.co.jp/qtactics/one.htm" target="_top">椎名繭</a>なのですか。
+	  <dt class="h2">Q12. mayu は<a href="http://www.tactics.co.jp/qtactics/one.htm" target="_top">椎名繭</a>なのですか。
 	  <dd class="d2"><p>違います。ぜんぜん違います。GTO の繭君でもないです。</p>
 	</dl>
       </div>
@@ -188,7 +184,6 @@
   <dd class="d1">
       <ul>
 	<li><span class="bug">[仕様]</span> コマンドプロンプトではロックキーとIMEの状態を区別することができません。また、コマンドプロンプトのプロパティに対しては無力です。
-	<li><span class="bug">[仕様]</span> WindowsNT4.0 以外 (9x, Me, 2000) では、「窓使いの憂鬱」を終了させたあとに何かのキーを押さないと終了しません。
 	<li><span class="bug">[バグ]</span> <a href="http://www.pgpi.org/products/pgp/versions/freeware/win32/7.0.3/" target="_top">PGPi</a> を利用しているとうまく動かないようです。
 	    
 	<li>TODO や Known Bug は<a href="http://sourceforge.net/pm/task.php?group_id=5403&group_project_id=7606&func=browse&set=open&order=priority" target="_top">SourceForge</a> で管理されています。
@@ -327,6 +322,13 @@
   <dd class="d1">
       <div>
 	<dl class="history">
+	  <dt>2001/08/?? 3.25
+	  <dd>
+	      <ul>
+		<li><code>*.mayu</code> のアイコンが間違っていたのを直した。
+		<li><a href="CUSTOMIZE.html#mod"><code>-=</code></a> で複数キーを設定しても一つしか有効にならないバグの修正。
+		<li>WindowsNT4.0 以外 (9x, Me, 2000) で、「窓使いの憂鬱」を終了させたあとに何かのキーを押さないと終了しないバグの退治。(Thanks to 小林)
+	      </ul>
 	  <dt>2001/08/05 3.24
 	  <dd>
 	      <ul>
