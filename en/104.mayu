@@ -4,12 +4,15 @@
 #
 
 define KBD101
+define KBD102
 define KBD104
+define KBD105
 define KBD107
+define KBD108
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 104 US keyboard definition
+# 101/102/104/105/107/108 US keyboard definition
 #
 
 def key Esc Escape			=    0x01
@@ -114,6 +117,7 @@ def key Insert				= E0-0x52
 def key NumFullStop NumPeriod		=    0x53 # Numpad .
 def key Delete Del			= E0-0x53
 def key SysRq				=    0x54
+def key Less				=    0x56 # < >
 def key F11				=    0x57
 def key F12				=    0x58
 def key LeftWindows LWindows LWin	= E0-0x5b

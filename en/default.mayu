@@ -274,11 +274,13 @@ window	Notepad /:Notepad:Edit$/ : EmacsEdit
 ## ASTEC-X ....................................................................
 ## http://www.astec.co.jp/
 
+ keyseq $ASTEC-X/copy-to-x	= &PostMessage(ToItself, 274, 16, 0)
+
 window	ASTEC-X /:ASTEC-X$/ : Global
  key C-Yen		=> &Default
- if ( GANA ) and ( KBD109 )
-   key Convert		=> &VK(F13)		# XIM, toggle-input-method
- endif
+ key S-Insert		=> $ASTEC-X/copy-to-x S-Insert
+ key C-V		=> $ASTEC-X/copy-to-x C-V
+ key C-Y		=> $ASTEC-X/copy-to-x C-Y
 
 
 ## Becky! Internet Mail .......................................................

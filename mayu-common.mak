@@ -166,5 +166,5 @@ distrib:
 		-@$(RM) mayu-$(VERSION).cab
 
 srcdesc::
-		@$(ECHO) USE DOC++ 3.4.4-pre5 OR HIGHER
-		$(DOCXX) *.h *.cpp
+		@$(ECHO) USE DOC++ 3.4.4 OR HIGHER
+		$(DOCXX) *.h
