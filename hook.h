@@ -10,7 +10,8 @@
 
 
 #define mailslotNotify						\
-"\\\\.\\mailslot\\GANAware\\mayu\\{330F7914-EB5B-49be-ACCE-D2B8DF585B32}"
+"\\\\.\\mailslot\\GANAware\\mayu\\{330F7914-EB5B-49be-ACCE-D2B8DF585B32}" \
+VERSION
 
 #define WM_Targetted_name "GANAware\\mayu\\WM_Targetted"
 

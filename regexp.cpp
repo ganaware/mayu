@@ -1246,7 +1246,7 @@ bool Regexp::regexp::regexec(const R_char *target)
   {
     // We don't -- general case.
     R_char *s;
-    for (s = t; s && *s; s = R_strinc(s))
+    for (s = t; s; s = R_strinc(s))
     {
       if (executor.regtry(s))
 	return true;

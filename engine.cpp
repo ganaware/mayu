@@ -771,6 +771,11 @@ void Engine::keyboardHandler()
 	!currentKeymap)
     {
       WriteFile(device, &kid, sizeof(kid), &len, NULL);
+      Acquire a(&log, 0);
+      if (currentFocusOfThread)
+	log << "internal error: currentFocusOfThread == NULL" << endl;
+      else
+	log << "internal error: currentKeymap == NULL" << endl;
       continue;
     }
     
@@ -1023,6 +1028,11 @@ bool Engine::setSetting(Setting *setting_)
     }
   }
   setting->keymaps.searchWindow(&globalFocus.keymaps, "", "");
+  if (globalFocus.keymaps.empty())
+  {
+    Acquire a(&log, 0);
+    log << "internal error: globalFocus.keymap is empty" << endl;
+  }
   currentFocusOfThread = &globalFocus;
   currentKeymap = globalFocus.keymaps.front();
   hwndFocus = NULL;
@@ -1180,7 +1190,7 @@ void Engine::shellExecute()
       break;
     }
   Acquire b(&log, 0);
-  log <<"error: &ShellExecute("
+  log <<"internal error: &ShellExecute("
       << af->args[0] << ", "
       << af->args[1] << ", "
       << af->args[2] << ", "

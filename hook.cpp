@@ -13,7 +13,7 @@
 #include <imm.h>
 
 
-#define HOOK_DATA_NAME "{08D6E55C-5103-4e00-8209-A1C4AB13BBEF}"
+#define HOOK_DATA_NAME "{08D6E55C-5103-4e00-8209-A1C4AB13BBEF}" VERSION
 
 
 using namespace std;
