@@ -20,7 +20,6 @@
 // C4786 identifier is truncated into 255 chars (in debug information)
 #    pragma warning(disable : 4061 4100 4132 4552 4701 4706 4786)
 
-#    define snprintf _snprintf
 #    define setmode _setmode
 #    define for if (false) ; else for
 

@@ -7,13 +7,14 @@
 
 
 #  include "misc.h"
+#  include <tchar.h>
 
 ///
-#  define NOTIFY_MAILSLOT_NAME						  \
-"\\\\.\\mailslot\\GANAware\\mayu\\{330F7914-EB5B-49be-ACCE-D2B8DF585B32}" \
-VERSION
+#  define NOTIFY_MAILSLOT_NAME						      \
+_T("\\\\.\\mailslot\\GANAware\\mayu\\{330F7914-EB5B-49be-ACCE-D2B8DF585B32}") \
+_T(VERSION)
 ///
-#  define WM_MAYU_TARGETTED_NAME "GANAware\\mayu\\WM_MAYU_TARGETTED"
+#  define WM_MAYU_TARGETTED_NAME _T("GANAware\\mayu\\WM_MAYU_TARGETTED")
 
 
 ///
@@ -40,8 +41,8 @@ struct NotifySetFocus
   Notify::Type m_type;				///
   DWORD m_threadId;				///
   HWND m_hwnd;					///
-  char m_className[GANA_MAX_PATH];		///
-  char m_titleName[GANA_MAX_PATH];		///
+  _TCHAR m_className[GANA_MAX_PATH];		///
+  _TCHAR m_titleName[GANA_MAX_PATH];		///
 };
 
 

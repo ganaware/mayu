@@ -14,10 +14,7 @@
 
 
 ///
-#define HOOK_DATA_NAME "{08D6E55C-5103-4e00-8209-A1C4AB13BBEF}" VERSION
-
-
-using namespace std;
+#define HOOK_DATA_NAME _T("{08D6E55C-5103-4e00-8209-A1C4AB13BBEF}") _T(VERSION)
 
 
 // ////////////////////////////////////////////////////////////////////////////
@@ -64,7 +61,7 @@ BOOL WINAPI DllMain(HINSTANCE i_hInstDLL, DWORD i_fdwReason,
       if (!mapHookData())
 	return FALSE;
       g.m_hInstDLL = i_hInstDLL;
-      setlocale(LC_ALL, "");
+      _tsetlocale(LC_ALL, _T(""));
       g.m_WM_MAYU_TARGETTED = RegisterWindowMessage(WM_MAYU_TARGETTED_NAME);
       break;
     }
@@ -136,50 +133,50 @@ DllExport bool notify(void *i_data, size_t i_dataSize)
 
 /// get class name and title name
 static void getClassNameTitleName(HWND i_hwnd, bool i_isInMenu, 
-				  StringTool::istring *o_className,
-				  string *o_titleName)
+				  tstringi *o_className,
+				  tstring *o_titleName)
 {
-  StringTool::istring &className = *o_className;
-  string &titleName = *o_titleName;
+  tstringi &className = *o_className;
+  tstring &titleName = *o_titleName;
   
   bool isTheFirstTime = true;
   
   if (i_isInMenu)
   {
-    className = titleName = "MENU";
+    className = titleName = _T("MENU");
     isTheFirstTime = false;
   }
 
   while (true)
   {
-    char buf[MAX(GANA_MAX_PATH, GANA_MAX_ATOM_LENGTH)];
+    _TCHAR buf[MAX(GANA_MAX_PATH, GANA_MAX_ATOM_LENGTH)];
 
     // get class name
     if (i_hwnd)
-      GetClassName(i_hwnd, buf, sizeof(buf));
+      GetClassName(i_hwnd, buf, NUMBER_OF(buf));
     else
-      GetModuleFileName(GetModuleHandle(NULL), buf, sizeof(buf));
-    buf[sizeof(buf) - 1] = '\0';
+      GetModuleFileName(GetModuleHandle(NULL), buf, NUMBER_OF(buf));
+    buf[NUMBER_OF(buf) - 1] = _T('\0');
     if (isTheFirstTime)
       className = buf;
     else
-      className = StringTool::istring(buf) + ":" + className;
+      className = tstringi(buf) + _T(":") + className;
     
     // get title name
     if (i_hwnd)
     {
-      GetWindowText(i_hwnd, buf, sizeof(buf));
-      buf[sizeof(buf) - 1] = '\0';
-      for (char *b = buf; *b; b++)
-	if (StringTool::ismbblead_(*b) && b[1])
+      GetWindowText(i_hwnd, buf, NUMBER_OF(buf));
+      buf[NUMBER_OF(buf) - 1] = _T('\0');
+      for (_TCHAR *b = buf; *b; ++ b)
+	if (_istlead(*b) && b[1])
 	  b ++;
-	else if (StringTool::iscntrl_(*b))
-	  *b = '?';
+	else if (_istcntrl(*b))
+	  *b = _T('?');
     }
     if (isTheFirstTime)
       titleName = buf;
     else
-      titleName = string(buf) + ":" + titleName;
+      titleName = tstring(buf) + _T(":") + titleName;
 
     // next loop or exit
     if (!i_hwnd)
@@ -193,18 +190,16 @@ static void getClassNameTitleName(HWND i_hwnd, bool i_isInMenu,
 /// notify WM_Targetted
 static void notifyName(HWND i_hwnd, Notify::Type i_type = Notify::Type_name)
 {
-  StringTool::istring className;
-  string titleName;
+  tstringi className;
+  tstring titleName;
   getClassNameTitleName(i_hwnd, g.m_isInMenu, &className, &titleName);
   
   NotifySetFocus *nfc = new NotifySetFocus;
   nfc->m_type = i_type;
   nfc->m_threadId = GetCurrentThreadId();
   nfc->m_hwnd = i_hwnd;
-  strncpy(nfc->m_className, className.c_str(), NUMBER_OF(nfc->m_className));
-  nfc->m_className[NUMBER_OF(nfc->m_className) - 1] = '\0';
-  strncpy(nfc->m_titleName, titleName.c_str(), NUMBER_OF(nfc->m_titleName));
-  nfc->m_titleName[NUMBER_OF(nfc->m_titleName) - 1] = '\0';
+  tcslcpy(nfc->m_className, className.c_str(), NUMBER_OF(nfc->m_className));
+  tcslcpy(nfc->m_titleName, titleName.c_str(), NUMBER_OF(nfc->m_titleName));
   notify(nfc, sizeof(*nfc));
   delete nfc;
 }

@@ -23,3 +23,8 @@ $(TARGET_2):	$(OBJS_2) $(RES_2) $(EXTRADEP_2)
 	$(LD) $(LDFLAGS_2) $(OBJS_2),$(TARGET_2),,$(LIBS_2),,$(RES_2)
 
 $(TARGET_3):	$(DLL_3)
+
+boost:
+		cd $(BOOST_DIR)/libs/regex/lib/
+		$(MAKE) -f bc55.mak
+		cd ../../../../mayu

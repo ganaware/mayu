@@ -8,9 +8,6 @@
 #include <algorithm>
 
 
-using namespace std;
-
-
 // ////////////////////////////////////////////////////////////////////////////
 // KeySeq
 
@@ -48,7 +45,7 @@ void KeySeq::clear()
 }
 
 
-KeySeq::KeySeq(const istring &i_name)
+KeySeq::KeySeq(const tstringi &i_name)
   : m_name(i_name)
 {
 }
@@ -102,8 +99,7 @@ KeySeq &KeySeq::add(const ActionFunction &i_af)
 
 
 // stream output
-std::ostream &
-operator<<(std::ostream &i_ost, const KeySeq &i_ks)
+tostream &operator<<(tostream &i_ost, const KeySeq &i_ks)
 {
   for (KeySeq::Actions::const_iterator
 	 i = i_ks.m_actions.begin(); i != i_ks.m_actions.end(); ++ i)
@@ -114,7 +110,7 @@ operator<<(std::ostream &i_ost, const KeySeq &i_ks)
 	i_ost << reinterpret_cast<const ActionKey *>(*i)->m_modifiedKey;
 	break;
       case Action::Type_keySeq:
-	i_ost << "$"
+	i_ost << _T("$")
 	      << reinterpret_cast<const ActionKeySeq *>(*i)->m_keySeq->m_name;
 	break;
       case Action::Type_function:
@@ -124,20 +120,20 @@ operator<<(std::ostream &i_ost, const KeySeq &i_ks)
 	i_ost << af->m_modifier << *af->m_function;
 	if (af->m_args.size())
 	{
-	  i_ost << "(";
+	  i_ost << _T("(");
 	  for (ActionFunction::Args::const_iterator
 		 i = af->m_args.begin(); i != af->m_args.end(); ++ i)
 	  {
 	    if (i != af->m_args.begin())
-	      i_ost << ", ";
+	      i_ost << _T(", ");
 	    i_ost << *i;
 	  }
-	  i_ost << ")";
+	  i_ost << _T(")");
 	}
 	break;
       }
     }
-    i_ost << " ";
+    i_ost << _T(" ");
   }
   return i_ost;
 }
@@ -156,23 +152,30 @@ Keymap::KeyAssignments &Keymap::getKeyAssignments(const ModifiedKey &i_mk)
   
 
 Keymap::Keymap(Type i_type,
-	       const istring &i_name,
-	       const istring &i_windowClass,
-	       const istring &i_windowTitle,
+	       const tstringi &i_name,
+	       const tstringi &i_windowClass,
+	       const tstringi &i_windowTitle,
 	       KeySeq *i_defaultKeySeq,
 	       Keymap *i_parentKeymap)
   : m_type(i_type),
     m_name(i_name),
     m_defaultKeySeq(i_defaultKeySeq),
-    m_parentKeymap(i_parentKeymap)
+    m_parentKeymap(i_parentKeymap),
+    m_windowClass(_T(".*")),
+    m_windowTitle(_T(".*"))
 {
   if (i_type == Type_windowAnd || i_type == Type_windowOr)
     try
     {
-      m_windowClass.compile(i_windowClass, true);
-      m_windowTitle.compile(i_windowTitle, true);
+      boost::regbase::flag_type f = (boost::regbase::normal | 
+				     boost::regbase::icase |
+				     boost::regbase::use_except);
+      if (!i_windowClass.empty())
+	m_windowClass.assign(i_windowClass, f);
+      if (!i_windowTitle.empty())
+	m_windowTitle.assign(i_windowTitle, f);
     }
-    catch (Regexp::InvalidRegexp &i_e)
+    catch (boost::bad_expression &i_e)
     {
       throw ErrorMessage() << i_e.what();
     }
@@ -224,49 +227,35 @@ Keymap::searchAssignment(const ModifiedKey &i_mk)
 {
   KeyAssignments &ka = getKeyAssignments(i_mk);
   for (KeyAssignments::iterator i = ka.begin(); i != ka.end(); ++ i)
-  {
-    try
-    {
-      if ((*i).m_modifiedKey.m_key == i_mk.m_key &&
-	  (*i).m_modifiedKey.m_modifier.doesMatch(i_mk.m_modifier))
-	return &(*i);
-    }
-    catch (Regexp::InvalidRegexp &i_e)
-    {
-      printf("error1: %s\n", i_e.what());
-    }
-  }
+    if ((*i).m_modifiedKey.m_key == i_mk.m_key &&
+	(*i).m_modifiedKey.m_modifier.doesMatch(i_mk.m_modifier))
+      return &(*i);
   return NULL;
 }
 
 
 // does same window
-bool Keymap::doesSameWindow(const istring i_className,
-			    const istring &i_titleName)
+bool Keymap::doesSameWindow(const tstringi i_className,
+			    const tstringi &i_titleName)
 {
   if (m_type == Type_keymap)
     return false;
-  try
+
+  if (boost::regex_search(i_className, tcmatch_results(), m_windowClass))
   {
-    if (m_windowClass.doesMatch(i_className))
-    {
-      if (m_type == Type_windowAnd)
-	return m_windowTitle.doesMatch(i_titleName);
-      else // type == TypeWindowOr
-	return true;
-    }
-    else
-    {
-      if (m_type == Type_windowAnd)
-	return false;
-      else // type == TypeWindowOr
-	return m_windowTitle.doesMatch(i_titleName);
-    }
+    if (m_type == Type_windowAnd)
+      return boost::regex_search(i_titleName,
+				 tcmatch_results(), m_windowTitle);
+    else // type == Type_windowOr
+      return true;
   }
-  catch (Regexp::InvalidRegexp &i_e)
+  else
   {
-    printf("error2: %s\n", i_e.what());
-    return false;
+    if (m_type == Type_windowAnd)
+      return false;
+    else // type == Type_windowOr
+      return boost::regex_search(i_titleName, tcmatch_results(),
+				 m_windowTitle);
   }
 }
 
@@ -359,18 +348,18 @@ void Keymap::adjustModifier(Keyboard &i_keyboard)
 }
 
 /// describe
-void Keymap::describe(std::ostream &i_ost, DescribedKeys *o_dk) const
+void Keymap::describe(tostream &i_ost, DescribedKeys *o_dk) const
 {
   switch (m_type)
   {
-    case Type_keymap: i_ost << "keymap "; break;
-    case Type_windowAnd: i_ost << "window "; break;
-    case Type_windowOr: i_ost << "window "; break;
+    case Type_keymap: i_ost << _T("keymap "); break;
+    case Type_windowAnd: i_ost << _T("window "); break;
+    case Type_windowOr: i_ost << _T("window "); break;
   }
-  i_ost << m_name << " /.../";
+  i_ost << m_name << _T(" /.../");
   if (m_parentKeymap)
-    i_ost << " : " << m_parentKeymap->m_name;
-  i_ost << " => " << *m_defaultKeySeq << endl;
+    i_ost << _T(" : ") << m_parentKeymap->m_name;
+  i_ost << _T(" => ") << *m_defaultKeySeq << std::endl;
 
   typedef std::vector<KeyAssignment> SortedKeyAssignments;
   SortedKeyAssignments ska;
@@ -386,15 +375,16 @@ void Keymap::describe(std::ostream &i_ost, DescribedKeys *o_dk) const
     if (o_dk)
     {
       DescribedKeys::iterator
-	j = find(o_dk->begin(), o_dk->end(), i->m_modifiedKey);
+	j = std::find(o_dk->begin(), o_dk->end(), i->m_modifiedKey);
       if (j != o_dk->end())
 	continue;
     }
-    i_ost << " key " << i->m_modifiedKey << "\t=> " << *i->m_keySeq << endl;
+    i_ost << _T(" key ") << i->m_modifiedKey << _T("\t=> ")
+	  << *i->m_keySeq << std::endl;
     if (o_dk)
       o_dk->push_back(i->m_modifiedKey);
   }
-  i_ost << endl;
+  i_ost << std::endl;
 
   if (m_parentKeymap)
     m_parentKeymap->describe(i_ost, o_dk);
@@ -412,7 +402,7 @@ Keymaps::Keymaps()
 
 
 // search by name
-Keymap *Keymaps::searchByName(const istring &i_name)
+Keymap *Keymaps::searchByName(const tstringi &i_name)
 {
   for (KeymapList::iterator
 	 i = m_keymapList.begin(); i != m_keymapList.end(); ++ i)
@@ -424,8 +414,8 @@ Keymap *Keymaps::searchByName(const istring &i_name)
 
 // search window
 void Keymaps::searchWindow(KeymapPtrList *o_keymapPtrList,
-			   const istring &i_className,
-			   const istring &i_titleName)
+			   const tstringi &i_className,
+			   const tstringi &i_titleName)
 {
   o_keymapPtrList->clear();
   for (KeymapList::iterator
@@ -475,7 +465,7 @@ KeySeq *KeySeqs::add(const KeySeq &i_keySeq)
 
 
 // search by name
-KeySeq *KeySeqs::searchByName(const istring &i_name)
+KeySeq *KeySeqs::searchByName(const tstringi &i_name)
 {
   for (KeySeqList::iterator
 	 i = m_keySeqList.begin(); i != m_keySeqList.end(); ++ i)

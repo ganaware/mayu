@@ -11,12 +11,9 @@
 #include "windowstool.h"
 #include "setting.h"
 #include "dlgeditsetting.h"
-#include "regexp.h"
 
 #include <commctrl.h>
-
-
-using namespace std;
+#include <windowsx.h>
 
 
 class LayoutManager
@@ -133,35 +130,35 @@ class DlgSetting
     item.iItem = i_index;
     
     item.iSubItem = 0;
-    item.pszText = const_cast<char *>(i_data.m_name.c_str());
+    item.pszText = const_cast<_TCHAR *>(i_data.m_name.c_str());
     CHECK_TRUE( ListView_InsertItem(m_hwndMayuPaths, &item) != -1 );
 
     ListView_SetItemText(m_hwndMayuPaths, i_index, 1,
-			 const_cast<char *>(i_data.m_filename.c_str()));
+			 const_cast<_TCHAR *>(i_data.m_filename.c_str()));
     ListView_SetItemText(m_hwndMayuPaths, i_index, 2,
-			 const_cast<char *>(i_data.m_symbols.c_str()));
+			 const_cast<_TCHAR *>(i_data.m_symbols.c_str()));
   }
   
   ///
   void setItem(int i_index, const Data &i_data)
   {
     ListView_SetItemText(m_hwndMayuPaths, i_index, 0,
-			 const_cast<char *>(i_data.m_name.c_str()));
+			 const_cast<_TCHAR *>(i_data.m_name.c_str()));
     ListView_SetItemText(m_hwndMayuPaths, i_index, 1,
-			 const_cast<char *>(i_data.m_filename.c_str()));
+			 const_cast<_TCHAR *>(i_data.m_filename.c_str()));
     ListView_SetItemText(m_hwndMayuPaths, i_index, 2,
-			 const_cast<char *>(i_data.m_symbols.c_str()));
+			 const_cast<_TCHAR *>(i_data.m_symbols.c_str()));
   }
 
   ///
   void getItem(int i_index, Data *o_data)
   {
-    char buf[GANA_MAX_PATH];
+    _TCHAR buf[GANA_MAX_PATH];
     LVITEM item;
     item.mask = LVIF_TEXT;
     item.iItem = i_index;
     item.pszText = buf;
-    item.cchTextMax = sizeof(buf);
+    item.cchTextMax = NUMBER_OF(buf);
     
     item.iSubItem = 0;
     CHECK_TRUE( ListView_GetItem(m_hwndMayuPaths, &item) );
@@ -221,34 +218,36 @@ public:
     lvc.fmt = LVCFMT_LEFT; 
     lvc.cx = (rc.right - rc.left) / 3;
 
-    istring str = loadString(IDS_mayuPathName);
-    lvc.pszText = const_cast<char *>(str.c_str());
+    tstringi str = loadString(IDS_mayuPathName);
+    lvc.pszText = const_cast<_TCHAR *>(str.c_str());
     CHECK( 0 ==, ListView_InsertColumn(m_hwndMayuPaths, 0, &lvc) );
     str = loadString(IDS_mayuPath);
-    lvc.pszText = const_cast<char *>(str.c_str());
+    lvc.pszText = const_cast<_TCHAR *>(str.c_str());
     CHECK( 1 ==, ListView_InsertColumn(m_hwndMayuPaths, 1, &lvc) );
     str = loadString(IDS_mayuSymbols);
-    lvc.pszText = const_cast<char *>(str.c_str());
+    lvc.pszText = const_cast<_TCHAR *>(str.c_str());
     CHECK( 2 ==, ListView_InsertColumn(m_hwndMayuPaths, 2, &lvc) );
 
     Data data;
     insertItem(0, data);				// TODO: why ?
     
     // set list view
-    Regexp split("^([^;]*);([^;]*);(.*)$");
-    StringTool::istring dot_mayu;
+    tregex split(_T("^([^;]*);([^;]*);(.*)$"));
+    tstringi dot_mayu;
     int i;
     for (i = 0; i < MAX_MAYU_PATHS; ++ i)
     {
-      char buf[100];
-      snprintf(buf, sizeof(buf), ".mayu%d", i);
+      _TCHAR buf[100];
+      _sntprintf(buf, NUMBER_OF(buf), _T(".mayu%d"), i);
       if (!m_reg.read(buf, &dot_mayu))
 	break;
-      if (split.doesMatch(dot_mayu))
+
+      tcmatch_results what;
+      if (boost::regex_match(dot_mayu, what, split))
       {
-	data.m_name = split[1];
-	data.m_filename = split[2];
-	data.m_symbols = split[3];
+	data.m_name = what.str(1);
+	data.m_filename = what.str(2);
+	data.m_symbols = what.str(3);
 	insertItem(i, data);
       }
     }
@@ -264,7 +263,7 @@ public:
 
     // set selection
     int index;
-    m_reg.read(".mayuIndex", &index, 0);
+    m_reg.read(_T(".mayuIndex"), &index, 0);
     setSelectedItem(index);
 
     // set layout manager
@@ -332,11 +331,24 @@ public:
     EndDialog(m_hwnd, 0);
     return TRUE;
   }
+
+  /// WM_NOTIFY
+  BOOL wmNotify(int i_id, NMHDR *i_nmh)
+  {
+    switch (i_id)
+    {
+      case IDC_LIST_mayuPaths:
+	if (i_nmh->code == NM_DBLCLK)
+	  FORWARD_WM_COMMAND(m_hwnd, IDC_BUTTON_edit, NULL, 0, SendMessage);
+	return TRUE;
+    }
+    return TRUE;
+  }
   
   /// WM_COMMAND
   BOOL wmCommand(int /* i_notifyCode */, int i_id, HWND /* i_hwndControl */)
   {
-    char buf[GANA_MAX_PATH];
+    _TCHAR buf[GANA_MAX_PATH];
     switch (i_id)
     {
       case IDC_BUTTON_up:
@@ -418,22 +430,22 @@ public:
 	int index;
 	for (index = 0; index < count; ++ index)
 	{
-	  snprintf(buf, sizeof(buf), ".mayu%d", index);
+	  _sntprintf(buf, NUMBER_OF(buf), _T(".mayu%d"), index);
 	  Data data;
 	  getItem(index, &data);
-	  m_reg.write(buf, data.m_name + ";" +
-		      data.m_filename + ";" + data.m_symbols);
+	  m_reg.write(buf, data.m_name + _T(";") +
+		      data.m_filename + _T(";") + data.m_symbols);
 	}
 	for (; ; ++ index)
 	{
-	  snprintf(buf, sizeof(buf), ".mayu%d", index);
+	  _sntprintf(buf, NUMBER_OF(buf), _T(".mayu%d"), index);
 	  if (!m_reg.remove(buf))
 	    break;
 	}
 	index = getSelectedItem();
 	if (index < 0)
 	  index = 0;
-	m_reg.write(".mayuIndex", index);
+	m_reg.write(_T(".mayuIndex"), index);
 	EndDialog(m_hwnd, 1);
 	return TRUE;
       }
@@ -474,6 +486,9 @@ BOOL CALLBACK dlgSetting_dlgProc(
       case WM_NCDESTROY:
 	delete wc;
 	return TRUE;
+      case WM_NOTIFY:
+	return wc->wmNotify(static_cast<int>(i_wParam),
+			    reinterpret_cast<NMHDR *>(i_lParam));
     }
   return FALSE;
 }

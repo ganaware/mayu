@@ -23,16 +23,17 @@ DEBUG_FLAG	=
 !endif
 
 .cpp.obj:
-	$(cc) -GX $(cdebug) $(cflags) $(cvarsmt) $(DEFINES) $(DEBUG_FLAG) \
-		-Fo$@ $*.cpp
+	$(cc) -GX $(cdebug) $(cflags) $(cvarsmt) $(DEFINES) $(INCLUDES) \
+		$(DEBUG_FLAG) -Fo$@ $*.cpp
 .rc.res:
 	$(rc) $(rcflags) $(rcvars) $*.rc
 
 conxlibsmt	= $(conlibsmt) libcpmt.lib
 guixlibsmt	= $(guilibsmt) libcpmt.lib
 
-DEPENDFLAGS	= --cpp=vc --ignore="$(INCLUDE)" \
-		-GX $(cdebug) $(cflags) $(cvarsmt) $(DEFINES) $(DEBUG_FLAG)
+DEPENDFLAGS	= --cpp=vc --ignore="$(INCLUDE)" $(DEPENDIGNORE) \
+		-GX $(cdebug) $(cflags) $(cvarsmt) $(DEFINES) $(INCLUDES) \
+		$(DEBUG_FLAG)
 
 
 # tools		###############################################################

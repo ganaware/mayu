@@ -7,6 +7,7 @@
 
 #  include <windows.h>
 
+
 ///
 extern ATOM Register_focus();
 

@@ -5,9 +5,7 @@
 #ifndef _DLGINVESTIGATE_H
 #  define _DLGINVESTIGATE_H
 
-#  ifndef _STRINGTOOL_H
-#    include "stringtool.h"
-#  endif // _STRINGTOOL_H
+#  include <windows.h>
 
 
 /// dialog procedure of "Investigate" dialog box

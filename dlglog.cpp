@@ -21,7 +21,7 @@ class DlgLog
   LOGFONT m_lf;					///
   HFONT m_hfontOriginal;			///
   HFONT m_hfont;				///
-  omsgstream *m_log;				///
+  tomsgstream *m_log;				///
   
 public:
   ///
@@ -36,14 +36,14 @@ public:
   /// WM_INITDIALOG
   BOOL wmInitDialog(HWND /* i_focus */, LPARAM i_lParam)
   {
-    m_log = reinterpret_cast<omsgstream *>(i_lParam);
+    m_log = reinterpret_cast<tomsgstream *>(i_lParam);
     
     // set icons
     setSmallIcon(m_hwnd, IDI_ICON_mayu);
     setBigIcon(m_hwnd, IDI_ICON_mayu);
     
     // set font
-    Registry::read(MAYU_REGISTRY_ROOT, "logFont", &m_lf,
+    Registry::read(MAYU_REGISTRY_ROOT, _T("logFont"), &m_lf,
 		   loadString(IDS_logFont));
     m_hfont = CreateFontIndirect(&m_lf);
     SetWindowFont(m_hwndEdit, m_hfont, false);
@@ -122,7 +122,7 @@ public:
       case IDC_BUTTON_clearLog:
       {
 	Edit_SetSel(m_hwndEdit, 0, Edit_GetTextLength(m_hwndEdit));
-	Edit_ReplaceSel(m_hwndEdit, "");
+	Edit_ReplaceSel(m_hwndEdit, _T(""));
 	return TRUE;
       }
       
@@ -140,7 +140,7 @@ public:
 	  SetWindowFont(m_hwnd, hfontNew, true);
 	  DeleteObject(m_hfont);
 	  m_hfont = hfontNew;
-	  Registry::write(MAYU_REGISTRY_ROOT, "logFont", m_lf);
+	  Registry::write(MAYU_REGISTRY_ROOT, _T("logFont"), m_lf);
 	}
 	return TRUE;
       }

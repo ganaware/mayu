@@ -226,6 +226,6 @@ ATOM Register_target()
   wc.hCursor       = LoadCursor(NULL, IDC_ARROW);
   wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
   wc.lpszMenuName  = NULL;
-  wc.lpszClassName = "mayuTarget";
+  wc.lpszClassName = _T("mayuTarget");
   return RegisterClass(&wc);
 }

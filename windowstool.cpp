@@ -23,13 +23,13 @@ HINSTANCE g_hInst = NULL;
 
 
 // load resource string
-std::string loadString(UINT i_id)
+tstring loadString(UINT i_id)
 {
-  char buf[1024];
-  if (LoadString(g_hInst, i_id, buf, sizeof(buf)))
-    return std::string(buf);
+  _TCHAR buf[1024];
+  if (LoadString(g_hInst, i_id, buf, NUMBER_OF(buf)))
+    return tstring(buf);
   else
-    return "";
+    return _T("");
 }
 
 
@@ -172,7 +172,7 @@ void asyncResize(HWND i_hwnd, int i_w, int i_h)
 
 
 /// get dll version
-DWORD getDllVersion(const char *i_dllname)
+DWORD getDllVersion(const _TCHAR *i_dllname)
 {
   DWORD dwVersion = 0;
   
@@ -222,12 +222,12 @@ void editDeleteLine(HWND i_hwnd, size_t i_n)
   len += 2;
   int index = Edit_LineIndex(i_hwnd, i_n);
   Edit_SetSel(i_hwnd, index, index + len);
-  Edit_ReplaceSel(i_hwnd, "");
+  Edit_ReplaceSel(i_hwnd, _T(""));
 }
   
 
 // insert text at last
-void editInsertTextAtLast(HWND i_hwnd, const std::string &i_text,
+void editInsertTextAtLast(HWND i_hwnd, const tstring &i_text,
 			  size_t i_threshold)
 {
   if (i_text.empty())
@@ -238,7 +238,7 @@ void editInsertTextAtLast(HWND i_hwnd, const std::string &i_text,
   if (i_threshold < len)
   {
     Edit_SetSel(i_hwnd, 0, len / 3 * 2);
-    Edit_ReplaceSel(i_hwnd, "");
+    Edit_ReplaceSel(i_hwnd, _T(""));
     editDeleteLine(i_hwnd, 0);
     len = editGetTextBytes(i_hwnd);
   }
@@ -246,16 +246,16 @@ void editInsertTextAtLast(HWND i_hwnd, const std::string &i_text,
   Edit_SetSel(i_hwnd, len, len);
   
   // \n -> \r\n
-  char *buf = (char *)_alloca(i_text.size() * 2 + 1);
-  char *d = buf;
-  const char *str = i_text.c_str();
-  for (const char *s = str; s < str + i_text.size(); ++ s)
+  std::auto_ptr<_TCHAR> buf(new _TCHAR[i_text.size() * 2 + 1]);
+  _TCHAR *d = buf.get();
+  const _TCHAR *str = i_text.c_str();
+  for (const _TCHAR *s = str; s < str + i_text.size(); ++ s)
   {
-    if (*s == '\n')
-      *d++ = '\r';
+    if (*s == _T('\n'))
+      *d++ = _T('\r');
     *d++ = *s;
   }
-  *d = '\0';
+  *d = _T('\0');
   
-  Edit_ReplaceSel(i_hwnd, buf);
+  Edit_ReplaceSel(i_hwnd, buf.get());
 }

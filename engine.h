@@ -8,11 +8,15 @@
 #  include "multithread.h"
 #  include "setting.h"
 #  include "msgstream.h"
-
 #  include <set>
 
-///
-#  define WM_APP_engineNotify (WM_APP + 110)
+
+enum
+{
+  ///
+  WM_APP_engineNotify = WM_APP + 110,
+};
+
 ///
 enum EngineNotify
 {
@@ -27,7 +31,8 @@ enum EngineNotify
 class Engine
 {
 private:
-  enum {
+  enum
+  {
     MAX_GENERATE_KEYBOARD_EVENTS_RECURSION_COUNT = 64,		///
   };
 
@@ -40,8 +45,8 @@ private:
     DWORD m_threadId;				/// thread id
     HWND m_hwndFocus;				/** window that has focus on
                                                     the thread */
-    istring m_className;			/// class name of hwndFocus
-    istring m_titleName;			/// title name of hwndFocus
+    tstringi m_className;			/// class name of hwndFocus
+    tstringi m_titleName;			/// title name of hwndFocus
     bool m_isConsole;				/// is hwndFocus console ?
     KeymapPtrList m_keymaps;			/// keymaps
 
@@ -166,11 +171,11 @@ public:
   WindowPositions m_windowPositions;		///
   WindowsWithAlpha m_windowsWithAlpha;		///
   
-  std::string m_helpMessage;			/// for &amp;HelpMessage
-  std::string m_helpTitle;			/// for &amp;HelpMessage
+  tstring m_helpMessage;			/// for &amp;HelpMessage
+  tstring m_helpTitle;				/// for &amp;HelpMessage
   int m_variable;				/// for &amp;Variable,
 						///  &amp;Repeat
-  omsgstream &m_log;				/** log stream (output to log
+  tomsgstream &m_log;				/** log stream (output to log
                                                     dialog's edit) */
   
 private:
@@ -220,7 +225,7 @@ private:
   
 public:
   ///
-  Engine(omsgstream &i_log);
+  Engine(tomsgstream &i_log);
   ///
   ~Engine();
 
@@ -251,14 +256,13 @@ public:
   bool setSetting(Setting *i_setting);
 
   /// focus
-  bool setFocus(HWND i_hwndFocus, DWORD i_threadId, const char *i_className,
-		const char *i_titleName, bool i_isConsole);
+  bool setFocus(HWND i_hwndFocus, DWORD i_threadId,
+		const tstringi &i_className,
+		const tstringi &i_titleName, bool i_isConsole);
 
   /// lock state
-  bool setLockState(bool i_isNumLockToggled,
-		    bool i_isCapsLockToggled,
-		    bool i_isScrollLockToggled,
-		    bool i_isImeLockToggled,
+  bool setLockState(bool i_isNumLockToggled, bool i_isCapsLockToggled,
+		    bool i_isScrollLockToggled, bool i_isImeLockToggled,
 		    bool i_isImeCompToggled);
 
   /// sync
@@ -271,7 +275,7 @@ public:
   void shellExecute();
 
   /// get help message
-  void getHelpMessages(std::string *o_helpMessage, std::string *o_helpTitle);
+  void getHelpMessages(tstring *o_helpMessage, tstring *o_helpTitle);
 
   /// command notify
   void commandNotify(HWND i_hwnd, UINT i_message, WPARAM i_wParam,

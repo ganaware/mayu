@@ -14,9 +14,6 @@
 #  include <map>
 
 
-using StringTool::istring;
-
-
 /// a scan code with flags
 class ScanCode
 {
@@ -63,7 +60,7 @@ public:
 
 private:
   ///
-  typedef std::vector<istring> Names;
+  typedef std::vector<tstringi> Names;
 
 public:
   /// if this key pressed physically
@@ -91,7 +88,7 @@ public:
   { }
 
   /// for Event::* only
-  Key(const istring &i_name)
+  Key(const tstringi &i_name)
     : m_isPressed(false),
       m_isPressedOnWin32(false),
       m_isPressedByAssign(false),
@@ -102,7 +99,7 @@ public:
   }
 
   /// get key name (first name)
-  const istring &getName() const { return m_names.at(0); }
+  const tstringi &getName() const { return m_names.front(); }
 
   /// get scan codes
   const ScanCode *getScanCodes() const { return m_scanCodes; }
@@ -110,7 +107,7 @@ public:
   size_t getScanCodesSize() const { return m_scanCodesSize; }
   
   /// add a name of key
-  void addName(const istring &i_name);
+  void addName(const tstringi &i_name);
   
   /// add a scan code
   void addScanCode(const ScanCode &i_sc);
@@ -119,9 +116,10 @@ public:
   Key &initialize();
   
   /// equation by name
-  bool operator==(const istring &i_name) const;
+  bool operator==(const tstringi &i_name) const;
   ///
-  bool operator!=(const istring &i_name) const { return !(*this == i_name); }
+  bool operator!=(const tstringi &i_name) const
+  { return !(*this == i_name); }
   
   /// is the scan code of this key ?
   bool isSameScanCode(const Key &i_key) const;
@@ -130,8 +128,7 @@ public:
   bool isPrefixScanCode(const Key &i_key) const;
   
   /// stream output
-  friend std::ostream &
-  operator<<(std::ostream &i_ost, const Key &i_key);
+  friend tostream &operator<<(tostream &i_ost, const Key &i_key);
   
   /// < 
   bool operator<(const Key &i_key) const
@@ -249,13 +246,14 @@ public:
   { return !!(m_dontcares & ((MODIFIERS(1)) << i_type)); }
 
   /// stream output
-  friend std::ostream &
-  operator<<(std::ostream &i_ost, const Modifier &i_m);
+  friend tostream &operator<<(tostream &i_ost, const Modifier &i_m);
   
   /// < 
   bool operator<(const Modifier &i_m) const
-  { return m_modifiers < i_m.m_modifiers ||
-      (m_modifiers == i_m.m_modifiers && m_dontcares < i_m.m_dontcares ); }
+  {
+    return m_modifiers < i_m.m_modifiers ||
+      (m_modifiers == i_m.m_modifiers && m_dontcares < i_m.m_dontcares );
+  }
 };
 
 
@@ -279,13 +277,14 @@ public:
   { return m_modifier == i_mk.m_modifier && m_key == i_mk.m_key; }
 
   /// stream output
-  friend std::ostream &
-  operator<<(std::ostream &i_ost, const ModifiedKey &i_mk);
+  friend tostream &operator<<(tostream &i_ost, const ModifiedKey &i_mk);
 
   /// < 
   bool operator<(const ModifiedKey &i_mk) const
-  { return *m_key < *i_mk.m_key ||
-      (!(*i_mk.m_key < *m_key) && m_modifier < i_mk.m_modifier); }
+  {
+    return *m_key < *i_mk.m_key ||
+      (!(*i_mk.m_key < *m_key) && m_modifier < i_mk.m_modifier);
+  }
 };
 
 
@@ -305,7 +304,7 @@ private:
     HASHED_KEYS_SIZE = 128,			///
   };
   typedef std::list<Key> Keys;			///
-  typedef std::map<istring, Key *> Aliases;	/// key name aliases
+  typedef std::map<tstringi, Key *> Aliases; /// key name aliases
 
 private:
   Keys m_hashedKeys[HASHED_KEYS_SIZE];		///
@@ -348,7 +347,7 @@ public:
   void addKey(const Key &i_key);
 
   /// add a key name alias
-  void addAlias(const istring &i_aliasName, Key *i_key);
+  void addAlias(const tstringi &i_aliasName, Key *i_key);
   
   /// get a sync key
   Key *getSyncKey() { return &m_syncKey; }
@@ -363,10 +362,10 @@ public:
   Key *searchPrefixKey(const Key &i_key);
   
   /// search a key by name
-  Key *searchKey(const istring &i_name);
+  Key *searchKey(const tstringi &i_name);
 
   /// search a key by non-alias name
-  Key *searchKeyByNonAliasName(const istring &i_name);
+  Key *searchKeyByNonAliasName(const tstringi &i_name);
 
   /// get modifiers
   Mods &getModifiers(Modifier::Type i_mt) { return m_mods[i_mt]; }

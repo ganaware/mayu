@@ -17,9 +17,6 @@
 #include <iomanip>
 
 
-using namespace std;
-
-
 ///
 class DlgInvestigate
 {
@@ -87,23 +84,24 @@ public:
   /// WM_targetNotify
   BOOL wmTargetNotify(HWND i_hwndTarget)
   {
-    char className[GANA_MAX_ATOM_LENGTH];
+    _TCHAR className[GANA_MAX_ATOM_LENGTH];
     bool ok = false;
-    if (GetClassName(i_hwndTarget, className, sizeof(className)))
+    if (GetClassName(i_hwndTarget, className, NUMBER_OF(className)))
     {
-      if (StringTool::mbsiequal_(className, "ConsoleWindowClass"))
+      if (_tcsicmp(className, _T("ConsoleWindowClass")) == 0)
       {
-	char titleName[1024];
-	if (GetWindowText(i_hwndTarget, titleName, sizeof(titleName)) == 0)
-	  titleName[0] = '\0';
+	_TCHAR titleName[1024];
+	if (GetWindowText(i_hwndTarget, titleName, NUMBER_OF(titleName)) == 0)
+	  titleName[0] = _T('\0');
 	{
 	  Acquire a(&m_data.m_engine->m_log, 1);
-	  m_data.m_engine->m_log << "HWND:\t" << hex
-			       << (int)i_hwndTarget << dec << endl;
+	  m_data.m_engine->m_log << _T("HWND:\t") << std::hex
+				 << reinterpret_cast<int>(i_hwndTarget)
+				 << std::dec << std::endl;
 	}
 	Acquire a(&m_data.m_engine->m_log, 0);
-	m_data.m_engine->m_log << "CLASS:\t" << className << endl;
-	m_data.m_engine->m_log << "TITLE:\t" << titleName << endl;
+	m_data.m_engine->m_log << _T("CLASS:\t") << className << std::endl;
+	m_data.m_engine->m_log << _T("TITLE:\t") << titleName << std::endl;
 	ok = true;
       }
     }
@@ -118,23 +116,24 @@ public:
 		    bool /* i_isAltDown */, bool i_isKeyup)
   {
     Acquire a(&m_data.m_engine->m_log, 0);
-    m_data.m_engine->m_log << (i_isExtended ? " E-" : "   ")
-		<< "0x" << hex << setw(2) << setfill('0') << i_nVirtKey << dec
-		<< "  &VK( "
-		<< (i_isExtended ? "E-" : "  ")
-		<< (i_isKeyup ? "U-" : "D-");
+    m_data.m_engine->m_log
+      << (i_isExtended ? _T(" E-") : _T("   "))
+      << _T("0x") << std::hex << std::setw(2) << std::setfill(_T('0'))
+      << i_nVirtKey << std::dec << _T("  &VK( ")
+      << (i_isExtended ? _T("E-") : _T("  "))
+      << (i_isKeyup ? _T("U-") : _T("D-"));
     
     for (const VKeyTable *vkt = g_vkeyTable; vkt->m_name; ++ vkt)
     {
       if (vkt->m_code == i_nVirtKey)
       {
-	m_data.m_engine->m_log << vkt->m_name << " )" << endl;
+	m_data.m_engine->m_log << vkt->m_name << _T(" )") << std::endl;
 	return TRUE;
       }
     }
-    m_data.m_engine->m_log << "0x" << hex << setw(2)
-			 << setfill('0') << i_nVirtKey << dec
-			 << " )" << endl;
+    m_data.m_engine->m_log << _T("0x") << std::hex << std::setw(2)
+			   << std::setfill(_T('0')) << i_nVirtKey << std::dec
+			   << _T(" )") << std::endl;
     return TRUE;
   }
 

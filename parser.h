@@ -10,9 +10,6 @@
 #  include <vector>
 
 
-using StringTool::istring;
-
-
 ///
 class Token
 {
@@ -31,16 +28,17 @@ private:
   u_char m_type;				///
   bool m_isValueQuoted;				///
   int m_numericValue;				///
-  istring m_stringValue;			///
+  tstringi m_stringValue;			///
   long m_data;					///
   
 public:
   ///
   Token(const Token &i_token);
   ///
-  Token(int i_value, const istring &i_display);
+  Token(int i_value, const tstringi &i_display);
   ///
-  Token(const istring &i_value, bool i_isValueQuoted, bool i_isRegexp = false);
+  Token(const tstringi &i_value, bool i_isValueQuoted,
+	bool i_isRegexp = false);
   ///
   Token(Type i_type);
   
@@ -64,10 +62,10 @@ public:
   int getNumber() const;
   
   /// get string value
-  istring getString() const;
+  tstringi getString() const;
   
   /// get regexp value
-  istring getRegexp() const;
+  tstringi getRegexp() const;
 
   /// get data
   long getData() const { return m_data; }
@@ -75,22 +73,23 @@ public:
   void setData(long i_data) { m_data = i_data; }
   
   /// case insensitive equal
-  bool operator==(const istring &i_str) const
+  bool operator==(const tstringi &i_str) const
   { return *this == i_str.c_str(); }
   ///
-  bool operator==(const char *i_str) const;
+  bool operator==(const _TCHAR *i_str) const;
   ///
-  bool operator!=(const istring &i_str) const{ return *this != i_str.c_str(); }
+  bool operator!=(const tstringi &i_str) const
+  { return *this != i_str.c_str(); }
   ///
-  bool operator!=(const char *i_str) const { return !(*this == i_str); }
+  bool operator!=(const _TCHAR *i_str) const { return !(*this == i_str); }
   
   /// paren equal c is '<code>(</code>' or '<code>)</code>'
-  bool operator==(const char i_c) const;
+  bool operator==(const _TCHAR i_c) const;
   ///
-  bool operator!=(const char i_c) const { return !(*this == i_c); }
+  bool operator!=(const _TCHAR i_c) const { return !(*this == i_c); }
 
   /// stream output
-  friend std::ostream &operator<<(std::ostream &i_ost, const Token &i_token);
+  friend tostream &operator<<(tostream &i_ost, const Token &i_token);
 };
 
 
@@ -101,7 +100,7 @@ public:
   typedef std::vector<Token> Tokens;
   
 private:
-  typedef std::vector<istring> Prefixes;
+  typedef std::vector<tstringi> Prefixes;
   
 private:
   size_t m_lineNumber;				/// current line number
@@ -109,15 +108,15 @@ private:
                                                     of a token */
   
   size_t m_internalLineNumber;			/// next line number
-  std::istream &m_ist;				/// input stream
+  tistream &m_ist;				/// input stream
 
 private:
   /// get a line
-  bool getLine(istring *o_line);
+  bool getLine(tstringi *o_line);
   
 public:
   ///
-  Parser(std::istream &i_ist);
+  Parser(tistream &i_ist);
 
   /** get a parsed line.  if no more lines exist, returns false */
   bool getLine(Tokens *o_tokens);

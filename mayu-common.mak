@@ -7,7 +7,8 @@
 
 VERSION		= 3.19
 
-COMMON_DEFINES	= -DSTRICT -D_WIN32_IE=0x0500
+COMMON_DEFINES	= -DSTRICT -D_WIN32_IE=0x0500 -DUNICODE -D_UNICODE
+BOOST_DIR	= ../boost
 
 
 # mayu.exe	###############################################################
@@ -25,9 +26,7 @@ OBJS_1		=			\
 		keyboard.obj		\
 		keymap.obj		\
 		mayu.obj		\
-		msgstream.obj		\
 		parser.obj		\
-		regexp.obj		\
 		registry.obj		\
 		setting.obj		\
 		stringtool.obj		\
@@ -47,9 +46,7 @@ SRCS_1		=			\
 		keyboard.cpp		\
 		keymap.cpp		\
 		mayu.cpp		\
-		msgstream.cpp		\
 		parser.cpp		\
-		regexp.cpp		\
 		registry.cpp		\
 		setting.cpp		\
 		stringtool.cpp		\
@@ -71,8 +68,8 @@ EXTRADEP_1	= mayu.lib
 # mayu.dll	###############################################################
 
 TARGET_2	= mayu.dll
-OBJS_2		= hook.obj
-SRCS_2		= hook.cpp
+OBJS_2		= hook.obj stringtool.obj
+SRCS_2		= hook.cpp stringtool.cpp
 LIBS_2		= $(guixlibsmt) imm32.lib
 
 
@@ -125,7 +122,6 @@ DISTRIBSRC	=			\
 		*.cpp			\
 		*.h			\
 		*.rc			\
-		regexp.html		\
 		doc++-header.html	\
 		doc++.conf		\
 					\
@@ -163,7 +159,7 @@ UNIX2DOS	= perl tools/unix2dos
 
 # rules		###############################################################
 
-all:		$(TARGET_1) $(TARGET_2) $(TARGET_3)
+all:		boost $(TARGET_1) $(TARGET_2) $(TARGET_3)
 
 clean:
 		-$(RM) *.obj
@@ -216,41 +212,38 @@ dlgeditsetting.obj: compiler_specific.h dlgeditsetting.h mayurc.h misc.h \
  stringtool.h windowstool.h
 dlginvestigate.obj: compiler_specific.h dlginvestigate.h driver.h engine.h \
  focus.h function.h hook.h keyboard.h keymap.h mayurc.h misc.h msgstream.h \
- multithread.h parser.h regexp.h regexp_internal.h setting.h stringtool.h \
- target.h vkeytable.h windowstool.h
+ multithread.h parser.h setting.h stringtool.h target.h vkeytable.h \
+ windowstool.h
 dlglog.obj: compiler_specific.h mayu.h mayurc.h misc.h msgstream.h \
- multithread.h registry.h windowstool.h
+ multithread.h registry.h stringtool.h windowstool.h
 dlgsetting.obj: compiler_specific.h dlgeditsetting.h driver.h function.h \
- keyboard.h keymap.h mayu.h mayurc.h misc.h multithread.h parser.h regexp.h \
- regexp_internal.h registry.h setting.h stringtool.h windowstool.h
-dlgversion.obj: compiler_specific.h mayu.h mayurc.h misc.h windowstool.h
+ keyboard.h keymap.h mayu.h mayurc.h misc.h multithread.h parser.h \
+ registry.h setting.h stringtool.h windowstool.h
+dlgversion.obj: compiler_specific.h mayu.h mayurc.h misc.h stringtool.h \
+ windowstool.h
 engine.obj: compiler_specific.h driver.h engine.h errormessage.h function.h \
  hook.h keyboard.h keymap.h mayurc.h misc.h msgstream.h multithread.h \
- parser.h regexp.h regexp_internal.h setting.h stringtool.h windowstool.h
-focus.obj: focus.h windowstool.h
+ parser.h setting.h stringtool.h windowstool.h
+focus.obj: compiler_specific.h focus.h misc.h stringtool.h windowstool.h
 function.obj: compiler_specific.h driver.h engine.h function.h hook.h \
- keyboard.h keymap.h misc.h msgstream.h multithread.h parser.h regexp.h \
- regexp_internal.h setting.h stringtool.h windowstool.h
+ keyboard.h keymap.h misc.h msgstream.h multithread.h parser.h setting.h \
+ stringtool.h windowstool.h
 keyboard.obj: compiler_specific.h driver.h keyboard.h misc.h stringtool.h
 keymap.obj: compiler_specific.h driver.h errormessage.h function.h \
- keyboard.h keymap.h misc.h parser.h regexp.h regexp_internal.h \
- stringtool.h
+ keyboard.h keymap.h misc.h parser.h stringtool.h
 mayu.obj: compiler_specific.h dlginvestigate.h dlglog.h dlgsetting.h \
  dlgversion.h driver.h engine.h errormessage.h focus.h function.h hook.h \
  keyboard.h keymap.h mayu.h mayurc.h misc.h msgstream.h multithread.h \
- parser.h regexp.h regexp_internal.h registry.h setting.h stringtool.h \
- target.h windowstool.h
-msgstream.obj: compiler_specific.h misc.h msgstream.h multithread.h
+ parser.h registry.h setting.h stringtool.h target.h windowstool.h
 parser.obj: compiler_specific.h errormessage.h misc.h parser.h stringtool.h
-regexp.obj: compiler_specific.h misc.h regexp.h regexp_internal.h \
- stringtool.h
 registry.obj: compiler_specific.h misc.h registry.h stringtool.h
 setting.obj: compiler_specific.h dlgsetting.h driver.h errormessage.h \
  function.h keyboard.h keymap.h mayu.h mayurc.h misc.h multithread.h \
- parser.h regexp.h regexp_internal.h registry.h setting.h stringtool.h \
- vkeytable.h windowstool.h
+ parser.h registry.h setting.h stringtool.h vkeytable.h windowstool.h
 stringtool.obj: compiler_specific.h misc.h stringtool.h
-target.obj: compiler_specific.h mayurc.h misc.h target.h windowstool.h
+target.obj: compiler_specific.h mayurc.h misc.h stringtool.h target.h \
+ windowstool.h
 vkeytable.obj: vkeytable.h
-windowstool.obj: compiler_specific.h misc.h windowstool.h
+windowstool.obj: compiler_specific.h misc.h stringtool.h windowstool.h
 hook.obj: compiler_specific.h hook.h misc.h stringtool.h
+stringtool.obj: compiler_specific.h misc.h stringtool.h

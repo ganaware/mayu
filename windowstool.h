@@ -6,7 +6,7 @@
 #  define _WINDOWSTOOL_H
 
 
-#  include <string>
+#  include "stringtool.h"
 #  include <windows.h>
 #  include <shlwapi.h>
 
@@ -19,7 +19,7 @@ extern HINSTANCE g_hInst;
 // resource
 
 /// load resource string
-extern std::string loadString(UINT i_id);
+extern tstring loadString(UINT i_id);
 
 /// load small/big icon resource (it must be deleted by DestroyIcon())
 extern HICON loadSmallIcon(UINT i_id);
@@ -62,7 +62,7 @@ extern void asyncMoveWindow(HWND i_hwnd, int i_x, int i_y, int i_w, int i_h);
 extern void asyncResize(HWND i_hwnd, int i_w, int i_h);
 
 /// get dll version
-extern DWORD getDllVersion(const char *i_dllname);
+extern DWORD getDllVersion(const _TCHAR *i_dllname);
 #define PACKVERSION(major,minor) MAKELONG(minor,major)
 
 // ////////////////////////////////////////////////////////////////////////////
@@ -104,7 +104,7 @@ extern size_t editGetTextBytes(HWND i_hwnd);
 /// delete a line
 extern void editDeleteLine(HWND i_hwnd, size_t i_n);
 /// insert text at last
-extern void editInsertTextAtLast(HWND i_hwnd, const std::string &i_text,
+extern void editInsertTextAtLast(HWND i_hwnd, const tstring &i_text,
 				 size_t i_threshold);
 
 

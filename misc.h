@@ -8,7 +8,7 @@
 #  include "compiler_specific.h"
 
 #  include <windows.h>
-#  include <assert.h>
+#  include <cassert>
 
 
 typedef unsigned char u_char;		/// unsigned char
@@ -21,6 +21,7 @@ typedef long int32;
 typedef unsigned char u_int8;
 typedef unsigned short u_int16;
 typedef unsigned long u_int32;
+
 
 #  ifdef NDEBUG
 #    define ASSERT(exp)		exp

@@ -11,9 +11,6 @@
 #include <windowsx.h>
 
 
-using namespace std;
-
-
 ///
 class DlgEditSetting
 {
@@ -47,10 +44,10 @@ public:
 		= GetDlgItem(m_hwnd, IDC_EDIT_mayuPathName) );
     CHECK_TRUE( m_hwndMayuPath = GetDlgItem(m_hwnd, IDC_EDIT_mayuPath) );
     CHECK_TRUE( m_hwndSymbols = GetDlgItem(m_hwnd, IDC_EDIT_symbols) );
-    
-    Edit_SetText(m_hwndMayuPathName, m_data->m_name.c_str());
-    Edit_SetText(m_hwndMayuPath, m_data->m_filename.c_str());
-    Edit_SetText(m_hwndSymbols, m_data->m_symbols.c_str());
+
+    SetWindowText(m_hwndMayuPathName, m_data->m_name.c_str());
+    SetWindowText(m_hwndMayuPath, m_data->m_filename.c_str());
+    SetWindowText(m_hwndSymbols, m_data->m_symbols.c_str());
     
     return TRUE;
   }
@@ -65,18 +62,18 @@ public:
   /// WM_COMMAND
   BOOL wmCommand(int /* i_notify_code */, int i_id, HWND /* i_hwnd_control */)
   {
-    char buf[GANA_MAX_PATH];
+    _TCHAR buf[GANA_MAX_PATH];
     switch (i_id)
     {
       case IDC_BUTTON_browse:
       {
-	string title = loadString(IDS_openMayu);
-	string filter = loadString(IDS_openMayuFilter);
+	tstring title = loadString(IDS_openMayu);
+	tstring filter = loadString(IDS_openMayuFilter);
 	for (size_t i = 0; i < filter.size(); ++ i)
-	  if (filter[i] == '|')
-	    filter[i] = '\0';
+	  if (filter[i] == _T('|'))
+	    filter[i] = _T('\0');
 
-	strcpy(buf, ".mayu");
+	_tcscpy(buf, _T(".mayu"));
 	OPENFILENAME of;
 	memset(&of, 0, sizeof(of));
 	of.lStructSize = sizeof(of);
@@ -89,17 +86,17 @@ public:
 	of.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST |
 	  OFN_HIDEREADONLY | OFN_PATHMUSTEXIST;
 	if (GetOpenFileName(&of))
-	  Edit_SetText(m_hwndMayuPath, buf);
+	  SetWindowText(m_hwndMayuPath, buf);
 	return TRUE;
       }
       
       case IDOK:
       {
-	Edit_GetText(m_hwndMayuPathName, buf, NUMBER_OF(buf));
+	GetWindowText(m_hwndMayuPathName, buf, NUMBER_OF(buf));
 	m_data->m_name = buf;
-	Edit_GetText(m_hwndMayuPath, buf, NUMBER_OF(buf));
+	GetWindowText(m_hwndMayuPath, buf, NUMBER_OF(buf));
 	m_data->m_filename = buf;
-	Edit_GetText(m_hwndSymbols, buf, NUMBER_OF(buf));
+	GetWindowText(m_hwndSymbols, buf, NUMBER_OF(buf));
 	m_data->m_symbols = buf;
 	CHECK_TRUE( EndDialog(m_hwnd, 1) );
 	return TRUE;

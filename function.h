@@ -16,14 +16,14 @@ class Engine;
 ///
 class EmacsEditKillLine
 {
-  std::string m_buf;	/// previous kill-line contents
+  tstring m_buf;	/// previous kill-line contents
 
 public:
   bool m_doForceReset;	///
   
 private:
   ///
-  HGLOBAL makeNewKillLineBuf(const char *i_data, int *i_retval);
+  HGLOBAL makeNewKillLineBuf(const _TCHAR *i_data, int *i_retval);
 
 public:
   ///
@@ -207,7 +207,7 @@ public:
 
 public:
   Id m_id;					/// function id
-  char *m_name;					/// function name
+  _TCHAR *m_name;				/// function name
   /** argument's type.
       '<code>&amp;</code>':rest is optional
       '<code>D</code>':dialog,
@@ -223,7 +223,7 @@ public:
       '<code>s</code>':string,
       '<code>w</code>':window,
   */
-  char *m_argType;
+  _TCHAR *m_argType;
   Func m_func;	///
   
   static const Function m_functions[];	///
@@ -231,11 +231,10 @@ public:
 public:
   /// search function in functions
   static const Function *search(Id i_id);
-  static const Function *search(const istring &i_name);	///
+  static const Function *search(const tstringi &i_name); ///
 
   /// stream output
-  friend std::ostream &
-  operator<<(std::ostream &i_ost, const Function &i_f);
+  friend tostream &operator<<(tostream &i_ost, const Function &i_f);
 };
 
 

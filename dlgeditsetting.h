@@ -5,9 +5,7 @@
 #ifndef _DLGEDITSETTING_H
 #  define _DLGEDITSETTING_H
 
-#  ifndef _STRINGTOOL_H
-#    include "stringtool.h"
-#  endif // _STRINGTOOL_H
+#  include "stringtool.h"
 
 
 /// dialog procedure of "Edit Setting" dialog box
@@ -18,9 +16,9 @@ BOOL CALLBACK dlgEditSetting_dlgProc(
 class DlgEditSettingData
 {
 public:
-  StringTool::istring m_name;			/// setting name
-  StringTool::istring m_filename;		/// filename of setting
-  StringTool::istring m_symbols; /// symbol list (-Dsymbol1;-Dsymbol2;-D...)
+  tstringi m_name;				/// setting name
+  tstringi m_filename;				/// filename of setting
+  tstringi m_symbols;		/// symbol list (-Dsymbol1;-Dsymbol2;-D...)
 };
 
 

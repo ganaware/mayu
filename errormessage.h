@@ -5,15 +5,14 @@
 #ifndef _ERRORMESSAGE_H
 #  define _ERRORMESSAGE_H
 
-
-#  include <strstream>
-#  include <string>
+#  include "stringtool.h"
+#  include <sstream>
 
 
 ///
 class ErrorMessage
 {
-  std::ostrstream m_ost;			///
+  tstringstream m_ost;				///
   
 public:
   ///
@@ -22,30 +21,45 @@ public:
   ErrorMessage(const ErrorMessage &i_em) { m_ost << i_em.getMessage(); }
 
   /// get error message
-  std::string getMessage() const
+  tstring getMessage() const
   {
-    ErrorMessage &em = *const_cast<ErrorMessage *>(this);
-    std::string msg(em.m_ost.str(), em.m_ost.pcount());
-    em.m_ost.freeze(false);
-    return msg;
+    return m_ost.str();
   }
   
   /// add message
-  template<class T> ErrorMessage &operator<<(const T &i_t)
+  template<class T> ErrorMessage &operator<<(const T &i_value)
   {
-    m_ost << i_t;
+    m_ost << i_value;
     return *this;
   }
 
+#ifdef UNICODE
+  /// add message
+  template<> ErrorMessage &operator<<(const std::string &i_value)
+  {
+    m_ost << to_wstring(i_value);
+    return *this;
+  }
+
+  /// add message
+  typedef const char *const_char_ptr;
+  template<> ErrorMessage &operator<<(const const_char_ptr &i_value)
+  {
+    m_ost << to_wstring(i_value);
+    return *this;
+  }
+#endif
+  
   /// stream output
-  friend std::ostream &
-  operator<<(std::ostream &i_ost, const ErrorMessage &i_em);
+  friend tostream &operator<<(tostream &i_ost, const ErrorMessage &i_em);
 };
 
 
 /// stream output
-inline std::ostream &operator<<(std::ostream &i_ost, const ErrorMessage &i_em)
-{ return i_ost << i_em.getMessage(); }
+inline tostream &operator<<(tostream &i_ost, const ErrorMessage &i_em)
+{
+  return i_ost << i_em.getMessage();
+}
 
 
 ///
@@ -53,8 +67,11 @@ class WarningMessage : public ErrorMessage
 {
 public:
   /// add message
-  template<class T> WarningMessage &operator<<(const T &i_t)
-  { ErrorMessage::operator<<(i_t); return *this; }
+  template<class T> WarningMessage &operator<<(const T &i_value)
+  {
+    ErrorMessage::operator<<(i_value);
+    return *this;
+  }
 };
 
 

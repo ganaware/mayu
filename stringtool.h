@@ -5,194 +5,147 @@
 #ifndef _STRINGTOOL_H
 #  define _STRINGTOOL_H
 
-#  ifndef _MISC_H
-#    include "misc.h"
-#  endif //_MISC_H
-
+#  include "misc.h"
+#  include <tchar.h>
+#  include <cctype>
 #  include <string>
-#  include <ctype.h>
-#  include <mbstring.h>
+#  include <iosfwd>
+#  include <boost/regex.hpp>
 
 
-/// string tool
-namespace StringTool
+typedef std::basic_string<_TCHAR> tstring;
+typedef std::basic_istream<_TCHAR> tistream;
+typedef std::basic_ostream<_TCHAR> tostream;
+typedef std::basic_streambuf<_TCHAR> tstreambuf;
+typedef std::basic_stringstream<_TCHAR> tstringstream;
+typedef std::basic_ifstream<_TCHAR> tifstream;
+typedef boost::reg_expression<_TCHAR> tregex;
+typedef boost::match_results<const _TCHAR *> tcmatch;
+
+
+class tcmatch_results : public tcmatch
 {
-  using std::string;
-
-/// (const char *s)
-#  define S_	const char *s
-/// (const char *s, char c)
-#  define SC_	const char *s, char c
-/// (const char *s, size_t n)
-#  define SN_	const char *s, size_t n
-/// (const char *s1, const char *s2)
-#  define SS_	const char *s1, const char *s2
-/// (const char *s1, const char *s2, size_t n)
-#  define SSN_	const char *s1, const char *s2, size_t n
-/// (const char *s, char *c, size_t n)
-#  define SCN_	const char *s, char *c, size_t n
-#  define _S	(u_char *)s
-#  define _SC	(u_char *)s, (int)(u_char)c
-#  define _SN	(u_char *)s, n
-#  define _SS	(u_char *)s1, (u_char *)s2
-#  define _SSN	(u_char *)s1, (u_char *)s2, n
-#  define _SCN	(u_char *)s, (int)(u_char)c, n
-  
-  // multi byte functions
-  
-  // ++, --
-  /** */inline char * mbsinc_    (S_  ) { return (char *)_mbsinc    (_S  ); }
-  /** */inline char * mbsninc_   (SN_ ) { return (char *)_mbsninc   (_SN ); }
-  /** */inline char * mbsdec_    (SS_ ) { return (char *)_mbsdec    (_SS ); }
-  // compare							       
-  /** */inline int    mbscmp_    (SS_ ) { return         _mbscmp    (_SS ); }
-  /** */inline int    mbsncmp_   (SSN_) { return         _mbsncmp   (_SSN); }
-  /** */inline int    mbsicmp_   (SS_ ) { return         _mbsicmp   (_SS ); }
-  /** */inline int    mbsnicmp_  (SSN_) { return         _mbsnicmp  (_SSN); }
-  /** */inline int    mbscoll_   (SS_ ) { return         _mbscoll   (_SS ); }
-  /** */inline int    mbsncoll_  (SSN_) { return         _mbsncoll  (_SSN); }
-  /** */inline int    mbsicoll_  (SS_ ) { return         _mbsicoll  (_SS ); }
-  /** */inline int    mbsnicoll_ (SSN_) { return         _mbsnicoll (_SSN); }
-  /** */inline int    mbsnbcmp_  (SSN_) { return         _mbsnbcmp  (_SSN); }
-  /** */inline int    mbsnbicmp_ (SSN_) { return         _mbsnbicmp (_SSN); }
-  /** */inline bool   mbsiequal_ (SS_ ) { return 0 ==    _mbsicmp   (_SS ); }
-  /** */inline bool   mbsniequal_(SSN_) { return 0 ==    _mbsnicmp  (_SSN); }
-  // char search						       
-  /** */inline char * mbschr_    (SC_ ) { return (char *)_mbschr    (_SC ); }
-  /** */inline char * mbsrchr_   (SC_ ) { return (char *)_mbsrchr   (_SC ); }
-  // char set search						       
-  /** */inline size_t mbsspn_    (SS_ ) { return         _mbsspn    (_SS ); }
-  /** */inline size_t mbscspn_   (SS_ ) { return         _mbscspn   (_SS ); }
-  /** */inline char * mbsspnp_   (SS_ ) { return (char *)_mbsspnp   (_SS ); }
-  /** */inline char * mbspbrk_   (SS_ ) { return (char *)_mbspbrk   (_SS ); }
-  // string search						       
-  /** */inline char * mbsstr_    (SS_ ) { return (char *)_mbsstr    (_SS ); }
-  // concatination						       
-  /** */inline char * mbscat_    (SS_ ) { return (char *)_mbscat    (_SS ); }
-  /** */inline char * mbsncat_   (SSN_) { return (char *)_mbsncat   (_SSN); }
-  /** */inline char * mbsnbcat_  (SSN_) { return (char *)_mbsnbcat  (_SSN); }
-  // copy							       
-  /** */inline char * mbscpy_    (SS_ ) { return (char *)_mbscpy    (_SS ); }
-  /** */inline char * mbsncpy_   (SSN_) { return (char *)_mbsncpy   (_SSN); }
-  /** */inline char * mbsnbcpy_  (SSN_) { return (char *)_mbsnbcpy  (_SSN); }
-  // set							       
-  /** */inline char * mbsset_    (SC_ ) { return (char *)_mbsset    (_SC ); }
-  /** */inline char * mbsnset_   (SCN_) { return (char *)_mbsnset   (_SCN); }
-  /** */inline char * mbsnbset_  (SCN_) { return (char *)_mbsnbset  (_SCN); }
-  // length							       
-  /** */inline size_t mbslen_    (S_  ) { return         _mbslen    (_S  ); }
-  //    inline size_t mbstrlen_  (S_  ) { return         _mbstrlen  (s   ); }
-  // convertor							       
-  /** */inline char * mbslwr_    (S_  ) { return (char *)_mbslwr    (_S  ); }
-  /** */inline char * mbsupr_    (S_  ) { return (char *)_mbsupr    (_S  ); }
-  /** */inline char * mbsrev_    (S_  ) { return (char *)_mbsrev    (_S  ); }
-  // count							       
-  /** */inline size_t mbsnccnt_  (SN_ ) { return         _mbsnccnt  (_SN ); }
-  /** */inline size_t mbsnbcnt_  (SN_ ) { return         _mbsnbcnt  (_SN ); }
-  // next char							       
-  /** */inline int    mbsnextc_  (S_  ) { return         _mbsnextc  (_S  ); }
-  // token							       
-  /** */inline char * mbstok_    (SS_ ) { return (char *)_mbstok    (_SS ); }
-
-#  undef S_
-#  undef SC_
-#  undef SN_
-#  undef SS_
-#  undef SSN_
-#  undef SCN_
-#  undef _S
-#  undef _SC
-#  undef _SN
-#  undef _SS
-#  undef _SSN
-#  undef _SCN
-
-  ///
-  inline char *strchr_(const char *s, char c)
-  { return strchr((char *)s, (int)(u_char)c); }
-
-  // character test
-  //    inline bool __isascii  (char c) { return !!__isascii  ((u_char)c); }
-  //    inline bool __iscsym   (char c) { return !!__iscsym   ((u_char)c); }
-  /** */inline bool isalnum_   (char c) { return !!isalnum    ((u_char)c); }
-  /** */inline bool isalpha_   (char c) { return !!isalpha    ((u_char)c); }
-  /** */inline bool iscntrl_   (char c) { return !!iscntrl    ((u_char)c); }
-  /** */inline bool isdigit_   (char c) { return !!isdigit    ((u_char)c); }
-  /** */inline bool isgraph_   (char c) { return !!isgraph    ((u_char)c); }
-  /** */inline bool islower_   (char c) { return !!islower    ((u_char)c); }
-  /** */inline bool isprint_   (char c) { return !!isprint    ((u_char)c); }
-  /** */inline bool ispunct_   (char c) { return !!ispunct    ((u_char)c); }
-  /** */inline bool isspace_   (char c) { return !!isspace    ((u_char)c); }
-  /** */inline bool isupper_   (char c) { return !!isupper    ((u_char)c); }
-  /** */inline bool isxdigit_  (char c) { return !!isxdigit   ((u_char)c); }
-								      
-  /** */inline bool ismbblead_ (char c) { return !!_ismbblead ((u_char)c); }
-  /** */inline bool ismbbtrail_(char c) { return !!_ismbbtrail((u_char)c); }
-  
-  /** */inline char toupper_   (char c) { return (char)toupper((u_char)c); }
-  /** */inline char tolower_   (char c) { return (char)tolower((u_char)c); }
-
-  
-  /// interpret meta characters such as \n
-  string interpretMetaCharacters(const char *str, size_t len,
-				 const char *quote = NULL);
-  
-  /// converter
-  std::wstring cast_wstring(const string &text);
-  /// converter
-  string cast_string(const std::wstring &w_text);
-
-  /// copy 
-  char *mbsfill(char *o_dest,  const char *i_src, size_t i_destSize);
-  
-  /// case insensitive string
-  class istring : public string
+public:
+  tstring str(tcmatch::size_type i_n) const
   {
-  public:
-    /** */istring() { }
-    /** */istring(const istring &s) : string(s) { }
-    /** */istring(const string &s) : string(s) { }
-    /** */istring(const char *s) : string(s) { }
-    /** */istring(const char *s, size_t n) : string(s, n) { }
-    /** */istring(const char *s, size_t pos, size_t n) : string(s, pos, n) { }
-    /** */istring(size_t n, char c) : string(n, c) { }
-    
-    /** */int compare(const istring &i) const { return compare(i.c_str()); }
-    /** */int compare(const string &s) const { return compare(s.c_str()); }
-    /** */int compare(const char *s) const  { return mbsicmp_(c_str(), s); }
-    /** */string &getString() { return *this; }
-  };
+    return static_cast<tstring>(
+      static_cast<const tcmatch *>(this)->operator[](i_n));
+  }
+};
 
-/// (const char)
-#  define CC_	const char
-/// (const istring)
-#  define CIS_	const istring
-/// (const string)
-#  define CS_	const string
-  
-  /** */inline bool operator<(CIS_ &i , CC_  *s )  { return i.compare(s) < 0; }
-  /** */inline bool operator<(CC_  *s , CIS_ &i )  { return 0 < i.compare(s); }
-  /** */inline bool operator<(CIS_ &i , CS_  &s )  { return i.compare(s) < 0; }
-  /** */inline bool operator<(CS_  &s , CIS_ &i )  { return 0 < i.compare(s); }
-  /** */inline bool operator<(CIS_ &i1, CIS_ &i2)  { return i1.compare(i2)<0; }
-  
-  /** */inline bool operator==(CC_  *s , CIS_ &i ) { return i.compare(s) == 0;}
-  /** */inline bool operator==(CIS_ &i , CC_  *s ) { return i.compare(s) == 0;}
-  /** */inline bool operator==(CS_  &s , CIS_ &i ) { return i.compare(s) == 0;}
-  /** */inline bool operator==(CIS_ &i , CS_  &s ) { return i.compare(s) == 0;}
-  /** */inline bool operator==(CIS_ &i1, CIS_ &i2) { return i1.compare(i2)==0;}
-  
-  // workarounds for Borland C++
-  /** */inline bool operator!=(CC_  *s , CIS_ &i ) { return i.compare(s) != 0;}
-  /** */inline bool operator!=(CIS_ &i , CC_  *s ) { return i.compare(s) != 0;}
-  /** */inline bool operator!=(CS_  &s , CIS_ &i ) { return i.compare(s) != 0;}
-  /** */inline bool operator!=(CIS_ &i , CS_  &s ) { return i.compare(s) != 0;}
-  /** */inline bool operator!=(CIS_ &i1, CIS_ &i2) { return i1.compare(i2)!=0;}
 
-#  undef CC_
-#  undef CIS_
-#  undef CS_
-}
+
+/// interpret meta characters such as \n
+tstring interpretMetaCharacters(const _TCHAR *i_str, size_t i_len,
+				const _TCHAR *i_quote = NULL,
+				bool i_doesUseRegexpBackReference = false);
+
+/// copy
+size_t strlcpy(char *o_dest, const char *i_src, size_t i_destSize);
+/// copy
+size_t mbslcpy(unsigned char *o_dest, const unsigned char *i_src,
+		       size_t i_destSize);
+/// copy
+size_t wcslcpy(wchar_t *o_dest, const wchar_t *i_src, size_t i_destSize);
+/// copy
+inline size_t tcslcpy(char *o_dest, const char *i_src, size_t i_destSize)
+{ return strlcpy(o_dest, i_src, i_destSize); }
+/// copy
+inline size_t tcslcpy(unsigned char *o_dest, const unsigned char *i_src,
+		      size_t i_destSize)
+{ return mbslcpy(o_dest, i_src, i_destSize); }
+/// copy
+inline size_t tcslcpy(wchar_t *o_dest, const wchar_t *i_src, size_t i_destSize)
+{ return wcslcpy(o_dest, i_src, i_destSize); }
+
+/// converter
+std::wstring to_wstring(const std::string &i_str);
+/// converter
+std::string to_string(const std::wstring &i_str);
+
+  
+/// case insensitive string
+class tstringi : public tstring
+{
+public:
+  ///
+  tstringi() { }
+  ///
+  tstringi(const tstringi &i_str) : tstring(i_str) { }
+  ///
+  tstringi(const tstring &i_str) : tstring(i_str) { }
+  ///
+  tstringi(const TCHAR *i_str) : tstring(i_str) { }
+  ///
+  tstringi(const TCHAR *i_str, size_t i_n) : tstring(i_str, i_n) { }
+  ///
+  tstringi(const TCHAR *i_str, size_t i_pos, size_t i_n)
+    : tstring(i_str, i_pos, i_n) { }
+  ///
+  tstringi(size_t i_n, TCHAR i_c) : tstring(i_n, i_c) { }
+  ///
+  int compare(const tstringi &i_str) const
+  { return compare(i_str.c_str()); }
+  ///
+  int compare(const tstring &i_str) const
+  { return compare(i_str.c_str()); }
+  ///
+  int compare(const TCHAR *i_str) const
+  { return _tcsicmp(c_str(), i_str); }
+  ///
+  tstring &getString() { return *this; }
+  ///
+  const tstring &getString() const { return *this; }
+};
+
+///
+inline bool operator<(const tstringi &i_wsi, const TCHAR *i_s)
+{ return i_wsi.compare(i_s) < 0; }
+///
+inline bool operator<(const TCHAR *i_s, const tstringi &i_wsi)
+{ return 0 < i_wsi.compare(i_s); }
+///
+inline bool operator<(const tstringi &i_wsi, const tstring &i_s)
+{ return i_wsi.compare(i_s) < 0; }
+///
+inline bool operator<(const tstring &i_s, const tstringi &i_wsi)
+{ return 0 < i_wsi.compare(i_s); }
+///
+inline bool operator<(const tstringi &i_wsi1, const tstringi &i_wsi2)
+{ return i_wsi1.compare(i_wsi2) < 0; }
+
+///
+inline bool operator==(const TCHAR *i_s, const tstringi &i_wsi)
+{ return i_wsi.compare(i_s) == 0; }
+///
+inline bool operator==(const tstringi &i_wsi, const TCHAR *i_s)
+{ return i_wsi.compare(i_s) == 0; }
+///
+inline bool operator==(const tstring &i_s, const tstringi &i_wsi)
+{ return i_wsi.compare(i_s) == 0; }
+///
+inline bool operator==(const tstringi &i_wsi, const tstring &i_s)
+{ return i_wsi.compare(i_s) == 0; }
+///
+inline bool operator==(const tstringi &i_wsi1, const tstringi &i_wsi2)
+{ return i_wsi1.compare(i_wsi2) == 0; }
+  
+// workarounds for Borland C++
+///
+inline bool operator!=(const TCHAR *i_s, const tstringi &i_wsi)
+{ return i_wsi.compare(i_s) != 0; }
+///
+inline bool operator!=(const tstringi &i_wsi, const TCHAR *i_s)
+{ return i_wsi.compare(i_s) != 0; }
+///
+inline bool operator!=(const tstring &i_s, const tstringi &i_wsi)
+{ return i_wsi.compare(i_s) != 0; }
+///
+inline bool operator!=(const tstringi &i_wsi, const tstring &i_s)
+{ return i_wsi.compare(i_s) != 0; }
+///
+inline bool operator!=(const tstringi &i_wsi1, const tstringi &i_wsi2)
+{ return i_wsi1.compare(i_wsi2) != 0; }
 
 
 #endif // _STRINGTOOL_H

@@ -15,9 +15,6 @@
 #include <process.h>
 
 
-using namespace std;
-
-
 // check focus window
 void Engine::checkFocusWindow()
 {
@@ -51,13 +48,13 @@ void Engine::checkFocusWindow()
 	  {
 	    FocusOfThread *fot = &((*j).second);
 	    Acquire a(&m_log, 1);
-	    m_log << "RemoveThread" << endl;
-	    m_log << "\tHWND:\t" << hex << (int)fot->m_hwndFocus
-		  << dec << endl;
-	    m_log << "\tTHREADID:" << fot->m_threadId << endl;
-	    m_log << "\tCLASS:\t" << fot->m_className << endl;
-	    m_log << "\tTITLE:\t" << fot->m_titleName << endl;
-	    m_log << endl;
+	    m_log << _T("RemoveThread") << std::endl;
+	    m_log << _T("\tHWND:\t") << std::hex << (int)fot->m_hwndFocus
+		  << std::dec << std::endl;
+	    m_log << _T("\tTHREADID:") << fot->m_threadId << std::endl;
+	    m_log << _T("\tCLASS:\t") << fot->m_className << std::endl;
+	    m_log << _T("\tTITLE:\t") << fot->m_titleName << std::endl;
+	    m_log << std::endl;
 	    m_focusOfThreads.erase(j);
 	  }
 	}
@@ -78,32 +75,37 @@ void Engine::checkFocusWindow()
 	  m_hwndFocus = m_currentFocusOfThread->m_hwndFocus;
 	
 	  Acquire a(&m_log, 1);
-	  m_log << "FocusChanged" << endl;
-	  m_log << "\tHWND:\t" << hex << (int)m_currentFocusOfThread->m_hwndFocus
-		<< dec << endl;
-	  m_log << "\tTHREADID:" << m_currentFocusOfThread->m_threadId << endl;
-	  m_log << "\tCLASS:\t" << m_currentFocusOfThread->m_className << endl;
-	  m_log << "\tTITLE:\t" << m_currentFocusOfThread->m_titleName << endl;
-	  m_log << endl;
+	  m_log << _T("FocusChanged") << std::endl;
+	  m_log << _T("\tHWND:\t")
+		<< std::hex << (int)m_currentFocusOfThread->m_hwndFocus
+		<< std::dec << std::endl;
+	  m_log << _T("\tTHREADID:")
+		<< m_currentFocusOfThread->m_threadId << std::endl;
+	  m_log << _T("\tCLASS:\t")
+		<< m_currentFocusOfThread->m_className << std::endl;
+	  m_log << _T("\tTITLE:\t")
+		<< m_currentFocusOfThread->m_titleName << std::endl;
+	  m_log << std::endl;
 	  return;
 	}
       }
     }
     
-    char className[GANA_MAX_ATOM_LENGTH];
-    if (GetClassName(hwndFore, className, sizeof(className)))
+    _TCHAR className[GANA_MAX_ATOM_LENGTH];
+    if (GetClassName(hwndFore, className, NUMBER_OF(className)))
     {
-      if (StringTool::mbsiequal_(className, "ConsoleWindowClass"))
+      if (_tcsicmp(className, _T("ConsoleWindowClass")) == 0)
       {
-	char titleName[1024];
-	if (GetWindowText(hwndFore, titleName, sizeof(titleName)) == 0)
-	  titleName[0] = '\0';
+	_TCHAR titleName[1024];
+	if (GetWindowText(hwndFore, titleName, NUMBER_OF(titleName)) == 0)
+	  titleName[0] = _T('\0');
 	setFocus(hwndFore, threadId, className, titleName, true);
 	Acquire a(&m_log, 1);
-	m_log << "HWND:\t" << hex << (int)hwndFore << dec << endl;
-	m_log << "THREADID:" << threadId << endl;
-	m_log << "CLASS:\t" << className << endl;
-	m_log << "TITLE:\t" << titleName << endl << endl;
+	m_log << _T("HWND:\t") << std::hex << reinterpret_cast<int>(hwndFore)
+	      << std::dec << std::endl;
+	m_log << _T("THREADID:") << threadId << std::endl;
+	m_log << _T("CLASS:\t") << className << std::endl;
+	m_log << _T("TITLE:\t") << titleName << std::endl << std::endl;
 	goto restart;
       }
     }
@@ -113,14 +115,14 @@ void Engine::checkFocusWindow()
   if (m_globalFocus.m_keymaps.empty())
   {
     Acquire a(&m_log, 1);
-    m_log << "NO GLOBAL FOCUS" << endl;
+    m_log << _T("NO GLOBAL FOCUS") << std::endl;
     m_currentFocusOfThread = NULL;
     m_currentKeymap = NULL;
   }
   else
   {
     Acquire a(&m_log, 1);
-    m_log << "GLOBAL FOCUS" << endl;
+    m_log << _T("GLOBAL FOCUS") << std::endl;
     m_currentFocusOfThread = &m_globalFocus;
     m_currentKeymap = m_globalFocus.m_keymaps.front();
   }
@@ -154,7 +156,7 @@ bool Engine::fixModifierKey(ModifiedKey *o_mkey, Keymap::AssignMode *o_am)
       {
 	{
 	  Acquire a(&m_log, 1);
-	  m_log << "* Modifier Key" << endl;
+	  m_log << _T("* Modifier Key") << std::endl;
 	}
 	o_mkey->m_modifier.dontcare(static_cast<Modifier::Type>(i));
 	*o_am = (*j).m_assignMode;
@@ -176,20 +178,22 @@ void Engine::outputToLog(const Key *i_key, const ModifiedKey &i_mkey,
   // output scan codes
   for (i = 0; i < i_key->getScanCodesSize(); ++ i)
   {
-    if (i_key->getScanCodes()[i].m_flags & ScanCode::E0) m_log << "E0-";
-    if (i_key->getScanCodes()[i].m_flags & ScanCode::E1) m_log << "E1-";
-    if (!(i_key->getScanCodes()[i].m_flags & ScanCode::E0E1)) m_log << "   ";
-    m_log << "0x" << hex << setw(2) << setfill('0')
-	  << static_cast<int>(i_key->getScanCodes()[i].m_scan) << dec << " ";
+    if (i_key->getScanCodes()[i].m_flags & ScanCode::E0) m_log << _T("E0-");
+    if (i_key->getScanCodes()[i].m_flags & ScanCode::E1) m_log << _T("E1-");
+    if (!(i_key->getScanCodes()[i].m_flags & ScanCode::E0E1))
+      m_log << _T("   ");
+    m_log << _T("0x") << std::hex << std::setw(2) << std::setfill(_T('0'))
+	  << static_cast<int>(i_key->getScanCodes()[i].m_scan)
+	  << std::dec << _T(" ");
   }
   
   if (!i_mkey.m_key) // key corresponds to no phisical key
   {
-    m_log << endl;
+    m_log << std::endl;
     return;
   }
   
-  m_log << "  " << i_mkey << endl;
+  m_log << _T("  ") << i_mkey << std::endl;
 }
 
 
@@ -203,7 +207,7 @@ void Engine::describeBindings()
   for (KeymapPtrList::iterator i = m_currentFocusOfThread->m_keymaps.begin();
        i != m_currentFocusOfThread->m_keymaps.end(); i ++)
     (*i)->describe(m_log, &dk);
-  m_log << endl;
+  m_log << std::endl;
 }
 
 
@@ -268,7 +272,7 @@ void Engine::generateKeyEvent(Key *i_key, bool i_doPress, bool i_isByAssign)
   
   {
     Acquire a(&m_log, 1);
-    m_log << "\t\t    =>\t";
+    m_log << _T("\t\t    =>\t");
   }
   ModifiedKey mkey(i_key);
   mkey.m_modifier.on(Modifier::Type_Up, !i_doPress);
@@ -288,7 +292,8 @@ void Engine::generateEvents(Current i_c, Keymap *i_keymap, Key *i_event)
   {
     {
       Acquire a(&m_log, 1);
-      m_log << endl << "           " << i_event->getName() << endl;
+      m_log << std::endl << _T("           ")
+	    << i_event->getName() << std::endl;
     }
     generateKeySeqEvents(i_c, keyAssign->m_keySeq, Part_all);
   }
@@ -300,7 +305,7 @@ void Engine::generateModifierEvents(const Modifier &i_mod)
 {
   {
     Acquire a(&m_log, 1);
-    m_log << "* Gen Modifiers\t{" << endl;
+    m_log << _T("* Gen Modifiers\t{") << std::endl;
   }
 
   for (int i = Modifier::Type_begin; i < Modifier::Type_BASIC; ++ i)
@@ -368,7 +373,7 @@ void Engine::generateModifierEvents(const Modifier &i_mod)
   
   {
     Acquire a(&m_log, 1);
-    m_log << "\t\t}" << endl;
+    m_log << _T("\t\t}") << std::endl;
   }
 }
 
@@ -435,7 +440,7 @@ void Engine::generateActionEvents(const Current &i_c, const Action *i_a,
 	bool doesNeedEndl = true;
 	{
 	  Acquire a(&m_log, 1);
-	  m_log << "\t\t     >\t&" << af->m_function->m_name;
+	  m_log << _T("\t\t     >\t&") << af->m_function->m_name;
 	}
 	switch (af->m_function->m_id)
 	{
@@ -444,7 +449,7 @@ void Engine::generateActionEvents(const Current &i_c, const Action *i_a,
 	  {
 	    {
 	      Acquire a(&m_log, 1);
-	      m_log << endl;
+	      m_log << std::endl;
 	      doesNeedEndl = false;
 	    }
 	    if (is_down)
@@ -460,7 +465,8 @@ void Engine::generateActionEvents(const Current &i_c, const Action *i_a,
 	      goto Default;
 	    {
 	      Acquire a(&m_log, 1);
-	      m_log << "(" << cnew.m_keymap->getName() << ")" << endl;
+	      m_log << _T("(") << cnew.m_keymap->getName()
+		    << _T(")") << std::endl;
 	      doesNeedEndl = false;
 	    }
 	    generateKeyboardEvents(cnew);
@@ -483,7 +489,8 @@ void Engine::generateActionEvents(const Current &i_c, const Action *i_a,
 	    cnew.m_keymap = (*cnew.m_i);
 	    {
 	      Acquire a(&m_log, 1);
-	      m_log << "(" << cnew.m_keymap->getName() << ")" << endl;
+	      m_log << _T("(") << cnew.m_keymap->getName()
+		    << _T(")") << std::endl;
 	      doesNeedEndl = false;
 	    }
 	    generateKeyboardEvents(cnew);
@@ -507,8 +514,10 @@ void Engine::generateActionEvents(const Current &i_c, const Action *i_a,
 	      if (af->m_args.size() == 2)	// optional function argument
 		m_doesIgnoreModifierForPrefix = !!af->m_args[1].getData();
 	      Acquire a(&m_log, 1);
-	      m_log << "(" << keymap->getName() << ", " <<
-		(m_doesIgnoreModifierForPrefix ? "true" : "false") << ")";
+	      m_log << _T("(") << keymap->getName() << _T(", ")
+		    << (m_doesIgnoreModifierForPrefix
+			? _T("true") : _T("false"))
+		    << _T(")");
 	    }
 	    break;
 	  }
@@ -519,7 +528,8 @@ void Engine::generateActionEvents(const Current &i_c, const Action *i_a,
 	    ASSERT( cnew.m_keymap );
 	    {
 	      Acquire a(&m_log, 1);
-	      m_log << "(" << cnew.m_keymap->getName() << ")" << endl;
+	      m_log << _T("(") << cnew.m_keymap->getName()
+		    << _T(")") << std::endl;
 	      doesNeedEndl = false;
 	    }
 	    generateKeyboardEvents(cnew);
@@ -549,7 +559,7 @@ void Engine::generateActionEvents(const Current &i_c, const Action *i_a,
 	    if (r == WAIT_TIMEOUT)
 	    {
 	      Acquire a(&m_log, 0);
-	      m_log << " *FAILED*";
+	      m_log << _T(" *FAILED*");
 	    }
 	    m_cs.acquire();
 	    m_isSynchronizing = false;
@@ -680,7 +690,7 @@ void Engine::generateActionEvents(const Current &i_c, const Action *i_a,
 	      break;
 	    {
 	      Acquire a(&m_log, 1);
-	      m_log << endl;
+	      m_log << std::endl;
 	    }
 	    describeBindings();
 	    break;
@@ -703,14 +713,14 @@ void Engine::generateActionEvents(const Current &i_c, const Action *i_a,
 	if (doesNeedEndl)
 	{
 	  Acquire a(&m_log, 1);
-	  m_log << endl;
+	  m_log << std::endl;
 	}
       }
       catch (ErrorMessage &i_e)
       {
 	Acquire a(&m_log);
-	m_log << "&" << af->m_function->m_name << ": invalid arguments: "
-	      << i_e << endl;
+	m_log << _T("&") << af->m_function->m_name
+	      << _T(": invalid arguments: ") << i_e << std::endl;
       }
       break;
     }
@@ -722,7 +732,7 @@ void Engine::generateActionEvents(const Current &i_c, const Action *i_a,
 void Engine::generateKeySeqEvents(const Current &i_c, const KeySeq *i_keySeq,
 				  Part i_part)
 {
-  const vector<Action *> &actions = i_keySeq->getActions();
+  const std::vector<Action *> &actions = i_keySeq->getActions();
   if (actions.empty())
     return;
   if (i_part == Part_up)
@@ -749,7 +759,8 @@ void Engine::generateKeyboardEvents(const Current &i_c)
       MAX_GENERATE_KEYBOARD_EVENTS_RECURSION_COUNT)
   {
     Acquire a(&m_log);
-    m_log << "error: too deep keymap recursion.  there may be a loop." << endl;
+    m_log << _T("error: too deep keymap recursion.  there may be a loop.")
+	  << std::endl;
     return;
   }
   
@@ -856,7 +867,16 @@ void Engine::keyboardHandler()
     if (!m_setting ||	// m_setting has not been loaded
 	!m_isEnabled)	// disabled
     {
-      WriteFile(m_device, &kid, sizeof(kid), &len, NULL);
+      if (m_isLogMode)
+      {
+	Key key;
+	key.addScanCode(ScanCode(kid.MakeCode, kid.Flags));
+	outputToLog(&key, ModifiedKey(), 0);
+      }
+      else
+      {
+	WriteFile(m_device, &kid, sizeof(kid), &len, NULL);
+      }
       continue;
     }
     
@@ -868,9 +888,11 @@ void Engine::keyboardHandler()
       WriteFile(m_device, &kid, sizeof(kid), &len, NULL);
       Acquire a(&m_log, 0);
       if (!m_currentFocusOfThread)
-	m_log << "internal error: m_currentFocusOfThread == NULL" << endl;
+	m_log << _T("internal error: m_currentFocusOfThread == NULL")
+	      << std::endl;
       if (!m_currentKeymap)
-	m_log << "internal error: m_currentKeymap == NULL" << endl;
+	m_log << _T("internal error: m_currentKeymap == NULL")
+	      << std::endl;
       continue;
     }
     
@@ -922,7 +944,7 @@ void Engine::keyboardHandler()
     {
       {
 	Acquire a(&m_log, 1);
-	m_log << "* true modifier" << endl;
+	m_log << _T("* true modifier") << std::endl;
       }
       // true modifier doesn't generate scan code
       outputToLog(&key, c.m_mkey, 1);
@@ -931,7 +953,7 @@ void Engine::keyboardHandler()
     {
       {
 	Acquire a(&m_log, 1);
-	m_log << "* one shot modifier" << endl;
+	m_log << _T("* one shot modifier") << std::endl;
       }
       // oneShot modifier doesn't generate scan code
       outputToLog(&key, c.m_mkey, 1);
@@ -967,7 +989,7 @@ void Engine::keyboardHandler()
     {
       {
 	Acquire a(&m_log, 1);
-	m_log << "* No key is pressed" << endl;
+	m_log << _T("* No key is pressed") << std::endl;
       }
       generateModifierEvents(Modifier());
       if (0 < m_currentKeyPressCountOnWin32)
@@ -983,7 +1005,7 @@ void Engine::keyboardHandler()
 }
   
 
-Engine::Engine(omsgstream &i_log)
+Engine::Engine(tomsgstream &i_log)
   : m_hwndAssocWindow(NULL),
     m_setting(NULL),
     m_device(NULL),
@@ -1136,11 +1158,12 @@ bool Engine::setSetting(Setting *i_setting)
 					fot->m_className, fot->m_titleName);
     }
   }
-  m_setting->m_keymaps.searchWindow(&m_globalFocus.m_keymaps, "", "");
+  m_setting->m_keymaps.searchWindow(&m_globalFocus.m_keymaps, _T(""), _T(""));
   if (m_globalFocus.m_keymaps.empty())
   {
     Acquire a(&m_log, 0);
-    m_log << "internal error: m_globalFocus.m_keymap is empty" << endl;
+    m_log << _T("internal error: m_globalFocus.m_keymap is empty")
+	  << std::endl;
   }
   m_currentFocusOfThread = &m_globalFocus;
   m_currentKeymap = m_globalFocus.m_keymaps.front();
@@ -1151,7 +1174,7 @@ bool Engine::setSetting(Setting *i_setting)
 
 // focus
 bool Engine::setFocus(HWND i_hwndFocus, DWORD i_threadId, 
-		      const char *i_className, const char *i_titleName,
+		      const tstringi &i_className, const tstringi &i_titleName,
 		      bool i_isConsole)
 {
   Acquire a(&m_cs);
@@ -1248,8 +1271,7 @@ bool Engine::threadDetachNotify(DWORD i_threadId)
 
 
 /// get help message
-void Engine::getHelpMessages(std::string *o_helpMessage,
-			     std::string *o_helpTitle)
+void Engine::getHelpMessages(tstring *o_helpMessage, tstring *o_helpTitle)
 {
   Acquire a(&m_cs);
   *o_helpMessage = m_helpMessage;
@@ -1263,11 +1285,11 @@ void Engine::shellExecute()
   Acquire a(&m_cs);
   const ActionFunction *af = m_afShellExecute;
   
-  istring operation  = af->m_args[0].getString();
-  istring file       = af->m_args[1].getString();
-  istring parameters = af->m_args[2].getString();
-  istring directory  = af->m_args[3].getString();
-  if (operation.empty()) operation = "open";
+  tstringi operation  = af->m_args[0].getString();
+  tstringi file       = af->m_args[1].getString();
+  tstringi parameters = af->m_args[2].getString();
+  tstringi directory  = af->m_args[3].getString();
+  if (operation.empty()) operation = _T("open");
   
   int r = (int)ShellExecute(NULL,
 			    operation.c_str(),
@@ -1278,33 +1300,46 @@ void Engine::shellExecute()
   if (32 < r)
     return; // success
   
-  struct ErrorMessages { int m_err; char *m_str; };
+  struct ErrorMessages { int m_err; _TCHAR *m_str; };
   const ErrorMessages err[] =
   {
-    { 0, "The operating system is out of memory or resources." },
-    { ERROR_FILE_NOT_FOUND, "The specified file was not found." },
-    { ERROR_PATH_NOT_FOUND, "The specified path was not found." },
+    { 0,
+      _T("The operating system is out of memory or resources.") },
+    { ERROR_FILE_NOT_FOUND,
+      _T("The specified file was not found.") },
+    { ERROR_PATH_NOT_FOUND,
+      _T("The specified path was not found.") },
     { ERROR_BAD_FORMAT,
-      "The .exe file is invalid (non-Win32R .exe or error in .exe image)." },
+      _T("The .exe file is invalid ")
+      _T("(non-Win32R .exe or error in .exe image).") },
     { SE_ERR_ACCESSDENIED,
-      "The operating system denied access to the specified file." },
+      _T("The operating system denied access to the specified file.") },
     { SE_ERR_ASSOCINCOMPLETE,
-      "The file name association is incomplete or invalid." },
-    { SE_ERR_DDEBUSY, "The DDE transaction could not be completed "
-      "because other DDE transactions were being processed. " },
-    { SE_ERR_DDEFAIL, "The DDE transaction failed." },
-    { SE_ERR_DDETIMEOUT, "The DDE transaction could not be completed "
-      "because the request timed out." },
-    { SE_ERR_DLLNOTFOUND, "The specified dynamic-link library was not found."},
-    { SE_ERR_FNF, "The specified file was not found." },
-    { SE_ERR_NOASSOC, "There is no application associated "
-      "with the given file name extension." },
-    { SE_ERR_OOM, "There was not enough memory to complete the operation." },
-    { SE_ERR_PNF, "The specified path was not found." },
-    { SE_ERR_SHARE, "A sharing violation occurred." },
+      _T("The file name association is incomplete or invalid.") },
+    { SE_ERR_DDEBUSY,
+      _T("The DDE transaction could not be completed ")
+      _T("because other DDE transactions were being processed. ") },
+    { SE_ERR_DDEFAIL,
+      _T("The DDE transaction failed.") },
+    { SE_ERR_DDETIMEOUT,
+      _T("The DDE transaction could not be completed ")
+      _T("because the request timed out.") },
+    { SE_ERR_DLLNOTFOUND,
+      _T("The specified dynamic-link library was not found.")},
+    { SE_ERR_FNF,
+      _T("The specified file was not found.") },
+    { SE_ERR_NOASSOC,
+      _T("There is no application associated ")
+      _T("with the given file name extension.") },
+    { SE_ERR_OOM,
+      _T("There was not enough memory to complete the operation.") },
+    { SE_ERR_PNF,
+      _T("The specified path was not found.") },
+    { SE_ERR_SHARE,
+      _T("A sharing violation occurred.") },
   };
 
-  const char *errorMessage = "Unknown error.";
+  const _TCHAR *errorMessage = _T("Unknown error.");
   for (size_t i = 0; i < NUMBER_OF(err); ++ i)
     if (r == err[i].m_err)
     {
@@ -1312,12 +1347,12 @@ void Engine::shellExecute()
       break;
     }
   Acquire b(&m_log, 0);
-  m_log <<"internal error: &ShellExecute("
-	<< af->m_args[0] << ", "
-	<< af->m_args[1] << ", "
-	<< af->m_args[2] << ", "
-	<< af->m_args[3] << ", "
-	<< af->m_args[4] << "): " << errorMessage;
+  m_log << _T("internal error: &ShellExecute(")
+	<< af->m_args[0] << _T(", ")
+	<< af->m_args[1] << _T(", ")
+	<< af->m_args[2] << _T(", ")
+	<< af->m_args[3] << _T(", ")
+	<< af->m_args[4] << _T("): ") << errorMessage;
 }
 
 
@@ -1334,13 +1369,13 @@ void Engine::commandNotify(
       GetWindowThreadProcessId(m_hwndAssocWindow, NULL))
     return;	// inhibit the investigation of MADO TSUKAI NO YUUTSU
 
-  const char *target = NULL;
+  const _TCHAR *target = NULL;
   int number_target = 0;
   
   if (i_hwnd == hf)
-    target = "ToItself";
+    target = _T("ToItself");
   else if (i_hwnd == GetParent(hf))
-    target = "ToParentWindow";
+    target = _T("ToParentWindow");
   else
   {
     // Function::toMainWindow
@@ -1353,7 +1388,7 @@ void Engine::commandNotify(
       h = p;
     }
     if (i_hwnd == h)
-      target = "ToMainWindow";
+      target = _T("ToMainWindow");
     else
     {
       // Function::toOverlappedWindow
@@ -1366,7 +1401,7 @@ void Engine::commandNotify(
 	h = GetParent(h);
       }
       if (i_hwnd == h)
-	target = "ToOverlappedWindow";
+	target = _T("ToOverlappedWindow");
       else
       {
 	// number
@@ -1379,23 +1414,23 @@ void Engine::commandNotify(
     }
   }
 
-  m_log << "&PostMessage(";
+  m_log << _T("&PostMessage(");
   if (target)
     m_log << target;
   else
     m_log << number_target;
-  m_log << ", " << i_message
-	<< ", 0x" << hex << i_wParam
-	<< ", 0x" << i_lParam << ") # hwnd = "
-	<< reinterpret_cast<int>(i_hwnd) << ", "
-	<< "message = " << dec;
+  m_log << _T(", ") << i_message
+	<< _T(", 0x") << std::hex << i_wParam
+	<< _T(", 0x") << i_lParam << _T(") # hwnd = ")
+	<< reinterpret_cast<int>(i_hwnd) << _T(", ")
+	<< _T("message = ") << std::dec;
   if (i_message == WM_COMMAND)
-    m_log << "WM_COMMAND, ";
+    m_log << _T("WM_COMMAND, ");
   else if (i_message == WM_SYSCOMMAND)
-    m_log << "WM_SYSCOMMAND, ";
+    m_log << _T("WM_SYSCOMMAND, ");
   else
-    m_log << i_message << ", ";
-  m_log << "wNotifyCode = " << HIWORD(i_wParam) << ", "
-	<< "wID = " << LOWORD(i_wParam) << ", "
-	<< "hwndCtrl = 0x" << hex << i_lParam << dec << endl;
+    m_log << i_message << _T(", ");
+  m_log << _T("wNotifyCode = ") << HIWORD(i_wParam) << _T(", ")
+	<< _T("wID = ") << LOWORD(i_wParam) << _T(", ")
+	<< _T("hwndCtrl = 0x") << std::hex << i_lParam << std::dec << std::endl;
 }

@@ -9,9 +9,9 @@
 
 
 /// mayu device file name
-#  define MAYU_DEVICE_FILE_NAME "\\\\.\\MayuDetour1"
+#  define MAYU_DEVICE_FILE_NAME _T("\\\\.\\MayuDetour1")
 ///
-#  define MAYU_DRIVER_NAME "mayud"
+#  define MAYU_DRIVER_NAME _T("mayud")
 
 /// Ioctl value (equivalent to CancelIo API)
 #  define IOCTL_MAYU_DETOUR_CANCEL					 \

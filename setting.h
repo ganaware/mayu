@@ -16,7 +16,7 @@
 class Setting
 {
 public:
-  typedef std::set<StringTool::istring> Symbols; ///
+  typedef std::set<tstringi> Symbols;		///
   typedef std::list<Modifier> Modifiers;	/// 
   
 public:
@@ -45,7 +45,7 @@ class SettingLoader
 {
 private:
   typedef std::vector<Token> Tokens;		///
-  typedef std::vector<istring> Prefixes;	///
+  typedef std::vector<tstringi> Prefixes;	///
   typedef std::vector<bool> CanReadStack;	/// 
   
 private:
@@ -53,9 +53,9 @@ private:
   bool m_isThereAnyError;			/// is there any error ?
 
   SyncObject *m_soLog;				/// guard log output stream
-  std::ostream *m_log;				/// log output stream
+  std::wostream *m_log;				/// log output stream
   
-  istring m_currentFilename;			/// current filename
+  tstringi m_currentFilename;			/// current filename
   
   Tokens m_tokens;				/// tokens for current line
   Tokens::iterator m_ti;			/// current processing token
@@ -81,8 +81,8 @@ private:
   void load_DEFINE();				/// &lt;DEFINE&gt;
   void load_IF();				/// &lt;IF&gt;
   void load_ELSE(bool i_isElseIf,
-		 const istring &i_token);	/// &lt;ELSE&gt; &lt;ELSEIF&gt;
-  bool load_ENDIF(const istring &i_token);	/// &lt;ENDIF&gt;
+		 const tstringi &i_token);	/// &lt;ELSE&gt; &lt;ELSEIF&gt;
+  bool load_ENDIF(const tstringi &i_token);	/// &lt;ENDIF&gt;
   void load_INCLUDE();				/// &lt;INCLUDE&gt;
   void load_SCAN_CODES(Key *o_key);		/// &lt;SCAN_CODES&gt;
   void load_DEFINE_KEY();			/// &lt;DEFINE_KEY&gt;
@@ -95,7 +95,7 @@ private:
   Key *load_KEY_NAME();				/// &lt;KEY_NAME&gt;
   void load_KEYMAP_DEFINITION(
     const Token *i_which);			/// &lt;KEYMAP_DEFINITION&gt;
-  KeySeq *load_KEY_SEQUENCE(const istring &i_name = "",
+  KeySeq *load_KEY_SEQUENCE(const tstringi &i_name = _T(""),
 			    bool i_isInParen = false); /// &lt;KEY_SEQUENCE&gt;
   void load_KEY_ASSIGN();			/// &lt;KEY_ASSIGN&gt;
   void load_EVENT_ASSIGN();			/// &lt;EVENT_ASSIGN&gt;
@@ -104,24 +104,26 @@ private:
   void load_KEYSEQ_DEFINITION();		/// &lt;KEYSEQ_DEFINITION&gt;
 
   /// load
-  void load(const istring &i_filename);
+  void load(const tstringi &i_filename);
 
   /// is the filename readable ?
-  bool isReadable(const istring &i_filename) const;
+  bool isReadable(const tstringi &i_filename) const;
 
   /// get filename
-  bool getFilename(const istring &i_name, istring *o_path) const;
+  bool getFilename(const tstringi &i_name,
+		   tstringi *o_path) const;
 
 public:
   ///
-  SettingLoader(SyncObject *i_soLog, std::ostream *i_log);
+  SettingLoader(SyncObject *i_soLog, std::wostream *i_log);
 
   /// load setting
-  bool load(Setting *o_setting, const istring &i_filename = "");
+  bool load(Setting *o_setting, const tstringi &i_filename = _T(""));
 };
 
 
 /// get home directory path
-extern void getHomeDirectories(std::list<istring> *o_path);
+extern void getHomeDirectories(std::list<tstringi> *o_path);
+
 
 #endif // _SETTING_H

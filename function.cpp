@@ -10,9 +10,6 @@
 #include <algorithm>
 
 
-using namespace std;
-
-
 /// undefined key
 static void undefined(const Function::FuncData &i_fd)
 {
@@ -99,9 +96,9 @@ static void investigateCommand(const Function::FuncData &i_fd)
   Acquire a(&i_fd.m_engine.m_log, 0);
   g_hookData->m_doesNotifyCommand = !g_hookData->m_doesNotifyCommand;
   if (g_hookData->m_doesNotifyCommand)
-    i_fd.m_engine.m_log << " begin" << endl;
+    i_fd.m_engine.m_log << _T(" begin") << std::endl;
   else
-    i_fd.m_engine.m_log << " end" << endl;
+    i_fd.m_engine.m_log << _T(" end") << std::endl;
 }
 
 
@@ -139,8 +136,8 @@ static void helpVariable(const Function::FuncData &i_fd)
   if (!i_fd.m_isPressed)
     return;
 
-  char buf[20];
-  snprintf(buf, NUMBER_OF(buf), "%d", i_fd.m_engine.m_variable);
+  _TCHAR buf[20];
+  _sntprintf(buf, NUMBER_OF(buf), _T("%d"), i_fd.m_engine.m_variable);
 
   i_fd.m_engine.m_helpTitle = i_fd.m_args[0].getString();
   i_fd.m_engine.m_helpMessage = buf;
@@ -276,36 +273,39 @@ static void windowIdentify(const Function::FuncData &i_fd)
   if (!i_fd.m_isPressed)
     return;
 
-  char className[GANA_MAX_ATOM_LENGTH];
+  _TCHAR className[GANA_MAX_ATOM_LENGTH];
   bool ok = false;
-  if (GetClassName(i_fd.m_hwnd, className, sizeof(className)))
+  if (GetClassName(i_fd.m_hwnd, className, NUMBER_OF(className)))
   {
-    if (StringTool::mbsiequal_(className, "ConsoleWindowClass"))
+    if (_tcsicmp(className, _T("ConsoleWindowClass")) == 0)
     {
-      char titleName[1024];
-      if (GetWindowText(i_fd.m_hwnd, titleName, sizeof(titleName)) == 0)
-	titleName[0] = '\0';
+      _TCHAR titleName[1024];
+      if (GetWindowText(i_fd.m_hwnd, titleName, NUMBER_OF(titleName)) == 0)
+	titleName[0] = _T('\0');
       {
 	Acquire a(&i_fd.m_engine.m_log, 1);
-	i_fd.m_engine.m_log << "HWND:\t" << hex << (int)i_fd.m_hwnd << dec << endl;
+	i_fd.m_engine.m_log << _T("HWND:\t") << std::hex
+			    << (int)i_fd.m_hwnd << std::dec << std::endl;
       }
       Acquire a(&i_fd.m_engine.m_log, 0);
-      i_fd.m_engine.m_log << "CLASS:\t" << className << endl;
-      i_fd.m_engine.m_log << "TITLE:\t" << titleName << endl;
+      i_fd.m_engine.m_log << _T("CLASS:\t") << className << std::endl;
+      i_fd.m_engine.m_log << _T("TITLE:\t") << titleName << std::endl;
 
       HWND hwnd = getToplevelWindow(i_fd.m_hwnd, NULL);
       RECT rc;
       GetWindowRect(hwnd, &rc);
-      i_fd.m_engine.m_log << "Toplevel Window Position/Size: ("
-			  << rc.left << ", "<< rc.top << ") / ("
-			  << rcWidth(&rc) << "x" << rcHeight(&rc) << ")" << endl;
+      i_fd.m_engine.m_log << _T("Toplevel Window Position/Size: (")
+			  << rc.left << _T(", ") << rc.top << _T(") / (")
+			  << rcWidth(&rc) << _T("x") << rcHeight(&rc)
+			  << _T(")") << std::endl;
       
       SystemParametersInfo(SPI_GETWORKAREA, 0, (void *)&rc, FALSE);
-      i_fd.m_engine.m_log << "Desktop Window Position/Size: ("
-			  << rc.left << ", "<< rc.top << ") / ("
-			  << rcWidth(&rc) << "x" << rcHeight(&rc) << ")" << endl;
+      i_fd.m_engine.m_log << _T("Desktop Window Position/Size: (")
+			  << rc.left << _T(", ") << rc.top << _T(") / (")
+			  << rcWidth(&rc) << _T("x") << rcHeight(&rc)
+			  << _T(")") << std::endl;
 
-      i_fd.m_engine.m_log << endl;
+      i_fd.m_engine.m_log << std::endl;
       ok = true;
     }
   }
@@ -427,7 +427,7 @@ static BOOL (WINAPI *SetLayeredWindowAttributes_)
 static BOOL WINAPI initalizeLayerdWindow(
   HWND i_hwnd, COLORREF i_crKey, BYTE i_bAlpha, DWORD i_dwFlags)
 {
-  HMODULE hModule = GetModuleHandle("user32.dll");
+  HMODULE hModule = GetModuleHandle(_T("user32.dll"));
   if (!hModule)
     return FALSE;
   SetLayeredWindowAttributes_ =
@@ -469,8 +469,8 @@ static void windowSetAlpha(const Function::FuncData &i_fd)
     if (exStyle & WS_EX_LAYERED)	// remove alpha
     {
       Engine::WindowsWithAlpha::iterator
-	i = find(i_fd.m_engine.m_windowsWithAlpha.begin(),
-		 i_fd.m_engine.m_windowsWithAlpha.end(), hwnd);
+	i = std::find(i_fd.m_engine.m_windowsWithAlpha.begin(),
+		      i_fd.m_engine.m_windowsWithAlpha.end(), hwnd);
       if (i == i_fd.m_engine.m_windowsWithAlpha.end())
 	return;	// already layered by the application
     
@@ -486,9 +486,9 @@ static void windowSetAlpha(const Function::FuncData &i_fd)
 				       (BYTE)(255 * alpha / 100), LWA_ALPHA))
       {
 	Acquire a(&i_fd.m_engine.m_log, 0);
-	i_fd.m_engine.m_log << "error: &WindowSetAlpha(" << alpha
-			    << ") failed for HWND: " << hex << hwnd << dec
-			    << endl;
+	i_fd.m_engine.m_log << _T("error: &WindowSetAlpha(") << alpha
+			    << _T(") failed for HWND: ") << std::hex
+			    << hwnd << std::dec << std::endl;
 	return;
       }
       i_fd.m_engine.m_windowsWithAlpha.push_front(hwnd);
@@ -568,18 +568,22 @@ static void mouseWheel(const Function::FuncData &i_fd)
 
 
 /// get clipboard text (you must call closeClopboard())
-static char *getTextFromClipboard(HGLOBAL *i_hdata)
+static const _TCHAR *getTextFromClipboard(HGLOBAL *o_hdata)
 {
-  *i_hdata = NULL;
+  *o_hdata = NULL;
   
   if (!OpenClipboard(NULL))
     return NULL;
-  
-  *i_hdata = GetClipboardData(CF_TEXT);
-  if (!*i_hdata)
+
+#ifdef UNICODE
+  *o_hdata = GetClipboardData(CF_UNICODETEXT);
+#else
+  *o_hdata = GetClipboardData(CF_TEXT);
+#endif
+  if (!*o_hdata)
     return NULL;
   
-  char *data = (char *)GlobalLock(*i_hdata);
+  _TCHAR *data = reinterpret_cast<_TCHAR *>(GlobalLock(*o_hdata));
   if (!data)
     return NULL;
   return data;
@@ -594,7 +598,11 @@ static void closeClipboard(HGLOBAL i_hdata, HGLOBAL i_hdataNew = NULL)
   if (i_hdataNew)
   {
     EmptyClipboard();
+#ifdef UNICODE
+    SetClipboardData(CF_UNICODETEXT, i_hdataNew);
+#else
     SetClipboardData(CF_TEXT, i_hdataNew);
+#endif
   }
   CloseClipboard();
 }
@@ -606,27 +614,27 @@ static void clipboardChangeCase(const Function::FuncData &i_fd)
   if (!i_fd.m_isPressed)
     return;
   HGLOBAL hdata;
-  char *text = getTextFromClipboard(&hdata);
+  const _TCHAR *text = getTextFromClipboard(&hdata);
   HGLOBAL hdataNew = NULL;
   if (text)
   {
-    int size = (int)GlobalSize(hdata);
+    int size = static_cast<int>(GlobalSize(hdata));
     hdataNew = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, size);
     if (hdataNew)
     {
-      char *dataNew = (char *)GlobalLock(hdataNew);
-      if (dataNew)
+      if (_TCHAR *dataNew = reinterpret_cast<_TCHAR *>(GlobalLock(hdataNew)))
       {
-	memcpy(dataNew, text, size);
-	char *dataEnd = dataNew + size;
+	std::memcpy(dataNew, text, size);
+	_TCHAR *dataEnd = dataNew + size;
 	while (dataNew < dataEnd && *dataNew)
 	{
-	  char c = (BYTE)*dataNew;
-	  if (StringTool::ismbblead_(c))
+	  _TCHAR c = *dataNew;
+	  if (_istlead(c))
 	    dataNew += 2;
 	  else
-	    *dataNew++ = (i_fd.m_id == Function::Id_ClipboardUpcaseWord)
-	      ? StringTool::toupper_(c) : StringTool::tolower_(c);
+	    *dataNew++ =
+	      (i_fd.m_id == Function::Id_ClipboardUpcaseWord)
+	      ? _totupper(c) : _totlower(c);
 	}
 	GlobalUnlock(hdataNew);
       }
@@ -643,13 +651,15 @@ static void clipboardCopy(const Function::FuncData &i_fd)
     return;
   if (!OpenClipboard(NULL))
     return;
-  istring str = i_fd.m_args[0].getString();
+  tstringi str = i_fd.m_args[0].getString();
   HGLOBAL hdataNew =
-    GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, str.size() + 1);
+    GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
+		(str.size() + 1) * sizeof(_TCHAR));
   if (!hdataNew)
     return;
-  char *dataNew = (char *)GlobalLock(hdataNew);
-  strcpy(dataNew, str.c_str());
+  _TCHAR *dataNew = reinterpret_cast<_TCHAR *>(GlobalLock(hdataNew));
+  _tcscpy(dataNew, str.c_str());
+  GlobalUnlock(hdataNew);
   closeClipboard(NULL, hdataNew);
 }
 
@@ -662,8 +672,8 @@ void EmacsEditKillLine::func()
   if (!m_buf.empty())
   {
     HGLOBAL g;
-    char *text = getTextFromClipboard(&g);
-    if (text == NULL || strcmp(text, m_buf.c_str()) != 0)
+    const _TCHAR *text = getTextFromClipboard(&g);
+    if (text == NULL || m_buf != text)
       reset();
     closeClipboard(g);
   }
@@ -685,37 +695,38 @@ void EmacsEditKillLine::func()
 ^retval
 </pre>
 */
-HGLOBAL EmacsEditKillLine::makeNewKillLineBuf(const char *i_data,
+HGLOBAL EmacsEditKillLine::makeNewKillLineBuf(const _TCHAR *i_data,
 					      int *o_retval)
 {
-  int len = m_buf.size();
-  len += strlen(i_data) + 3;
+  size_t len = m_buf.size();
+  len += _tcslen(i_data) + 3;
   
-  HGLOBAL hdata = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, len);
+  HGLOBAL hdata = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
+			      len * sizeof(_TCHAR));
   if (!hdata)
     return NULL;
-  char *dataNew = (char *)GlobalLock(hdata);
-  *dataNew = '\0';
+  _TCHAR *dataNew = reinterpret_cast<_TCHAR *>(GlobalLock(hdata));
+  *dataNew = _T('\0');
   if (!m_buf.empty())
-    strcpy(dataNew, m_buf.c_str());
+    _tcscpy(dataNew, m_buf.c_str());
   
-  len = strlen(i_data);
+  len = _tcslen(i_data);
   if (3 <= len &&
-      i_data[len - 2] == '\r' && i_data[len - 1] == '\n')
+      i_data[len - 2] == _T('\r') && i_data[len - 1] == _T('\n'))
   {
-    strcat(dataNew, i_data);
-    len = strlen(dataNew);
-    dataNew[len - 2] = '\0'; // chomp
+    _tcscat(dataNew, i_data);
+    len = _tcslen(dataNew);
+    dataNew[len - 2] = _T('\0'); // chomp
     *o_retval = 2;
   }
   else if (len == 0)
   {
-    strcat(dataNew, "\r\n");
+    _tcscat(dataNew, _T("\r\n"));
     *o_retval = 1;
   }
   else
   {
-    strcat(dataNew, i_data);
+    _tcscat(dataNew, i_data);
     *o_retval = 0;
   }
   
@@ -730,16 +741,16 @@ HGLOBAL EmacsEditKillLine::makeNewKillLineBuf(const char *i_data,
 int EmacsEditKillLine::pred()
 {
   HGLOBAL g;
-  char *text = getTextFromClipboard(&g);
+  const _TCHAR *text = getTextFromClipboard(&g);
   int retval;
-  HGLOBAL hdata = makeNewKillLineBuf(text ? text : "", &retval);
+  HGLOBAL hdata = makeNewKillLineBuf(text ? text : _T(""), &retval);
   closeClipboard(g, hdata);
   return retval;
 }
 
 
 ///
-#define FUNC(id) Id_##id, #id
+#define FUNC(id) Id_##id, _T(#id)
 ///
 const Function Function::m_functions[] =
 {
@@ -748,27 +759,27 @@ const Function Function::m_functions[] =
   { FUNC(KeymapParent),			NULL, NULL, },
   { FUNC(KeymapWindow),			NULL, NULL, },
   { FUNC(OtherWindowClass),		NULL, NULL, },
-  { FUNC(Prefix),			"K&b", NULL, },
-  { FUNC(Keymap),			"K" , NULL, },
+  { FUNC(Prefix),			_T("K&b"), NULL, },
+  { FUNC(Keymap),			_T("K") , NULL, },
   { FUNC(Sync),				NULL, NULL, },
-  { FUNC(Toggle),			"l", NULL, },
-  { FUNC(EditNextModifier),		"M", NULL, },
-  { FUNC(Variable),			"dd", NULL, },
-  { FUNC(Repeat),			"S&d", NULL, },
+  { FUNC(Toggle),			_T("l"), NULL, },
+  { FUNC(EditNextModifier),		_T("M"), NULL, },
+  { FUNC(Variable),			_T("dd"), NULL, },
+  { FUNC(Repeat),			_T("S&d"), NULL, },
   
   // other
   { FUNC(Undefined),			NULL, undefined, },
   { FUNC(Ignore),			NULL, NULL, },
-  { FUNC(PostMessage),			"wddd", postMessage, },
-  { FUNC(ShellExecute),			"ssssW", NULL, },
+  { FUNC(PostMessage),			_T("wddd"), postMessage, },
+  { FUNC(ShellExecute),			_T("ssssW"), NULL, },
   { FUNC(LoadSetting),			NULL, NULL, },
-  { FUNC(VK),				"V", vk, },
-  { FUNC(Wait),				"d", NULL, },
+  { FUNC(VK),				_T("V"), vk, },
+  { FUNC(Wait),				_T("d"), NULL, },
   { FUNC(InvestigateCommand),		NULL, investigateCommand, },
-  { FUNC(MayuDialog),			"DW", mayuDialog, },
+  { FUNC(MayuDialog),			_T("DW"), mayuDialog, },
   { FUNC(DescribeBindings),		NULL, NULL, },
-  { FUNC(HelpMessage),			"&ss", helpMessage, },
-  { FUNC(HelpVariable),			"s", helpVariable, },
+  { FUNC(HelpMessage),			_T("&ss"), helpMessage, },
+  { FUNC(HelpVariable),			_T("s"), helpVariable, },
   //{ FUNC(Input),			1, INPUT, },
   
   // IME
@@ -778,30 +789,30 @@ const Function Function::m_functions[] =
   //{ FUNC(ToggleKatakanaHiragana),	0, NULL, },
   
   // window
-  { FUNC(WindowRaise),			"&b", windowRaise, },
-  { FUNC(WindowLower),			"&b", windowLower, },
-  { FUNC(WindowMinimize),		"&b", windowMinimize, },
-  { FUNC(WindowMaximize),		"&b", windowMaximize, },
-  { FUNC(WindowHMaximize),		"&b", windowHVMaximize, },
-  { FUNC(WindowVMaximize),		"&b", windowHVMaximize, },
-  { FUNC(WindowMove),			"dd&b", windowMove, },
-  { FUNC(WindowMoveTo),			"Gdd&b", windowMoveTo, },
-  { FUNC(WindowMoveVisibly),		"&b", windowMoveVisibly, },
-  { FUNC(WindowClingToLeft),		"&b", windowClingTo, },
-  { FUNC(WindowClingToRight),		"&b", windowClingTo, },
-  { FUNC(WindowClingToTop),		"&b", windowClingTo, },
-  { FUNC(WindowClingToBottom),		"&b", windowClingTo, },
-  { FUNC(WindowClose),			"&b", windowClose, },
+  { FUNC(WindowRaise),			_T("&b"), windowRaise, },
+  { FUNC(WindowLower),			_T("&b"), windowLower, },
+  { FUNC(WindowMinimize),		_T("&b"), windowMinimize, },
+  { FUNC(WindowMaximize),		_T("&b"), windowMaximize, },
+  { FUNC(WindowHMaximize),		_T("&b"), windowHVMaximize, },
+  { FUNC(WindowVMaximize),		_T("&b"), windowHVMaximize, },
+  { FUNC(WindowMove),			_T("dd&b"), windowMove, },
+  { FUNC(WindowMoveTo),			_T("Gdd&b"), windowMoveTo, },
+  { FUNC(WindowMoveVisibly),		_T("&b"), windowMoveVisibly, },
+  { FUNC(WindowClingToLeft),		_T("&b"), windowClingTo, },
+  { FUNC(WindowClingToRight),		_T("&b"), windowClingTo, },
+  { FUNC(WindowClingToTop),		_T("&b"), windowClingTo, },
+  { FUNC(WindowClingToBottom),		_T("&b"), windowClingTo, },
+  { FUNC(WindowClose),			_T("&b"), windowClose, },
   { FUNC(WindowToggleTopMost),		NULL, windowToggleTopMost, },
   { FUNC(WindowIdentify),		NULL, windowIdentify, },
-  { FUNC(WindowSetAlpha),		"d",  windowSetAlpha, },
+  { FUNC(WindowSetAlpha),		_T("d"),  windowSetAlpha, },
   { FUNC(WindowRedraw),			NULL, windowRedraw, },
-  { FUNC(WindowResizeTo),		"dd&b", windowResizeTo, },
+  { FUNC(WindowResizeTo),		_T("dd&b"), windowResizeTo, },
   //{ FUNC(ScreenSaver),		NULL, screenSaver, },
 
   // mouse
-  { FUNC(MouseMove),			"dd", mouseMove, },
-  { FUNC(MouseWheel),			"d", mouseWheel, },
+  { FUNC(MouseMove),			_T("dd"), mouseMove, },
+  { FUNC(MouseWheel),			_T("d"), mouseWheel, },
   //{ FUNC(MouseScrollIntelliMouse),	0, NULL, },
   //{ FUNC(MouseScrollAcrobatReader),	0, NULL, },
   //{ FUNC(MouseScrollAcrobatReader2),	0, NULL, },
@@ -818,10 +829,10 @@ const Function Function::m_functions[] =
   // clipboard
   { FUNC(ClipboardUpcaseWord),		NULL, clipboardChangeCase, },
   { FUNC(ClipboardDowncaseWord),	NULL, clipboardChangeCase, },
-  { FUNC(ClipboardCopy),		"s", clipboardCopy, },
+  { FUNC(ClipboardCopy),		_T("s"), clipboardCopy, },
   
   // EmacsEdit
-  { FUNC(EmacsEditKillLinePred),	"SS", NULL, },
+  { FUNC(EmacsEditKillLinePred),	_T("SS"), NULL, },
   { FUNC(EmacsEditKillLineFunc),	NULL, NULL, },
 
   { Id_NONE, NULL, NULL, NULL, },
@@ -836,7 +847,7 @@ const Function *Function::search(Id i_id)
       return f;
   return NULL;
 }
-const Function *Function::search(const istring &i_name)
+const Function *Function::search(const tstringi &i_name)
 {
   for (const Function *f = m_functions; f->m_id != Id_NONE; ++ f)
     if (i_name == f->m_name)
@@ -845,8 +856,7 @@ const Function *Function::search(const istring &i_name)
 }
 
 /// stream output
-std::ostream &
-operator<<(std::ostream &i_ost, const Function &i_f)
+tostream &operator<<(tostream &i_ost, const Function &i_f)
 {
-  return i_ost << "&" << i_f.m_name;
+  return i_ost << _T("&") << i_f.m_name;
 }

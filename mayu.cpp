@@ -31,9 +31,6 @@
 #include <commctrl.h>
 
 
-using namespace std;
-
-
 ///
 #define ID_MENUITEM_reloadBegin _APS_NEXT_COMMAND_VALUE
 
@@ -55,7 +52,7 @@ class Mayu
   NOTIFYICONDATA m_ni;				/// taskbar icon data
   bool m_canUseTasktrayBaloon;			/// 
 
-  omsgstream m_log;				/** log stream (output to log
+  tomsgstream m_log;				/** log stream (output to log
 						    dialog's edit) */
 
   HANDLE m_mhEvent;				/** event for message handler
@@ -89,7 +86,7 @@ private:
     wc.hCursor       = NULL;
     wc.hbrBackground = NULL;
     wc.lpszMenuName  = NULL;
-    wc.lpszClassName = "mayuTasktray";
+    wc.lpszClassName = _T("mayuTasktray");
     return RegisterClass(&wc);
   }
 
@@ -133,8 +130,8 @@ private:
 	case Notify::Type_name:
 	{
 	  NotifySetFocus *n = (NotifySetFocus *)buf;
-	  n->m_className[NUMBER_OF(n->m_className) - 1] = '\0';
-	  n->m_titleName[NUMBER_OF(n->m_titleName) - 1] = '\0';
+	  n->m_className[NUMBER_OF(n->m_className) - 1] = _T('\0');
+	  n->m_titleName[NUMBER_OF(n->m_titleName) - 1] = _T('\0');
 	  
 	  if (n->m_type == Notify::Type_setFocus)
 	    m_engine.setFocus(n->m_hwnd, n->m_threadId,
@@ -142,13 +139,15 @@ private:
 
 	  {
 	    Acquire a(&m_log, 1);
-	    m_log << "HWND:\t" << hex << reinterpret_cast<int>(n->m_hwnd)
-		  << dec << endl;
-	    m_log << "THREADID:" << static_cast<int>(n->m_threadId) << endl;
+	    m_log << _T("HWND:\t") << std::hex
+		  << reinterpret_cast<int>(n->m_hwnd)
+		  << std::dec << std::endl;
+	    m_log << _T("THREADID:") << static_cast<int>(n->m_threadId)
+		  << std::endl;
 	  }
 	  Acquire a(&m_log, (n->m_type == Notify::Type_name) ? 0 : 1);
-	  m_log << "CLASS:\t" << n->m_className << endl;
-	  m_log << "TITLE:\t" << n->m_titleName << endl;
+	  m_log << _T("CLASS:\t") << n->m_className << std::endl;
+	  m_log << _T("TITLE:\t") << n->m_titleName << std::endl;
 	  
 	  bool isMDI = true;
 	  HWND hwnd = getToplevelWindow(n->m_hwnd, &isMDI);
@@ -156,23 +155,26 @@ private:
 	  if (isMDI)
 	  {
 	    getChildWindowRect(hwnd, &rc);
-	    m_log << "MDI Window Position/Size: ("
-		<< rc.left << ", "<< rc.top << ") / ("
-		<< rcWidth(&rc) << "x" << rcHeight(&rc) << ")" << endl;
+	    m_log << _T("MDI Window Position/Size: (")
+		  << rc.left << _T(", ") << rc.top << _T(") / (")
+		  << rcWidth(&rc) << _T("x") << rcHeight(&rc) << _T(")")
+		  << std::endl;
 	    hwnd = getToplevelWindow(n->m_hwnd, NULL);
 	  }
 	  
 	  GetWindowRect(hwnd, &rc);
-	  m_log << "Toplevel Window Position/Size: ("
-		<< rc.left << ", "<< rc.top << ") / ("
-		<< rcWidth(&rc) << "x" << rcHeight(&rc) << ")" << endl;
+	  m_log << _T("Toplevel Window Position/Size: (")
+		<< rc.left << _T(", ") << rc.top << _T(") / (")
+		<< rcWidth(&rc) << _T("x") << rcHeight(&rc) << _T(")")
+		<< std::endl;
 
 	  SystemParametersInfo(SPI_GETWORKAREA, 0, (void *)&rc, FALSE);
-	  m_log << "Desktop Window Position/Size: ("
-	      << rc.left << ", "<< rc.top << ") / ("
-	      << rcWidth(&rc) << "x" << rcHeight(&rc) << ")" << endl;
+	  m_log << _T("Desktop Window Position/Size: (")
+		<< rc.left << _T(", ") << rc.top << _T(") / (")
+		<< rcWidth(&rc) << _T("x") << rcHeight(&rc) << _T(")")
+		<< std::endl;
 	  
-	  m_log << endl;
+	  m_log << std::endl;
 	  break;
 	}
 	
@@ -232,8 +234,9 @@ private:
       {
 	case WM_APP_msgStreamNotify:
 	{
-	  omsgbuf *log = (omsgbuf *)i_lParam;
-	  const string &str = log->acquireString();
+	  tomsgstream::StreamBuf *log =
+	    reinterpret_cast<tomsgstream::StreamBuf *>(i_lParam);
+	  const tstring &str = log->acquireString();
 	  editInsertTextAtLast(GetDlgItem(This->m_hwndLog, IDC_EDIT_log),
 			       str, 65000);
 	  log->releaseString();
@@ -264,29 +267,30 @@ private:
 		HMENU hMenuSubSub = GetSubMenu(hMenuSub, 1);
 		Registry reg(MAYU_REGISTRY_ROOT);
 		int mayuIndex;
-		reg.read(".mayuIndex", &mayuIndex, 0);
+		reg.read(_T(".mayuIndex"), &mayuIndex, 0);
 		while (DeleteMenu(hMenuSubSub, 0, MF_BYPOSITION))
 		  ;
-		Regexp getName("^([^;]*);");
+		tregex getName(_T("^([^;]*);"));
 		for (int index = 0; ; index ++)
 		{
-		  char buf[100];
-		  snprintf(buf, sizeof(buf), ".mayu%d", index);
-		  StringTool::istring dot_mayu;
+		  _TCHAR buf[100];
+		  _sntprintf(buf, NUMBER_OF(buf), _T(".mayu%d"), index);
+		  tstringi dot_mayu;
 		  if (!reg.read(buf, &dot_mayu))
 		    break;
-		  if (getName.doesMatch(dot_mayu))
+		  tcmatch_results what;
+		  if (boost::regex_search(dot_mayu, what, getName))
 		  {
 		    MENUITEMINFO mii;
-		    memset(&mii, 0, sizeof(mii));
+		    std::memset(&mii, 0, sizeof(mii));
 		    mii.cbSize = sizeof(mii);
 		    mii.fMask = MIIM_ID | MIIM_STATE | MIIM_TYPE;
 		    mii.fType = MFT_STRING;
 		    mii.fState =
 		      MFS_ENABLED | ((mayuIndex == index) ? MFS_CHECKED : 0);
 		    mii.wID = ID_MENUITEM_reloadBegin + index;
-		    StringTool::istring name = getName[1];
-		    mii.dwTypeData = (char *)name.c_str();
+		    tstringi name = what[1];
+		    mii.dwTypeData = const_cast<_TCHAR *>(name.c_str());
 		    mii.cch = name.size();
 		    
 		    InsertMenuItem(hMenuSubSub, index, TRUE, &mii);
@@ -319,7 +323,7 @@ private:
 		if (ID_MENUITEM_reloadBegin <= id)
 		{
 		  Registry reg(MAYU_REGISTRY_ROOT);
-		  reg.write(".mayuIndex", id - ID_MENUITEM_reloadBegin);
+		  reg.write(_T(".mayuIndex"), id - ID_MENUITEM_reloadBegin);
 		  This->load();
 		}
 		break;
@@ -362,14 +366,14 @@ private:
 		break;
 	      case ID_MENUITEM_help:
 	      {
-		char buf[GANA_MAX_PATH];
+		TCHAR buf[GANA_MAX_PATH];
 		CHECK_TRUE( GetModuleFileName(g_hInst, buf, NUMBER_OF(buf)) );
 		CHECK_TRUE( PathRemoveFileSpec(buf) );
 	    
-		istring helpFilename = buf;
-		helpFilename += "\\";
+		tstringi helpFilename = buf;
+		helpFilename += _T("\\");
 		helpFilename += loadString(IDS_helpFilename);
-		ShellExecute(NULL, "open", helpFilename.c_str(),
+		ShellExecute(NULL, _T("open"), helpFilename.c_str(),
 			     NULL, NULL, SW_SHOWNORMAL);
 		break;
 	      }
@@ -449,8 +453,8 @@ private:
     // set symbol
     for (int i = 1; i < __argc; ++ i)
     {
-      if (__argv[i][0] == '-' && __argv[i][1] == 'D')
-	newSetting->m_symbols.insert(__argv[i] + 2);
+      if (__wargv[i][0] == _T('-') && __wargv[i][1] == _T('D'))
+	newSetting->m_symbols.insert(__wargv[i] + 2);
     }
 
     if (!SettingLoader(&m_log, &m_log).load(newSetting))
@@ -459,7 +463,7 @@ private:
       SetForegroundWindow(m_hwndLog);
       delete newSetting;
       Acquire a(&m_log, 0);
-      m_log << "error: failed to load." << endl;
+      m_log << _T("error: failed to load.") << std::endl;
       return;
     }
     while (!m_engine.setSetting(newSetting))
@@ -476,16 +480,15 @@ private:
       m_ni.uFlags |= NIF_INFO;
       if (i_doesShow)
       {
-	std::string helpMessage, helpTitle;
+	tstring helpMessage, helpTitle;
 	m_engine.getHelpMessages(&helpMessage, &helpTitle);
-	StringTool::mbsfill(m_ni.szInfo, helpMessage.c_str(),
-			    NUMBER_OF(m_ni.szInfo));
-	StringTool::mbsfill(m_ni.szInfoTitle, helpTitle.c_str(),
-			    NUMBER_OF(m_ni.szInfoTitle));
+	tcslcpy(m_ni.szInfo, helpMessage.c_str(), NUMBER_OF(m_ni.szInfo));
+	tcslcpy(m_ni.szInfoTitle, helpTitle.c_str(),
+		NUMBER_OF(m_ni.szInfoTitle));
 	m_ni.dwInfoFlags = NIIF_INFO;
       }
       else
-	m_ni.szInfo[0] = m_ni.szInfoTitle[0] = '\0';
+	m_ni.szInfo[0] = m_ni.szInfoTitle[0] = _T('\0');
       CHECK_TRUE( Shell_NotifyIcon(i_doesAdd ? NIM_ADD : NIM_MODIFY, &m_ni) );
     }
   }
@@ -495,29 +498,29 @@ public:
   Mayu()
     : m_hwndTaskTray(NULL),
       m_hwndLog(NULL),
-      m_WM_TaskbarRestart(RegisterWindowMessage(TEXT("TaskbarCreated"))),
+      m_WM_TaskbarRestart(RegisterWindowMessage(_T("TaskbarCreated"))),
       m_log(WM_APP_msgStreamNotify),
       m_setting(NULL),
       m_isSettingDialogOpened(false),
       m_engine(m_log),
       m_canUseTasktrayBaloon(
-	PACKVERSION(5, 0) <= getDllVersion(TEXT("shlwapi.dll")))
+	PACKVERSION(5, 0) <= getDllVersion(_T("shlwapi.dll")))
   {
     CHECK_TRUE( Register_focus() );
     CHECK_TRUE( Register_target() );
     CHECK_TRUE( Register_tasktray() );
 
     // change dir
-    std::list<istring> pathes;
+    std::list<tstringi> pathes;
     getHomeDirectories(&pathes);
-    for (std::list<istring>::iterator
+    for (std::list<tstringi>::iterator
 	   i = pathes.begin(); i != pathes.end(); i ++)
       if (SetCurrentDirectory(i->c_str()))
 	break;
     
     // create windows, dialogs
-    istring title = loadString(IDS_mayu);
-    m_hwndTaskTray = CreateWindow("mayuTasktray", title.c_str(),
+    tstringi title = loadString(IDS_mayu);
+    m_hwndTaskTray = CreateWindow(_T("mayuTasktray"), title.c_str(),
 				  WS_OVERLAPPEDWINDOW,
 				  CW_USEDEFAULT, CW_USEDEFAULT, 
 				  CW_USEDEFAULT, CW_USEDEFAULT, 
@@ -551,15 +554,14 @@ public:
     m_engine.start();
     
     // show tasktray icon
-    memset(&m_ni, 0, sizeof(m_ni));
+    std::memset(&m_ni, 0, sizeof(m_ni));
     m_ni.uID    = ID_TaskTrayIcon;
     m_ni.hWnd   = m_hwndTaskTray;
     m_ni.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
     m_ni.hIcon  = loadSmallIcon(IDI_ICON_mayu);
     m_ni.uCallbackMessage = WM_APP_taskTrayNotify;
-    string tip = loadString(IDS_mayu);
-    strncpy(m_ni.szTip, tip.c_str(), sizeof(m_ni.szTip));
-    m_ni.szTip[NUMBER_OF(m_ni.szTip) - 1] = '\0';
+    tstring tip = loadString(IDS_mayu);
+    tcslcpy(m_ni.szTip, tip.c_str(), NUMBER_OF(m_ni.szTip));
     if (m_canUseTasktrayBaloon)
       m_ni.cbSize = sizeof(m_ni);
     else
@@ -618,22 +620,24 @@ public:
     {
       time_t now;
       time(&now);
-      char buf[1024];
+      _TCHAR buf[1024];
 #ifdef __BORLANDC__
 #pragma message("\t\t****\tAfter std::ostream() is called,  ")
 #pragma message("\t\t****\tstrftime(... \"%%#c\" ...) fails.")
 #pragma message("\t\t****\tWhy ? Bug of Borland C++ 5.5 ?   ")
 #pragma message("\t\t****\t                         - nayuta")
-      strftime(buf, NUMBER_OF(buf),
-	       "%Y/%m/%d %H:%M:%S (Compiled by Borland C++)", localtime(&now));
+      _tcsftime(buf, NUMBER_OF(buf),
+		_T("%Y/%m/%d %H:%M:%S (Compiled by Borland C++)"),
+		localtime(&now));
 #else
-      strftime(buf, NUMBER_OF(buf), "%#c", localtime(&now));
+      _tcsftime(buf, NUMBER_OF(buf), _T("%#c"), localtime(&now));
 #endif
       
       Acquire a(&m_log, 0);
-      m_log << loadString(IDS_mayu) << " "VERSION" @ " << buf << endl;
+      m_log << loadString(IDS_mayu) << _T(" ") _T(VERSION) _T(" @ ")
+	    << buf << std::endl;
       CHECK_TRUE( GetModuleFileName(g_hInst, buf, NUMBER_OF(buf)) );
-      m_log << buf << endl << endl;
+      m_log << buf << std::endl << std::endl;
     }
     load();
     
@@ -662,47 +666,48 @@ public:
 void convertRegistry()
 {
   Registry reg(MAYU_REGISTRY_ROOT);
-  StringTool::istring dot_mayu;
+  tstringi dot_mayu;
   bool doesAdd = false;
-  if (reg.read(".mayu", &dot_mayu))
+  if (reg.read(_T(".mayu"), &dot_mayu))
   {
-    reg.write(".mayu0", ";" + dot_mayu + ";");
-    reg.remove(".mayu");
+    reg.write(_T(".mayu0"), _T(";") + dot_mayu + _T(";"));
+    reg.remove(_T(".mayu"));
     doesAdd = true;
   }
-  else if (!reg.read(".mayu0", &dot_mayu))
+  else if (!reg.read(_T(".mayu0"), &dot_mayu))
   {
-    reg.write(".mayu0", loadString(IDS_readFromHomeDirectory) + ";;");
+    reg.write(_T(".mayu0"), loadString(IDS_readFromHomeDirectory) + _T(";;"));
     doesAdd = true;
   }
   if (doesAdd)
   {
-    Registry commonreg(HKEY_LOCAL_MACHINE, "Software\\GANAware\\mayu");
-    StringTool::istring dir, layout;
-    if (commonreg.read("dir", &dir) && commonreg.read("layout", &layout))
+    Registry commonreg(HKEY_LOCAL_MACHINE, _T("Software\\GANAware\\mayu"));
+    tstringi dir, layout;
+    if (commonreg.read(_T("dir"), &dir) &&
+	commonreg.read(_T("layout"), &layout))
     {
-      StringTool::istring tmp = ";" + dir + "\\dot.mayu";
-      if (layout == "109")
+      tstringi tmp = _T(";") + dir + _T("\\dot.mayu");
+      if (layout == _T("109"))
       {
-	reg.write(".mayu1", loadString(IDS_109Emacs) + tmp
-		  + ";-DUSE109" ";-DUSEdefault");
-	reg.write(".mayu2", loadString(IDS_104on109Emacs) + tmp
-		  + ";-DUSE109" ";-DUSEdefault" ";-DUSE104on109");
-	reg.write(".mayu3", loadString(IDS_109) + tmp
-		  + ";-DUSE109");
-	reg.write(".mayu4", loadString(IDS_104on109) + tmp
-		  + ";-DUSE109" ";-DUSE104on109");
+	reg.write(_T(".mayu1"), loadString(IDS_109Emacs) + tmp
+		  + _T(";-DUSE109") _T(";-DUSEdefault"));
+	reg.write(_T(".mayu2"), loadString(IDS_104on109Emacs) + tmp
+		  + _T(";-DUSE109") _T(";-DUSEdefault") _T(";-DUSE104on109"));
+	reg.write(_T(".mayu3"), loadString(IDS_109) + tmp
+		  + _T(";-DUSE109"));
+	reg.write(_T(".mayu4"), loadString(IDS_104on109) + tmp
+		  + _T(";-DUSE109") _T(";-DUSE104on109"));
       }
       else
       {
-	reg.write(".mayu1", loadString(IDS_104Emacs) + tmp
-		  + ";-DUSE104" ";-DUSEdefault");
-	reg.write(".mayu2", loadString(IDS_109on104Emacs) + tmp
-		  + ";-DUSE104" ";-DUSEdefault" ";-DUSE109on104");
-	reg.write(".mayu3", loadString(IDS_104) + tmp
-		  + ";-DUSE104");
-	reg.write(".mayu4", loadString(IDS_109on104) + tmp
-		  + ";-DUSE104" ";-DUSE109on104");
+	reg.write(_T(".mayu1"), loadString(IDS_104Emacs) + tmp
+		  + _T(";-DUSE104") _T(";-DUSEdefault"));
+	reg.write(_T(".mayu2"), loadString(IDS_109on104Emacs) + tmp
+		  + _T(";-DUSE104") _T(";-DUSEdefault") _T(";-DUSE109on104"));
+	reg.write(_T(".mayu3"), loadString(IDS_104) + tmp
+		  + _T(";-DUSE104"));
+	reg.write(_T(".mayu4"), loadString(IDS_109on104) + tmp
+		  + _T(";-DUSE104") _T(";-DUSE109on104"));
       }
     }
   }
@@ -710,13 +715,13 @@ void convertRegistry()
 
 
 /// main
-int WINAPI WinMain(HINSTANCE i_hInstance, HINSTANCE /* i_hPrevInstance */,
-		   LPSTR /* i_lpszCmdLine */, int /* i_nCmdShow */)
+int WINAPI _tWinMain(HINSTANCE i_hInstance, HINSTANCE /* i_hPrevInstance */,
+		     LPTSTR /* i_lpszCmdLine */, int /* i_nCmdShow */)
 {
   g_hInst = i_hInstance;
 
   // set locale
-  CHECK_TRUE( setlocale(LC_ALL, "") );
+  CHECK_TRUE( _tsetlocale(LC_ALL, _T("")) );
 
   // common controls
   INITCOMMONCONTROLSEX icc;
@@ -733,8 +738,8 @@ int WINAPI WinMain(HINSTANCE i_hInstance, HINSTANCE /* i_hPrevInstance */,
   if (GetLastError() == ERROR_ALREADY_EXISTS)
   {
     // another mayu already running
-    string text = loadString(IDS_mayuAlreadyExists);
-    string title = loadString(IDS_mayu);
+    tstring text = loadString(IDS_mayuAlreadyExists);
+    tstring title = loadString(IDS_mayu);
     MessageBox((HWND)NULL, text.c_str(), title.c_str(), MB_OK | MB_ICONSTOP);
     return 1;
   }
@@ -746,7 +751,7 @@ int WINAPI WinMain(HINSTANCE i_hInstance, HINSTANCE /* i_hPrevInstance */,
   }
   catch (ErrorMessage &i_e)
   {
-    string title = loadString(IDS_mayu);
+    tstring title = loadString(IDS_mayu);
     MessageBox((HWND)NULL, i_e.getMessage().c_str(), title.c_str(),
 	       MB_OK | MB_ICONSTOP);
   }

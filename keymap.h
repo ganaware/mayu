@@ -7,7 +7,6 @@
 
 
 #  include "keyboard.h"
-#  include "regexp.h"
 #  include "function.h"
 #  include <vector>
 
@@ -87,7 +86,7 @@ public:
 
 private:
   Actions m_actions;				///
-  istring m_name;				/// 
+  tstringi m_name;				/// 
 
 private:
   ///
@@ -97,7 +96,7 @@ private:
   
 public:
   ///
-  KeySeq(const istring &i_name);
+  KeySeq(const tstringi &i_name);
   ///
   KeySeq(const KeySeq &i_ks);
   ///
@@ -117,11 +116,10 @@ public:
   KeySeq &add(const ActionFunction &i_af);
 
   ///
-  const istring &getName() const { return m_name; }
+  const tstringi &getName() const { return m_name; }
   
   /// stream output
-  friend std::ostream &
-  operator<<(std::ostream &i_ost, const KeySeq &i_ks);
+  friend tostream &operator<<(tostream &i_ost, const KeySeq &i_ks);
 };
 
 
@@ -208,9 +206,9 @@ private:
   ModAssignments m_modAssignments[Modifier::Type_ASSIGN];
 
   Type m_type;					/// type
-  istring m_name;				/// keymap name
-  Regexp m_windowClass;				/// window class name regexp
-  Regexp m_windowTitle;				/// window title name regexp
+  tstringi m_name;				/// keymap name
+  tregex m_windowClass;				/// window class name regexp
+  tregex m_windowTitle;				/// window title name regexp
 
   KeySeq *m_defaultKeySeq;			/// default keySeq
   Keymap *m_parentKeymap;			/// parent keymap
@@ -222,9 +220,9 @@ private:
 public:
   ///
   Keymap(Type i_type,
-	 const istring &i_name,
-	 const istring &i_windowClass,
-	 const istring &i_windowTitle,
+	 const tstringi &i_name,
+	 const tstringi &i_windowClass,
+	 const tstringi &i_windowTitle,
 	 KeySeq *i_defaultKeySeq,
 	 Keymap *i_parentKeymap);
   
@@ -243,10 +241,11 @@ public:
   ///
   Keymap *getParentKeymap() const { return m_parentKeymap; }
   ///
-  const istring &getName() const { return m_name; }
+  const tstringi &getName() const { return m_name; }
 
   /// does same window
-  bool doesSameWindow(const istring i_className, const istring &i_titleName);
+  bool doesSameWindow(const tstringi i_className,
+		      const tstringi &i_titleName);
   
   /// adjust modifier
   void adjustModifier(Keyboard &i_keyboard);
@@ -256,7 +255,7 @@ public:
   { return m_modAssignments[i_mt]; }
 
   /// describe
-  void describe(std::ostream &i_ost, DescribedKeys *o_mk) const;
+  void describe(tostream &i_ost, DescribedKeys *o_mk) const;
 };
 
 
@@ -278,12 +277,12 @@ public:
   Keymaps();
   
   /// search by name
-  Keymap *searchByName(const istring &i_name);
+  Keymap *searchByName(const tstringi &i_name);
 
   /// search window
   void searchWindow(KeymapPtrList *o_keymapPtrList,
-		    const istring &i_className,
-		    const istring &i_titleName);
+		    const tstringi &i_className,
+		    const tstringi &i_titleName);
   
   /// add keymap
   Keymap *add(const Keymap &i_keymap);
@@ -296,21 +295,6 @@ public:
 ///
 class KeySeqs
 {
-#if 0
-  ///
-  class NamedKeySeq
-  {
-  public:
-    const istring name;		///
-    KeySeq keySeq;		///
-    ///
-    NamedKeySeq(const istring &name_, const KeySeq &keySeq_)
-      : name(name_), keySeq(keySeq_) { }
-  };
-  typedef std::list<NamedKeySeq> NamedKeySeqs;	///
-  NamedKeySeqs namedKeySeqs;			///
-#endif
-
 private:
   typedef std::list<KeySeq> KeySeqList;		///
 
@@ -322,7 +306,7 @@ public:
   KeySeq *add(const KeySeq &i_keySeq);
   
   /// search by name
-  KeySeq *searchByName(const istring &i_name);
+  KeySeq *searchByName(const tstringi &i_name);
 };
 
 

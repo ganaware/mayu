@@ -12,8 +12,6 @@
 #include <windowsx.h>
 
 
-using namespace std;
-
 ///
 class DlgVersion
 {
@@ -32,10 +30,10 @@ public:
     setSmallIcon(m_hwnd, IDI_ICON_mayu);
     setBigIcon(m_hwnd, IDI_ICON_mayu);
     
-    char buf[1024], buf2[1024];
+    _TCHAR buf[1024], buf2[1024];
     Edit_GetText(GetDlgItem(m_hwnd, IDC_STATIC_version), buf,
 		 NUMBER_OF(buf));
-    snprintf(buf2, NUMBER_OF(buf2), buf, VERSION);
+    _sntprintf(buf2, NUMBER_OF(buf2), buf, VERSION);
     Edit_SetText(GetDlgItem(m_hwnd, IDC_STATIC_version), buf2);
     return TRUE;
   }
@@ -59,9 +57,9 @@ public:
       }
       case IDC_BUTTON_download:
       {
-	char buf[1024];
+	_TCHAR buf[1024];
 	Edit_GetText(GetDlgItem(m_hwnd, IDC_STATIC_url), buf, NUMBER_OF(buf));
-	ShellExecute(NULL, "open", buf, NULL, NULL, SW_SHOWNORMAL);
+	ShellExecute(NULL, _T("open"), buf, NULL, NULL, SW_SHOWNORMAL);
 	CHECK_TRUE( EndDialog(m_hwnd, 0) );
 	return TRUE;
       }
