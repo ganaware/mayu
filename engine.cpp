@@ -265,42 +265,54 @@ void Engine::generateKeyEvent(Key *i_key, bool i_doPress, bool i_isByAssign)
       break;
     }
 
+  bool isAlreadyReleased = false;
+  
   if (!isEvent)
   {
     if (i_doPress && !i_key->m_isPressedOnWin32)
       ++ m_currentKeyPressCountOnWin32;
-    else if (!i_doPress && i_key->m_isPressedOnWin32)
-      -- m_currentKeyPressCountOnWin32;
+    else if (!i_doPress)
+    {
+      if (i_key->m_isPressedOnWin32)
+	-- m_currentKeyPressCountOnWin32;
+      else
+	isAlreadyReleased = true;
+    }
     i_key->m_isPressedOnWin32 = i_doPress;
     
     if (i_isByAssign)
       i_key->m_isPressedByAssign = i_doPress;
-    
-    KEYBOARD_INPUT_DATA kid = { 0, 0, 0, 0, 0 };
-    const ScanCode *sc = i_key->getScanCodes();
-    for (size_t i = 0; i < i_key->getScanCodesSize(); ++ i)
+
+    if (!isAlreadyReleased)
     {
-      kid.MakeCode = sc[i].m_scan;
-      kid.Flags = sc[i].m_flags;
-      if (!i_doPress)
-	kid.Flags |= KEYBOARD_INPUT_DATA::BREAK;
-      DWORD len;
+      KEYBOARD_INPUT_DATA kid = { 0, 0, 0, 0, 0 };
+      const ScanCode *sc = i_key->getScanCodes();
+      for (size_t i = 0; i < i_key->getScanCodesSize(); ++ i)
+      {
+	kid.MakeCode = sc[i].m_scan;
+	kid.Flags = sc[i].m_flags;
+	if (!i_doPress)
+	  kid.Flags |= KEYBOARD_INPUT_DATA::BREAK;
+	DWORD len;
 #if defined(_WINNT)
-      WriteFile(m_device, &kid, sizeof(kid), &len, &m_ol);
-      CHECK_TRUE( GetOverlappedResult(m_device, &m_ol, &len, TRUE) );
+	WriteFile(m_device, &kid, sizeof(kid), &len, &m_ol);
+	CHECK_TRUE( GetOverlappedResult(m_device, &m_ol, &len, TRUE) );
 #elif defined(_WIN95)
-      DeviceIoControl(m_device, 2, &kid, sizeof(kid), NULL, 0, &len, NULL);
+	DeviceIoControl(m_device, 2, &kid, sizeof(kid), NULL, 0, &len, NULL);
 #else
 #  error
 #endif
+      }
+      
+      m_lastGeneratedKey = i_doPress ? i_key : NULL;
     }
-    
-    m_lastGeneratedKey = i_doPress ? i_key : NULL;
   }
   
   {
     Acquire a(&m_log, 1);
     m_log << _T("\t\t    =>\t");
+    if (isAlreadyReleased)
+      m_log << _T("(already released) ");
   }
   ModifiedKey mkey(i_key);
   mkey.m_modifier.on(Modifier::Type_Up, !i_doPress);
@@ -806,11 +818,6 @@ void Engine::keyboardHandler()
 	    && m_oneShotKey.m_key == c.m_mkey.m_key)
 	{
 	  Current cnew = c;
-#if 0
-	  cnew.m_mkey.m_modifier.off(Modifier::Type_Up);
-	  cnew.m_mkey.m_modifier.on(Modifier::Type_Down);
-	  outputToLog(&key, cnew.m_mkey, 1);
-#endif
 	  beginGeneratingKeyboardEvents(cnew, false);
 	}
 	else
