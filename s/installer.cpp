@@ -338,7 +338,7 @@ namespace Installer
   
   // install files
   bool installFiles(const SetupFile::Data *i_setupFiles,
-		    size_t i_setupFilesSize,
+		    size_t i_setupFilesSize, u_int32 i_flags,
 		    const tstringi &i_srcDir, const tstringi &i_destDir)
   {
     tstringi to, from;
@@ -360,6 +360,9 @@ namespace Installer
       if (!checkOs(s.m_os))			// check operating system
 	continue;
 
+      if ((s.m_flags & i_flags) != i_flags)	// check flags
+	continue;
+      
       // type
       switch (s.m_kind)
       {
@@ -413,8 +416,9 @@ namespace Installer
   
 
   // remove files from src
-  bool removeSrcFiles(const SetupFile::Data *i_setupFiles,
-		      size_t i_setupFilesSize, const tstringi &i_srcDir)
+  bool removeSrcFiles(const SetupFile::Data *i_setupFiles, 
+		      size_t i_setupFilesSize, u_int32 i_flags,
+		      const tstringi &i_srcDir)
   {
     tstringi destDriverDir = getDriverDirectory();
 
@@ -427,6 +431,9 @@ namespace Installer
 	continue;	// remove only
 
       if (!checkOs(s.m_os))	// check operating system
+	continue;
+      
+      if ((s.m_flags & i_flags) != i_flags)	// check flags
 	continue;
 
       // type
@@ -449,7 +456,8 @@ namespace Installer
   
   // remove files
   void removeFiles(const SetupFile::Data *i_setupFiles,
-		   size_t i_setupFilesSize, const tstringi &i_destDir)
+		   size_t i_setupFilesSize, u_int32 i_flags,
+		   const tstringi &i_destDir)
   {
     tstringi destDriverDir = getDriverDirectory();
 
@@ -462,6 +470,9 @@ namespace Installer
       if (!checkOs(s.m_os))	// check operating system
 	continue;
 
+      if ((s.m_flags & i_flags) != i_flags)	// check flags
+	continue;
+      
       // type
       switch (s.m_kind)
       {

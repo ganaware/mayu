@@ -60,7 +60,7 @@ BEGIN
     RTEXT           "インストール先(&D):",IDC_STATIC,0,87,52,8
     EDITTEXT        IDC_EDIT_path,56,84,152,14,ES_AUTOHSCROLL
     PUSHBUTTON      "参照(&B)...",IDC_BUTTON_browse,212,84,44,14
-    ICON            IDI_ICON_mayu,IDC_STATIC,8,120,18,21
+    ICON            IDI_ICON_mayu,IDC_STATIC,8,120,20,20
     GROUPBOX        "",IDC_STATIC,35,100,192,56
     CONTROL         "All Users のスタートメニューに登録(&A)",
                     IDC_CHECK_registerStartMenu,"Button",BS_AUTOCHECKBOX | 
@@ -69,7 +69,7 @@ BEGIN
                     IDC_CHECK_registerStartUp,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,44,122,176,10
     RTEXT           "キーボードの種類(&K):",IDC_STATIC,36,138,64,8
-    COMBOBOX        IDC_COMBO_keyboard,104,136,116,50,CBS_DROPDOWNLIST | 
+    COMBOBOX        IDC_COMBO_keyboard,104,136,116,64,CBS_DROPDOWNLIST | 
                     WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,76,160,50,14
     PUSHBUTTON      "キャンセル",IDCANCEL,132,160,50,14
@@ -128,6 +128,9 @@ BEGIN
     IDS_shortcutName        "窓使いの憂鬱"
     IDS_keyboard109         "日本語 109 (106) キーボード"
     IDS_keyboard104         "英語 104 (101) キーボード"
+    IDS_keyboard109usb      "(日本語 109 (106) USB キーボードα版)"
+    IDS_keyboard104usb      "(英語 104(101) USB キーボードα版)"
+    IDS_usbWarning          "警告 : USB ドライバはα版です。十分テストがされていません。\r\nどうしても必要でなければ使用しないでください。"
 END
 
 STRINGTABLE DISCARDABLE 
@@ -136,6 +139,8 @@ BEGIN
     IDS_note02              "標準でないキーボードドライバを利用していると WindowsNT/2000 が青画面になって終了してしまうことがあります。"
     IDS_note03              "そのような場合は、標準でないドライバをアンインストールしてください。"
     IDS_note04              "標準でないドライバとは、ロジテックマウスに付属のドライバや AltIME のドライバなどです。"
+    IDS_copyFinishUsb       "インストールが終了しました。\nコンピュータを再起動する必要があります。\n今すぐ再起動しますか?"
+    IDS_failedToReboot      "再起動に失敗しました。窓使いの憂鬱を実行する前に必ず再起動してください。"
 END
 
 #endif    // 日本語 resources
@@ -240,7 +245,9 @@ BEGIN
     IDS_shortcutName        "MADO TSUKAI NO YUUTSU"
     IDS_keyboard109         "Japanese 109 (106) Keyboard"
     IDS_keyboard104         "Standard 104 (101) Keyboard"
-    IDS_readFromHomeDirectory "(from home directory)"
+    IDS_keyboard109usb      "(Japanese 109 (106) USB Keybaord ALPHA)"
+    IDS_keyboard104usb      "(Standard 104(101) USB Keyboard ALPHA)"
+    IDS_usbWarning          "WARNING : USB Driver is experimental.  Do not use it unless you know what you are doing!"
 END
 
 STRINGTABLE DISCARDABLE 
@@ -249,6 +256,8 @@ BEGIN
     IDS_note02              "* WindowsNT/2000 may hang up, if you are using a non-standard keybaord driver. "
     IDS_note03              "In that case, please uninstall the non-standard keybaord driver.\r\n"
     IDS_note04              "* Non-standrd keybaord drivers are such as that of Logitech Mouse, and that of AltIME.\r\n"
+    IDS_copyFinishUsb       "Install complete.  Do you want to reboot now?"
+    IDS_failedToReboot      "Failed to reboot."
 END
 
 #endif    // 英語 (ｱﾒﾘｶ) resources

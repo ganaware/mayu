@@ -21,11 +21,16 @@
 #define IDS_shortcutName                17
 #define IDS_keyboard109                 18
 #define IDS_keyboard104                 19
+#define IDS_keyboard109usb              20
+#define IDS_keyboard104usb              21
 #define IDS_readFromHomeDirectory       22
+#define IDS_usbWarning                  22
 #define IDS_note01                      32
 #define IDS_note02                      33
 #define IDS_note03                      34
 #define IDS_note04                      35
+#define IDS_copyFinishUsb               36
+#define IDS_failedToReboot              37
 #define IDD_DIALOG_main                 101
 #define IDI_ICON_mayu                   102
 #define IDC_EDIT_path                   1000

@@ -33,11 +33,17 @@ namespace Installer
       ToDest,
       ToDriver,
     };
+
+    enum Flag
+    {
+      Normal = 1,
+    };
     
     struct Data
     {
       Kind m_kind;
       OS m_os;
+      u_int32 m_flags;				/// user defined flags
       const _TCHAR *m_from;
       Destination m_destination;
       const _TCHAR *m_to;
@@ -138,17 +144,17 @@ namespace Installer
   
   // install files
   bool installFiles(const SetupFile::Data *i_setupFiles,
-		    size_t i_setupFilesSize,
+		    size_t i_setupFilesSize, u_int32 i_flags,
 		    const tstringi &i_srcDir, const tstringi &i_destDir);
   
   // remove files from src
   bool removeSrcFiles(const SetupFile::Data *i_setupFiles,
-		      size_t i_setupFilesSize,
+		      size_t i_setupFilesSize, u_int32 i_flags,
 		      const tstringi &i_srcDir);
   
   // remove files
   void removeFiles(const SetupFile::Data *i_setupFiles,
-		   size_t i_setupFilesSize,
+		   size_t i_setupFilesSize, u_int32 i_flags,
 		   const tstringi &i_destDir);
   
   // uninstall step1
