@@ -12,20 +12,20 @@
 ///
 class Target
 {
-  HWND hwnd;		///
-  HWND preHwnd;		///
-  HICON hCursor;	///
+  HWND m_hwnd;					///
+  HWND m_preHwnd;				///
+  HICON m_hCursor;				///
 
   ///
-  static void invertFrame(HWND hwnd)
+  static void invertFrame(HWND i_hwnd)
   {
-    HDC hdc = GetWindowDC(hwnd);
-    assert(hdc);
+    HDC hdc = GetWindowDC(i_hwnd);
+    ASSERT(hdc);
     int rop2 = SetROP2(hdc, R2_XORPEN);
     if (rop2)
     {
       RECT rc;
-      CHECK_TRUE( GetWindowRect(hwnd, &rc) );
+      CHECK_TRUE( GetWindowRect(i_hwnd, &rc) );
       int width = rcWidth(&rc);
       int height = rcHeight(&rc);
     
@@ -39,21 +39,22 @@ class Target
       // no need to DeleteObject StockObject
       SetROP2(hdc, rop2);
     }
-    CHECK_TRUE( ReleaseDC(hwnd, hdc) );
+    CHECK_TRUE( ReleaseDC(i_hwnd, hdc) );
   }
   
   ///
-  Target(HWND hwnd_)
-    : hwnd(hwnd_),
-      preHwnd(NULL),
-      hCursor(NULL)
+  Target(HWND i_hwnd)
+    : m_hwnd(i_hwnd),
+      m_preHwnd(NULL),
+      m_hCursor(NULL)
   {
   }
 
   /// WM_CREATE
-  int wmCreate(CREATESTRUCT * /* cs */)
+  int wmCreate(CREATESTRUCT * /* i_cs */)
   {
-    CHECK_TRUE( hCursor = LoadCursor(hInst, MAKEINTRESOURCE(IDC_CURSOR_target)) );
+    CHECK_TRUE( m_hCursor =
+		LoadCursor(g_hInst, MAKEINTRESOURCE(IDC_CURSOR_target)) );
     return 0;
   }
 
@@ -61,60 +62,61 @@ class Target
   int wmPaint()
   {
     PAINTSTRUCT ps;
-    HDC hdc = BeginPaint(hwnd, &ps);
-    assert(hdc);
+    HDC hdc = BeginPaint(m_hwnd, &ps);
+    ASSERT(hdc);
 
-    if (GetCapture() != hwnd)
+    if (GetCapture() != m_hwnd)
     {
       RECT rc;
-      CHECK_TRUE( GetClientRect(hwnd, &rc) );
-      CHECK_TRUE( DrawIcon(hdc, (rcWidth(&rc) - GetSystemMetrics(SM_CXICON)) / 2,
-		      (rcHeight(&rc) - GetSystemMetrics(SM_CYICON)) / 2,
-		      hCursor) );
+      CHECK_TRUE( GetClientRect(m_hwnd, &rc) );
+      CHECK_TRUE(
+	DrawIcon(hdc, (rcWidth(&rc) - GetSystemMetrics(SM_CXICON)) / 2,
+		 (rcHeight(&rc) - GetSystemMetrics(SM_CYICON)) / 2,
+		 m_hCursor) );
     }
     
-    EndPaint(hwnd, &ps);
+    EndPaint(m_hwnd, &ps);
     return 0;
   }
 
   ///
   struct PointWindow
   {
-    POINT p;		///
-    HWND hwnd;		///
-    RECT rc;		///
+    POINT m_p;					///
+    HWND m_hwnd;				///
+    RECT m_rc;					///
   };
   
   ///
-  static BOOL CALLBACK childWindowFromPoint(HWND hwnd, LPARAM lParam)
+  static BOOL CALLBACK childWindowFromPoint(HWND i_hwnd, LPARAM i_lParam)
   {
-    if (IsWindowVisible(hwnd))
+    if (IsWindowVisible(i_hwnd))
     {
-      PointWindow &pw = *(PointWindow *)lParam;
+      PointWindow &pw = *(PointWindow *)i_lParam;
       RECT rc;
-      CHECK_TRUE( GetWindowRect(hwnd, &rc) );
-      if (PtInRect(&rc, pw.p))
-	if (isRectInRect(&rc, &pw.rc))
+      CHECK_TRUE( GetWindowRect(i_hwnd, &rc) );
+      if (PtInRect(&rc, pw.m_p))
+	if (isRectInRect(&rc, &pw.m_rc))
 	{
-	  pw.hwnd = hwnd;
-	  pw.rc = rc;
+	  pw.m_hwnd = i_hwnd;
+	  pw.m_rc = rc;
 	}
     }
     return TRUE;
   }
   
   ///
-  static BOOL CALLBACK windowFromPoint(HWND hwnd, LPARAM lParam)
+  static BOOL CALLBACK windowFromPoint(HWND i_hwnd, LPARAM i_lParam)
   {
-    if (IsWindowVisible(hwnd))
+    if (IsWindowVisible(i_hwnd))
     {
-      PointWindow &pw = *(PointWindow *)lParam;
+      PointWindow &pw = *(PointWindow *)i_lParam;
       RECT rc;
-      CHECK_TRUE( GetWindowRect(hwnd, &rc) );
-      if (PtInRect(&rc, pw.p))
+      CHECK_TRUE( GetWindowRect(i_hwnd, &rc) );
+      if (PtInRect(&rc, pw.m_p))
       {
-	pw.hwnd = hwnd;
-	pw.rc = rc;
+	pw.m_hwnd = i_hwnd;
+	pw.m_rc = rc;
 	return FALSE;
       }
     }
@@ -122,91 +124,92 @@ class Target
   }
 
   /// WM_MOUSEMOVE
-  int wmMouseMove(WORD /* keys */, int /* x */, int /* y */)
+  int wmMouseMove(WORD /* i_keys */, int /* i_x */, int /* i_y */)
   {
-    if (GetCapture() == hwnd)
+    if (GetCapture() == m_hwnd)
     {
       PointWindow pw;
-      CHECK_TRUE( GetCursorPos(&pw.p) );
-      pw.hwnd = 0;
-      CHECK_TRUE( GetWindowRect(GetDesktopWindow(), &pw.rc) );
+      CHECK_TRUE( GetCursorPos(&pw.m_p) );
+      pw.m_hwnd = 0;
+      CHECK_TRUE( GetWindowRect(GetDesktopWindow(), &pw.m_rc) );
       EnumWindows(windowFromPoint, (LPARAM)&pw);
       while (1)
       {
-	HWND hwndParent = pw.hwnd;
-	if (!EnumChildWindows(pw.hwnd, childWindowFromPoint, (LPARAM)&pw))
+	HWND hwndParent = pw.m_hwnd;
+	if (!EnumChildWindows(pw.m_hwnd, childWindowFromPoint, (LPARAM)&pw))
 	  break;
-	if (hwndParent == pw.hwnd)
+	if (hwndParent == pw.m_hwnd)
 	  break;
       }
-      if (pw.hwnd != preHwnd)
+      if (pw.m_hwnd != m_preHwnd)
       {
-	if (preHwnd)
-	  invertFrame(preHwnd);
-	preHwnd = pw.hwnd;
-	invertFrame(preHwnd);
-	SendMessage(GetParent(hwnd), WM_targetNotify, 0, (LPARAM)preHwnd);
+	if (m_preHwnd)
+	  invertFrame(m_preHwnd);
+	m_preHwnd = pw.m_hwnd;
+	invertFrame(m_preHwnd);
+	SendMessage(GetParent(m_hwnd), WM_APP_targetNotify, 0,
+		    (LPARAM)m_preHwnd);
       }
-      SetCursor(hCursor);
+      SetCursor(m_hCursor);
     }
     return 0;
   }
 
   /// WM_LBUTTONDOWN
-  int wmLButtonDown(WORD /* keys */, int /* x */, int /* y */)
+  int wmLButtonDown(WORD /* i_keys */, int /* i_x */, int /* i_y */)
   {
-    SetCapture(hwnd);
-    SetCursor(hCursor);
-    CHECK_TRUE( InvalidateRect(hwnd, NULL, TRUE) );
-    CHECK_TRUE( UpdateWindow(hwnd) );
+    SetCapture(m_hwnd);
+    SetCursor(m_hCursor);
+    CHECK_TRUE( InvalidateRect(m_hwnd, NULL, TRUE) );
+    CHECK_TRUE( UpdateWindow(m_hwnd) );
     return 0;
   }
 
   /// WM_LBUTTONUP
-  int wmLButtonUp(WORD /* keys */, int /* x */, int /* y */)
+  int wmLButtonUp(WORD /* i_keys */, int /* i_x */, int /* i_y */)
   {
-    if (preHwnd)
-      invertFrame(preHwnd);
-    preHwnd = NULL;
+    if (m_preHwnd)
+      invertFrame(m_preHwnd);
+    m_preHwnd = NULL;
     ReleaseCapture();
-    CHECK_TRUE( InvalidateRect(hwnd, NULL, TRUE) );
-    CHECK_TRUE( UpdateWindow(hwnd) );
+    CHECK_TRUE( InvalidateRect(m_hwnd, NULL, TRUE) );
+    CHECK_TRUE( UpdateWindow(m_hwnd) );
     return 0;
   }
 
 public:
   ///
-  static LRESULT CALLBACK WndProc(HWND hwnd, UINT message,
-				  WPARAM wParam, LPARAM lParam)
+  static LRESULT CALLBACK WndProc(HWND i_hwnd, UINT i_message,
+				  WPARAM i_wParam, LPARAM i_lParam)
   {
     Target *wc;
-    getUserData(hwnd, &wc);
+    getUserData(i_hwnd, &wc);
     if (!wc)
-      switch (message)
+      switch (i_message)
       {
 	case WM_CREATE:
-	  wc = setUserData(hwnd, new Target(hwnd));
-	  return wc->wmCreate((CREATESTRUCT *)lParam);
+	  wc = setUserData(i_hwnd, new Target(i_hwnd));
+	  return wc->wmCreate((CREATESTRUCT *)i_lParam);
       }
     else 
-      switch (message)
+      switch (i_message)
       {
 	case WM_PAINT:
 	  return wc->wmPaint();
 	case WM_LBUTTONDOWN:
-	  return wc->wmLButtonDown((WORD)wParam, (short)LOWORD(lParam),
-				   (short)HIWORD(lParam));
+	  return wc->wmLButtonDown((WORD)i_wParam, (short)LOWORD(i_lParam),
+				   (short)HIWORD(i_lParam));
 	case WM_LBUTTONUP:
-	  return wc->wmLButtonUp((WORD)wParam, (short)LOWORD(lParam),
-				 (short)HIWORD(lParam));
+	  return wc->wmLButtonUp((WORD)i_wParam, (short)LOWORD(i_lParam),
+				 (short)HIWORD(i_lParam));
 	case WM_MOUSEMOVE:
-	  return wc->wmMouseMove((WORD)wParam, (short)LOWORD(lParam),
-				 (short)HIWORD(lParam));
+	  return wc->wmMouseMove((WORD)i_wParam, (short)LOWORD(i_lParam),
+				 (short)HIWORD(i_lParam));
 	case WM_NCDESTROY:
 	  delete wc;
 	  return 0;
       }
-    return DefWindowProc(hwnd, message, wParam, lParam);
+    return DefWindowProc(i_hwnd, i_message, i_wParam, i_lParam);
   }
 };
   
@@ -218,7 +221,7 @@ ATOM Register_target()
   wc.lpfnWndProc   = Target::WndProc;
   wc.cbClsExtra    = 0;
   wc.cbWndExtra    = 0;
-  wc.hInstance     = hInst;
+  wc.hInstance     = g_hInst;
   wc.hIcon         = NULL;
   wc.hCursor       = LoadCursor(NULL, IDC_ARROW);
   wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);

@@ -71,7 +71,7 @@ public:
   
   void adjust() const
   {
-    for (Items::const_iterator i = m_items.begin(); i != m_items.end(); i ++)
+    for (Items::const_iterator i = m_items.begin(); i != m_items.end(); ++ i)
     {
       RECT rc;
       GetWindowRect(i->m_hwndParent, &rc);
@@ -84,7 +84,7 @@ public:
 	{ rcWidth(&i->m_rcParent), i->m_rc.right, rcWidth(&rc), &rc.right },
 	{ rcHeight(&i->m_rcParent), i->m_rc.bottom, rcHeight(&rc), &rc.bottom }
       };
-      for (int j = 0; j < 4; j ++)
+      for (int j = 0; j < 4; ++ j)
       {
 	switch (i->m_origin[j])
 	{
@@ -188,7 +188,7 @@ class DlgSetting
   {
     if (ListView_GetSelectedCount(m_hwndMayuPaths) == 0)
       return -1;
-    for (int i = 0; ; i ++)
+    for (int i = 0; ; ++ i)
     {
       if (ListView_GetItemState(m_hwndMayuPaths, i, LVIS_SELECTED))
 	return i;
@@ -205,7 +205,7 @@ public:
   }
   
   /// WM_INITDIALOG
-  BOOL wmInitDialog(HWND /* focus */, LPARAM /* lParam */)
+  BOOL wmInitDialog(HWND /* i_focus */, LPARAM /* i_lParam */)
   {
     setSmallIcon(m_hwnd, IDI_ICON_mayu);
     setBigIcon(m_hwnd, IDI_ICON_mayu);
@@ -238,7 +238,7 @@ public:
     Regexp split("^([^;]*);([^;]*);(.*)$");
     StringTool::istring dot_mayu;
     int i;
-    for (i = 0; i < MAX_MAYU_PATHS; i ++)
+    for (i = 0; i < MAX_MAYU_PATHS; ++ i)
     {
       char buf[100];
       snprintf(buf, sizeof(buf), ".mayu%d", i);
@@ -317,7 +317,8 @@ public:
   }
 
   /// WM_SIZE
-  BOOL wmSize(DWORD /* fwSizeType */, short /* nWidth */, short /* nHeight */)
+  BOOL wmSize(DWORD /* i_fwSizeType */, short /* i_nWidth */,
+	      short /* i_nHeight */)
   {
     m_layoutManager.adjust();
     RedrawWindow(m_hwnd, NULL, NULL,
@@ -333,7 +334,7 @@ public:
   }
   
   /// WM_COMMAND
-  BOOL wmCommand(int /* notify_code */, int i_id, HWND /* hwnd_control */)
+  BOOL wmCommand(int /* i_notifyCode */, int i_id, HWND /* i_hwndControl */)
   {
     char buf[GANA_MAX_PATH];
     switch (i_id)
@@ -368,7 +369,7 @@ public:
 	int index = getSelectedItem();
 	if (0 <= index)
 	  getItem(index, &data);
-	if (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_DIALOG_editSetting),
+	if (DialogBoxParam(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_editSetting),
 			   m_hwnd, dlgEditSetting_dlgProc, (LPARAM)&data))
 	  if (!data.m_name.empty())
 	  {
@@ -402,7 +403,7 @@ public:
 	if (index < 0)
 	  return TRUE;
 	getItem(index, &data);
-	if (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_DIALOG_editSetting),
+	if (DialogBoxParam(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_editSetting),
 			   m_hwnd, dlgEditSetting_dlgProc, (LPARAM)&data))
 	{
 	  setItem(index, data);
@@ -415,7 +416,7 @@ public:
       {
 	int count = ListView_GetItemCount(m_hwndMayuPaths);
 	int index;
-	for (index = 0; index < count; index ++)
+	for (index = 0; index < count; ++ index)
 	{
 	  snprintf(buf, sizeof(buf), ".mayu%d", index);
 	  Data data;
@@ -423,7 +424,7 @@ public:
 	  m_reg.write(buf, data.m_name + ";" +
 		      data.m_filename + ";" + data.m_symbols);
 	}
-	for (; ; index ++)
+	for (; ; ++ index)
 	{
 	  snprintf(buf, sizeof(buf), ".mayu%d", index);
 	  if (!m_reg.remove(buf))

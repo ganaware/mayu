@@ -17,52 +17,52 @@ using namespace std;
 ///
 class DlgVersion
 {
-  HWND hwnd;		///
+  HWND m_hwnd;		///
   
 public:
   ///
-  DlgVersion(HWND hwnd_)
-    : hwnd(hwnd_)
+  DlgVersion(HWND i_hwnd)
+    : m_hwnd(i_hwnd)
   {
   }
   
   /// WM_INITDIALOG
-  BOOL wmInitDialog(HWND /* focus */, LPARAM /* lParam */)
+  BOOL wmInitDialog(HWND /* i_focus */, LPARAM /* i_lParam */)
   {
-    setSmallIcon(hwnd, IDI_ICON_mayu);
-    setBigIcon(hwnd, IDI_ICON_mayu);
+    setSmallIcon(m_hwnd, IDI_ICON_mayu);
+    setBigIcon(m_hwnd, IDI_ICON_mayu);
     
     char buf[1024], buf2[1024];
-    Edit_GetText(GetDlgItem(hwnd, IDC_STATIC_version), buf,
+    Edit_GetText(GetDlgItem(m_hwnd, IDC_STATIC_version), buf,
 		 NUMBER_OF(buf));
     snprintf(buf2, NUMBER_OF(buf2), buf, VERSION);
-    Edit_SetText(GetDlgItem(hwnd, IDC_STATIC_version), buf2);
+    Edit_SetText(GetDlgItem(m_hwnd, IDC_STATIC_version), buf2);
     return TRUE;
   }
   
   /// WM_CLOSE
   BOOL wmClose()
   {
-    CHECK_TRUE( EndDialog(hwnd, 0) );
+    CHECK_TRUE( EndDialog(m_hwnd, 0) );
     return TRUE;
   }
 
   /// WM_COMMAND
-  BOOL wmCommand(int /* notify_code */, int id, HWND /* hwnd_control */)
+  BOOL wmCommand(int /* i_notifyCode */, int i_id, HWND /* i_hwndControl */)
   {
-    switch (id)
+    switch (i_id)
     {
       case IDOK:
       {
-	CHECK_TRUE( EndDialog(hwnd, 0) );
+	CHECK_TRUE( EndDialog(m_hwnd, 0) );
 	return TRUE;
       }
       case IDC_BUTTON_download:
       {
 	char buf[1024];
-	Edit_GetText(GetDlgItem(hwnd, IDC_STATIC_url), buf, NUMBER_OF(buf));
+	Edit_GetText(GetDlgItem(m_hwnd, IDC_STATIC_url), buf, NUMBER_OF(buf));
 	ShellExecute(NULL, "open", buf, NULL, NULL, SW_SHOWNORMAL);
-	CHECK_TRUE( EndDialog(hwnd, 0) );
+	CHECK_TRUE( EndDialog(m_hwnd, 0) );
 	return TRUE;
       }
     }
@@ -72,23 +72,24 @@ public:
 
 
 ///
-BOOL CALLBACK dlgVersion_dlgProc(HWND hwnd, UINT message,
-				 WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK dlgVersion_dlgProc(
+  HWND i_hwnd, UINT i_message, WPARAM i_wParam, LPARAM i_lParam)
 {
   DlgVersion *wc;
-  getUserData(hwnd, &wc);
+  getUserData(i_hwnd, &wc);
   if (!wc)
-    switch (message)
+    switch (i_message)
     {
       case WM_INITDIALOG:
-	wc = setUserData(hwnd, new DlgVersion(hwnd));
-	return wc->wmInitDialog((HWND)wParam, lParam);
+	wc = setUserData(i_hwnd, new DlgVersion(i_hwnd));
+	return wc->wmInitDialog(reinterpret_cast<HWND>(i_wParam), i_lParam);
     }
   else
-    switch (message)
+    switch (i_message)
     {
       case WM_COMMAND:
-	return wc->wmCommand(HIWORD(wParam), LOWORD(wParam), (HWND)lParam);
+	return wc->wmCommand(HIWORD(i_wParam), LOWORD(i_wParam),
+			     reinterpret_cast<HWND>(i_lParam));
       case WM_CLOSE:
 	return wc->wmClose();
       case WM_NCDESTROY:

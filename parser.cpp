@@ -16,98 +16,98 @@ using namespace std;
 // Token
 
 
-Token::Token(const Token &t)
-  : type(t.type),
-    isValueQuoted(t.isValueQuoted),
-    numericValue(t.numericValue),
-    stringValue(t.stringValue),
-    data(t.data)
+Token::Token(const Token &i_token)
+  : m_type(i_token.m_type),
+    m_isValueQuoted(i_token.m_isValueQuoted),
+    m_numericValue(i_token.m_numericValue),
+    m_stringValue(i_token.m_stringValue),
+    m_data(i_token.m_data)
 {
 }
 
-Token::Token(int value, const istring &display)
-  : type(Number),
-    isValueQuoted(false),
-    numericValue(value),
-    stringValue(display),
-    data(NULL)
+Token::Token(int i_value, const istring &i_display)
+  : m_type(Type_number),
+    m_isValueQuoted(false),
+    m_numericValue(i_value),
+    m_stringValue(i_display),
+    m_data(NULL)
 {
 }
 
-Token::Token(const istring &value, bool isValueQuoted_, bool isRegexp)
-  : type(isRegexp ? Regexp : String),
-    isValueQuoted(isValueQuoted_),
-    numericValue(0),
-    stringValue(value),
-    data(NULL)
+Token::Token(const istring &i_value, bool i_isValueQuoted, bool i_isRegexp)
+  : m_type(i_isRegexp ? Type_regexp : Type_string),
+    m_isValueQuoted(i_isValueQuoted),
+    m_numericValue(0),
+    m_stringValue(i_value),
+    m_data(NULL)
 {
 }
 
-Token::Token(Type type_)
-  : type(type_),
-    isValueQuoted(false),
-    numericValue(0),
-    stringValue(""),
-    data(NULL)
+Token::Token(Type i_m_type)
+  : m_type(i_m_type),
+    m_isValueQuoted(false),
+    m_numericValue(0),
+    m_stringValue(""),
+    m_data(NULL)
 {
-  assert(type == OpenParen || type == CloseParen);
+  ASSERT(m_type == Type_openParen || m_type == Type_closeParen);
 }
 
 // get numeric value
 int Token::getNumber() const
 {
-  if (type == Number)
-    return numericValue;
-  if (stringValue.empty())
+  if (m_type == Type_number)
+    return m_numericValue;
+  if (m_stringValue.empty())
     return 0;
   else
-    throw ErrorMessage() << "`" << *this << "' is not a number.";
+    throw ErrorMessage() << "`" << *this << "' is not a Type_number.";
 }
 
 // get string value
 istring Token::getString() const
 {
-  if (type == String)
-    return stringValue;
+  if (m_type == Type_string)
+    return m_stringValue;
   throw ErrorMessage() << "`" << *this << "' is not a string.";
 }
 
 // get regexp value
 istring Token::getRegexp() const
 {
-  if (type == Regexp)
-    return stringValue;
+  if (m_type == Type_regexp)
+    return m_stringValue;
   throw ErrorMessage() << "`" << *this << "' is not a regexp.";
 }
 
 // case insensitive equal
-bool Token::operator==(const char *str) const
+bool Token::operator==(const char *i_str) const
 {
-  if (type == String)
-    return stringValue == str;
+  if (m_type == Type_string)
+    return m_stringValue == i_str;
   return false;
 }
 
 // paren equal
-bool Token::operator==(const char c) const
+bool Token::operator==(const char i_c) const
 {
-  if (c == '(') return type == OpenParen;
-  if (c == ')') return type == OpenParen;
+  if (i_c == '(') return m_type == Type_openParen;
+  if (i_c == ')') return m_type == Type_openParen;
   return false;
 }
 
 // stream output
-ostream &operator<<(ostream &ost, const Token &t)
+ostream &operator<<(ostream &i_ost, const Token &i_token)
 {
-  switch (t.type)
+  switch (i_token.m_type)
   {
-    case Token::String: ost << t.stringValue; break;
-    case Token::Number: ost << t.stringValue; break;
-    case Token::Regexp: ost << t.stringValue; break;
-    case Token::OpenParen: ost << "("; break;
-    case Token::CloseParen: ost << ")"; break;
+    case Token::Type_string: i_ost << i_token.m_stringValue; break;
+    case Token::Type_number: i_ost << i_token.m_stringValue; break;
+    case Token::Type_regexp: i_ost << i_token.m_stringValue; break;
+    case Token::Type_openParen: i_ost << "("; break;
+    case Token::Type_closeParen: i_ost << ")"; break;
   }
-  return ost;
+  return i_ost;
 }
 
 
@@ -115,55 +115,55 @@ ostream &operator<<(ostream &ost, const Token &t)
 // Parser
 
 
-Parser::Parser(istream &ist_)
-  : lineNumber(1),
-    prefix(NULL),
-    internalLineNumber(1),
-    ist(ist_)
+Parser::Parser(istream &i_ist)
+  : m_lineNumber(1),
+    m_prefixes(NULL),
+    m_internalLineNumber(1),
+    m_ist(i_ist)
 {
 }
 
 // set string that may be prefix of a token.
 // prefix_ is not copied, so it must be preserved after setPrefix()
-void Parser::setPrefix(const vector<istring> *prefix_)
+void Parser::setPrefixes(const Prefixes *i_prefixes)
 {
-  prefix = prefix_;
+  m_prefixes = i_prefixes;
 }
 
 // get a line
-bool Parser::getLine(istring *line_r)
+bool Parser::getLine(istring *o_line)
 {
-  line_r->resize(0);
+  o_line->resize(0);
   while (true)
   {
     char linebuf[1024] = "";
-    ist.get(linebuf, sizeof(linebuf), '\n');
-    if (ist.eof())
+    m_ist.get(linebuf, sizeof(linebuf), '\n');
+    if (m_ist.eof())
       break;
-    ist.clear();
-    *line_r += linebuf;
+    m_ist.clear();
+    *o_line += linebuf;
     char c;
-    ist.get(c);
-    if (ist.eof())
+    m_ist.get(c);
+    if (m_ist.eof())
       break;
     if (c == '\n')
     {
-      internalLineNumber ++;
+      m_internalLineNumber ++;
       break;
     }
-    *line_r += c;
+    *o_line += c;
   }
   
-  return !(line_r->empty() && ist.eof());
+  return !(o_line->empty() && m_ist.eof());
 }
 
 
 // get a parsed line.
 // if no more lines exist, returns false
-bool Parser::getLine(vector<Token> *tokens_r)
+bool Parser::getLine(vector<Token> *o_tokens)
 {
-  tokens_r->clear();
-  lineNumber = internalLineNumber;
+  o_tokens->clear();
+  m_lineNumber = m_internalLineNumber;
 
   istring line;
   continue_getLineLoop:
@@ -189,7 +189,7 @@ bool Parser::getLine(vector<Token> *tokens_r)
       if (*t == ',')
       {
 	if (!isTokenExist)
-	  tokens_r->push_back(Token("", false));
+	  o_tokens->push_back(Token("", false));
 	isTokenExist = false;
 	t ++;
 	goto continue_getTokenLoop;
@@ -198,7 +198,7 @@ bool Parser::getLine(vector<Token> *tokens_r)
       // paren
       if (*t == '(')
       {
-	tokens_r->push_back(Token(Token::OpenParen));
+	o_tokens->push_back(Token(Token::Type_openParen));
 	isTokenExist = false;
 	t ++;
 	goto continue_getTokenLoop;
@@ -206,9 +206,9 @@ bool Parser::getLine(vector<Token> *tokens_r)
       if (*t == ')')
       {
 	if (!isTokenExist)
-	  tokens_r->push_back(Token("", false));
+	  o_tokens->push_back(Token("", false));
 	isTokenExist = true;
-	tokens_r->push_back(Token(Token::CloseParen));
+	o_tokens->push_back(Token(Token::Type_closeParen));
 	t ++;
 	goto continue_getTokenLoop;
       }
@@ -216,13 +216,13 @@ bool Parser::getLine(vector<Token> *tokens_r)
       isTokenExist = true;
       
       // prefix
-      if (prefix)
-	for (size_t i = 0; i < prefix->size(); i ++)
-	  if (StringTool::mbsniequal_(tokenStart, prefix->at(i).c_str(),
-				      prefix->at(i).size()))
+      if (m_prefixes)
+	for (size_t i = 0; i < m_prefixes->size(); i ++)
+	  if (StringTool::mbsniequal_(tokenStart, m_prefixes->at(i).c_str(),
+				      m_prefixes->at(i).size()))
 	  {
-	    tokens_r->push_back(Token(prefix->at(i), false));
-	    t += prefix->at(i).size();
+	    o_tokens->push_back(Token(m_prefixes->at(i), false));
+	    t += m_prefixes->at(i).size();
 	    goto continue_getTokenLoop;
 	  }
 
@@ -250,7 +250,7 @@ bool Parser::getLine(vector<Token> *tokens_r)
 	
 	string str =
 	  StringTool::interpretMetaCharacters(tokenStart, t - tokenStart, q);
-	tokens_r->push_back(Token(str, true, isRegexp));
+	o_tokens->push_back(Token(str, true, isRegexp));
 	if (*t != '\0')
 	  t ++;
 	goto continue_getTokenLoop;
@@ -288,11 +288,11 @@ bool Parser::getLine(vector<Token> *tokens_r)
 	{
 	  string str =
 	    StringTool::interpretMetaCharacters(tokenStart, t - tokenStart);
-	  tokens_r->push_back(Token(str, false));
+	  o_tokens->push_back(Token(str, false));
 	}
 	else
 	{
-	  tokens_r->push_back(
+	  o_tokens->push_back(
 	    Token(value, istring(tokenStart, numEnd - tokenStart)));
 	  t = numEnd;
 	}
@@ -300,10 +300,10 @@ bool Parser::getLine(vector<Token> *tokens_r)
       }
     }
     break_getTokenLoop:
-    if (0 < tokens_r->size())
+    if (0 < o_tokens->size())
       break;
-    lineNumber = internalLineNumber;
+    m_lineNumber = m_internalLineNumber;
   }
   
-  return 0 < tokens_r->size();
+  return 0 < o_tokens->size();
 }

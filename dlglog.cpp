@@ -34,7 +34,7 @@ public:
   }
   
   /// WM_INITDIALOG
-  BOOL wmInitDialog(HWND /* focus */, LPARAM i_lParam)
+  BOOL wmInitDialog(HWND /* i_focus */, LPARAM i_lParam)
   {
     m_log = reinterpret_cast<omsgstream *>(i_lParam);
     
@@ -75,7 +75,7 @@ public:
   }
   
   /// WM_SIZE
-  BOOL wmSize(DWORD /* fwSizeType */, short i_nWidth, short i_nHeight)
+  BOOL wmSize(DWORD /* i_fwSizeType */, short i_nWidth, short i_nHeight)
   {
     RECT rcLog, rcCl, rcCf, rcD, rcOK;
     HWND hwndCl = GetDlgItem(m_hwnd, IDC_BUTTON_clearLog);
@@ -109,7 +109,7 @@ public:
   }
 
   /// WM_COMMAND
-  BOOL wmCommand(int /* notify_code */, int i_id, HWND /* m_hwnd_control */)
+  BOOL wmCommand(int /* i_notifyCode */, int i_id, HWND /* i_hwndControl */)
   {
     switch (i_id)
     {

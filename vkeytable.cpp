@@ -10,7 +10,7 @@
 
 #define VK(name) { VK_##name, #name }
 
-const VKeyTable vkeyTable[] =
+const VKeyTable g_vkeyTable[] =
 {
   VK(LBUTTON),				// 01 LButton
   VK(RBUTTON),				// 02 RButton

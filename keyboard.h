@@ -2,125 +2,132 @@
 // keyboard.h
 
 
-#ifndef __keyboard_h__
-#define __keyboard_h__
+#ifndef _KEYBOARD_H
+#  define _KEYBOARD_H
 
 
-#include "misc.h"
-
-#include "driver.h"
-#include "stringtool.h"
-
-#include <vector>
-#include <list>
-#include <map>
+#  include "misc.h"
+#  include "driver.h"
+#  include "stringtool.h"
+#  include <vector>
+#  include <list>
+#  include <map>
 
 
 using StringTool::istring;
 
 
-///
+/// a scan code with flags
 class ScanCode
 {
 public:
-  /** @name ANONYMOUS */
+  ///
   enum
   {
-    BREAK = KEYBOARD_INPUT_DATA::BREAK,	/// BREAK is key release
-    E0    = KEYBOARD_INPUT_DATA::E0,	/// E0 is for extended key,
-    E1    = KEYBOARD_INPUT_DATA::E1,	/// E1 is for extended key,
-    E0E1  = KEYBOARD_INPUT_DATA::E0E1,	/// E0, E1 are for extended key,
+    BREAK = KEYBOARD_INPUT_DATA::BREAK,		/// key release flag
+    E0    = KEYBOARD_INPUT_DATA::E0,		/// extended key flag
+    E1    = KEYBOARD_INPUT_DATA::E1,		/// extended key flag
+    E0E1  = KEYBOARD_INPUT_DATA::E0E1,		/// extended key flag
   };
-  u_char scan;		///
-  u_char flags;		///
+
+public:
+  u_int8 m_scan;				///
+  u_int8 m_flags;				///
 
 public:
   ///
-  ScanCode() : scan(0), flags(0) { }
+  ScanCode() : m_scan(0), m_flags(0) { }
   ///
-  ScanCode(u_char scan_, u_char flags_) : scan(scan_), flags(flags_) { }
-  
+  ScanCode(u_int8 i_scan, u_int8 i_flags)
+    : m_scan(i_scan), m_flags(i_flags) { }
   ///
-  bool operator==(const ScanCode &sc) const
-  { return (scan == sc.scan && (E0E1 & flags) == (E0E1 & sc.flags)); }
+  bool operator==(const ScanCode &i_sc) const
+  {
+    return (m_scan == i_sc.m_scan &&
+	    (E0E1 & m_flags) == (E0E1 & i_sc.m_flags));
+  }
   ///
-  bool operator!=(const ScanCode &sc) const { return !(*this == sc); }
+  bool operator!=(const ScanCode &i_sc) const { return !(*this == i_sc); }
 };
 
 
-///
+/// a key
 class Key
 {
 public:
-  /** @name ANONYMOUS */
-  enum {
+  enum
+  {
     ///
-    maxlengthof_scanCodes = 4,
+    MAX_SCAN_CODES_SIZE = 4,
   };
 
+private:
+  ///
+  typedef std::vector<istring> Names;
+
+public:
   /// if this key pressed physically
-  bool isPressed;
+  bool m_isPressed;
   /// if this key pressed on Win32
-  bool isPressedOnWin32;
+  bool m_isPressedOnWin32;
   /// if this key pressed by assign
-  bool isPressedByAssign;
+  bool m_isPressedByAssign;
 
 private:
   /// key name
-  std::vector<istring> names;
-  
+  Names m_names;
   /// key scan code length
-  size_t lengthof_scanCodes;
+  size_t m_scanCodesSize;
   /// key scan code
-  ScanCode scanCodes[maxlengthof_scanCodes];
+  ScanCode m_scanCodes[MAX_SCAN_CODES_SIZE];
 
 public:
   ///
   Key()
-    : isPressed(false),
-      isPressedOnWin32(false),
-      isPressedByAssign(false),
-      lengthof_scanCodes(0)
+    : m_isPressed(false),
+      m_isPressedOnWin32(false),
+      m_isPressedByAssign(false),
+      m_scanCodesSize(0)
   { }
 
   /// for Event::* only
-  Key(const istring &name)
-    : isPressed(false),
-      isPressedOnWin32(false),
-      isPressedByAssign(false),
-      lengthof_scanCodes(0)
+  Key(const istring &i_name)
+    : m_isPressed(false),
+      m_isPressedOnWin32(false),
+      m_isPressedByAssign(false),
+      m_scanCodesSize(0)
   {
-    addName(name);
+    addName(i_name);
     addScanCode(ScanCode());
   }
 
   /// get key name (first name)
-  const istring &getName() const { return names.at(0); }
+  const istring &getName() const { return m_names.at(0); }
 
   /// get scan codes
-  const ScanCode *getScanCodes() const { return scanCodes; }
+  const ScanCode *getScanCodes() const { return m_scanCodes; }
   ///
-  size_t getLengthof_scanCodes() const { return lengthof_scanCodes; }
+  size_t getScanCodesSize() const { return m_scanCodesSize; }
   
   /// add a name of key
-  void addName(const istring &name);
+  void addName(const istring &i_name);
   
   /// add a scan code
-  void addScanCode(const ScanCode &sc);
+  void addScanCode(const ScanCode &i_sc);
   
   /// initializer
   Key &initialize();
   
   /// equation by name
-  bool operator==(const istring &name) const;
+  bool operator==(const istring &i_name) const;
   ///
-  bool operator!=(const istring &name) const { return !(*this == name); }
+  bool operator!=(const istring &i_name) const { return !(*this == i_name); }
   
   /// is the scan code of this key ?
-  bool isSameScanCode(const Key &key) const;
+  bool isSameScanCode(const Key &i_key) const;
   
-  /// is the key's scan code the prefix of this key's scan code ?
-  bool isPrefixScanCode(const Key &key) const;
+  /// is the i_key's scan code the prefix of this key's scan code ?
+  bool isPrefixScanCode(const Key &i_key) const;
   
   /// stream output
   friend std::ostream &
@@ -138,97 +145,108 @@ class Modifier
   ///
   typedef u_long MODIFIERS;
   ///
-  MODIFIERS modifiers;
+  MODIFIERS m_modifiers;
   ///
-  MODIFIERS dontcares;
+  MODIFIERS m_dontcares;
   
 public:
   ///
   enum Type
   {
-    begin = 0,    	///
-    Shift = begin,	/// &lt;BASIC_MODIFIER&gt;
-    Alt,		/// &lt;BASIC_MODIFIER&gt;
-    Control,		/// &lt;BASIC_MODIFIER&gt;
-    Windows,		/// &lt;BASIC_MODIFIER&gt;
-    BASIC,		///
-    Up = BASIC,		/// &lt;KEYSEQ_MODIFIER&gt;
-    Down,		/// &lt;KEYSEQ_MODIFIER&gt;
-    KEYSEQ,		///
-    ImeLock = KEYSEQ,	/// &lt;ASSIGN_MODIFIER&gt;
-    ImeComp,		/// &lt;ASSIGN_MODIFIER&gt;
-    NumLock,		/// &lt;ASSIGN_MODIFIER&gt;
-    CapsLock,		/// &lt;ASSIGN_MODIFIER&gt;
-    ScrollLock,		/// &lt;ASSIGN_MODIFIER&gt;
-    Mod0,		/// &lt;ASSIGN_MODIFIER&gt;
-    Mod1,		/// &lt;ASSIGN_MODIFIER&gt;
-    Mod2,		/// &lt;ASSIGN_MODIFIER&gt;
-    Mod3,		/// &lt;ASSIGN_MODIFIER&gt;
-    Mod4,		/// &lt;ASSIGN_MODIFIER&gt;
-    Mod5,		/// &lt;ASSIGN_MODIFIER&gt;
-    Mod6,		/// &lt;ASSIGN_MODIFIER&gt;
-    Mod7,		/// &lt;ASSIGN_MODIFIER&gt;
-    Mod8,		/// &lt;ASSIGN_MODIFIER&gt;
-    Mod9,		/// &lt;ASSIGN_MODIFIER&gt;
-    Lock0,		/// &lt;ASSIGN_MODIFIER&gt;
-    Lock1,		/// &lt;ASSIGN_MODIFIER&gt;
-    Lock2,		/// &lt;ASSIGN_MODIFIER&gt;
-    Lock3,		/// &lt;ASSIGN_MODIFIER&gt;
-    Lock4,		/// &lt;ASSIGN_MODIFIER&gt;
-    Lock5,		/// &lt;ASSIGN_MODIFIER&gt;
-    Lock6,		/// &lt;ASSIGN_MODIFIER&gt;
-    Lock7,		/// &lt;ASSIGN_MODIFIER&gt;
-    Lock8,		/// &lt;ASSIGN_MODIFIER&gt;
-    Lock9,		/// &lt;ASSIGN_MODIFIER&gt;
-    ASSIGN,		/// &lt;ASSIGN_MODIFIER&gt;
-    end = ASSIGN	///
+    Type_begin = 0,				///
+
+    Type_Shift = Type_begin,			/// &lt;BASIC_MODIFIER&gt;
+    Type_Alt,					/// &lt;BASIC_MODIFIER&gt;
+    Type_Control,				/// &lt;BASIC_MODIFIER&gt;
+    Type_Windows,				/// &lt;BASIC_MODIFIER&gt;
+    Type_BASIC,					///
+    
+    Type_Up = Type_BASIC,			/// &lt;KEYSEQ_MODIFIER&gt;
+    Type_Down,					/// &lt;KEYSEQ_MODIFIER&gt;
+    Type_KEYSEQ,				///
+    
+    Type_ImeLock = Type_KEYSEQ,			/// &lt;ASSIGN_MODIFIER&gt;
+    Type_ImeComp,				/// &lt;ASSIGN_MODIFIER&gt;
+    Type_NumLock,				/// &lt;ASSIGN_MODIFIER&gt;
+    Type_CapsLock,				/// &lt;ASSIGN_MODIFIER&gt;
+    Type_ScrollLock,				/// &lt;ASSIGN_MODIFIER&gt;
+    Type_Mod0,					/// &lt;ASSIGN_MODIFIER&gt;
+    Type_Mod1,					/// &lt;ASSIGN_MODIFIER&gt;
+    Type_Mod2,					/// &lt;ASSIGN_MODIFIER&gt;
+    Type_Mod3,					/// &lt;ASSIGN_MODIFIER&gt;
+    Type_Mod4,					/// &lt;ASSIGN_MODIFIER&gt;
+    Type_Mod5,					/// &lt;ASSIGN_MODIFIER&gt;
+    Type_Mod6,					/// &lt;ASSIGN_MODIFIER&gt;
+    Type_Mod7,					/// &lt;ASSIGN_MODIFIER&gt;
+    Type_Mod8,					/// &lt;ASSIGN_MODIFIER&gt;
+    Type_Mod9,					/// &lt;ASSIGN_MODIFIER&gt;
+    Type_Lock0,					/// &lt;ASSIGN_MODIFIER&gt;
+    Type_Lock1,					/// &lt;ASSIGN_MODIFIER&gt;
+    Type_Lock2,					/// &lt;ASSIGN_MODIFIER&gt;
+    Type_Lock3,					/// &lt;ASSIGN_MODIFIER&gt;
+    Type_Lock4,					/// &lt;ASSIGN_MODIFIER&gt;
+    Type_Lock5,					/// &lt;ASSIGN_MODIFIER&gt;
+    Type_Lock6,					/// &lt;ASSIGN_MODIFIER&gt;
+    Type_Lock7,					/// &lt;ASSIGN_MODIFIER&gt;
+    Type_Lock8,					/// &lt;ASSIGN_MODIFIER&gt;
+    Type_Lock9,					/// &lt;ASSIGN_MODIFIER&gt;
+    Type_ASSIGN,				///
+
+    Type_end = Type_ASSIGN			///
   };
   
 public:
   ///
   Modifier();
   ///
-  Modifier &on      (Type t) { return press(t); }
+  Modifier &on(Type i_type) { return press(i_type); }
   ///
-  Modifier &off     (Type t) { return release(t); }
+  Modifier &off(Type i_type) { return release(i_type); }
   ///
-  Modifier &press   (Type t) {modifiers|= ((MODIFIERS(1))<<t); return care(t);}
+  Modifier &press(Type i_type)
+  { m_modifiers |= ((MODIFIERS(1)) << i_type); return care(i_type); }
   ///
-  Modifier &release (Type t) {modifiers&=~((MODIFIERS(1))<<t); return care(t);}
+  Modifier &release(Type i_type)
+  { m_modifiers &= ~((MODIFIERS(1)) << i_type); return care(i_type); }
   ///
-  Modifier &care    (Type t) {dontcares&=~((MODIFIERS(1))<<t); return *this;}
+  Modifier &care(Type i_type)
+  { m_dontcares &= ~((MODIFIERS(1)) << i_type); return *this; }
   ///
-  Modifier &dontcare(Type t) {dontcares|= ((MODIFIERS(1))<<t); return *this;}
+  Modifier &dontcare(Type i_type)
+  { m_dontcares |= ((MODIFIERS(1)) << i_type); return *this; }
   /// set all modifiers to dontcare
-  Modifier &dontcare() { dontcares = ~MODIFIERS(0); return *this; }
+  Modifier &dontcare() { m_dontcares = ~MODIFIERS(0); return *this; }
 
   ///
-  Modifier &on      (Type t, bool isOn_) { return press(t, isOn_); }
+  Modifier &on(Type i_type, bool i_isOn) { return press(i_type, i_isOn); }
   ///
-  Modifier &press   (Type t, bool isPressed_)
-  { return isPressed_ ? press(t) : release(t); }
+  Modifier &press(Type i_type, bool i_isPressed)
+  { return i_isPressed ? press(i_type) : release(i_type); }
   ///
-  Modifier &care    (Type t, bool doCare)
-  { return doCare ? care(t) : dontcare(t); }
+  Modifier &care(Type i_type, bool i_doCare)
+  { return i_doCare ? care(i_type) : dontcare(i_type); }
   
   ///
-  bool operator==(const Modifier &m) const
-  { return modifiers == m.modifiers && dontcares == m.dontcares; }
+  bool operator==(const Modifier &i_m) const
+  { return m_modifiers == i_m.m_modifiers && m_dontcares == i_m.m_dontcares; }
 
   /// add m's modifiers where this dontcare
-  Modifier &operator+=(const Modifier &m);
+  void add(const Modifier &i_m);
+  //Modifier &operator+=(const Modifier &i_m);
 
   /** does match. (except dontcare modifiers) (is the m included *this
       set ?) */
-  bool doesMatch(const Modifier &m) const
-  { return ((modifiers | dontcares) == (m.modifiers | dontcares)); }
+  bool doesMatch(const Modifier &i_m) const
+  { return ((m_modifiers | m_dontcares) == (i_m.m_modifiers | m_dontcares)); }
   
   ///
-  bool isOn(Type t) const { return isPressed(t); }
+  bool isOn(Type i_type) const { return isPressed(i_type); }
   ///
-  bool isPressed(Type t) const { return !!(modifiers & ((MODIFIERS(1))<<t)); }
+  bool isPressed(Type i_type) const
+  { return !!(m_modifiers & ((MODIFIERS(1)) << i_type)); }
   ///
-  bool isDontcare(Type t) const { return !!(dontcares & ((MODIFIERS(1))<<t)); }
+  bool isDontcare(Type i_type) const
+  { return !!(m_dontcares & ((MODIFIERS(1)) << i_type)); }
 
   /// stream output
   friend std::ostream &
@@ -236,8 +254,8 @@ public:
   
   /// < 
   bool operator<(const Modifier &i_m) const
-  { return modifiers < i_m.modifiers ||
-      (modifiers == i_m.modifiers && dontcares < i_m.dontcares ); }
+  { return m_modifiers < i_m.m_modifiers ||
+      (m_modifiers == i_m.m_modifiers && m_dontcares < i_m.m_dontcares ); }
 };
 
 
@@ -245,19 +263,20 @@ public:
 class ModifiedKey
 {
 public:
-  Modifier modifier;	///
-  Key *key;		///
+  Modifier m_modifier;	///
+  Key *m_key;		///
   
 public:
   ///
-  ModifiedKey() : key(NULL) { }
+  ModifiedKey() : m_key(NULL) { }
   ///
-  ModifiedKey(Key *key_) : key(key_) { }
+  ModifiedKey(Key *i_key) : m_key(i_key) { }
   ///
-  ModifiedKey(const Modifier &m, Key *key_)  : modifier(m), key(key_) { }
+  ModifiedKey(const Modifier &i_modifier, Key *i_key)
+    : m_modifier(i_modifier), m_key(i_key) { }
   ///
-  bool operator==(const ModifiedKey &mk) const
-  { return modifier == mk.modifier && key == mk.key; }
+  bool operator==(const ModifiedKey &i_mk) const
+  { return m_modifier == i_mk.m_modifier && m_key == i_mk.m_key; }
 
   /// stream output
   friend std::ostream &
@@ -265,97 +284,97 @@ public:
 
   /// < 
   bool operator<(const ModifiedKey &i_mk) const
-  { return *key < *i_mk.key ||
-      (!(*i_mk.key < *key) && modifier < i_mk.modifier); }
+  { return *m_key < *i_mk.m_key ||
+      (!(*i_mk.m_key < *m_key) && m_modifier < i_mk.m_modifier); }
 };
 
 
 ///
 class Keyboard
 {
-  /** keyboard keys (hashed by first scan code).
-      Keys must be *list* of Key, because
-      *pointers* into Keys exist anywhere.
-      @name ANONYMOUS
-  */
-  enum {
-    lengthof_hashedKeys = 128,			///
-  };
-  typedef std::list<Key> Keys;			///
-  Keys hashedKeys[lengthof_hashedKeys];		///
-
-  typedef std::map<istring, Key *> Aliases;	/// key name aliases
-  Aliases aliases;				///
-  
-  Key syncKey;					/// key used to synchronize
-
 public:
   /// keyboard modifiers (pointer into Keys)
   typedef std::list<Key *> Mods;
 
 private:
+  /** keyboard keys (hashed by first scan code).
+      Keys must be *list* of Key.
+      Because *pointers* into Keys exist anywhere in this program, the address
+      of Key's elements must be fixed.  */
+  enum {
+    HASHED_KEYS_SIZE = 128,			///
+  };
+  typedef std::list<Key> Keys;			///
+  typedef std::map<istring, Key *> Aliases;	/// key name aliases
+
+private:
+  Keys m_hashedKeys[HASHED_KEYS_SIZE];		///
+  Aliases m_aliases;				///
+  Key m_syncKey;				/// key used to synchronize
+  
+private:
   ///
-  Mods mods[Modifier::BASIC];
+  Mods m_mods[Modifier::Type_BASIC];
 
 public:
   ///
   class KeyIterator
   {
     ///
-    Keys *hashedKeys;
+    Keys *m_hashedKeys;
     ///
-    size_t lengthof_hashedKeys;
+    size_t m_hashedKeysSize;
     ///
-    Keys::iterator i;
+    Keys::iterator m_i;
     
     ///
     void next();
     
   public:
     ///
-    KeyIterator(Keys *hashedKeys_, size_t lengthof_hashedKeys_);
+    KeyIterator(Keys *i_hashedKeys, size_t i_hashedKeysSize);
     ///
     Key *operator *();
     ///
-    void operator++(int) { next(); }
+    void operator++() { next(); }
   };
   
 private:
   ///
-  Keys &getKeys(const Key &key);
+  Keys &getKeys(const Key &i_key);
 
 public:
   /// add a key
-  void addKey(const Key &key);
+  void addKey(const Key &i_key);
 
   /// add a key name alias
-  void addAlias(const istring &aliasName, Key *key);
+  void addAlias(const istring &i_aliasName, Key *i_key);
   
   /// get a sync key
-  Key *getSyncKey() { return &syncKey; }
+  Key *getSyncKey() { return &m_syncKey; }
   
   /// add a modifier key
-  void addModifier(Modifier::Type mt, Key * key);
+  void addModifier(Modifier::Type i_mt, Key * i_key);
   
   /// search a key
-  Key *searchKey(const Key &key);
+  Key *searchKey(const Key &i_key);
   
   /// search a key (of which the key's scan code is the prefix)
-  Key *searchPrefixKey(const Key &key);
+  Key *searchPrefixKey(const Key &i_key);
   
   /// search a key by name
-  Key *searchKey(const istring &name);
+  Key *searchKey(const istring &i_name);
 
   /// search a key by non-alias name
-  Key *searchKeyByNonAliasName(const istring &name);
+  Key *searchKeyByNonAliasName(const istring &i_name);
 
   /// get modifiers
-  Mods &getModifiers(Modifier::Type mt) { return mods[mt]; }
+  Mods &getModifiers(Modifier::Type i_mt) { return m_mods[i_mt]; }
 
   /// get key iterator
   KeyIterator getKeyIterator()
-  { return KeyIterator(&hashedKeys[0], lengthof_hashedKeys); }
+  { return KeyIterator(&m_hashedKeys[0], HASHED_KEYS_SIZE); }
 };
 
 
-#endif // __keyboard_h__
+#endif // _KEYBOARD_H

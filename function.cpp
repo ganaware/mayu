@@ -14,29 +14,29 @@ using namespace std;
 
 
 /// undefined key
-static void undefined(const Function::FuncData &fd)
+static void undefined(const Function::FuncData &i_fd)
 {
-  if (!fd.isPressed)
+  if (!i_fd.m_isPressed)
     return;
   MessageBeep(MB_OK);
 }
 
 
 /// PostMessage
-static void postMessage(const Function::FuncData &fd)
+static void postMessage(const Function::FuncData &i_fd)
 {
-  if (!fd.isPressed)
+  if (!i_fd.m_isPressed)
     return;
 
-  int window = fd.args[0].getData();
+  int window = i_fd.m_args[0].getData();
   
-  HWND hwnd = fd.hwnd;
+  HWND hwnd = i_fd.m_hwnd;
   if (0 < window)
   {
-    for (int i = 0; i < window; i ++)
+    for (int i = 0; i < window; ++ i)
       hwnd = GetParent(hwnd);
   }
-  else if (window == Function::toMainWindow)
+  else if (window == Function::PM_toMainWindow)
   {
     while (true)
     {
@@ -46,7 +46,7 @@ static void postMessage(const Function::FuncData &fd)
       hwnd = p;
     }
   }
-  else if (window == Function::toOverlappedWindow)
+  else if (window == Function::PM_toOverlappedWindow)
   {
     while (hwnd)
     {
@@ -58,19 +58,19 @@ static void postMessage(const Function::FuncData &fd)
   }
 
   if (hwnd)
-    PostMessage(hwnd, fd.args[1].getNumber(), fd.args[2].getNumber(),
-		fd.args[3].getNumber());
+    PostMessage(hwnd, i_fd.m_args[1].getNumber(), i_fd.m_args[2].getNumber(),
+		i_fd.m_args[3].getNumber());
 }
 
 
 /// virtual key
-static void vk(const Function::FuncData &fd)
+static void vk(const Function::FuncData &i_fd)
 {
-  long key = fd.args[0].getData();
+  long key = i_fd.m_args[0].getData();
   BYTE vkey = (BYTE)key;
-  bool isExtended = !!(key & Function::vkExtended);
-  bool isUp       = !fd.isPressed && !!(key & Function::vkUp);
-  bool isDown     = fd.isPressed && !!(key & Function::vkDown);
+  bool isExtended = !!(key & Function::VK_extended);
+  bool isUp       = !i_fd.m_isPressed && !!(key & Function::VK_up);
+  bool isDown     = i_fd.m_isPressed && !!(key & Function::VK_down);
   
   if (vkey == VK_LBUTTON && isDown)
     mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
@@ -87,127 +87,127 @@ static void vk(const Function::FuncData &fd)
   else if (isUp || isDown)
     keybd_event(vkey, (BYTE)MapVirtualKey((BYTE)vkey, 0),
 		(isExtended ? KEYEVENTF_EXTENDEDKEY : 0) |
-		(fd.isPressed ? 0 : KEYEVENTF_KEYUP), 0);
+		(i_fd.m_isPressed ? 0 : KEYEVENTF_KEYUP), 0);
 }
 
 
 /// investigate WM_COMMAND, WM_SYSCOMMAND
-static void investigateCommand(const Function::FuncData &fd)
+static void investigateCommand(const Function::FuncData &i_fd)
 {
-  if (!fd.isPressed)
+  if (!i_fd.m_isPressed)
     return;
-  Acquire a(&fd.engine.log, 0);
-  hookData->doesNotifyCommand = !hookData->doesNotifyCommand;
-  if (hookData->doesNotifyCommand)
-    fd.engine.log << " begin" << endl;
+  Acquire a(&i_fd.m_engine.m_log, 0);
+  g_hookData->m_doesNotifyCommand = !g_hookData->m_doesNotifyCommand;
+  if (g_hookData->m_doesNotifyCommand)
+    i_fd.m_engine.m_log << " begin" << endl;
   else
-    fd.engine.log << " end" << endl;
+    i_fd.m_engine.m_log << " end" << endl;
 }
 
 
 /// mayu dialog
-static void mayuDialog(const Function::FuncData &fd)
+static void mayuDialog(const Function::FuncData &i_fd)
 {
-  if (!fd.isPressed)
+  if (!i_fd.m_isPressed)
     return;
-  PostMessage(fd.engine.getAssociatedWndow(), WM_engineNotify,
-	      engineNotify_showDlg,
-	      fd.args[0].getData() | fd.args[1].getData());
+  PostMessage(i_fd.m_engine.getAssociatedWndow(), WM_APP_engineNotify,
+	      EngineNotify_showDlg,
+	      i_fd.m_args[0].getData() | i_fd.m_args[1].getData());
 }
 
 
 /// help message
-static void helpMessage(const Function::FuncData &fd)
+static void helpMessage(const Function::FuncData &i_fd)
 {
-  if (!fd.isPressed)
+  if (!i_fd.m_isPressed)
     return;
 
   bool doesShow = false;
-  if (fd.args.size() == 2)
+  if (i_fd.m_args.size() == 2)
   {
     doesShow = true;
-    fd.engine.m_helpMessage = fd.args[1].getString();
-    fd.engine.m_helpTitle = fd.args[0].getString();
+    i_fd.m_engine.m_helpMessage = i_fd.m_args[1].getString();
+    i_fd.m_engine.m_helpTitle = i_fd.m_args[0].getString();
   }
-  PostMessage(fd.engine.getAssociatedWndow(), WM_engineNotify,
-	      engineNotify_helpMessage, doesShow);
+  PostMessage(i_fd.m_engine.getAssociatedWndow(), WM_APP_engineNotify,
+	      EngineNotify_helpMessage, doesShow);
 }
 
 /// help variable
-static void helpVariable(const Function::FuncData &fd)
+static void helpVariable(const Function::FuncData &i_fd)
 {
-  if (!fd.isPressed)
+  if (!i_fd.m_isPressed)
     return;
 
   char buf[20];
-  snprintf(buf, NUMBER_OF(buf), "%d", fd.engine.m_variable);
+  snprintf(buf, NUMBER_OF(buf), "%d", i_fd.m_engine.m_variable);
 
-  fd.engine.m_helpTitle = fd.args[0].getString();
-  fd.engine.m_helpMessage = buf;
-  PostMessage(fd.engine.getAssociatedWndow(), WM_engineNotify,
-	      engineNotify_helpMessage, true);
+  i_fd.m_engine.m_helpTitle = i_fd.m_args[0].getString();
+  i_fd.m_engine.m_helpMessage = buf;
+  PostMessage(i_fd.m_engine.getAssociatedWndow(), WM_APP_engineNotify,
+	      EngineNotify_helpMessage, true);
 }
 
 
 // input string
-//  static void INPUT(const Function::FuncData &fd)
+//  static void INPUT(const Function::FuncData &i_fd)
 //  {
-//    if (!fd.isPressed)
+//    if (!i_fd.m_isPressed)
 //      return;
-//    std::string text = fd.args[0].getString();
-//    for (const char *t = text.c_str(); *t; t++)
-//      PostMessage(fd.hwnd, WM_CHAR, *t, 0);
+//    std::string text = i_fd.m_args[0].getString();
+//    for (const char *t = text.c_str(); *t; ++ t)
+//      PostMessage(i_fd.m_hwnd, WM_CHAR, *t, 0);
 //  }
 
 
 ///
-#define WINDOW_ROUTINE				\
-  if (!fd.isPressed)				\
-    return;					\
-  HWND hwnd = getToplevelWindow(fd.hwnd, NULL);	\
-  if (!hwnd)					\
+#define WINDOW_ROUTINE					\
+  if (!i_fd.m_isPressed)				\
+    return;						\
+  HWND hwnd = getToplevelWindow(i_fd.m_hwnd, NULL);	\
+  if (!hwnd)						\
     return;
 
 ///
-#define MDI_WINDOW_ROUTINE(i)						\
-  if (!fd.isPressed)							\
-    return;								\
-  bool isMDI = (fd.args.size() == i + 1 && fd.args[i].getData());	\
-  HWND hwnd = getToplevelWindow(fd.hwnd, &isMDI);			\
-  if (!hwnd)								\
-    return;								\
-  RECT rc, rcd;								\
-  if (isMDI)								\
-  {									\
-    getChildWindowRect(hwnd, &rc);					\
-    GetClientRect(GetParent(hwnd), &rcd);				\
-  }									\
-  else									\
-  {									\
-    GetWindowRect(hwnd, &rc);						\
-    SystemParametersInfo(SPI_GETWORKAREA, 0, (void *)&rcd, FALSE);	\
+#define MDI_WINDOW_ROUTINE(i)						  \
+  if (!i_fd.m_isPressed)						  \
+    return;								  \
+  bool isMDI = (i_fd.m_args.size() == i + 1 && i_fd.m_args[i].getData()); \
+  HWND hwnd = getToplevelWindow(i_fd.m_hwnd, &isMDI);			  \
+  if (!hwnd)								  \
+    return;								  \
+  RECT rc, rcd;								  \
+  if (isMDI)								  \
+  {									  \
+    getChildWindowRect(hwnd, &rc);					  \
+    GetClientRect(GetParent(hwnd), &rcd);				  \
+  }									  \
+  else									  \
+  {									  \
+    GetWindowRect(hwnd, &rc);						  \
+    SystemParametersInfo(SPI_GETWORKAREA, 0, (void *)&rcd, FALSE);	  \
   }
 
 
 /// window cling to ...
-static void windowClingTo(const Function::FuncData &fd)
+static void windowClingTo(const Function::FuncData &i_fd)
 {
   MDI_WINDOW_ROUTINE(0);
   int x = rc.left, y = rc.top;
-  if (fd.id == Function::WindowClingToLeft)
+  if (i_fd.m_id == Function::Id_WindowClingToLeft)
     x = rcd.left;
-  else if (fd.id == Function::WindowClingToRight)
+  else if (i_fd.m_id == Function::Id_WindowClingToRight)
     x = rcd.right - rcWidth(&rc);
-  else if (fd.id == Function::WindowClingToTop)
+  else if (i_fd.m_id == Function::Id_WindowClingToTop)
     y = rcd.top;
-  else // id == Function::WindowClingToBottom
+  else // id == Function::Id_WindowClingToBottom
     y = rcd.bottom - rcHeight(&rc);
   asyncMoveWindow(hwnd, x, y);
 }
 
 
 /// rise window
-static void windowRaise(const Function::FuncData &fd)
+static void windowRaise(const Function::FuncData &i_fd)
 {
   MDI_WINDOW_ROUTINE(0);
   SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0,
@@ -216,7 +216,7 @@ static void windowRaise(const Function::FuncData &fd)
 
 
 /// lower window
-static void windowLower(const Function::FuncData &fd)
+static void windowLower(const Function::FuncData &i_fd)
 {
   MDI_WINDOW_ROUTINE(0);
   SetWindowPos(hwnd, HWND_BOTTOM, 0, 0, 0, 0,
@@ -225,7 +225,7 @@ static void windowLower(const Function::FuncData &fd)
 
 
 /// minimize window
-static void windowMinimize(const Function::FuncData &fd)
+static void windowMinimize(const Function::FuncData &i_fd)
 {
   MDI_WINDOW_ROUTINE(0);
   PostMessage(hwnd, WM_SYSCOMMAND,
@@ -234,7 +234,7 @@ static void windowMinimize(const Function::FuncData &fd)
 
 
 /// maximize window
-static void windowMaximize(const Function::FuncData &fd)
+static void windowMaximize(const Function::FuncData &i_fd)
 {
   MDI_WINDOW_ROUTINE(0);
   PostMessage(hwnd, WM_SYSCOMMAND,
@@ -243,7 +243,7 @@ static void windowMaximize(const Function::FuncData &fd)
 
 
 // screen saver (TODO: this does not work)
-//  static void screenSaver(const Function::FuncData &fd)
+//  static void screenSaver(const Function::FuncData &i_fd)
 //  {
 //    WINDOW_ROUTINE;
 //    PostMessage(hwnd, WM_SYSCOMMAND, SC_SCREENSAVE, 0);
@@ -251,7 +251,7 @@ static void windowMaximize(const Function::FuncData &fd)
 
 
 /// close window
-static void windowClose(const Function::FuncData &fd)
+static void windowClose(const Function::FuncData &i_fd)
 {
   MDI_WINDOW_ROUTINE(0);
   PostMessage(hwnd, WM_SYSCOMMAND, SC_CLOSE, 0);
@@ -259,7 +259,7 @@ static void windowClose(const Function::FuncData &fd)
 
 
 /// toggle top most
-static void windowToggleTopMost(const Function::FuncData &fd)
+static void windowToggleTopMost(const Function::FuncData &i_fd)
 {
   WINDOW_ROUTINE;
   SetWindowPos(hwnd,
@@ -271,79 +271,79 @@ static void windowToggleTopMost(const Function::FuncData &fd)
 
 
 /// identify
-static void windowIdentify(const Function::FuncData &fd)
+static void windowIdentify(const Function::FuncData &i_fd)
 {
-  if (!fd.isPressed)
+  if (!i_fd.m_isPressed)
     return;
 
   char className[GANA_MAX_ATOM_LENGTH];
   bool ok = false;
-  if (GetClassName(fd.hwnd, className, sizeof(className)))
+  if (GetClassName(i_fd.m_hwnd, className, sizeof(className)))
   {
     if (StringTool::mbsiequal_(className, "ConsoleWindowClass"))
     {
       char titleName[1024];
-      if (GetWindowText(fd.hwnd, titleName, sizeof(titleName)) == 0)
+      if (GetWindowText(i_fd.m_hwnd, titleName, sizeof(titleName)) == 0)
 	titleName[0] = '\0';
       {
-	Acquire a(&fd.engine.log, 1);
-	fd.engine.log << "HWND:\t" << hex << (int)fd.hwnd << dec << endl;
+	Acquire a(&i_fd.m_engine.m_log, 1);
+	i_fd.m_engine.m_log << "HWND:\t" << hex << (int)i_fd.m_hwnd << dec << endl;
       }
-      Acquire a(&fd.engine.log, 0);
-      fd.engine.log << "CLASS:\t" << className << endl;
-      fd.engine.log << "TITLE:\t" << titleName << endl;
+      Acquire a(&i_fd.m_engine.m_log, 0);
+      i_fd.m_engine.m_log << "CLASS:\t" << className << endl;
+      i_fd.m_engine.m_log << "TITLE:\t" << titleName << endl;
 
-      HWND hwnd = getToplevelWindow(fd.hwnd, NULL);
+      HWND hwnd = getToplevelWindow(i_fd.m_hwnd, NULL);
       RECT rc;
       GetWindowRect(hwnd, &rc);
-      fd.engine.log << "Toplevel Window Position/Size: ("
-		    << rc.left << ", "<< rc.top << ") / ("
-		    << rcWidth(&rc) << "x" << rcHeight(&rc) << ")" << endl;
+      i_fd.m_engine.m_log << "Toplevel Window Position/Size: ("
+			  << rc.left << ", "<< rc.top << ") / ("
+			  << rcWidth(&rc) << "x" << rcHeight(&rc) << ")" << endl;
       
       SystemParametersInfo(SPI_GETWORKAREA, 0, (void *)&rc, FALSE);
-      fd.engine.log << "Desktop Window Position/Size: ("
-		    << rc.left << ", "<< rc.top << ") / ("
-		    << rcWidth(&rc) << "x" << rcHeight(&rc) << ")" << endl;
+      i_fd.m_engine.m_log << "Desktop Window Position/Size: ("
+			  << rc.left << ", "<< rc.top << ") / ("
+			  << rcWidth(&rc) << "x" << rcHeight(&rc) << ")" << endl;
 
-      fd.engine.log << endl;
+      i_fd.m_engine.m_log << endl;
       ok = true;
     }
   }
   if (!ok)
   {
-    UINT WM_Targetted = RegisterWindowMessage(WM_Targetted_name);
-    CHECK_TRUE( PostMessage(fd.hwnd, WM_Targetted, 0, 0) );
+    UINT WM_MAYU_TARGETTED = RegisterWindowMessage(WM_MAYU_TARGETTED_NAME);
+    CHECK_TRUE( PostMessage(i_fd.m_hwnd, WM_MAYU_TARGETTED, 0, 0) );
   }
 }
 
 
 /// maximize horizontally or virtically
-static void windowHVMaximize(const Function::FuncData &fd)
+static void windowHVMaximize(const Function::FuncData &i_fd)
 {
   MDI_WINDOW_ROUTINE(0);
 
-  bool isHorizontal = fd.id == Function::WindowHMaximize;
+  bool isHorizontal = i_fd.m_id == Function::Id_WindowHMaximize;
   typedef std::list<Engine::WindowPosition>::iterator WPiter;
     
   // erase non window
   while (true)
   {
-    WPiter i = fd.engine.windowPositions.begin();
-    WPiter end = fd.engine.windowPositions.end();
-    for (; i != end; i ++)
-      if (!IsWindow((*i).hwnd))
+    WPiter i = i_fd.m_engine.m_windowPositions.begin();
+    WPiter end = i_fd.m_engine.m_windowPositions.end();
+    for (; i != end; ++ i)
+      if (!IsWindow((*i).m_hwnd))
 	break;
     if (i == end)
       break;
-    fd.engine.windowPositions.erase(i);
+    i_fd.m_engine.m_windowPositions.erase(i);
   }
 
   // find target
-  WPiter i = fd.engine.windowPositions.begin();
-  WPiter end = fd.engine.windowPositions.end();
+  WPiter i = i_fd.m_engine.m_windowPositions.begin();
+  WPiter end = i_fd.m_engine.m_windowPositions.end();
   WPiter target = end;
-  for (; i != end; i ++)
-    if ((*i).hwnd == hwnd)
+  for (; i != end; ++ i)
+    if ((*i).m_hwnd == hwnd)
     {
       target = i;
       break;
@@ -353,32 +353,34 @@ static void windowHVMaximize(const Function::FuncData &fd)
     PostMessage(hwnd, WM_SYSCOMMAND, SC_RESTORE, 0);
   else
   {
-    Engine::WindowPosition::Mode mode = Engine::WindowPosition::ModeNormal;
+    Engine::WindowPosition::Mode mode = Engine::WindowPosition::Mode_normal;
     
     if (target != end)
     {
       Engine::WindowPosition &wp = *target;
-      rc = wp.rc;
-      if (wp.mode == Engine::WindowPosition::ModeHV)
-	mode = wp.mode = isHorizontal ?
-	  Engine::WindowPosition::ModeV : Engine::WindowPosition::ModeH;
-      else if (( isHorizontal && wp.mode == Engine::WindowPosition::ModeV) ||
-	       (!isHorizontal && wp.mode == Engine::WindowPosition::ModeH))
-	mode = wp.mode = Engine::WindowPosition::ModeHV;
+      rc = wp.m_rc;
+      if (wp.m_mode == Engine::WindowPosition::Mode_HV)
+	mode = wp.m_mode = isHorizontal ?
+	  Engine::WindowPosition::Mode_V : Engine::WindowPosition::Mode_H;
+      else if (( isHorizontal &&
+		 wp.m_mode == Engine::WindowPosition::Mode_V) ||
+	       (!isHorizontal &&
+		wp.m_mode == Engine::WindowPosition::Mode_H))
+	mode = wp.m_mode = Engine::WindowPosition::Mode_HV;
       else
-	fd.engine.windowPositions.erase(target);
+	i_fd.m_engine.m_windowPositions.erase(target);
     }
     else
     {
       mode = isHorizontal ?
-	Engine::WindowPosition::ModeH : Engine::WindowPosition::ModeV;
-      fd.engine.windowPositions.push_front(
+	Engine::WindowPosition::Mode_H : Engine::WindowPosition::Mode_V;
+      i_fd.m_engine.m_windowPositions.push_front(
 	Engine::WindowPosition(hwnd, rc, mode));
     }
     
-    if ((int)mode & (int)Engine::WindowPosition::ModeH)
+    if ((int)mode & (int)Engine::WindowPosition::Mode_H)
       rc.left = rcd.left, rc.right = rcd.right;
-    if ((int)mode & (int)Engine::WindowPosition::ModeV)
+    if ((int)mode & (int)Engine::WindowPosition::Mode_V)
       rc.top = rcd.top, rc.bottom = rcd.bottom;
     
     asyncMoveWindow(hwnd, rc.left, rc.top, rcWidth(&rc), rcHeight(&rc));
@@ -387,16 +389,16 @@ static void windowHVMaximize(const Function::FuncData &fd)
 
 
 /// move window
-static void windowMove(const Function::FuncData &fd)
+static void windowMove(const Function::FuncData &i_fd)
 {
   MDI_WINDOW_ROUTINE(2);
-  asyncMoveWindow(hwnd, rc.left + fd.args[0].getNumber(),
-		  rc.top  + fd.args[1].getNumber());
+  asyncMoveWindow(hwnd, rc.left + i_fd.m_args[0].getNumber(),
+		  rc.top  + i_fd.m_args[1].getNumber());
 }
 
 
 /// move window visibly
-static void windowMoveVisibly(const Function::FuncData &fd)
+static void windowMoveVisibly(const Function::FuncData &i_fd)
 {
   MDI_WINDOW_ROUTINE(0);
   int x = rc.left, y = rc.top;
@@ -423,7 +425,7 @@ static BOOL (WINAPI *SetLayeredWindowAttributes_)
 
 // initialize layerd window
 static BOOL WINAPI initalizeLayerdWindow(
-  HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags)
+  HWND i_hwnd, COLORREF i_crKey, BYTE i_bAlpha, DWORD i_dwFlags)
 {
   HMODULE hModule = GetModuleHandle("user32.dll");
   if (!hModule)
@@ -432,63 +434,64 @@ static BOOL WINAPI initalizeLayerdWindow(
     (BOOL (WINAPI *)(HWND, COLORREF, BYTE, DWORD))
     GetProcAddress(hModule, "SetLayeredWindowAttributes");
   if (SetLayeredWindowAttributes_)
-    return SetLayeredWindowAttributes_(hwnd, crKey, bAlpha, dwFlags);
+    return SetLayeredWindowAttributes_(i_hwnd, i_crKey, i_bAlpha, i_dwFlags);
   else
     return FALSE;
 }
 
-static const LONG LWA_ALPHA_ = 0x00000002;		///
-static const DWORD WS_EX_LAYERED_ = 0x00080000;		///
+//static const LONG LWA_ALPHA_ = 0x00000002;		///
+//static const DWORD WS_EX_LAYERED_ = 0x00080000;		///
 
 
 /// set window alpha
-static void windowSetAlpha(const Function::FuncData &fd)
+static void windowSetAlpha(const Function::FuncData &i_fd)
 {
   WINDOW_ROUTINE;
   
-  int alpha = fd.args[0].getNumber();
+  int alpha = i_fd.m_args[0].getNumber();
 
   if (alpha < 0)	// remove all alpha
   {
     for (Engine::WindowsWithAlpha::iterator
-	   i = fd.engine.windowsWithAlpha.begin(); 
-	 i != fd.engine.windowsWithAlpha.end(); i ++)
+	   i = i_fd.m_engine.m_windowsWithAlpha.begin(); 
+	 i != i_fd.m_engine.m_windowsWithAlpha.end(); ++ i)
     {
       SetWindowLong(*i, GWL_EXSTYLE,
-		    GetWindowLong(*i, GWL_EXSTYLE) & ~WS_EX_LAYERED_);
+		    GetWindowLong(*i, GWL_EXSTYLE) & ~WS_EX_LAYERED);
       RedrawWindow(*i, NULL, NULL,
 		   RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
     }
-    fd.engine.windowsWithAlpha.clear();
+    i_fd.m_engine.m_windowsWithAlpha.clear();
   }
   else
   {
     LONG exStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
-    if (exStyle & WS_EX_LAYERED_)	// remove alpha
+    if (exStyle & WS_EX_LAYERED)	// remove alpha
     {
       Engine::WindowsWithAlpha::iterator
-	i = find(fd.engine.windowsWithAlpha.begin(),
-		 fd.engine.windowsWithAlpha.end(), hwnd);
-      if (i == fd.engine.windowsWithAlpha.end())
+	i = find(i_fd.m_engine.m_windowsWithAlpha.begin(),
+		 i_fd.m_engine.m_windowsWithAlpha.end(), hwnd);
+      if (i == i_fd.m_engine.m_windowsWithAlpha.end())
 	return;	// already layered by the application
     
-      fd.engine.windowsWithAlpha.erase(i);
+      i_fd.m_engine.m_windowsWithAlpha.erase(i);
     
-      SetWindowLong(hwnd, GWL_EXSTYLE, exStyle & ~WS_EX_LAYERED_);
+      SetWindowLong(hwnd, GWL_EXSTYLE, exStyle & ~WS_EX_LAYERED);
     }
     else	// add alpha
     {
-      SetWindowLong(hwnd, GWL_EXSTYLE, exStyle | WS_EX_LAYERED_);
+      SetWindowLong(hwnd, GWL_EXSTYLE, exStyle | WS_EX_LAYERED);
       alpha %= 101;
       if (!SetLayeredWindowAttributes_(hwnd, 0,
-				       (BYTE)(255 * alpha / 100), LWA_ALPHA_))
+				       (BYTE)(255 * alpha / 100), LWA_ALPHA))
       {
-	Acquire a(&fd.engine.log, 0);
-	fd.engine.log << "error: &WindowSetAlpha(" << alpha
-		      << ") failed for HWND: " << hex << hwnd << dec << endl;
+	Acquire a(&i_fd.m_engine.m_log, 0);
+	i_fd.m_engine.m_log << "error: &WindowSetAlpha(" << alpha
+			    << ") failed for HWND: " << hex << hwnd << dec
+			    << endl;
 	return;
       }
-      fd.engine.windowsWithAlpha.push_front(hwnd);
+      i_fd.m_engine.m_windowsWithAlpha.push_front(hwnd);
     }
     RedrawWindow(hwnd, NULL, NULL,
 		 RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
@@ -497,7 +500,7 @@ static void windowSetAlpha(const Function::FuncData &fd)
 
 
 /// redraw
-static void windowRedraw(const Function::FuncData &fd)
+static void windowRedraw(const Function::FuncData &i_fd)
 {
   WINDOW_ROUTINE;
   RedrawWindow(hwnd, NULL, NULL,
@@ -506,16 +509,16 @@ static void windowRedraw(const Function::FuncData &fd)
 
 
 /// resize
-static void windowResizeTo(const Function::FuncData &fd)
+static void windowResizeTo(const Function::FuncData &i_fd)
 {
   MDI_WINDOW_ROUTINE(2);
-  int w = fd.args[0].getNumber();
+  int w = i_fd.m_args[0].getNumber();
   if (w == 0)
     w = rcWidth(&rc);
   else if (w < 0)
     w += rcWidth(&rcd);
   
-  int h = fd.args[1].getNumber();
+  int h = i_fd.m_args[1].getNumber();
   if (h == 0)
     h = rcHeight(&rc);
   else if (h < 0)
@@ -525,58 +528,58 @@ static void windowResizeTo(const Function::FuncData &fd)
 }
 
 /// move
-static void windowMoveTo(const Function::FuncData &fd)
+static void windowMoveTo(const Function::FuncData &i_fd)
 {
   MDI_WINDOW_ROUTINE(3);
-  int arg_x = fd.args[1].getNumber(), arg_y = fd.args[2].getNumber();
-  int gravity = fd.args[0].getData();
+  int arg_x = i_fd.m_args[1].getNumber(), arg_y = i_fd.m_args[2].getNumber();
+  int gravity = i_fd.m_args[0].getData();
   int x = rc.left + arg_x, y = rc.top + arg_y;
 
-  if (gravity & Function::GravityN)
+  if (gravity & Function::Gravity_N)
     y = arg_y + rcd.top;
-  if (gravity & Function::GravityE)
+  if (gravity & Function::Gravity_E)
     x = arg_x + rcd.right - rcWidth(&rc);
-  if (gravity & Function::GravityW)
+  if (gravity & Function::Gravity_W)
     x = arg_x + rcd.left;
-  if (gravity & Function::GravityS)
+  if (gravity & Function::Gravity_S)
     y = arg_y + rcd.bottom - rcHeight(&rc);
   asyncMoveWindow(hwnd, x, y);
 }
 
 
 /// move mouse
-static void mouseMove(const Function::FuncData &fd)
+static void mouseMove(const Function::FuncData &i_fd)
 {
-  if (!fd.isPressed)
+  if (!i_fd.m_isPressed)
     return;
   POINT pt;
   GetCursorPos(&pt);
-  SetCursorPos(pt.x + fd.args[0].getNumber(), pt.y + fd.args[1].getNumber());
+  SetCursorPos(pt.x + i_fd.m_args[0].getNumber(), pt.y + i_fd.m_args[1].getNumber());
 }
 
 
 /// move wheel
-static void mouseWheel(const Function::FuncData &fd)
+static void mouseWheel(const Function::FuncData &i_fd)
 {
-  if (!fd.isPressed)
+  if (!i_fd.m_isPressed)
     return;
-  mouse_event(MOUSEEVENTF_WHEEL, 0, 0, fd.args[0].getNumber(), 0);
+  mouse_event(MOUSEEVENTF_WHEEL, 0, 0, i_fd.m_args[0].getNumber(), 0);
 }
 
 
 /// get clipboard text (you must call closeClopboard())
-static char *getTextFromClipboard(HGLOBAL *hdata)
+static char *getTextFromClipboard(HGLOBAL *i_hdata)
 {
-  *hdata = NULL;
+  *i_hdata = NULL;
   
   if (!OpenClipboard(NULL))
     return NULL;
   
-  *hdata = GetClipboardData(CF_TEXT);
-  if (!*hdata)
+  *i_hdata = GetClipboardData(CF_TEXT);
+  if (!*i_hdata)
     return NULL;
   
-  char *data = (char *)GlobalLock(*hdata);
+  char *data = (char *)GlobalLock(*i_hdata);
   if (!data)
     return NULL;
   return data;
@@ -584,23 +587,23 @@ static char *getTextFromClipboard(HGLOBAL *hdata)
 
 
 /// close clipboard that opend by getTextFromClipboard()
-static void closeClipboard(HGLOBAL hdata, HGLOBAL hdataNew = NULL)
+static void closeClipboard(HGLOBAL i_hdata, HGLOBAL i_hdataNew = NULL)
 {
-  if (hdata)
-    GlobalUnlock(hdata);
-  if (hdataNew)
+  if (i_hdata)
+    GlobalUnlock(i_hdata);
+  if (i_hdataNew)
   {
     EmptyClipboard();
-    SetClipboardData(CF_TEXT, hdataNew);
+    SetClipboardData(CF_TEXT, i_hdataNew);
   }
   CloseClipboard();
 }
 
 
 /// chenge case of the text in the clipboard
-static void clipboardChangeCase(const Function::FuncData &fd)
+static void clipboardChangeCase(const Function::FuncData &i_fd)
 {
-  if (!fd.isPressed)
+  if (!i_fd.m_isPressed)
     return;
   HGLOBAL hdata;
   char *text = getTextFromClipboard(&hdata);
@@ -622,7 +625,7 @@ static void clipboardChangeCase(const Function::FuncData &fd)
 	  if (StringTool::ismbblead_(c))
 	    dataNew += 2;
 	  else
-	    *dataNew++ = (fd.id == Function::ClipboardUpcaseWord)
+	    *dataNew++ = (i_fd.m_id == Function::Id_ClipboardUpcaseWord)
 	      ? StringTool::toupper_(c) : StringTool::tolower_(c);
 	}
 	GlobalUnlock(hdataNew);
@@ -634,13 +637,13 @@ static void clipboardChangeCase(const Function::FuncData &fd)
 
 
 /// copy string to clipboard
-static void clipboardCopy(const Function::FuncData &fd)
+static void clipboardCopy(const Function::FuncData &i_fd)
 {
-  if (!fd.isPressed)
+  if (!i_fd.m_isPressed)
     return;
   if (!OpenClipboard(NULL))
     return;
-  istring str = fd.args[0].getString();
+  istring str = i_fd.m_args[0].getString();
   HGLOBAL hdataNew =
     GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, str.size() + 1);
   if (!hdataNew)
@@ -656,11 +659,11 @@ static void clipboardCopy(const Function::FuncData &fd)
 // at that time, confirm if it is the result of the previous kill-line
 void EmacsEditKillLine::func()
 {
-  if (!buf.empty())
+  if (!m_buf.empty())
   {
     HGLOBAL g;
     char *text = getTextFromClipboard(&g);
-    if (text == NULL || strcmp(text, buf.c_str()) != 0)
+    if (text == NULL || strcmp(text, m_buf.c_str()) != 0)
       reset();
     closeClipboard(g);
   }
@@ -682,40 +685,41 @@ void EmacsEditKillLine::func()
 ^retval
 </pre>
 */
-HGLOBAL EmacsEditKillLine::makeNewKillLineBuf(const char *data, int *retval)
+HGLOBAL EmacsEditKillLine::makeNewKillLineBuf(const char *i_data,
+					      int *o_retval)
 {
-  int len = buf.size();
-  len += strlen(data) + 3;
+  int len = m_buf.size();
+  len += strlen(i_data) + 3;
   
   HGLOBAL hdata = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, len);
   if (!hdata)
     return NULL;
   char *dataNew = (char *)GlobalLock(hdata);
   *dataNew = '\0';
-  if (!buf.empty())
-    strcpy(dataNew, buf.c_str());
+  if (!m_buf.empty())
+    strcpy(dataNew, m_buf.c_str());
   
-  len = strlen(data);
+  len = strlen(i_data);
   if (3 <= len &&
-      data[len - 2] == '\r' && data[len - 1] == '\n')
+      i_data[len - 2] == '\r' && i_data[len - 1] == '\n')
   {
-    strcat(dataNew, data);
+    strcat(dataNew, i_data);
     len = strlen(dataNew);
     dataNew[len - 2] = '\0'; // chomp
-    *retval = 2;
+    *o_retval = 2;
   }
   else if (len == 0)
   {
     strcat(dataNew, "\r\n");
-    *retval = 1;
+    *o_retval = 1;
   }
   else
   {
-    strcat(dataNew, data);
-    *retval = 0;
+    strcat(dataNew, i_data);
+    *o_retval = 0;
   }
   
-  buf = dataNew;
+  m_buf = dataNew;
   
   GlobalUnlock(hdata);
   return hdata;
@@ -735,9 +739,9 @@ int EmacsEditKillLine::pred()
 
 
 ///
-#define FUNC(id) id, #id
+#define FUNC(id) Id_##id, #id
 ///
-const Function Function::functions[] =
+const Function Function::m_functions[] =
 {
   // special
   { FUNC(Default),			NULL, NULL, },
@@ -820,22 +824,22 @@ const Function Function::functions[] =
   { FUNC(EmacsEditKillLinePred),	"SS", NULL, },
   { FUNC(EmacsEditKillLineFunc),	NULL, NULL, },
 
-  { NONE, NULL, NULL, NULL, },
+  { Id_NONE, NULL, NULL, NULL, },
 };
 
 
 // search function in functions
-const Function *Function::search(Id id)
+const Function *Function::search(Id i_id)
 {
-  for (const Function *f = functions; f->id != NONE; f ++)
-    if (id == f->id)
+  for (const Function *f = m_functions; f->m_id != Id_NONE; ++ f)
+    if (i_id == f->m_id)
       return f;
   return NULL;
 }
-const Function *Function::search(const istring &name)
+const Function *Function::search(const istring &i_name)
 {
-  for (const Function *f = functions; f->id != NONE; f ++)
-    if (name == f->name)
+  for (const Function *f = m_functions; f->m_id != Id_NONE; ++ f)
+    if (i_name == f->m_name)
       return f;
   return NULL;
 }
@@ -844,5 +848,5 @@ const Function *Function::search(const istring &name)
 std::ostream &
 operator<<(std::ostream &i_ost, const Function &i_f)
 {
-  return i_ost << "&" << i_f.name;
+  return i_ost << "&" << i_f.m_name;
 }

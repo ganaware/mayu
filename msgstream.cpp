@@ -13,14 +13,14 @@
 using namespace std;
 
 
-omsgbuf::omsgbuf(UINT messageid_, HWND hwnd_)
-  : hwnd(hwnd_),
-    messageid(messageid_),
+omsgbuf::omsgbuf(UINT i_messageid, HWND i_hwnd)
+  : hwnd(i_hwnd),
+    messageid(i_messageid),
     debugLevel(0),
     msgDebugLevel(0)
 {
   buf = new char[lengthof_buf];
-  assert(buf);
+  ASSERT(buf);
   setp(buf, buf + lengthof_buf);
 }
 
@@ -33,13 +33,13 @@ omsgbuf::~omsgbuf()
   
 
 // attach a msg control
-omsgbuf* omsgbuf::attach(HWND hwnd_)
+omsgbuf* omsgbuf::attach(HWND i_hwnd)
 {
   Acquire a(&cs);
-  if (hwnd || !hwnd_)
+  if (hwnd || !i_hwnd)
     return NULL;	// error if already attached
   
-  hwnd = hwnd_;
+  hwnd = i_hwnd;
   if (!str.empty())
     PostMessage(hwnd, messageid, 0, (LPARAM)this);
   return this;
@@ -57,14 +57,14 @@ omsgbuf* omsgbuf::detach()
 
 
 // for stream
-int omsgbuf::overflow(int c)
+int omsgbuf::overflow(int i_c)
 {
   if (omsgbuf::sync() == EOF) // sync before new buffer created below
     return EOF;
     
-  if (c != EOF)
+  if (i_c != EOF)
   {
-    *pptr() = (char)c;
+    *pptr() = static_cast<char>(i_c);
     pbump(1);
     omsgbuf::sync();
   }
@@ -123,10 +123,10 @@ void omsgbuf::acquire()
 
 
 // begin writing
-void omsgbuf::acquire(int msgDebugLevel_)
+void omsgbuf::acquire(int i_msgDebugLevel)
 {
   cs.acquire();
-  msgDebugLevel = msgDebugLevel_;
+  msgDebugLevel = i_msgDebugLevel;
 }
 
 
@@ -140,7 +140,7 @@ void omsgbuf::release()
 }
 
 
-omsgstream::omsgstream(UINT message, HWND hwnd)
-  : ostream(new omsgbuf(message, hwnd))
+omsgstream::omsgstream(UINT i_message, HWND i_hwnd)
+  : ostream(new omsgbuf(i_message, i_hwnd))
 {
 }

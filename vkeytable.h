@@ -2,20 +2,19 @@
 // vkeytable.h
 
 
-#ifndef __vkeytable_h__
-#define __vkeytable_h__
+#ifndef _VKEYTABLE_H
+#  define _VKEYTABLE_H
 
 
 ///
 class VKeyTable
 {
 public:
-  unsigned char code;		///
-  const char *name;		///
+  unsigned char m_code;				///
+  const char *m_name;				///
 };
 
+extern const VKeyTable g_vkeyTable[];		///
 
-extern const VKeyTable vkeyTable[];	///
 
-
-#endif // __vkeytable_h__
+#endif // _VKEYTABLE_H

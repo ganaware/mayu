@@ -12,50 +12,134 @@
 #  include <set>
 
 ///
-#  define WM_engineNotify (WM_APP + 110)
-/** @name ANONYMOUS */
-enum {
-  engineNotify_shellExecute,			///
-  engineNotify_loadSetting,			///
-  engineNotify_showDlg,				///
-  engineNotify_helpMessage,			///
+#  define WM_APP_engineNotify (WM_APP + 110)
+///
+enum EngineNotify
+{
+  EngineNotify_shellExecute,			///
+  EngineNotify_loadSetting,			///
+  EngineNotify_showDlg,				///
+  EngineNotify_helpMessage,			///
 };
 
 
 ///
 class Engine
 {
-  CriticalSection cs;		/// criticalSection
-  
-  // setting
-  HWND hwndAssocWindow;		/// associated window (we post message to it)
-  Setting * volatile setting;	/// setting
-  
-  // engine thread state
-  HANDLE device;		/// mayu device
-  bool didMayuStartDevice;	/// Did the mayu start the mayu-device ?
-  HANDLE eEvent;		/// event for engine thread
-  bool volatile doForceTerminate; /// terminate engine thread
-  bool volatile isLogMode;	/// is logging mode ?
-  bool volatile isEnabled;	/// is enabled  ?
-  bool volatile isSynchronizing;/// is synchronizing ?
-  HANDLE eSync;			/// event for synchronization
-  int generateKeyboardEventsRecursionGuard;/// guard against too many recursion
-  /** @name ANONYMOUS */
+private:
   enum {
-    maxGenerateKeyboardEventsRecursion = 64,		///
+    MAX_GENERATE_KEYBOARD_EVENTS_RECURSION_COUNT = 64,		///
   };
 
+  typedef Keymaps::KeymapPtrList KeymapPtrList;
+  
+  /// focus of a thread
+  class FocusOfThread
+  {
+  public:
+    DWORD m_threadId;				/// thread id
+    HWND m_hwndFocus;				/** window that has focus on
+                                                    the thread */
+    istring m_className;			/// class name of hwndFocus
+    istring m_titleName;			/// title name of hwndFocus
+    bool m_isConsole;				/// is hwndFocus console ?
+    KeymapPtrList m_keymaps;			/// keymaps
+
+  public:
+    ///
+    FocusOfThread() : m_threadId(0), m_hwndFocus(NULL), m_isConsole(false) { }
+  };
+  typedef std::map<DWORD /*ThreadId*/, FocusOfThread> FocusOfThreads;	///
+
+  typedef std::list<DWORD /*ThreadId*/> DetachedThreadIds;	///
+
+  /// current status in generateKeyboardEvents
+  class Current
+  {
+  public:
+    Keymap *m_keymap;		/// current keymap
+    ModifiedKey m_mkey;		/// current processing key that user inputed
+    				/// index in currentFocusOfThread-&gt;keymaps
+    Keymaps::KeymapPtrList::iterator m_i;
+
+  public:
+    ///
+    bool isPressed() const
+    { return m_mkey.m_modifier.isOn(Modifier::Type_Down); }
+  };
+  
+  /// part of keySeq
+  enum Part
+  {
+    Part_all,					///
+    Part_up,					///
+    Part_down,					///
+  };
+
+public:
+  /// window positon for &amp;WindowHMaximize, &amp;WindowVMaximize
+  class WindowPosition
+  {
+  public:
+    ///
+    enum Mode
+    {
+      Mode_normal,				///
+      Mode_H,					///
+      Mode_V,					///
+      Mode_HV,					///
+    };
+
+  public:
+    HWND m_hwnd;				///
+    RECT m_rc;					///
+    Mode m_mode;				///
+
+  public:
+    ///
+    WindowPosition(HWND i_hwnd, const RECT &i_rc, Mode i_mode)
+      : m_hwnd(i_hwnd), m_rc(i_rc), m_mode(i_mode) { }
+  };
+  typedef std::list<WindowPosition> WindowPositions;
+  
+  typedef std::list<HWND> WindowsWithAlpha; /// windows for &amp;WindowSetAlpha
+  
+private:
+  CriticalSection m_cs;				/// criticalSection
+  
+  // setting
+  HWND m_hwndAssocWindow;			/** associated window (we post
+                                                    message to it) */
+  Setting * volatile m_setting;			/// setting
+  
+  // engine thread state
+  HANDLE m_device;				/// mayu device
+  bool m_didMayuStartDevice;			/** Did the mayu start the
+                                                    mayu-device ? */
+  HANDLE m_eEvent;				/// event for engine thread
+  bool volatile m_doForceTerminate;		/// terminate engine thread
+  bool volatile m_isLogMode;			/// is logging mode ?
+  bool volatile m_isEnabled;			/// is enabled  ?
+  bool volatile m_isSynchronizing;		/// is synchronizing ?
+  HANDLE m_eSync;				/// event for synchronization
+  int m_generateKeyboardEventsRecursionGuard;	/** guard against too many
+                                                    recursion */
+  
   // current key state
-  Modifier /*volatile*/ currentLock;	/// current lock key's state
-  int currentKeyPressCount;	/// how many keys are pressed phisically ?
-  int currentKeyPressCountOnWin32; /// how many keys are pressed on win32 ?
-  Key *lastPressedKey;		/// last pressed key
-  Key *oneShotKey;		/// one shot key
-  bool isPrefix;		/// is prefix ?
-  bool doesIgnoreModifierForPrefix;/// does ignore modifier key when prefixed ?
-  bool doesEditNextModifier;	/// does edit next user input key's modifier ?
-  Modifier modifierForNextKey;	/// modifier for next key if above is true
+  Modifier m_currentLock;			/// current lock key's state
+  int m_currentKeyPressCount;			/** how many keys are pressed
+                                                    phisically ? */
+  int m_currentKeyPressCountOnWin32;		/** how many keys are pressed
+                                                    on win32 ? */
+  Key *m_lastPressedKey;			/// last pressed key
+  Key *m_oneShotKey;				/// one shot key
+  bool m_isPrefix;				/// is prefix ?
+  bool m_doesIgnoreModifierForPrefix;		/** does ignore modifier key
+                                                    when prefixed ? */
+  bool m_doesEditNextModifier;			/** does edit next user input
+                                                    key's modifier ? */
+  Modifier m_modifierForNextKey;		/** modifier for next key if
+                                                    above is true */
 
   /** current keymaps.
       <dl>
@@ -67,131 +151,76 @@ class Engine
       <dd>currentKeyamp becoms *Current::i
       </dl>
   */
-  Keymap * volatile currentKeymap; // current keymap
-  
-  /// focus of a thread
-  class FocusOfThread
-  {
-  public:
-    DWORD threadId;			/// thread id
-    HWND hwndFocus;			/// window that has focus on the thread
-    istring className;			/// class name of hwndFocus
-    istring titleName;			/// title name of hwndFocus
-    bool isConsole;			/// is hwndFocus console ?
-    std::list<Keymap *> keymaps;	/// keymaps
-    ///
-    FocusOfThread() : threadId(0), hwndFocus(NULL), isConsole(false) { }
-  };
-  typedef std::map<DWORD /*ThreadId*/, FocusOfThread> FocusOfThreads;	///
-  FocusOfThreads /*volatile*/ focusOfThreads;			///
-  FocusOfThread * volatile currentFocusOfThread;		///
-  FocusOfThread globalFocus;	///
-  HWND hwndFocus;		/// current focus window
-  typedef std::list<DWORD /*ThreadId*/> DetachedThreadIds;	///
-  DetachedThreadIds detachedThreadIds;				///
+  Keymap * volatile m_currentKeymap;		/// current keymap
+  FocusOfThreads /*volatile*/ m_focusOfThreads;	///
+  FocusOfThread * volatile m_currentFocusOfThread; ///
+  FocusOfThread m_globalFocus;			///
+  HWND m_hwndFocus;				/// current focus window
+  DetachedThreadIds m_detachedThreadIds;	///
   
   // for functions
-  EmacsEditKillLine emacsEditKillLine;		/// for &amp;EmacsEditKillLine
-  ActionFunction *afShellExecute;		/// for &amp;ShellExecute
+  EmacsEditKillLine m_emacsEditKillLine;	/// for &amp;EmacsEditKillLine
+  const ActionFunction *m_afShellExecute;	/// for &amp;ShellExecute
   
-  /// current status in generateKeyboardEvents
-  class Current
-  {
-  public:
-    Keymap *keymap;		/// current keymap
-    ModifiedKey mkey;		/// current processing key that user inputed
-    				/// index in currentFocusOfThread-&gt;keymaps
-    std::list<Keymap *>::iterator i;
-    ///
-    bool isPressed() const { return mkey.modifier.isOn(Modifier::Down); }
-  };
-  
-  /// part of keySeq
-  enum Part
-  {
-    PartAll,		///
-    PartUp,		///
-    PartDown,		///
-  };
-
 public:
-  /// window positon for &amp;WindowHMaximize, &amp;WindowVMaximize
-  class WindowPosition
-  {
-  public:
-    HWND hwnd;		///
-    RECT rc;		///
-    ///
-    enum Mode {
-      ModeNormal,	///
-      ModeH,		///
-      ModeV,		///
-      ModeHV,		///
-    };
-    Mode mode;		///
-    ///
-    WindowPosition(HWND hwnd_, const RECT &rc_, Mode mode_)
-      : hwnd(hwnd_), rc(rc_), mode(mode_) { }
-  };
-  std::list<WindowPosition> windowPositions; ///
-  
-  typedef std::list<HWND> WindowsWithAlpha; /// windows for &amp;WindowSetAlpha
-  WindowsWithAlpha windowsWithAlpha; ///
+  WindowPositions m_windowPositions;		///
+  WindowsWithAlpha m_windowsWithAlpha;		///
   
   std::string m_helpMessage;			/// for &amp;HelpMessage
   std::string m_helpTitle;			/// for &amp;HelpMessage
   int m_variable;				/// for &amp;Variable,
 						///  &amp;Repeat
-
+  omsgstream &m_log;				/** log stream (output to log
+                                                    dialog's edit) */
+  
 private:
   /// keyboard handler thread
-  static void keyboardHandler(void *This);
+  static void keyboardHandler(void *i_this);
   ///
   void keyboardHandler();
 
   /// check focus window
   void checkFocusWindow();
   /// is modifier pressed ?
-  bool isPressed(Modifier::Type mt);
+  bool isPressed(Modifier::Type i_mt);
   /// fix modifier key
-  bool fixModifierKey(ModifiedKey *mkey_r, Keymap::AssignMode *am_r);
+  bool fixModifierKey(ModifiedKey *o_mkey, Keymap::AssignMode *o_am);
 
   /// output to log
-  void outputToLog(const Key *key, const ModifiedKey &mkey, int debugLevel);
+  void outputToLog(const Key *i_key, const ModifiedKey &i_mkey,
+		   int i_debugLevel);
 
   /// genete modifier events
-  void generateModifierEvents(const Modifier &mod);
+  void generateModifierEvents(const Modifier &i_mod);
   
   /// genete event
   void generateEvents(Current i_c, Keymap *i_keymap, Key *i_event);
   
   /// generate keyboard event
-  void generateKeyEvent(Key *key, bool doPress, bool isByAssign);
+  void generateKeyEvent(Key *i_key, bool i_doPress, bool i_isByAssign);
   ///
-  void generateActionEvents(const Current &c, const Action *a, bool doPress);
+  void generateActionEvents(const Current &i_c, const Action *i_a,
+			    bool i_doPress);
   ///
-  void generateKeySeqEvents(const Current &c, const KeySeq *keySeq, Part part);
+  void generateKeySeqEvents(const Current &i_c, const KeySeq *i_keySeq,
+			    Part i_part);
   ///
-  void generateKeyboardEvents(const Current &c);
+  void generateKeyboardEvents(const Current &i_c);
   ///
-  void generateKeyboardEvents(const Current &c, bool isModifier);
+  void generateKeyboardEvents(const Current &i_c, bool i_isModifier);
   
   /// pop all pressed key on win32
   void keyboardResetOnWin32();
   
   /// get current modifiers
-  Modifier getCurrentModifiers(bool isPressed_);
+  Modifier getCurrentModifiers(bool i_isPressed);
 
   // describe bindings
   void describeBindings();
   
 public:
-  /// log stream (output to log dialog's edit)
-  omsgstream &log;
-  
-public:
   ///
-  Engine(omsgstream &log_);
+  Engine(omsgstream &i_log);
   ///
   ~Engine();
 
@@ -201,42 +230,42 @@ public:
   void stop();
 
   /// logging mode
-  void enableLogMode(bool isLogMode_ = true) { isLogMode = isLogMode_; }
+  void enableLogMode(bool i_isLogMode = true) { m_isLogMode = i_isLogMode; }
   ///
-  void disableLogMode() { isLogMode = false; }
+  void disableLogMode() { m_isLogMode = false; }
   
   /// enable/disable engine
-  void enable(bool isEnabled_ = true) { isEnabled = isEnabled_; }
+  void enable(bool i_isEnabled = true) { m_isEnabled = i_isEnabled; }
   ///
-  void disable() { isEnabled = false; }
+  void disable() { m_isEnabled = false; }
   ///
-  bool getIsEnabled() const { return isEnabled; }
+  bool getIsEnabled() const { return m_isEnabled; }
 
   /// associated window
-  void setAssociatedWndow(HWND hwnd) { hwndAssocWindow = hwnd; }
+  void setAssociatedWndow(HWND i_hwnd) { m_hwndAssocWindow = i_hwnd; }
   
   /// associated window
-  HWND getAssociatedWndow() const { return hwndAssocWindow; }
+  HWND getAssociatedWndow() const { return m_hwndAssocWindow; }
   
   /// setting
-  bool setSetting(Setting *setting_);
+  bool setSetting(Setting *i_setting);
 
   /// focus
-  bool setFocus(HWND hwndFocus, DWORD threadId, 
-		const char *className, const char *titleName, bool isConsole);
+  bool setFocus(HWND i_hwndFocus, DWORD i_threadId, const char *i_className,
+		const char *i_titleName, bool i_isConsole);
 
   /// lock state
-  bool setLockState(bool isNumLockToggled,
-		    bool isCapsLockToggled,
-		    bool isScrollLockToggled,
-		    bool isImeLockToggled,
-		    bool isImeCompToggled);
+  bool setLockState(bool i_isNumLockToggled,
+		    bool i_isCapsLockToggled,
+		    bool i_isScrollLockToggled,
+		    bool i_isImeLockToggled,
+		    bool i_isImeCompToggled);
 
   /// sync
   bool syncNotify();
 
   /// thread detach notify
-  bool threadDetachNotify(DWORD threadId);
+  bool threadDetachNotify(DWORD i_threadId);
 
   /// shell execute
   void shellExecute();
@@ -245,7 +274,8 @@ public:
   void getHelpMessages(std::string *o_helpMessage, std::string *o_helpTitle);
 
   /// command notify
-  void commandNotify(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+  void commandNotify(HWND i_hwnd, UINT i_message, WPARAM i_wParam,
+		     LPARAM i_lParam);
 };
 
 

@@ -114,7 +114,7 @@ using namespace std;
 // is there no more tokens ?
 bool SettingLoader::isEOL()
 {
-  return ti == tokens.end();
+  return m_ti == m_tokens.end();
 }
 
 
@@ -123,7 +123,7 @@ Token *SettingLoader::getToken()
 {
   if (isEOL())
     throw ErrorMessage() << "too few words.";
-  return &*(ti++);
+  return &*(m_ti ++);
 }
 
   
@@ -132,39 +132,39 @@ Token *SettingLoader::lookToken()
 {
   if (isEOL())
     throw ErrorMessage() << "too few words.";
-  return &*ti;
+  return &*m_ti;
 }
 
 
 // <INCLUDE>
 void SettingLoader::load_INCLUDE()
 {
-  SettingLoader loader(soLog, log);
-  loader.defaultAssignModifier = defaultAssignModifier;
-  loader.defaultKeySeqModifier = defaultKeySeqModifier;
-  if (!loader.load(setting, (*getToken()).getString()))
-    isThereAnyError = true;
+  SettingLoader loader(m_soLog, m_log);
+  loader.m_defaultAssignModifier = m_defaultAssignModifier;
+  loader.m_defaultKeySeqModifier = m_defaultKeySeqModifier;
+  if (!loader.load(m_setting, (*getToken()).getString()))
+    m_isThereAnyError = true;
 }
 
 
 // <SCAN_CODES>
-void SettingLoader::load_SCAN_CODES(Key *key_r)
+void SettingLoader::load_SCAN_CODES(Key *o_key)
 {
-  for (int j = 0; j < Key::maxlengthof_scanCodes && !isEOL(); j++)
+  for (int j = 0; j < Key::MAX_SCAN_CODES_SIZE && !isEOL(); ++ j)
   {
     ScanCode sc;
-    sc.flags = 0;
+    sc.m_flags = 0;
     while (true)
     {
       Token *t = getToken();
       if (t->isNumber())
       {
-	sc.scan = (u_char)t->getNumber();
-	key_r->addScanCode(sc);
+	sc.m_scan = (u_char)t->getNumber();
+	o_key->addScanCode(sc);
 	break;
       }
-      if      (*t == "E0-") sc.flags |= ScanCode::E0;
-      else if (*t == "E1-") sc.flags |= ScanCode::E1;
+      if      (*t == "E0-") sc.m_flags |= ScanCode::E0;
+      else if (*t == "E1-") sc.m_flags |= ScanCode::E1;
       else  throw ErrorMessage() << "`" << *t << "': invalid modifier.";
     }
   }
@@ -194,7 +194,7 @@ void SettingLoader::load_DEFINE_KEY()
   }
 
   load_SCAN_CODES(&key);
-  setting->keyboard.addKey(key);
+  m_setting->m_keyboard.addKey(key);
 }
 
 
@@ -203,14 +203,14 @@ void SettingLoader::load_DEFINE_MODIFIER()
 {
   Token *t = getToken();
   Modifier::Type mt;
-  if      (*t == "shift"  ) mt = Modifier::Shift;
+  if      (*t == "shift"  ) mt = Modifier::Type_Shift;
   else if (*t == "alt"     ||
 	   *t == "meta"    ||
-	   *t == "menu"   ) mt = Modifier::Alt;
+	   *t == "menu"   ) mt = Modifier::Type_Alt;
   else if (*t == "control" ||
-	   *t == "ctrl"   ) mt = Modifier::Control;
+	   *t == "ctrl"   ) mt = Modifier::Type_Control;
   else if (*t == "windows" ||
-	   *t == "win"    ) mt = Modifier::Windows;
+	   *t == "win"    ) mt = Modifier::Type_Windows;
   else throw ErrorMessage() << "`" << *t << "': invalid modifier name.";
     
   if (*getToken() != "=")
@@ -220,10 +220,10 @@ void SettingLoader::load_DEFINE_MODIFIER()
   {
     t = getToken();
     Key *key =
-      setting->keyboard.searchKeyByNonAliasName(t->getString());
+      m_setting->m_keyboard.searchKeyByNonAliasName(t->getString());
     if (!key)
       throw ErrorMessage() << "`" << *t << "': invalid key name.";
-    setting->keyboard.addModifier(mt, key);
+    m_setting->m_keyboard.addModifier(mt, key);
   }
 }
 
@@ -231,7 +231,7 @@ void SettingLoader::load_DEFINE_MODIFIER()
 // <DEFINE_SYNC_KEY>
 void SettingLoader::load_DEFINE_SYNC_KEY()
 {
-  Key *key = setting->keyboard.getSyncKey();
+  Key *key = m_setting->m_keyboard.getSyncKey();
   key->initialize();
   key->addName("sync");
   
@@ -251,10 +251,10 @@ void SettingLoader::load_DEFINE_ALIAS()
     throw ErrorMessage() << "there must be `=' after `alias'.";
 
   Token *t = getToken();
-  Key *key = setting->keyboard.searchKeyByNonAliasName(t->getString());
+  Key *key = m_setting->m_keyboard.searchKeyByNonAliasName(t->getString());
   if (!key)
     throw ErrorMessage() << "`" << *t << "': invalid key name.";
-  setting->keyboard.addAlias(name->getString(), key);
+  m_setting->m_keyboard.addAlias(name->getString(), key);
 }
 
 
@@ -281,15 +281,16 @@ void SettingLoader::load_KEYBOARD_DEFINITION()
 
 
 // <..._MODIFIER>
-Modifier SettingLoader::load_MODIFIER(Modifier::Type mode, Modifier modifier)
+Modifier SettingLoader::load_MODIFIER(Modifier::Type i_mode,
+				      Modifier i_modifier)
 {
   Modifier isModifierSpecified;
   enum { PRESS, RELEASE, DONTCARE } flag = PRESS;
 
   int i;
-  for (i = mode; i < Modifier::ASSIGN; i++)
+  for (i = i_mode; i < Modifier::Type_ASSIGN; ++ i)
   {
-    modifier.dontcare(Modifier::Type(i));
+    i_modifier.dontcare(Modifier::Type(i));
     isModifierSpecified.on(Modifier::Type(i));
   }
   
@@ -303,56 +304,56 @@ Modifier SettingLoader::load_MODIFIER(Modifier::Type mode, Modifier modifier)
     const static struct { const char *s; Modifier::Type mt; } map[] =
     {
       // <BASIC_MODIFIER>
-      { "S-",  Modifier::Shift },
-      { "A-",  Modifier::Alt },
-      { "M-",  Modifier::Alt },
-      { "C-",  Modifier::Control },
-      { "W-",  Modifier::Windows },
+      { "S-",  Modifier::Type_Shift },
+      { "A-",  Modifier::Type_Alt },
+      { "M-",  Modifier::Type_Alt },
+      { "C-",  Modifier::Type_Control },
+      { "W-",  Modifier::Type_Windows },
       // <KEYSEQ_MODIFIER>
-      { "U-",  Modifier::Up },
-      { "D-",  Modifier::Down },
+      { "U-",  Modifier::Type_Up },
+      { "D-",  Modifier::Type_Down },
       // <ASSIGN_MODIFIER>
-      { "IL-", Modifier::ImeLock },
-      { "IC-", Modifier::ImeComp },
-      { "I-",  Modifier::ImeComp },
-      { "NL-", Modifier::NumLock },
-      { "CL-", Modifier::CapsLock },
-      { "SL-", Modifier::ScrollLock },
-      { "M0-", Modifier::Mod0 },
-      { "M1-", Modifier::Mod1 },
-      { "M2-", Modifier::Mod2 },
-      { "M3-", Modifier::Mod3 },
-      { "M4-", Modifier::Mod4 },
-      { "M5-", Modifier::Mod5 },
-      { "M6-", Modifier::Mod6 },
-      { "M7-", Modifier::Mod7 },
-      { "M8-", Modifier::Mod8 },
-      { "M9-", Modifier::Mod9 },
-      { "L0-", Modifier::Lock0 },
-      { "L1-", Modifier::Lock1 },
-      { "L2-", Modifier::Lock2 },
-      { "L3-", Modifier::Lock3 },
-      { "L4-", Modifier::Lock4 },
-      { "L5-", Modifier::Lock5 },
-      { "L6-", Modifier::Lock6 },
-      { "L7-", Modifier::Lock7 },
-      { "L8-", Modifier::Lock8 },
-      { "L9-", Modifier::Lock9 },
+      { "IL-", Modifier::Type_ImeLock },
+      { "IC-", Modifier::Type_ImeComp },
+      { "I-",  Modifier::Type_ImeComp },
+      { "NL-", Modifier::Type_NumLock },
+      { "CL-", Modifier::Type_CapsLock },
+      { "SL-", Modifier::Type_ScrollLock },
+      { "M0-", Modifier::Type_Mod0 },
+      { "M1-", Modifier::Type_Mod1 },
+      { "M2-", Modifier::Type_Mod2 },
+      { "M3-", Modifier::Type_Mod3 },
+      { "M4-", Modifier::Type_Mod4 },
+      { "M5-", Modifier::Type_Mod5 },
+      { "M6-", Modifier::Type_Mod6 },
+      { "M7-", Modifier::Type_Mod7 },
+      { "M8-", Modifier::Type_Mod8 },
+      { "M9-", Modifier::Type_Mod9 },
+      { "L0-", Modifier::Type_Lock0 },
+      { "L1-", Modifier::Type_Lock1 },
+      { "L2-", Modifier::Type_Lock2 },
+      { "L3-", Modifier::Type_Lock3 },
+      { "L4-", Modifier::Type_Lock4 },
+      { "L5-", Modifier::Type_Lock5 },
+      { "L6-", Modifier::Type_Lock6 },
+      { "L7-", Modifier::Type_Lock7 },
+      { "L8-", Modifier::Type_Lock8 },
+      { "L9-", Modifier::Type_Lock9 },
     };
 
-    for (int i = 0; i < NUMBER_OF(map); i++)
+    for (int i = 0; i < NUMBER_OF(map); ++ i)
       if (*t == map[i].s)
       {
 	getToken();
 	Modifier::Type mt = map[i].mt;
-	if ((int)mode <= (int)mt)
+	if (static_cast<int>(i_mode) <= static_cast<int>(mt))
 	  throw ErrorMessage() << "`" << *t
 			       << "': invalid modifier at this context.";
 	switch (flag)
 	{
-	  case PRESS: modifier.press(mt); break;
-	  case RELEASE: modifier.release(mt); break;
-	  case DONTCARE: modifier.dontcare(mt); break;
+	  case PRESS: i_modifier.press(mt); break;
+	  case RELEASE: i_modifier.release(mt); break;
+	  case DONTCARE: i_modifier.dontcare(mt); break;
 	}
 	isModifierSpecified.on(mt);
 	flag = PRESS;
@@ -376,32 +377,32 @@ Modifier SettingLoader::load_MODIFIER(Modifier::Type mode, Modifier modifier)
     break;
   }
   
-  for (i = Modifier::begin; i != Modifier::end; i++)
+  for (i = Modifier::Type_begin; i != Modifier::Type_end; i++)
     if (!isModifierSpecified.isOn(Modifier::Type(i)))
       switch (flag)
       {
 	case PRESS: break;
-	case RELEASE: modifier.release(Modifier::Type(i)); break;
-	case DONTCARE: modifier.dontcare(Modifier::Type(i)); break;
+	case RELEASE: i_modifier.release(Modifier::Type(i)); break;
+	case DONTCARE: i_modifier.dontcare(Modifier::Type(i)); break;
       }
 
   // fix up and down
-  bool isDontcareUp   = modifier.isDontcare(Modifier::Up);
-  bool isDontcareDown = modifier.isDontcare(Modifier::Down);
-  bool isOnUp         = modifier.isOn(Modifier::Up);
-  bool isOnDown       = modifier.isOn(Modifier::Down);
+  bool isDontcareUp   = i_modifier.isDontcare(Modifier::Type_Up);
+  bool isDontcareDown = i_modifier.isDontcare(Modifier::Type_Down);
+  bool isOnUp         = i_modifier.isOn(Modifier::Type_Up);
+  bool isOnDown       = i_modifier.isOn(Modifier::Type_Down);
   if (isDontcareUp && isDontcareDown)
     ;
   else if (isDontcareUp)
-    modifier.on(Modifier::Up, !isOnDown);
+    i_modifier.on(Modifier::Type_Up, !isOnDown);
   else if (isDontcareDown)
-    modifier.on(Modifier::Down, !isOnUp);
+    i_modifier.on(Modifier::Type_Down, !isOnUp);
   else if (isOnUp == isOnDown)
   {
-    modifier.dontcare(Modifier::Up);
-    modifier.dontcare(Modifier::Down);
+    i_modifier.dontcare(Modifier::Type_Up);
+    i_modifier.dontcare(Modifier::Type_Down);
   }
-  return modifier;
+  return i_modifier;
 }
 
 
@@ -409,7 +410,7 @@ Modifier SettingLoader::load_MODIFIER(Modifier::Type mode, Modifier modifier)
 Key *SettingLoader::load_KEY_NAME()
 {
   Token *t = getToken();
-  Key *key = setting->keyboard.searchKey(t->getString());
+  Key *key = m_setting->m_keyboard.searchKey(t->getString());
   if (!key)
     throw ErrorMessage() << "`" << *t << "': invalid key name.";
   return key;
@@ -417,9 +418,9 @@ Key *SettingLoader::load_KEY_NAME()
 
 
 // <KEYMAP_DEFINITION>
-void SettingLoader::load_KEYMAP_DEFINITION(Token *which)
+void SettingLoader::load_KEYMAP_DEFINITION(const Token *i_which)
 {
-  Keymap::Type type = Keymap::TypeKeymap;
+  Keymap::Type type = Keymap::Type_keymap;
   Token *name = getToken();	// <KEYMAP_NAME>
   istring windowClassName;
   istring windowTitleName;
@@ -430,7 +431,7 @@ void SettingLoader::load_KEYMAP_DEFINITION(Token *which)
   if (!isEOL())
   {
     Token *t = lookToken();
-    if (*which == "window")	// <WINDOW>
+    if (*i_which == "window")	// <WINDOW>
     {
       if (t->isOpenParen())
 	// "(" <WINDOW_CLASS_NAME> "&&" <WINDOW_TITLE_NAME> ")"
@@ -440,9 +441,9 @@ void SettingLoader::load_KEYMAP_DEFINITION(Token *which)
 	windowClassName = getToken()->getRegexp();
 	t = getToken();
 	if (*t == "&&")
-	  type = Keymap::TypeWindowAnd;
+	  type = Keymap::Type_windowAnd;
 	else if (*t == "||")
-	  type = Keymap::TypeWindowOr;
+	  type = Keymap::Type_windowOr;
 	else
 	  throw ErrorMessage() << "`" << *t << "': unknown operator.";
 	windowTitleName = getToken()->getRegexp();
@@ -452,16 +453,16 @@ void SettingLoader::load_KEYMAP_DEFINITION(Token *which)
       else if (t->isRegexp())	// <WINDOW_CLASS_NAME>
       {
 	getToken();
-	type = Keymap::TypeWindowAnd;
+	type = Keymap::Type_windowAnd;
 	windowClassName = t->getRegexp();
       }
     }
-    else if (*which == "keymap")
+    else if (*i_which == "keymap")
       ;
-    else if (*which == "keymap2")
+    else if (*i_which == "keymap2")
       isKeymap2 = true;
     else
-      assert(false);
+      ASSERT(false);
     
     if (!isEOL())
     {
@@ -471,7 +472,7 @@ void SettingLoader::load_KEYMAP_DEFINITION(Token *which)
       {
 	getToken();
 	t = getToken();
-	parentKeymap = setting->keymaps.searchByName(t->getString());
+	parentKeymap = m_setting->m_keymaps.searchByName(t->getString());
 	if (!parentKeymap)
 	  throw ErrorMessage() << "`" << *t << "': unknown keymap name.";
       }
@@ -488,34 +489,36 @@ void SettingLoader::load_KEYMAP_DEFINITION(Token *which)
   if (keySeq == NULL)
   {
     Function::Id id;
-    if (type == Keymap::TypeKeymap && !isKeymap2)
-      id = Function::KeymapParent;
-    else if (type == Keymap::TypeKeymap && !isKeymap2)
-      id = Function::Undefined;
-    else // (type == Keymap::TypeWindowAnd || type == Keymap::TypeWindowOr)
-      id = Function::KeymapParent;
+    if (type == Keymap::Type_keymap && !isKeymap2)
+      id = Function::Id_KeymapParent;
+    else if (type == Keymap::Type_keymap && !isKeymap2)
+      id = Function::Id_Undefined;
+    else // (type == Keymap::Type_windowAnd || type == Keymap::Type_windowOr)
+      id = Function::Id_KeymapParent;
     ActionFunction af;
-    af.function = Function::search(id);
-    assert( af.function );
-    keySeq = setting->keySeqs.add(KeySeq(name->getString()).add(af));
+    af.m_function = Function::search(id);
+    ASSERT( af.m_function );
+    keySeq = m_setting->m_keySeqs.add(KeySeq(name->getString()).add(af));
   }
   
-  currentKeymap =
-    setting->keymaps.add(
+  m_currentKeymap =
+    m_setting->m_keymaps.add(
       Keymap(type, name->getString(), windowClassName, windowTitleName,
 	     keySeq, parentKeymap));
 }
 
 
 // <KEY_SEQUENCE>
-KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
+KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &i_name,
+					 bool i_isInParen)
 {
-  KeySeq keySeq(name);
+  KeySeq keySeq(i_name);
   while (!isEOL())
   {
-    Modifier modifier = load_MODIFIER(Modifier::KEYSEQ, defaultKeySeqModifier);
+    Modifier modifier =
+      load_MODIFIER(Modifier::Type_KEYSEQ, m_defaultKeySeqModifier);
     Token *t = lookToken();
-    if (t->isCloseParen() && isInParen)
+    if (t->isCloseParen() && i_isInParen)
       break;
     else if (t->isOpenParen())
     {
@@ -528,7 +531,7 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
     {
       getToken();
       t = getToken();
-      KeySeq *ks = setting->keySeqs.searchByName(t->getString());
+      KeySeq *ks = m_setting->m_keySeqs.searchByName(t->getString());
       if (ks == NULL)
 	throw ErrorMessage() << "`$" << *t << "': unknown keyseq name.";
       keySeq.add(ActionKeySeq(ks));
@@ -540,13 +543,13 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
       
       // search function
       ActionFunction af;
-      af.modifier = modifier;
-      af.function = Function::search(t->getString());
-      if (af.function == NULL)
+      af.m_modifier = modifier;
+      af.m_function = Function::search(t->getString());
+      if (af.m_function == NULL)
 	throw ErrorMessage() << "`&" << *t << "': unknown function name.";
 
       // get arguments
-      const char *type = af.function->argType;
+      const char *type = af.m_function->m_argType;
       if (type == NULL)
 	// no argument
       {
@@ -554,7 +557,7 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
 	{
 	  getToken();
 	  if (!getToken()->isCloseParen())
-	    throw ErrorMessage() << "`&" << af.function->name
+	    throw ErrorMessage() << "`&" << af.m_function->m_name
 				 << "': too many arguments.";
 	}
       }
@@ -568,7 +571,7 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
 	  if (*type == '&')
 	    goto ok;
 	  throw ErrorMessage() << "there must be `(' after `&"
-			       << af.function->name << "'.";
+			       << af.m_function->m_name << "'.";
 	}
 	
 	getToken();
@@ -583,14 +586,15 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
 	      type ++;
 	  
 	  if (t->isCloseParen())
-	    throw ErrorMessage() << "`&"  << af.function->name
+	    throw ErrorMessage() << "`&"  << af.m_function->m_name
 				 << "': too few arguments.";
 	  switch (*type)
 	  {
 	    case 'K': // keymap
 	    {
 	      getToken();
-	      Keymap *keymap = setting->keymaps.searchByName(t->getString());
+	      Keymap *keymap =
+		m_setting->m_keymaps.searchByName(t->getString());
 	      if (!keymap)
 		throw ErrorMessage() << "`" << *t << "': unknown keymap name.";
 	      t->setData((long)keymap);
@@ -609,7 +613,8 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
 	      else if (*t == "$")
 	      {
 		t = getToken();
-		keySeq = setting->keySeqs.searchByName(t->getString());
+		keySeq =
+		  m_setting->m_keySeqs.searchByName(t->getString());
 		if (!keySeq)
 		  throw ErrorMessage() << "`$" << *t
 				       << "': unknown keyseq name.";
@@ -625,16 +630,16 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
 	      getToken();
 	      const static struct { const char *s; Modifier::Type mt; } map[] =
 	      {
-		{ "lock0", Modifier::Lock0 },
-		{ "lock1", Modifier::Lock1 },
-		{ "lock2", Modifier::Lock2 },
-		{ "lock3", Modifier::Lock3 },
-		{ "lock4", Modifier::Lock4 },
-		{ "lock5", Modifier::Lock5 },
-		{ "lock6", Modifier::Lock6 },
-		{ "lock7", Modifier::Lock7 },
-		{ "lock8", Modifier::Lock8 },
-		{ "lock9", Modifier::Lock9 },
+		{ "lock0", Modifier::Type_Lock0 },
+		{ "lock1", Modifier::Type_Lock1 },
+		{ "lock2", Modifier::Type_Lock2 },
+		{ "lock3", Modifier::Type_Lock3 },
+		{ "lock4", Modifier::Type_Lock4 },
+		{ "lock5", Modifier::Type_Lock5 },
+		{ "lock6", Modifier::Type_Lock6 },
+		{ "lock7", Modifier::Type_Lock7 },
+		{ "lock8", Modifier::Type_Lock8 },
+		{ "lock9", Modifier::Type_Lock9 },
 	      };
 	      int i;
 	      for (i = 0; i < NUMBER_OF(map); i++)
@@ -665,25 +670,25 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
 	      while (true)
 	      {
 		if (t->isNumber()) { vkey |= (BYTE)t->getNumber(); break; }
-		else if (*t == "E-") vkey |= Function::vkExtended;
-		else if (*t == "U-") vkey |= Function::vkUp;
-		else if (*t == "D-") vkey |= Function::vkDown;
+		else if (*t == "E-") vkey |= Function::VK_extended;
+		else if (*t == "U-") vkey |= Function::VK_up;
+		else if (*t == "D-") vkey |= Function::VK_down;
 		else
 		{
 		  const VKeyTable *vkt;
-		  for (vkt = vkeyTable; vkt->name; vkt ++)
-		    if (*t == vkt->name)
+		  for (vkt = g_vkeyTable; vkt->m_name; vkt ++)
+		    if (*t == vkt->m_name)
 		      break;
-		  if (!vkt->name)
+		  if (!vkt->m_name)
 		    throw ErrorMessage() << "`" << *t
 					 << "': unknown virtual key name.";
-		  vkey |= vkt->code;
+		  vkey |= vkt->m_code;
 		  break;
 		}
 		t = getToken();
 	      }
-	      if (!(vkey & Function::vkUp) && !(vkey & Function::vkDown))
-		vkey |= Function::vkUp | Function::vkDown;
+	      if (!(vkey & Function::VK_up) && !(vkey & Function::VK_down))
+		vkey |= Function::VK_up | Function::VK_down;
 	      t->setData(vkey);
 	      break;
 	    }
@@ -693,7 +698,7 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
 	      getToken();
 	      if (t->isNumber())
 	      {
-		if (t->getNumber() < Function::toBegin)
+		if (t->getNumber() < Function::PM_toBegin)
 		  throw ErrorMessage() << "`" << *t
 				       << "': invalid target window";
 		t->setData(t->getNumber());
@@ -701,10 +706,10 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
 	      }
 	      const struct { int window; char *name; } window[] =
 	      {
-		{ Function::toOverlappedWindow, "toOverlappedWindow" },
-		{ Function::toMainWindow, "toMainWindow" },
-		{ Function::toItself, "toItself" },
-		{ Function::toParentWindow, "toParentWindow" },
+		{ Function::PM_toOverlappedWindow, "toOverlappedWindow" },
+		{ Function::PM_toMainWindow, "toMainWindow" },
+		{ Function::PM_toItself, "toItself" },
+		{ Function::PM_toParentWindow, "toParentWindow" },
 	      };
 	      int i;
 	      for (i = 0; i < NUMBER_OF(window); i++)
@@ -722,7 +727,8 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
 	    case 'W': // showWindow
 	    {
 	      getToken();
-	      const struct { int show; char *name; } show[] =
+	      struct ShowType { int m_show; char *m_name; };
+	      static const ShowType show[] =
 	      {
 #define SHOW(name) { SW_##name, #name }
 		SHOW(HIDE), SHOW(MAXIMIZE), SHOW(MINIMIZE), SHOW(RESTORE),
@@ -733,10 +739,10 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
 	      };
 	      t->setData(SW_SHOW);
 	      int i;
-	      for (i = 0; i < NUMBER_OF(show); i++)
-		if (*t == show[i].name)
+	      for (i = 0; i < NUMBER_OF(show); ++ i)
+		if (*t == show[i].m_name)
 		{
-		  t->setData(show[i].show);
+		  t->setData(show[i].m_show);
 		  break;
 		}
 	      if (i == NUMBER_OF(show))
@@ -750,15 +756,15 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
 	      getToken();
 	      const struct { int m_gravity; char *m_name; } gravity[] =
 	      {
-		Function::GravityC, "C", 
-		Function::GravityN, "N", Function::GravityE, "E",
-		Function::GravityW, "W", Function::GravityS, "S",
-		Function::GravityNW, "NW", Function::GravityNW, "WN",
-		Function::GravityNE, "NE", Function::GravityNE, "EN",
-		Function::GravitySW, "SW", Function::GravitySW, "WS",
-		Function::GravitySE, "SE", Function::GravitySE, "ES",
+		Function::Gravity_C, "C", 
+		Function::Gravity_N, "N", Function::Gravity_E, "E",
+		Function::Gravity_W, "W", Function::Gravity_S, "S",
+		Function::Gravity_NW, "NW", Function::Gravity_NW, "WN",
+		Function::Gravity_NE, "NE", Function::Gravity_NE, "EN",
+		Function::Gravity_SW, "SW", Function::Gravity_SW, "WS",
+		Function::Gravity_SE, "SE", Function::Gravity_SE, "ES",
 	      };
-	      t->setData(Function::GravityNW);
+	      t->setData(Function::Gravity_NW);
 	      int i;
 	      for (i = 0; i < NUMBER_OF(gravity); i++)
 		if (*t == gravity[i].m_name)
@@ -786,9 +792,9 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
 	    {
 	      getToken();
 	      if (*t == "Investigate")
-		t->setData(Function::mayuDlgInvestigate);
+		t->setData(Function::MayuDlg_investigate);
 	      else if (*t == "Log")
-		t->setData(Function::mayuDlgLog);
+		t->setData(Function::MayuDlg_log);
 	      else
 		throw ErrorMessage() << "`" << *t
 				     << "': unknown dialog box.";
@@ -798,11 +804,11 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
 	    case 'M': // modifier
 	    {
 	      Modifier modifier;
-	      for (int i = Modifier::begin; i != Modifier::end; i ++)
+	      for (int i = Modifier::Type_begin; i != Modifier::Type_end; i ++)
 		modifier.dontcare((Modifier::Type)i);
-	      modifier = load_MODIFIER(Modifier::ASSIGN, modifier);
-	      setting->modifiers.push_front(modifier);
-	      t->setData((long)&*setting->modifiers.begin());
+	      modifier = load_MODIFIER(Modifier::Type_ASSIGN, modifier);
+	      m_setting->m_modifiers.push_front(modifier);
+	      t->setData((long)&*m_setting->m_modifiers.begin());
 	      break;
 	    }
 
@@ -810,10 +816,10 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
 	    default:
 	      throw ErrorMessage() << "internal error.";
 	  }
-	  af.args.push_back(*t);
+	  af.m_args.push_back(*t);
 	}
 	if (!getToken()->isCloseParen())
-	  throw ErrorMessage() << "`&"  << af.function->name
+	  throw ErrorMessage() << "`&"  << af.m_function->m_name
 			       << "': too many arguments.";
 	ok: ;
       }
@@ -822,12 +828,12 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
     else // <KEYSEQ_MODIFIED_KEY_NAME>
     {
       ModifiedKey mkey;
-      mkey.modifier = modifier;
-      mkey.key = load_KEY_NAME();
+      mkey.m_modifier = modifier;
+      mkey.m_key = load_KEY_NAME();
       keySeq.add(ActionKey(mkey));
     }
   }
-  return setting->keySeqs.add(keySeq);
+  return m_setting->m_keySeqs.add(keySeq);
 }
 
 
@@ -837,31 +843,33 @@ void SettingLoader::load_KEY_ASSIGN()
   list<ModifiedKey> assignedKeys;
   
   ModifiedKey mkey;
-  mkey.modifier = load_MODIFIER(Modifier::ASSIGN, defaultAssignModifier);
+  mkey.m_modifier =
+    load_MODIFIER(Modifier::Type_ASSIGN, m_defaultAssignModifier);
   if (*lookToken() == "=")
   {
     getToken();
-    defaultKeySeqModifier = load_MODIFIER(Modifier::KEYSEQ,
-					  defaultKeySeqModifier);
-    defaultAssignModifier = mkey.modifier;
+    m_defaultKeySeqModifier = load_MODIFIER(Modifier::Type_KEYSEQ,
+					  m_defaultKeySeqModifier);
+    m_defaultAssignModifier = mkey.m_modifier;
     return;
   }
   
   while (true)
   {
-    mkey.key = load_KEY_NAME();
+    mkey.m_key = load_KEY_NAME();
     assignedKeys.push_back(mkey);
     if (*lookToken() == "=>")
       break;
-    mkey.modifier = load_MODIFIER(Modifier::ASSIGN, defaultAssignModifier);
+    mkey.m_modifier =
+      load_MODIFIER(Modifier::Type_ASSIGN, m_defaultAssignModifier);
   }
   getToken();
 
-  assert(currentKeymap);
+  ASSERT(m_currentKeymap);
   KeySeq *keySeq = load_KEY_SEQUENCE();
   for (list<ModifiedKey>::iterator i = assignedKeys.begin();
        i != assignedKeys.end(); i++)
-    currentKeymap->addAssignment(*i, keySeq);
+    m_currentKeymap->addAssignment(*i, keySeq);
 }
 
 
@@ -871,14 +879,14 @@ void SettingLoader::load_EVENT_ASSIGN()
   list<ModifiedKey> assignedKeys;
 
   ModifiedKey mkey;
-  mkey.modifier.dontcare();			//set all modifiers to dontcare
+  mkey.m_modifier.dontcare();			//set all modifiers to dontcare
   
   Token *t = getToken();
   Key **e;
   for (e = Event::events; *e; e ++)
     if (*t == (*e)->getName())
     {
-      mkey.key = *e;
+      mkey.m_key = *e;
       break;
     }
   if (!*e)
@@ -887,9 +895,9 @@ void SettingLoader::load_EVENT_ASSIGN()
   if (*getToken() != "=>")
     throw ErrorMessage() << "`=>' is expected.";
 
-  assert(currentKeymap);
+  ASSERT(m_currentKeymap);
   KeySeq *keySeq = load_KEY_SEQUENCE();
-  currentKeymap->addAssignment(mkey, keySeq);
+  m_currentKeymap->addAssignment(mkey, keySeq);
 }
 
 
@@ -902,34 +910,34 @@ void SettingLoader::load_MODIFIER_ASSIGNMENT()
 
   while (true)
   {
-    Keymap::AssignMode am = Keymap::AMnotModifier;
-    if      (*t == "!" ) am = Keymap::AMtrue, t = getToken();
-    else if (*t == "!!") am = Keymap::AMoneShot, t = getToken();
+    Keymap::AssignMode am = Keymap::AM_notModifier;
+    if      (*t == "!" ) am = Keymap::AM_true, t = getToken();
+    else if (*t == "!!") am = Keymap::AM_oneShot, t = getToken();
     
-    if      (*t == "shift") mt = Modifier::Shift;
+    if      (*t == "shift") mt = Modifier::Type_Shift;
     else if (*t == "alt"  ||
 	     *t == "meta" ||
-	     *t == "menu" ) mt = Modifier::Alt;
+	     *t == "menu" ) mt = Modifier::Type_Alt;
     else if (*t == "control" ||
-	     *t == "ctrl" ) mt = Modifier::Control;
+	     *t == "ctrl" ) mt = Modifier::Type_Control;
     else if (*t == "windows" ||
-	     *t == "win"  ) mt = Modifier::Windows;
-    else if (*t == "mod0" ) mt = Modifier::Mod0;
-    else if (*t == "mod1" ) mt = Modifier::Mod1;
-    else if (*t == "mod2" ) mt = Modifier::Mod2;
-    else if (*t == "mod3" ) mt = Modifier::Mod3;
-    else if (*t == "mod4" ) mt = Modifier::Mod4;
-    else if (*t == "mod5" ) mt = Modifier::Mod5;
-    else if (*t == "mod6" ) mt = Modifier::Mod6;
-    else if (*t == "mod7" ) mt = Modifier::Mod7;
-    else if (*t == "mod8" ) mt = Modifier::Mod8;
-    else if (*t == "mod9" ) mt = Modifier::Mod9;
+	     *t == "win"  ) mt = Modifier::Type_Windows;
+    else if (*t == "mod0" ) mt = Modifier::Type_Mod0;
+    else if (*t == "mod1" ) mt = Modifier::Type_Mod1;
+    else if (*t == "mod2" ) mt = Modifier::Type_Mod2;
+    else if (*t == "mod3" ) mt = Modifier::Type_Mod3;
+    else if (*t == "mod4" ) mt = Modifier::Type_Mod4;
+    else if (*t == "mod5" ) mt = Modifier::Type_Mod5;
+    else if (*t == "mod6" ) mt = Modifier::Type_Mod6;
+    else if (*t == "mod7" ) mt = Modifier::Type_Mod7;
+    else if (*t == "mod8" ) mt = Modifier::Type_Mod8;
+    else if (*t == "mod9" ) mt = Modifier::Type_Mod9;
     else throw ErrorMessage() << "`" << *t << "': invalid modifier name.";
 
-    if (am == Keymap::AMnotModifier)
+    if (am == Keymap::AM_notModifier)
       break;
     
-    currentKeymap->addModifier(mt, Keymap::AOoverwrite, am, NULL);
+    m_currentKeymap->addModifier(mt, Keymap::AO_overwrite, am, NULL);
     if (isEOL())
       return;
     t = getToken();
@@ -938,9 +946,9 @@ void SettingLoader::load_MODIFIER_ASSIGNMENT()
   // <ASSIGN_OP>
   t = getToken();
   Keymap::AssignOperator ao;
-  if      (*t == "=" ) ao = Keymap::AOnew;
-  else if (*t == "+=") ao = Keymap::AOadd;
-  else if (*t == "-=") ao = Keymap::AOsub;
+  if      (*t == "=" ) ao = Keymap::AO_new;
+  else if (*t == "+=") ao = Keymap::AO_add;
+  else if (*t == "-=") ao = Keymap::AO_sub;
   else  throw ErrorMessage() << "`" << *t << "': is unknown operator.";
 
   // <ASSIGN_MODE>? <KEY_NAME>
@@ -948,18 +956,19 @@ void SettingLoader::load_MODIFIER_ASSIGNMENT()
   {
     // <ASSIGN_MODE>? 
     t = getToken();
-    Keymap::AssignMode am = Keymap::AMnormal;
-    if      (*t == "!" ) am = Keymap::AMtrue, t = getToken();
-    else if (*t == "!!") am = Keymap::AMoneShot, t = getToken();
+    Keymap::AssignMode am = Keymap::AM_normal;
+    if      (*t == "!" ) am = Keymap::AM_true, t = getToken();
+    else if (*t == "!!") am = Keymap::AM_oneShot, t = getToken();
     
     // <KEY_NAME>
-    Key *key = setting->keyboard.searchKey(t->getString());
+    Key *key = m_setting->m_keyboard.searchKey(t->getString());
     if (!key)
       throw ErrorMessage() << "`" << *t << "': invalid key name.";
 
-    currentKeymap->addModifier(mt, ao, am, key); // we can ignore warning C4701
-    if (ao == Keymap::AOnew)
-      ao = Keymap::AOadd;
+    // we can ignore warning C4701
+    m_currentKeymap->addModifier(mt, ao, am, key);
+    if (ao == Keymap::AO_new)
+      ao = Keymap::AO_add;
   }
 }
 
@@ -979,7 +988,7 @@ void SettingLoader::load_KEYSEQ_DEFINITION()
 // <DEFINE>
 void SettingLoader::load_DEFINE()
 {
-  setting->symbols.insert(getToken()->getString());
+  m_setting->m_symbols.insert(getToken()->getString());
 }
 
 
@@ -996,29 +1005,29 @@ void SettingLoader::load_IF()
     t = getToken(); // <SYMBOL>
   }
   
-  bool doesSymbolExist = (setting->symbols.find(t->getString())
-			  != setting->symbols.end());
+  bool doesSymbolExist = (m_setting->m_symbols.find(t->getString())
+			  != m_setting->m_symbols.end());
   bool doesRead = ((doesSymbolExist && !not) ||
 		   (!doesSymbolExist && not));
-  if (0 < canRead.size())
-    doesRead = doesRead && canRead.back();
+  if (0 < m_canReadStack.size())
+    doesRead = doesRead && m_canReadStack.back();
   
   if (!getToken()->isCloseParen())
     throw ErrorMessage() << "there must be `)'.";
 
-  canRead.push_back(doesRead);
+  m_canReadStack.push_back(doesRead);
   if (!isEOL())
   {
-    size_t len = canRead.size();
+    size_t len = m_canReadStack.size();
     load_LINE();
-    if (len < canRead.size())
+    if (len < m_canReadStack.size())
     {
-      bool r = canRead.back();
-      canRead.pop_back();
-      canRead[len - 1] = r && doesRead;
+      bool r = m_canReadStack.back();
+      m_canReadStack.pop_back();
+      m_canReadStack[len - 1] = r && doesRead;
     }
-    else if (len == canRead.size())
-      canRead.pop_back();
+    else if (len == m_canReadStack.size())
+      m_canReadStack.pop_back();
     else
       ; // `end' found
   }
@@ -1026,27 +1035,27 @@ void SettingLoader::load_IF()
 
 
 // <ELSE> <ELSEIF>
-void SettingLoader::load_ELSE(bool isElseIf, const istring &t)
+void SettingLoader::load_ELSE(bool i_isElseIf, const istring &i_token)
 {
-  bool doesRead = !load_ENDIF(t);
-  if (0 < canRead.size())
-    doesRead = doesRead && canRead.back();
-  canRead.push_back(doesRead);
+  bool doesRead = !load_ENDIF(i_token);
+  if (0 < m_canReadStack.size())
+    doesRead = doesRead && m_canReadStack.back();
+  m_canReadStack.push_back(doesRead);
   if (!isEOL())
   {
-    size_t len = canRead.size();
-    if (isElseIf)
+    size_t len = m_canReadStack.size();
+    if (i_isElseIf)
       load_IF();
     else
       load_LINE();
-    if (len < canRead.size())
+    if (len < m_canReadStack.size())
     {
-      bool r = canRead.back();
-      canRead.pop_back();
-      canRead[len - 1] = doesRead && r;
+      bool r = m_canReadStack.back();
+      m_canReadStack.pop_back();
+      m_canReadStack[len - 1] = doesRead && r;
     }
-    else if (len == canRead.size())
-      canRead.pop_back();
+    else if (len == m_canReadStack.size())
+      m_canReadStack.pop_back();
     else
       ; // `end' found
   }
@@ -1054,12 +1063,12 @@ void SettingLoader::load_ELSE(bool isElseIf, const istring &t)
 
 
 // <ENDIF>
-bool SettingLoader::load_ENDIF(const istring &t)
+bool SettingLoader::load_ENDIF(const istring &i_token)
 {
-  if (canRead.size() == 0)
-    throw ErrorMessage() << "unbalanced `" << t << "'";
-  bool r = canRead.back();
-  canRead.pop_back();
+  if (m_canReadStack.size() == 0)
+    throw ErrorMessage() << "unbalanced `" << i_token << "'";
+  bool r = m_canReadStack.back();
+  m_canReadStack.pop_back();
   return r;
 }
 
@@ -1067,61 +1076,61 @@ bool SettingLoader::load_ENDIF(const istring &t)
 // <LINE>
 void SettingLoader::load_LINE()
 {
-  Token *t = getToken();
+  Token *i_token = getToken();
 
   // <COND_SYMBOL>
-  if      (*t == "if" ||
-	   *t == "and") load_IF();
-  else if (*t == "else") load_ELSE(false, t->getString());
-  else if (*t == "elseif" ||
-	   *t == "elsif"  ||
-	   *t == "elif"   ||
-	   *t == "or") load_ELSE(true, t->getString());
-  else if (*t == "endif") load_ENDIF("endif");
-  else if (0 < canRead.size() && !canRead.back())
+  if      (*i_token == "if" ||
+	   *i_token == "and") load_IF();
+  else if (*i_token == "else") load_ELSE(false, i_token->getString());
+  else if (*i_token == "elseif" ||
+	   *i_token == "elsif"  ||
+	   *i_token == "elif"   ||
+	   *i_token == "or") load_ELSE(true, i_token->getString());
+  else if (*i_token == "endif") load_ENDIF("endif");
+  else if (0 < m_canReadStack.size() && !m_canReadStack.back())
   {
     while (!isEOL())
       getToken();
   }
-  else if (*t == "define") load_DEFINE();
+  else if (*i_token == "define") load_DEFINE();
   // <INCLUDE>
-  else if (*t == "include") load_INCLUDE();
+  else if (*i_token == "include") load_INCLUDE();
   // <KEYBOARD_DEFINITION>
-  else if (*t == "def") load_KEYBOARD_DEFINITION();
+  else if (*i_token == "def") load_KEYBOARD_DEFINITION();
   // <KEYMAP_DEFINITION>
-  else if (*t == "keymap"  ||
-	   *t == "keymap2" ||
-	   *t == "window") load_KEYMAP_DEFINITION(t);
+  else if (*i_token == "keymap"  ||
+	   *i_token == "keymap2" ||
+	   *i_token == "window") load_KEYMAP_DEFINITION(i_token);
   // <KEY_ASSIGN>
-  else if (*t == "key") load_KEY_ASSIGN();
+  else if (*i_token == "key") load_KEY_ASSIGN();
   // <EVENT_ASSIGN>
-  else if (*t == "event") load_EVENT_ASSIGN();
+  else if (*i_token == "event") load_EVENT_ASSIGN();
   // <MODIFIER_ASSIGNMENT>
-  else if (*t == "mod") load_MODIFIER_ASSIGNMENT();
+  else if (*i_token == "mod") load_MODIFIER_ASSIGNMENT();
   // <KEYSEQ_DEFINITION>
-  else if (*t == "keyseq") load_KEYSEQ_DEFINITION();
+  else if (*i_token == "keyseq") load_KEYSEQ_DEFINITION();
   else
-    throw ErrorMessage() << "syntax error `" << *t << "'.";
+    throw ErrorMessage() << "syntax error `" << *i_token << "'.";
 }
 
   
 // prefix sort predicate used in load(const string &)
-static bool prefixSortPred(const istring &a, const istring &b)
+static bool prefixSortPred(const istring &i_a, const istring &i_b)
 {
-  return b.size() < a.size();
+  return i_b.size() < i_a.size();
 }
 
 
 // load (called from load(Setting *, const istring &) only)
-void SettingLoader::load(const istring &filename)
+void SettingLoader::load(const istring &i_filename)
 {
-  currentFilename = filename;
-  ifstream ist(currentFilename.c_str());
+  m_currentFilename = i_filename;
+  ifstream ist(m_currentFilename.c_str());
 
   // prefix
-  if (refcountof_prefix == 0)
+  if (m_prefixesRefCcount == 0)
   {
-    static const char *prefix_[] =
+    static const char *prefixes[] =
     {
       "=", "=>", "&&", "||", ":", "$", "&",
       "-=", "+=", "!", "!!", 
@@ -1134,34 +1143,34 @@ void SettingLoader::load(const istring &filename)
       "L0-", "L1-", "L2-", "L3-", "L4-",
       "L5-", "L6-", "L7-", "L8-", "L9-", 
     };
-    prefix = new vector<istring>;
-    for (int i = 0; i < NUMBER_OF(prefix_); i++)
-      prefix->push_back(prefix_[i]);
-    sort(prefix->begin(), prefix->end(), prefixSortPred);
+    m_prefixes = new vector<istring>;
+    for (size_t i = 0; i < NUMBER_OF(prefixes); ++ i)
+      m_prefixes->push_back(prefixes[i]);
+    sort(m_prefixes->begin(), m_prefixes->end(), prefixSortPred);
   }
-  refcountof_prefix ++;
+  m_prefixesRefCcount ++;
 
   // create parser
   Parser parser(ist);
-  parser.setPrefix(prefix);
+  parser.setPrefixes(m_prefixes);
     
   while (true)
   {
     try
     {
-      if (!parser.getLine(&tokens))
+      if (!parser.getLine(&m_tokens))
 	break;
-      ti = tokens.begin();
+      m_ti = m_tokens.begin();
     }
     catch (ErrorMessage &e)
     {
-      if (log && soLog)
+      if (m_log && m_soLog)
       {
-	Acquire a(soLog);
-	*log << currentFilename << "(" << parser.getLineNumber()
+	Acquire a(m_soLog);
+	*m_log << m_currentFilename << "(" << parser.getLineNumber()
 	     << ") : error: " << e << endl;
       }
-      isThereAnyError = true;
+      m_isThereAnyError = true;
       continue;
     }
       
@@ -1173,62 +1182,62 @@ void SettingLoader::load(const istring &filename)
     }
     catch (WarningMessage &w)
     {
-      if (log && soLog)
+      if (m_log && m_soLog)
       {
-	Acquire a(soLog);
-	*log << filename << "(" << parser.getLineNumber()
-	     << ") : warning: " << w << endl;
+	Acquire a(m_soLog);
+	*m_log << i_filename << "(" << parser.getLineNumber()
+	       << ") : warning: " << w << endl;
       }
     }
     catch (ErrorMessage &e)
     {
-      if (log && soLog)
+      if (m_log && m_soLog)
       {
-	Acquire a(soLog);
-	*log << filename << "(" << parser.getLineNumber()
-	     << ") : error: " << e << endl;
+	Acquire a(m_soLog);
+	*m_log << i_filename << "(" << parser.getLineNumber()
+	       << ") : error: " << e << endl;
       }
-      isThereAnyError = true;
+      m_isThereAnyError = true;
     }
   }
     
-  // prefix
-  refcountof_prefix --;
-  if (refcountof_prefix == 0)
-    delete prefix;
+  // m_prefixes
+  m_prefixesRefCcount --;
+  if (m_prefixesRefCcount == 0)
+    delete m_prefixes;
 
-  if (0 < canRead.size())
+  if (0 < m_canReadStack.size())
   {
-    Acquire a(soLog);
-    *log << currentFilename << "(" << parser.getLineNumber()
-	 << ") : error: unbalanced `if'.  you forget `endif', didn't you?"
+    Acquire a(m_soLog);
+    *m_log << m_currentFilename << "(" << parser.getLineNumber()
+	 << ") : error: unbalanced `if'.  you forget `endif', didn'i_token you?"
 	 << endl;
-    isThereAnyError = true;
+    m_isThereAnyError = true;
   }
 }
 
 
 // is the filename readable ?
-bool SettingLoader::isReadable(const istring &filename) const 
+bool SettingLoader::isReadable(const istring &i_filename) const 
 {
-  if (filename.empty())
+  if (i_filename.empty())
     return false;
-  ifstream ist(filename.c_str());
+  ifstream ist(i_filename.c_str());
   if (ist.good())
   {
-    if (log && soLog)
+    if (m_log && m_soLog)
     {
-      Acquire a(soLog, 1);
-      *log << "loading: " << filename << endl;
+      Acquire a(m_soLog, 1);
+      *m_log << "loading: " << i_filename << endl;
     }
     return true;
   }
   else
   {
-    if (log && soLog)
+    if (m_log && m_soLog)
     {
-      Acquire a(soLog, 1);
-      *log << "     no: " << filename << endl;
+      Acquire a(m_soLog, 1);
+      *m_log << "     no: " << i_filename << endl;
     }
     return false;
   }
@@ -1263,7 +1272,7 @@ bool SettingLoader::getFilenameFromRegistry(istring *o_path) const
   Regexp symbol("-D([^;]*)");
   while (symbol.doesMatch(options))
   {
-    setting->symbols.insert(symbol[1]);
+    m_setting->symbols.insert(symbol[1]);
     options = options.substr(symbol.subBegin(1));
   }
   
@@ -1292,7 +1301,7 @@ bool SettingLoader::getFilename(const istring &i_name, istring *o_path) const
 	  return false;
 	for (std::list<istring>::iterator
 	       i = symbols.begin(); i != symbols.end(); i ++)
-	  setting->symbols.insert(*i);
+	  m_setting->m_symbols.insert(*i);
 	return true;
       }
     }
@@ -1314,7 +1323,7 @@ bool SettingLoader::getFilename(const istring &i_name, istring *o_path) const
     if (!i_name.empty())
       return false;				// called by 'include'
     
-    if (!DialogBox(hInst, MAKEINTRESOURCE(IDD_DIALOG_setting),
+    if (!DialogBox(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_setting),
 		   NULL, dlgSetting_dlgProc))
       return false;
   }
@@ -1322,50 +1331,50 @@ bool SettingLoader::getFilename(const istring &i_name, istring *o_path) const
 
 
 // constructor
-SettingLoader::SettingLoader(SyncObject *soLog_, ostream *log_)
-  : setting(NULL),
-    isThereAnyError(false),
-    soLog(soLog_),
-    log(log_),
-    currentKeymap(NULL)
+SettingLoader::SettingLoader(SyncObject *i_soLog, ostream *i_log)
+  : m_setting(NULL),
+    m_isThereAnyError(false),
+    m_soLog(i_soLog),
+    m_log(i_log),
+    m_currentKeymap(NULL)
 {
-  defaultKeySeqModifier =
-    defaultAssignModifier.release(Modifier::ImeComp);
+  m_defaultKeySeqModifier =
+    m_defaultAssignModifier.release(Modifier::Type_ImeComp);
 }
 
 
-/* load setting
+/* load m_setting
    If called by "include", 'filename' describes filename.
    Otherwise the 'filename' is empty.
  */
-bool SettingLoader::load(Setting *setting_r, const istring &filename)
+bool SettingLoader::load(Setting *i_setting, const istring &i_filename)
 {
-  setting = setting_r;
-  isThereAnyError = false;
+  m_setting = i_setting;
+  m_isThereAnyError = false;
     
   istring path;
-  if (!getFilename(filename, &path))
+  if (!getFilename(i_filename, &path))
   {
-    if (filename.empty())
+    if (i_filename.empty())
     {
-      Acquire a(soLog);
-      *log << "error: failed to load ~/.mayu" << endl;
+      Acquire a(m_soLog);
+      *m_log << "error: failed to load ~/.mayu" << endl;
       return false;
     }
     else
-      throw ErrorMessage() << "`" << filename
+      throw ErrorMessage() << "`" << i_filename
 			   << "': no such file or other error.";
   }
 
   // create global keymap's default keySeq
   ActionFunction af;
-  af.function = Function::search(Function::OtherWindowClass);
-  assert( af.function );
-  KeySeq *globalDefault = setting->keySeqs.add(KeySeq("").add(af));
+  af.m_function = Function::search(Function::Id_OtherWindowClass);
+  ASSERT( af.m_function );
+  KeySeq *globalDefault = m_setting->m_keySeqs.add(KeySeq("").add(af));
   
   // add default keymap
-  currentKeymap = setting->keymaps.add(
-    Keymap(Keymap::TypeWindowOr, "Global", "", "", globalDefault, NULL));
+  m_currentKeymap = m_setting->m_keymaps.add(
+    Keymap(Keymap::Type_windowOr, "Global", "", "", globalDefault, NULL));
 
   /*
   // add keyboard layout name
@@ -1375,9 +1384,9 @@ bool SettingLoader::load(Setting *setting_r, const istring &filename)
     if (GetKeyboardLayoutName(keyboardLayoutName))
     {
       istring kl = istring("KeyboardLayout/") + keyboardLayoutName;
-      setting->symbols.insert(kl);
-      Acquire a(soLog);
-      *log << "KeyboardLayout: " << kl << endl;
+      m_setting->symbols.insert(kl);
+      Acquire a(m_soLog);
+      *m_log << "KeyboardLayout: " << kl << endl;
     }
   }
   */
@@ -1386,12 +1395,13 @@ bool SettingLoader::load(Setting *setting_r, const istring &filename)
   load(path);
 
   // finalize
-  if (filename.empty())
-    setting->keymaps.adjustModifier(setting->keyboard);
+  if (i_filename.empty())
+    m_setting->m_keymaps.adjustModifier(m_setting->m_keyboard);
   
-  return !isThereAnyError;
+  return !m_isThereAnyError;
 }
 
 
-vector<istring> *SettingLoader::prefix;		// prefix terminal symbol
-size_t SettingLoader::refcountof_prefix;	// reference count of prefix
+vector<istring> *SettingLoader::m_prefixes;	// m_prefixes terminal symbol
+size_t SettingLoader::m_prefixesRefCcount;	// reference count of
+						// m_prefixes

@@ -2,13 +2,11 @@
 // function.h
 
 
-#ifndef __function_h__
-#define __function_h__
+#ifndef _FUNCTION_H
+#  define _FUNCTION_H
 
-
-#include "parser.h"
-
-#include <vector>
+#  include "parser.h"
+#  include <vector>
 
 
 ///
@@ -18,18 +16,18 @@ class Engine;
 ///
 class EmacsEditKillLine
 {
-  std::string buf;	/// previous kill-line contents
+  std::string m_buf;	/// previous kill-line contents
 
 public:
-  bool doForceReset;	///
+  bool m_doForceReset;	///
   
 private:
   ///
-  HGLOBAL makeNewKillLineBuf(const char *data, int *retval);
+  HGLOBAL makeNewKillLineBuf(const char *i_data, int *i_retval);
 
 public:
   ///
-  void reset() { buf.resize(0); }
+  void reset() { m_buf.resize(0); }
   /** EmacsEditKillLineFunc.
       clear the contents of the clopboard
       at that time, confirm if it is the result of the previous kill-line
@@ -47,139 +45,143 @@ public:
   ///
   enum Id
   {
-    NONE = 0,			///
-
+    Id_NONE = 0,				///
+    
     /// special
-    SPECIAL = 0x10000,
-    Default,			/// default key
-    KeymapParent,		/// parent keymap's key
-    KeymapWindow,		/// keymap's key of current window
-    OtherWindowClass,	/// search other window class for the key or default
-    Prefix,			/// prefix key
-    Keymap,			/// other keymap's key
-    Sync,			/// sync
-    Toggle,			/// toggle lock
-    EditNextModifier,		/// edit next user input key's modifier
-    Variable,			/// &amp;Variable(mag, inc)
-    Repeat,			/// repeat N times
+    Id_SPECIAL = 0x10000,
+    Id_Default,					/// default key
+    Id_KeymapParent,				/// parent keymap's key
+    Id_KeymapWindow,				/** keymap's key of current
+                                                    window */
+    Id_OtherWindowClass,			/** search other window class
+                                                    for the key or default */
+    Id_Prefix,					/// prefix key
+    Id_Keymap,					/// other keymap's key
+    Id_Sync,					/// sync
+    Id_Toggle,					/// toggle lock
+    Id_EditNextModifier,			/** edit next user input key's
+                                                    modifier */
+    Id_Variable,				/// &amp;Variable(mag, inc)
+    Id_Repeat,					/// repeat N times
     
     /// other
-    OTHER = 0x20000,
-    Undefined,			/// undefined (bell)
-    Ignore,			/// ignore
-    PostMessage,		/// post message
-    ShellExecute,		/// ShellExecute
-    LoadSetting,		/// load setting
-    VK,				/// virtual key
-    Wait,			/// wait
-    InvestigateCommand,		/// investigate WM_COMMAND, WM_SYSCOMMAND
-    MayuDialog,			/// show mayu dialog box
-    DescribeBindings,		/// describe bindings
-    HelpMessage,		/// show help message
-    HelpVariable,		/// show variable
-    //input,			/// input string
+    Id_OTHER = 0x20000,
+    Id_Undefined,				/// undefined (bell)
+    Id_Ignore,					/// ignore
+    Id_PostMessage,				/// post message
+    Id_ShellExecute,				/// ShellExecute
+    Id_LoadSetting,				/// load setting
+    Id_VK,					/// virtual key
+    Id_Wait,					/// wait
+    Id_InvestigateCommand,			/** investigate WM_COMMAND,
+						    WM_SYSCOMMAND */
+    Id_MayuDialog,				/// show mayu dialog box
+    Id_DescribeBindings,			/// describe bindings
+    Id_HelpMessage,				/// show help message
+    Id_HelpVariable,				/// show variable
+    //input,					/// input string
     
     /// IME
-    IME = 0x30000,
-    //ToggleIME,		///
-    //ToggleNativeAlphanumeric,	///
-    //ToggleKanaRoman,		///
-    //ToggleKatakanaHiragana,	///
+    Id_IME = 0x30000,
+    //ToggleIME,				///
+    //ToggleNativeAlphanumeric,			///
+    //ToggleKanaRoman,				///
+    //ToggleKatakanaHiragana,			///
     
     /// window
-    Window = 0x40000,
-    WindowRaise,		///
-    WindowLower,		///
-    WindowMinimize,		///
-    WindowMaximize,		///
-    WindowHMaximize,		///
-    WindowVMaximize,		///
-    WindowMove,			///
-    WindowMoveVisibly,		///
-    WindowMoveTo,		///
-    WindowClingToLeft,		///
-    WindowClingToRight,		///
-    WindowClingToTop,		///
-    WindowClingToBottom,	///
-    WindowClose,		///
-    WindowToggleTopMost,	///
-    WindowIdentify,		///
-    WindowSetAlpha,		///
-    WindowRedraw,		///
-    WindowResizeTo,		///
-    //ScreenSaver,		///
+    Id_Window = 0x40000,
+    Id_WindowRaise,				///
+    Id_WindowLower,				///
+    Id_WindowMinimize,				///
+    Id_WindowMaximize,				///
+    Id_WindowHMaximize,				///
+    Id_WindowVMaximize,				///
+    Id_WindowMove,				///
+    Id_WindowMoveVisibly,			///
+    Id_WindowMoveTo,				///
+    Id_WindowClingToLeft,			///
+    Id_WindowClingToRight,			///
+    Id_WindowClingToTop,			///
+    Id_WindowClingToBottom,			///
+    Id_WindowClose,				///
+    Id_WindowToggleTopMost,			///
+    Id_WindowIdentify,				///
+    Id_WindowSetAlpha,				///
+    Id_WindowRedraw,				///
+    Id_WindowResizeTo,				///
+    //ScreenSaver,				///
     
     /// mouse
-    Mouse = 0x50000,
-    MouseMove,			///
-    MouseWheel,			///
-    //MouseScrollIntelliMouse,  ///
-    //MouseScrollAcrobatReader,	///
-    //MouseScrollAcrobatReader2,///
-    //MouseScrollTrack,		///
-    //MouseScrollReverseTrack,	///
-    //MouseScrollTrack2,	///
-    //MouseScrollReverseTrack2,	///
-    //MouseScrollCancel,	///
-    //MouseScrollLock,		///
-    //LButtonInMouseScroll,	///
-    //MButtonInMouseScroll,	///
-    //RButtonInMouseScroll,	///
-
+    Id_Mouse = 0x50000,
+    Id_MouseMove,				///
+    Id_MouseWheel,				///
+    //MouseScrollIntelliMouse,  		///
+    //MouseScrollAcrobatReader,			///
+    //MouseScrollAcrobatReader2,		///
+    //MouseScrollTrack,				///
+    //MouseScrollReverseTrack,			///
+    //MouseScrollTrack2,			///
+    //MouseScrollReverseTrack2,			///
+    //MouseScrollCancel,			///
+    //MouseScrollLock,				///
+    //LButtonInMouseScroll,			///
+    //MButtonInMouseScroll,			///
+    //RButtonInMouseScroll,			///
+    
     /// clipboard
-    Clipboard = 0x60000,
-    ClipboardUpcaseWord,	///
-    ClipboardDowncaseWord,	///
-    ClipboardCopy,		///
+    Id_Clipboard = 0x60000,
+    Id_ClipboardUpcaseWord,			///
+    Id_ClipboardDowncaseWord,			///
+    Id_ClipboardCopy,				///
     
     /// EmacsEdit
-    EmacsEdit = 0x70000,
-    EmacsEditKillLinePred,	///
-    EmacsEditKillLineFunc,	///
+    Id_EmacsEdit = 0x70000,
+    Id_EmacsEditKillLinePred,			///
+    Id_EmacsEditKillLineFunc,			///
   };
 
   /** for VK
       @name ANONYMOUS1 */
-  enum
+  enum VK
   {
-    vkExtended = 0x100,		///
-    vkUp       = 0x200,		///
-    vkDown     = 0x400,		///
+    VK_extended = 0x100,			///
+    VK_up       = 0x200,			///
+    VK_down     = 0x400,			///
   };
 
   /** for PostMessage
       @name ANONYMOUS2 */
-  enum
+  enum PostMessage
   {
-    toBegin = -2,		///
-    toMainWindow = -2,		///
-    toOverlappedWindow = -1,	///
-    toItself = 0,		///
-    toParentWindow = 1,		///
+    PM_toBegin = -2,				///
+    PM_toMainWindow = -2,			///
+    PM_toOverlappedWindow = -1,			///
+    PM_toItself = 0,				///
+    PM_toParentWindow = 1,			///
   };
 
   /** for WindowMoveTo
       @name ANONYMOUS3 */
-  enum
+  enum Gravity
   {
-    GravityC = 0,				/// center
-    GravityN = 1 << 0,				/// north
-    GravityE = 1 << 1,				/// east
-    GravityW = 1 << 2,				/// west
-    GravityS = 1 << 3,				/// south
-    GravityNW = GravityN | GravityW,		/// north west
-    GravityNE = GravityN | GravityE,		/// north east
-    GravitySW = GravityS | GravityW,		/// south west
-    GravitySE = GravityS | GravityE,		/// south east
+    Gravity_C = 0,				/// center
+    Gravity_N = 1 << 0,				/// north
+    Gravity_E = 1 << 1,				/// east
+    Gravity_W = 1 << 2,				/// west
+    Gravity_S = 1 << 3,				/// south
+    Gravity_NW = Gravity_N | Gravity_W,		/// north west
+    Gravity_NE = Gravity_N | Gravity_E,		/// north east
+    Gravity_SW = Gravity_S | Gravity_W,		/// south west
+    Gravity_SE = Gravity_S | Gravity_E,		/// south east
   };
 
   /** for MayuDialog
       @name ANONYMOUS3 */
-  enum
+  enum MayuDlg
   {
-    mayuDlgInvestigate = 0x1000,		/// 
-    mayuDlgLog         = 0x2000,		/// 
-    mayuDlgMask        = 0xffff000,		/// 
+    MayuDlg_investigate = 0x1000,		/// 
+    MayuDlg_log         = 0x2000,		/// 
+    MayuDlg_mask        = 0xffff000,		/// 
   };
 
 
@@ -187,20 +189,25 @@ public:
   class FuncData
   {
   public:
-    Id id;		///
-    const std::vector<Token> &args;	///
-    HWND hwnd;		///
-    bool isPressed;	///
-    Engine &engine;	///
-    /// uha
-    FuncData(const std::vector<Token> &args_, Engine &engine_)
-      : args(args_), engine(engine_) { }
+    typedef std::vector<Token> Tokens;		/// 
+    
+  public:
+    Id m_id;					///
+    const Tokens &m_args;			///
+    HWND m_hwnd;				///
+    bool m_isPressed;				///
+    Engine &m_engine;				///
+    
+    /// 
+    FuncData(const Tokens &i_args, Engine &i_engine)
+      : m_args(i_args), m_engine(i_engine) { }
   };
   
-  typedef void (*Func)(const FuncData &fd);	///
-  
-  Id id;	/// function id
-  char *name;	/// function name
+  typedef void (*Func)(const FuncData &i_fd);	///
+
+public:
+  Id m_id;					/// function id
+  char *m_name;					/// function name
   /** argument's type.
       '<code>&amp;</code>':rest is optional
       '<code>D</code>':dialog,
@@ -216,13 +223,15 @@ public:
       '<code>s</code>':string,
       '<code>w</code>':window,
   */
-  char *argType;
-  Func func;	///
+  char *m_argType;
+  Func m_func;	///
   
-  static const Function functions[];	///
-  
-  static const Function *search(Id id);	/// search function in functions
-  static const Function *search(const istring &name);	///
+  static const Function m_functions[];	///
+
+public:
+  /// search function in functions
+  static const Function *search(Id i_id);
+  static const Function *search(const istring &i_name);	///
 
   /// stream output
   friend std::ostream &
@@ -230,5 +239,5 @@ public:
 };
 
 
-#endif // __function_h__
+#endif // _FUNCTION_H
 

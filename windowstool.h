@@ -2,65 +2,64 @@
 // windowstool.h
 
 
-#ifndef __windowstool_h__
-#define __windowstool_h__
+#ifndef _WINDOWSTOOL_H
+#  define _WINDOWSTOOL_H
 
 
-#include <string>
-
-#include <windows.h>
-#include <shlwapi.h>
+#  include <string>
+#  include <windows.h>
+#  include <shlwapi.h>
 
 
 /// instance handle of this application
-extern HINSTANCE hInst;
+extern HINSTANCE g_hInst;
 
 
 // ////////////////////////////////////////////////////////////////////////////
 // resource
 
 /// load resource string
-extern std::string loadString(UINT id);
+extern std::string loadString(UINT i_id);
 
 /// load small/big icon resource (it must be deleted by DestroyIcon())
-extern HICON loadSmallIcon(UINT id);
+extern HICON loadSmallIcon(UINT i_id);
 ///
-extern HICON loadBigIcon(UINT id);
+extern HICON loadBigIcon(UINT i_id);
 
 
 // ////////////////////////////////////////////////////////////////////////////
 // window
 
 /// resize the window (it does not move the window)
-extern bool resizeWindow(HWND hwnd, int w, int h, bool doRepaint);
+extern bool resizeWindow(HWND i_hwnd, int i_w, int i_h, bool i_doRepaint);
 
 /** get rect of the window in client coordinates.
     @return rect of the window in client coordinates */
-extern bool getChildWindowRect(HWND hwnd, RECT *rc);
+extern bool getChildWindowRect(HWND i_hwnd, RECT *o_rc);
 
 /** set small icon to the specified window.
     @return handle of previous icon or NULL */
-extern HICON setSmallIcon(HWND hwnd, UINT id);
+extern HICON setSmallIcon(HWND i_hwnd, UINT i_id);
 /** set big icon to the specified window.
     @return handle of previous icon or NULL */
-extern HICON setBigIcon(HWND hwnd, UINT id);
+extern HICON setBigIcon(HWND i_hwnd, UINT i_id);
 
 /// remove icon from a window that is set by setSmallIcon/setBigIcon
-extern void unsetSmallIcon(HWND hwnd);
+extern void unsetSmallIcon(HWND i_hwnd);
 ///
-extern void unsetBigIcon(HWND hwnd);
+extern void unsetBigIcon(HWND i_hwnd);
 
 /// get toplevel (non-child) window
-extern HWND getToplevelWindow(HWND hwnd, bool *isMDI);
+extern HWND getToplevelWindow(HWND i_hwnd, bool *io_isMDI);
 
 /// move window asynchronously
-extern void asyncMoveWindow(HWND hwnd, int x, int y);
+extern void asyncMoveWindow(HWND i_hwnd, int i_x, int i_y);
 
 /// move window asynchronously
-extern void asyncMoveWindow(HWND hwnd, int x, int y, int w, int h);
+extern void asyncMoveWindow(HWND i_hwnd, int i_x, int i_y, int i_w, int i_h);
 
 /// resize asynchronously
-extern void asyncResize(HWND hwnd, int w, int h);
+extern void asyncResize(HWND i_hwnd, int i_w, int i_h);
 
 /// get dll version
 extern DWORD getDllVersion(const char *i_dllname);
@@ -70,27 +69,30 @@ extern DWORD getDllVersion(const char *i_dllname);
 // dialog
 
 /// get/set GWL_USERDATA
-template <class T> static T getUserData(HWND hwnd, T *wc)
-{ return (*wc = (T)GetWindowLong(hwnd, GWL_USERDATA)); }
+template <class T> static T getUserData(HWND i_hwnd, T *i_wc)
+{ return (*i_wc = reinterpret_cast<T>(GetWindowLong(i_hwnd, GWL_USERDATA))); }
 ///
-template <class T> static T setUserData(HWND hwnd, T wc)
-{ SetWindowLong(hwnd, GWL_USERDATA, (long)wc); return wc; }
+template <class T> static T setUserData(HWND i_hwnd, T i_wc)
+{
+  SetWindowLong(i_hwnd, GWL_USERDATA, reinterpret_cast<long>(i_wc));
+  return i_wc;
+}
 
 
 // ////////////////////////////////////////////////////////////////////////////
 // RECT
 
 ///
-inline int rcWidth(const RECT *rc) { return rc->right - rc->left; }
+inline int rcWidth(const RECT *i_rc) { return i_rc->right - i_rc->left; }
 ///
-inline int rcHeight(const RECT *rc) { return rc->bottom - rc->top; }
+inline int rcHeight(const RECT *i_rc) { return i_rc->bottom - i_rc->top; }
 ///
-inline bool isRectInRect(const RECT *rcin, const RECT *rcout)
+inline bool isRectInRect(const RECT *i_rcin, const RECT *i_rcout)
 {
-  return (rcout->left <= rcin->left &&
-	  rcin->right <= rcout->right &&
-	  rcout->top <= rcin->top &&
-	  rcin->bottom <= rcout->bottom);
+  return (i_rcout->left <= i_rcin->left &&
+	  i_rcin->right <= i_rcout->right &&
+	  i_rcout->top <= i_rcin->top &&
+	  i_rcin->bottom <= i_rcout->bottom);
 }
 
 
@@ -98,12 +100,12 @@ inline bool isRectInRect(const RECT *rcin, const RECT *rcout)
 // edit control
 
 /// returns bytes of text
-extern size_t editGetTextBytes(HWND hwnd);
+extern size_t editGetTextBytes(HWND i_hwnd);
 /// delete a line
-extern void editDeleteLine(HWND hwnd, size_t n);
+extern void editDeleteLine(HWND i_hwnd, size_t i_n);
 /// insert text at last
-extern void editInsertTextAtLast(HWND hwnd, const std::string &text,
-				 size_t threshold);
+extern void editInsertTextAtLast(HWND i_hwnd, const std::string &i_text,
+				 size_t i_threshold);
 
 
-#endif // __windowstool_h__
+#endif // _WINDOWSTOOL_H

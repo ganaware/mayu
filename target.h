@@ -2,17 +2,16 @@
 // target.h
 
 
-#ifndef __target_h__
-#define __target_h__
+#ifndef _TARGET_H
+#  define _TARGET_H
 
-
-#include <windows.h>
+#  include <windows.h>
 
 
 ///
 extern ATOM Register_target();
 ///
-#define WM_targetNotify (WM_APP + 102)
+#  define WM_APP_targetNotify (WM_APP + 102)
 
 
-#endif // __target_h__
+#endif // _TARGET_H

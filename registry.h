@@ -1,100 +1,101 @@
 // ////////////////////////////////////////////////////////////////////////////
 // registry.h
 
-#ifndef __registry_h__
-#define __registry_h__
+#ifndef _REGISTRY_H
+#  define _REGISTRY_H
 
 
-#include <string>
-#include <windows.h>
+#  include <string>
+#  include <windows.h>
 
 
 ///
 class Registry
 {
-  HKEY root;		/// registry root
-  std::string path;	/// path from registry root
+  HKEY m_root;					/// registry root
+  std::string m_path;				/// path from registry root
   
 public:
   ///
-  Registry() : root(NULL) { }
+  Registry() : m_root(NULL) { }
   ///
-  Registry(HKEY root_, const std::string &path_) : root(root_), path(path_) { }
+  Registry(HKEY i_root, const std::string &i_path)
+    : m_root(i_root), m_path(i_path) { }
   
   /// set registry root and path
-  void setRoot(HKEY root_, const std::string &path_)
-  { root = root_; path = path_; }
+  void setRoot(HKEY i_root, const std::string &i_path)
+  { m_root = i_root; m_path = i_path; }
   
   /// remvoe
-  bool remove(const std::string &name = "") const
-  { return remove(root, path, name); }
+  bool remove(const std::string &i_name = "") const
+  { return remove(m_root, m_path, i_name); }
   
   /// does exist the key ?
-  bool doesExist() const { return doesExist(root, path); }
+  bool doesExist() const { return doesExist(m_root, m_path); }
 
   /// DWORD
-  bool read(const std::string &name, int *value_r, int default_value = 0) const
-  { return read(root, path, name, value_r, default_value); }
+  bool read(const std::string &i_name, int *o_value, int i_defaultValue = 0)
+    const
+  { return read(m_root, m_path, i_name, o_value, i_defaultValue); }
   ///
-  bool write(const std::string &name, int value) const
-  { return write(root, path, name, value); }
+  bool write(const std::string &i_name, int i_value) const
+  { return write(m_root, m_path, i_name, i_value); }
  
   /// std::string
-  bool read(const std::string &name, std::string *value_r, 
-	    const std::string &default_value = "") const
-  { return read(root, path, name, value_r, default_value); }
+  bool read(const std::string &i_name, std::string *o_value, 
+	    const std::string &i_defaultValue = "") const
+  { return read(m_root, m_path, i_name, o_value, i_defaultValue); }
   ///
-  bool write(const std::string &name, const std::string &value) const
-  { return write(root, path, name, value); }
+  bool write(const std::string &i_name, const std::string &i_value) const
+  { return write(m_root, m_path, i_name, i_value); }
 
   /// binary
-  bool read(const std::string &name, BYTE *value_r, DWORD sizeof_value_r,
-	    const BYTE *default_value = NULL, DWORD sizeof_default_value = 0)
+  bool read(const std::string &i_name, BYTE *o_value, DWORD i_valueSize,
+	    const BYTE *i_defaultValue = NULL, DWORD i_defaultValueSize = 0)
     const
-  { return read(root, path, name, value_r, sizeof_value_r, default_value,
-		sizeof_default_value); }
+  { return read(m_root, m_path, i_name, o_value, i_valueSize, i_defaultValue,
+		i_defaultValueSize); }
   ///
-  bool write(const std::string &name, const BYTE *value,
-	     DWORD sizeof_value) const
-  { return write(root, path, name, value, sizeof_value); }
+  bool write(const std::string &i_name, const BYTE *i_value,
+	     DWORD i_valueSize) const
+  { return write(m_root, m_path, i_name, i_value, i_valueSize); }
 
 public:
   
   ///
 #define Registry_path \
-  HKEY root, const std::string &path, const std::string &name
+  HKEY i_root, const std::string &i_path, const std::string &i_name
   
   /// remove
   static bool remove(Registry_path = "");
   
   /// does exist the key ?
-  static bool doesExist(HKEY root, const std::string &path);
+  static bool doesExist(HKEY i_root, const std::string &i_path);
   
   /// DWORD
-  static bool read(Registry_path, int *value_r, int default_value = 0);
+  static bool read(Registry_path, int *o_value, int i_defaultValue = 0);
   ///
-  static bool write(Registry_path, int value);
+  static bool write(Registry_path, int i_value);
 
   /// std::string
-  static bool read(Registry_path, std::string *value_r,
-		   const std::string &default_value = "");
+  static bool read(Registry_path, std::string *o_value,
+		   const std::string &i_defaultValue = "");
   ///
-  static bool write(Registry_path, const std::string &value);
+  static bool write(Registry_path, const std::string &i_value);
   
   /// binary
-  static bool read(Registry_path, BYTE *value_r, DWORD sizeof_value_r,
-		   const BYTE *default_value = NULL,
-		   DWORD sizeof_default_value = 0);
+  static bool read(Registry_path, BYTE *o_value, DWORD i_valueSize,
+		   const BYTE *i_defaultValue = NULL,
+		   DWORD i_defaultValueSize = 0);
   ///
-  static bool write(Registry_path,
-		    const BYTE *value, DWORD sizeof_value);
+  static bool write(Registry_path, const BYTE *i_value, DWORD i_valueSize);
   /// read LOGFONT
-  static bool read(Registry_path, LOGFONT *value,
-		   const std::string &default_string_value);
+  static bool read(Registry_path, LOGFONT *o_value,
+		   const std::string &i_defaultStringValue);
   /// write LOGFONT
-  static bool write(Registry_path, const LOGFONT &value);
+  static bool write(Registry_path, const LOGFONT &i_value);
 #undef Registry_path
 };
 
 
-#endif // __registry_h__
+#endif // _REGISTRY_H

@@ -14,10 +14,10 @@
 // C4061 enum 'identifier' is not handled by case label
 // C4100 argument 'identifier' is not used
 // C4132 const 'object' must be initialized
+// C4552 'operator' : operator has no effect
 // C4701 local variable 'name' may be uninitialized
 // C4706 condition is a result of a assign
 // C4786 identifier is truncated into 255 chars (in debug information)
-// C4552 'operator' : operator has no effect
 #    pragma warning(disable : 4061 4100 4132 4552 4701 4706 4786)
 
 #    define snprintf _snprintf

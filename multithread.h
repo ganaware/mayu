@@ -2,11 +2,11 @@
 // multithread.h
 
 
-#ifndef __multithread_h__
-#define __multithread_h__
+#ifndef _MULTITHREAD_H
+#  define _MULTITHREAD_H
 
 
-#include <windows.h>
+#  include <windows.h>
 
 
 ///
@@ -25,32 +25,32 @@ public:
 ///
 class CriticalSection : public SyncObject
 {
-  CRITICAL_SECTION cs;		///
+  CRITICAL_SECTION m_cs;			///
 
 public:
   ///
-  CriticalSection() { InitializeCriticalSection(&cs); }
+  CriticalSection() { InitializeCriticalSection(&m_cs); }
   ///
-  ~CriticalSection() { DeleteCriticalSection(&cs); }
+  ~CriticalSection() { DeleteCriticalSection(&m_cs); }
   ///
-  void acquire() { EnterCriticalSection(&cs); }
+  void acquire() { EnterCriticalSection(&m_cs); }
   ///
-  void release() { LeaveCriticalSection(&cs); }
+  void release() { LeaveCriticalSection(&m_cs); }
 };
 
 
 ///
 class Acquire
 {
-  SyncObject *so;	///
+  SyncObject *m_so;	///
 public:
   ///
-  Acquire(SyncObject *so_) : so(so_) { so->acquire(); }
+  Acquire(SyncObject *i_so) : m_so(i_so) { m_so->acquire(); }
   ///
-  Acquire(SyncObject *so_, int n) : so(so_) { so->acquire(n); }
+  Acquire(SyncObject *i_so, int i_n) : m_so(i_so) { m_so->acquire(i_n); }
   ///
-  ~Acquire() { so->release(); }
+  ~Acquire() { m_so->release(); }
 };
 
 
-#endif // __multithread_h__
+#endif // _MULTITHREAD_H

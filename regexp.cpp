@@ -649,7 +649,7 @@ void CRegCompiler::regtail(PROGRAM *p, const PROGRAM *val)
 
 #if sizeof_R_char == 1
   short offset = (short)((OP(scan) == BACK) ? scan - val : val - scan);
-  assert(0 <= offset);
+  ASSERT(0 <= offset);
   scan[1] = (PROGRAM)offset;
   scan[2] = (PROGRAM)(offset >> 8);
 #else
@@ -683,7 +683,7 @@ Regexp::regexp::regexp(const R_char *exp, bool doesIgnoreCase)
     refcount(1),
     numSubs(1)
 {
-  assert(exp);
+  ASSERT(exp);
   
   if (doesIgnoreCase)
   {
@@ -743,7 +743,7 @@ Regexp::regexp::regexp(const regexp &o)
 void Regexp::regexp::regcomp(const R_char *exp)
   throw (Regexp::InvalidRegexp)
 {
-  assert(exp);
+  ASSERT(exp);
   
   int flags;
   
@@ -773,7 +773,7 @@ void Regexp::regexp::regcomp(const R_char *exp)
   CHECK_TRUE( comp.reg(false, &flags) );
 
   PROGRAM *scan = program + 1;		// First BRANCH.
-  assert(OP(scan) == BRANCH);
+  ASSERT(OP(scan) == BRANCH);
   if (OP(regnext(scan)) == END)		// Only one top-level choice. 
   {
     scan = OPERAND(scan);
@@ -842,7 +842,7 @@ R_char *CRegCompilerBase::reg(bool isInParen, int *flags_r)
   // Pick up the branches, linking them together.
   int flags;
   R_char *br = regbranch(&flags);
-  assert(br);
+  ASSERT(br);
   if (isInParen)
     regtail(ret, br);			// OPEN -> first. 
   else
@@ -853,7 +853,7 @@ R_char *CRegCompilerBase::reg(bool isInParen, int *flags_r)
   {
     regparse ++;
     br = regbranch(&flags);
-    assert(br);
+    ASSERT(br);
     regtail(ret, br);			// BRANCH -> BRANCH. 
     *flags_r &= ~(~flags & HASWIDTH);
     *flags_r |= flags & SPSTART;
@@ -872,7 +872,7 @@ R_char *CRegCompilerBase::reg(bool isInParen, int *flags_r)
     throw Regexp::InvalidRegexp("unterminated ()");
   else if (!isInParen && *regparse != R_char_0)
   {
-    assert(*regparse == R_(')'));
+    ASSERT(*regparse == R_(')'));
     throw Regexp::InvalidRegexp("unmatched ()");
   }
   
@@ -894,7 +894,7 @@ R_char *CRegCompilerBase::regbranch(int *flags_r)
   {
     int flags;
     R_char *latest = regpiece(&flags);
-    assert(latest);
+    ASSERT(latest);
     *flags_r |= flags & HASWIDTH;
     if (chain == NULL)		// First piece. 
       *flags_r |= flags & SPSTART;
@@ -920,7 +920,7 @@ R_char *CRegCompilerBase::regpiece(int *flags_r)
 {
   int flags;
   R_char *ret = regatom(&flags);
-  assert(ret);
+  ASSERT(ret);
 
   R_char op = *regparse;
   if (!(op == R_('*') || op == R_('+') || op == R_('?')))
@@ -1133,7 +1133,7 @@ R_char *CRegCompilerBase::regatom(int *flags_r)
     {
       int flags;
       ret = reg(true, &flags);
-      assert(ret);
+      ASSERT(ret);
       *flags_r |= flags & (HASWIDTH | SPSTART);
       break;
     }
@@ -1308,8 +1308,8 @@ bool Regexp::regexp::regexec(const R_char *target)
   throw (Regexp::InvalidRegexp)
 {
   // Check validity of program.
-  assert(*program == MAGIC);
-  assert(target);
+  ASSERT(*program == MAGIC);
+  ASSERT(target);
   
   R_char *t = (R_char *)target;    // avert const poisoning
 
@@ -1620,7 +1620,7 @@ bool CRegExecutor::regmatch(R_char *prog)
 	}
 	else
 	{
-	  assert(!"regexp corruption");
+	  ASSERT(!"regexp corruption");
 	  return false;
 	}
       }
@@ -1630,7 +1630,7 @@ bool CRegExecutor::regmatch(R_char *prog)
   // We get here only if there's trouble -- normally "case END"
   // is the terminating point.
   
-  assert(!"corrupted pointers");
+  ASSERT(!"corrupted pointers");
   return false;
 }
 
@@ -1720,7 +1720,7 @@ const R_char *CRegExecutor::regrepeat(PROGRAM *node)
       throw Regexp::InvalidRegexp("invalid string(8)");
     }
     default:	// Oh dear.  Called inappropriately.
-      assert(!"internal error: bad call of regrepeat");
+      ASSERT(!"internal error: bad call of regrepeat");
       throw Regexp::InvalidRegexp("internal error: bad call of regrepeat");
   }
 }
@@ -1799,8 +1799,8 @@ bool Regexp::doesMatch(const R_char *target_)
 {
   target = target_;
   bool r = false;
-  assert(rc.ptr);
-  assert(target);
+  ASSERT(rc.ptr);
+  ASSERT(target);
   
   if (1 < rc->getRefcount()) // copy on write !
   {
@@ -1827,7 +1827,7 @@ bool Regexp::doesMatch(const R_char *target_)
 // get number of sub strings
 size_t Regexp::getNumberOfSubStrings() const
 {
-  assert(rc.ptr);
+  ASSERT(rc.ptr);
   return rc->getNumSubs();
 }
 
@@ -1842,7 +1842,7 @@ R_string Regexp::operator[](size_t i) const
 size_t Regexp::subBegin(size_t i) const
   throw (std::out_of_range)
 {
-  assert(rc.ptr);
+  ASSERT(rc.ptr);
   return rc->getBeginp(i) - target;
 }
 
@@ -1850,7 +1850,7 @@ size_t Regexp::subBegin(size_t i) const
 size_t Regexp::subEnd(size_t i) const
   throw (std::out_of_range)
 {
-  assert(rc.ptr);
+  ASSERT(rc.ptr);
   return rc->getEndp(i) - target;
 }
 
@@ -1858,14 +1858,14 @@ size_t Regexp::subEnd(size_t i) const
 size_t Regexp::subSize(size_t i) const
   throw (std::out_of_range)
 {
-  assert(rc.ptr);
+  ASSERT(rc.ptr);
   return rc->getEndp(i) - rc->getBeginp(i);
 }
 
 // replace \1 \2 ... in source
 R_string Regexp::replace(const R_char *source) const
 {
-  assert(rc.ptr);
+  ASSERT(rc.ptr);
   return rc->replace(source);
 }
 
@@ -1902,7 +1902,7 @@ void Regexp::regexp::ignoreCase(const R_char *in, R_char *out)
 // Returns          - The resultant string
 R_string Regexp::regexp::replace(const R_char *sReplaceExp) const
 {
-  assert(sReplaceExp);
+  ASSERT(sReplaceExp);
   
   R_char null = R_char_0;
   R_string szEmpty(&null);
@@ -1915,7 +1915,7 @@ R_string Regexp::regexp::replace(const R_char *sReplaceExp) const
   
   if (*program != MAGIC)
   {
-    assert(!"damaged regexp fed to regsub");
+    ASSERT(!"damaged regexp fed to regsub");
     return szEmpty;
   }
 
@@ -1978,7 +1978,7 @@ R_string Regexp::regexp::replace(const R_char *sReplaceExp) const
       buf += len;
       if (len != 0 && *(buf-1) == R_char_0)
       {		// strncpy hit NUL.
-	assert(!"damaged match string");
+	ASSERT(!"damaged match string");
 	return szEmpty;
       }
     }

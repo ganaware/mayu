@@ -24,4 +24,4 @@ public:
 };
 
 
-#endif _DLGEDITSETTING_H
+#endif // _DLGEDITSETTING_H

@@ -24,21 +24,21 @@ using namespace std;
 class DlgInvestigate
 {
   HWND m_hwnd;					///
-  UINT m_WM_Targetted;				///
+  UINT m_WM_MAYU_TARGETTED;			///
   DlgInvestigateData m_data;			/// 
   
 public:
   ///
   DlgInvestigate(HWND i_hwnd)
     : m_hwnd(i_hwnd),
-      m_WM_Targetted(RegisterWindowMessage(WM_Targetted_name))
+      m_WM_MAYU_TARGETTED(RegisterWindowMessage(WM_MAYU_TARGETTED_NAME))
   {
     m_data.m_engine = NULL;
     m_data.m_hwndLog = NULL;
   }
   
   /// WM_INITDIALOG
-  BOOL wmInitDialog(HWND /* focus */, LPARAM i_lParam)
+  BOOL wmInitDialog(HWND /* i_focus */, LPARAM i_lParam)
   {
     m_data = *reinterpret_cast<DlgInvestigateData *>(i_lParam);
     setSmallIcon(m_hwnd, IDI_ICON_mayu);
@@ -62,7 +62,7 @@ public:
   }
 
   /// WM_COMMAND
-  BOOL wmCommand(int /* notify_code */, int i_id, HWND /* hwnd_control */)
+  BOOL wmCommand(int /* i_notifyCode */, int i_id, HWND /* i_hwndControl */)
   {
     switch (i_id)
     {
@@ -97,41 +97,42 @@ public:
 	if (GetWindowText(i_hwndTarget, titleName, sizeof(titleName)) == 0)
 	  titleName[0] = '\0';
 	{
-	  Acquire a(&m_data.m_engine->log, 1);
-	  m_data.m_engine->log << "HWND:\t" << hex
+	  Acquire a(&m_data.m_engine->m_log, 1);
+	  m_data.m_engine->m_log << "HWND:\t" << hex
 			       << (int)i_hwndTarget << dec << endl;
 	}
-	Acquire a(&m_data.m_engine->log, 0);
-	m_data.m_engine->log << "CLASS:\t" << className << endl;
-	m_data.m_engine->log << "TITLE:\t" << titleName << endl;
+	Acquire a(&m_data.m_engine->m_log, 0);
+	m_data.m_engine->m_log << "CLASS:\t" << className << endl;
+	m_data.m_engine->m_log << "TITLE:\t" << titleName << endl;
 	ok = true;
       }
     }
     if (!ok)
-      CHECK_TRUE( PostMessage(i_hwndTarget, m_WM_Targetted, 0, 0) );
+      CHECK_TRUE( PostMessage(i_hwndTarget, m_WM_MAYU_TARGETTED, 0, 0) );
     return TRUE;
   }
   
   /// WM_vkeyNotify
-  BOOL wmVkeyNotify(int i_nVirtKey, int /* repeatCount*/, BYTE /*scanCode*/,
-		    bool i_isExtended, bool /*isAltDown*/, bool i_isKeyup)
+  BOOL wmVkeyNotify(int i_nVirtKey, int /* i_repeatCount */,
+		    BYTE /* i_scanCode */, bool i_isExtended,
+		    bool /* i_isAltDown */, bool i_isKeyup)
   {
-    Acquire a(&m_data.m_engine->log, 0);
-    m_data.m_engine->log << (i_isExtended ? " E-" : "   ")
+    Acquire a(&m_data.m_engine->m_log, 0);
+    m_data.m_engine->m_log << (i_isExtended ? " E-" : "   ")
 		<< "0x" << hex << setw(2) << setfill('0') << i_nVirtKey << dec
 		<< "  &VK( "
 		<< (i_isExtended ? "E-" : "  ")
 		<< (i_isKeyup ? "U-" : "D-");
     
-    for (const VKeyTable *vkt = vkeyTable; vkt->name; vkt ++)
+    for (const VKeyTable *vkt = g_vkeyTable; vkt->m_name; ++ vkt)
     {
-      if (vkt->code == i_nVirtKey)
+      if (vkt->m_code == i_nVirtKey)
       {
-	m_data.m_engine->log << vkt->name << " )" << endl;
+	m_data.m_engine->m_log << vkt->m_name << " )" << endl;
 	return TRUE;
       }
     }
-    m_data.m_engine->log << "0x" << hex << setw(2)
+    m_data.m_engine->m_log << "0x" << hex << setw(2)
 			 << setfill('0') << i_nVirtKey << dec
 			 << " )" << endl;
     return TRUE;
@@ -177,12 +178,12 @@ BOOL CALLBACK dlgInvestigate_dlgProc(HWND i_hwnd, UINT i_message,
 	return wc->wmClose();
       case WM_DESTROY:
 	return wc->wmDestroy();
-      case WM_focusNotify:
+      case WM_APP_notifyFocus:
 	return wc->wmFocusNotify(!!i_wParam,
 				 reinterpret_cast<HWND>(i_lParam));
-      case WM_targetNotify:
+      case WM_APP_targetNotify:
 	return wc->wmTargetNotify(reinterpret_cast<HWND>(i_lParam));
-      case WM_vkeyNotify:
+      case WM_APP_notifyVKey:
 	return wc->wmVkeyNotify(
 	  static_cast<int>(i_wParam), static_cast<int>(i_lParam & 0xffff),
 	  static_cast<BYTE>((i_lParam >> 16) & 0xff),

@@ -2,70 +2,66 @@
 // hook.h
 
 
-#ifndef __hook_h__
-#define __hook_h__
+#ifndef _HOOK_H
+#  define _HOOK_H
 
 
-#include "misc.h"
+#  include "misc.h"
 
 ///
-#define mailslotNotify							  \
+#  define NOTIFY_MAILSLOT_NAME						  \
 "\\\\.\\mailslot\\GANAware\\mayu\\{330F7914-EB5B-49be-ACCE-D2B8DF585B32}" \
 VERSION
 ///
-#define WM_Targetted_name "GANAware\\mayu\\WM_Targetted"
+#  define WM_MAYU_TARGETTED_NAME "GANAware\\mayu\\WM_MAYU_TARGETTED"
 
 
 ///
-class Notify
+struct Notify
 {
-public:
   ///
   enum Type
   {
-    TypeMayuExit,	/// Notify
-    TypeSetFocus,	/// NotifySetFocus
-    TypeName,		/// NotifySetFocus
-    TypeLockState,	/// NotifyLockState
-    TypeSync,		/// Notify
-    TypeThreadDetach,	/// NotifyThreadDetach
-    TypeCommand,	/// NotifyThreadDetach
+    Type_mayuExit,				/// Notify
+    Type_setFocus,				/// NotifySetFocus
+    Type_name,					/// NotifySetFocus
+    Type_lockState,				/// NotifyLockState
+    Type_sync,					/// Notify
+    Type_threadDetach,				/// NotifyThreadDetach
+    Type_command,				/// NotifyThreadDetach
   };
-  Type type;		///
+  Type m_type;					///
 };
 
 
 ///
-class NotifySetFocus
+struct NotifySetFocus
 {
-public:
-  Notify::Type type;			///
-  DWORD threadId;			///
-  HWND hwnd;				///
-  char className[GANA_MAX_PATH];	///
-  char titleName[GANA_MAX_PATH];	///
+  Notify::Type m_type;				///
+  DWORD m_threadId;				///
+  HWND m_hwnd;					///
+  char m_className[GANA_MAX_PATH];		///
+  char m_titleName[GANA_MAX_PATH];		///
 };
 
 
 ///
-class NotifyLockState
+struct NotifyLockState
 {
-public:
-  Notify::Type type;		///
-  bool isNumLockToggled;	///
-  bool isCapsLockToggled;	///
-  bool isScrollLockToggled;	///
-  bool isImeLockToggled;	///
-  bool isImeCompToggled;	///
+  Notify::Type m_type;				///
+  bool m_isNumLockToggled;			///
+  bool m_isCapsLockToggled;			///
+  bool m_isScrollLockToggled;			///
+  bool m_isImeLockToggled;			///
+  bool m_isImeCompToggled;			///
 };
 
 
 ///
-class NotifyThreadDetach
+struct NotifyThreadDetach
 {
-public:
-  Notify::Type type;		///
-  DWORD threadId;		///
+  Notify::Type m_type;				///
+  DWORD m_threadId;				///
 };
 
 
@@ -73,17 +69,17 @@ public:
 class NotifyCommand
 {
 public:
-  Notify::Type type;	///
-  HWND hwnd;		///
-  UINT message;		///
-  WPARAM wParam;	///
-  LPARAM lParam;	///
+  Notify::Type m_type;				///
+  HWND m_hwnd;					///
+  UINT m_message;				///
+  WPARAM m_wParam;				///
+  LPARAM m_lParam;				///
 };
 
 
-/** @name ANONYMOUS */
-enum {
-  notifyMessageSize = sizeof(NotifySetFocus),	///
+enum
+{
+  NOTIFY_MESSAGE_SIZE = sizeof(NotifySetFocus),	///
 };
 
 
@@ -91,26 +87,27 @@ enum {
 class HookData
 {
 public:
-  HHOOK hhook[2];		///
-  BYTE syncKey;			///
-  bool syncKeyIsExtended;	///
-  bool doesNotifyCommand;	///
+  HHOOK m_hHookGetMessage;			///
+  HHOOK m_hHookCallWndProc;			///
+  BYTE m_syncKey;				///
+  bool m_syncKeyIsExtended;			///
+  bool m_doesNotifyCommand;			///
 };
 
 
 ///
-#define DllExport __declspec(dllexport)
+#  define DllExport __declspec(dllexport)
 ///
-#define DllImport __declspec(dllimport)
+#  define DllImport __declspec(dllimport)
 
 
-#ifndef __hook_cpp__
-extern DllImport HookData *hookData;
+#  ifndef _HOOK_CPP
+extern DllImport HookData *g_hookData;
 extern DllImport int installHooks();
 extern DllImport int uninstallHooks();
 extern DllImport bool notify(void *data, size_t sizeof_data);
 extern DllImport void notifyLockState();
-#endif __hook_cpp__
+#  endif // _HOOK_CPP
 
 
-#endif // __hook_h__
+#endif // _HOOK_H

@@ -2,19 +2,19 @@
 // focus.h
 
 
-#ifndef __focus_h__
-#define __focus_h__
+#ifndef _FOCUS_H
+#  define _FOCUS_H
 
-
-#include <windows.h>
-
+#  include <windows.h>
 
 ///
 extern ATOM Register_focus();
-///
-#define WM_focusNotify (WM_APP + 103)
-///
-#define WM_vkeyNotify (WM_APP + 104)
+
+enum
+{
+  WM_APP_notifyFocus = WM_APP + 103,
+  WM_APP_notifyVKey  = WM_APP + 104,
+};
 
 
-#endif // __focus_h__
+#endif // _FOCUS_H

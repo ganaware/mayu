@@ -15,53 +15,53 @@ using namespace std;
 
 
 // add a name or an alias of key
-void Key::addName(const istring &name)
+void Key::addName(const istring &i_name)
 {
-  names.push_back(name);
+  m_names.push_back(i_name);
 }
 
 
 // add a scan code
-void Key::addScanCode(const ScanCode &sc)
+void Key::addScanCode(const ScanCode &i_sc)
 {
-  assert(lengthof_scanCodes < maxlengthof_scanCodes);
-  scanCodes[lengthof_scanCodes ++] = sc;
+  ASSERT(m_scanCodesSize < MAX_SCAN_CODES_SIZE);
+  m_scanCodes[m_scanCodesSize ++] = i_sc;
 }
 
 
 // initializer
 Key &Key::initialize()
 {
-  names.clear();
-  isPressed = false;
-  isPressedOnWin32 = false;
-  isPressedByAssign = false;
-  lengthof_scanCodes = 0;
+  m_names.clear();
+  m_isPressed = false;
+  m_isPressedOnWin32 = false;
+  m_isPressedByAssign = false;
+  m_scanCodesSize = 0;
   return *this;
 }
 
 
 // equation by name
-bool Key::operator==(const istring &name) const
+bool Key::operator==(const istring &i_name) const
 {
-  return find(names.begin(), names.end(), name) != names.end();
+  return find(m_names.begin(), m_names.end(), i_name) != m_names.end();
 }
 
   
 // is the scan code of this key ?
-bool Key::isSameScanCode(const Key &key) const
+bool Key::isSameScanCode(const Key &i_key) const
 {
-  if (lengthof_scanCodes != key.lengthof_scanCodes)
+  if (m_scanCodesSize != i_key.m_scanCodesSize)
     return false;
-  return isPrefixScanCode(key);
+  return isPrefixScanCode(i_key);
 }
 
 
 // is the key's scan code the prefix of this key's scan code ?
-bool Key::isPrefixScanCode(const Key &key) const
+bool Key::isPrefixScanCode(const Key &i_key) const
 {
-  for (size_t i = 0; i < key.lengthof_scanCodes; i++)
-    if (scanCodes[i] != key.scanCodes[i])
+  for (size_t i = 0; i < i_key.m_scanCodesSize; ++ i)
+    if (m_scanCodes[i] != i_key.m_scanCodes[i])
       return false;
   return true;
 }
@@ -79,15 +79,16 @@ std::ostream &operator<<(std::ostream &i_ost, const Key &i_mk)
 
 
 Modifier::Modifier()
-  : modifiers(0),
-    dontcares(0)
+  : m_modifiers(0),
+    m_dontcares(0)
 {
-  assert(end <= (sizeof(MODIFIERS) * 8));
+  ASSERT(Type_end <= (sizeof(MODIFIERS) * 8));
   static const Type defaultDontCare[] =
   {
-    Up, Down,
-    ImeLock, ImeComp, NumLock, CapsLock, ScrollLock,
-    Lock0, Lock1, Lock2, Lock3, Lock4, Lock5, Lock6, Lock7, Lock8, Lock9,
+    Type_Up, Type_Down,
+    Type_ImeLock, Type_ImeComp, Type_NumLock, Type_CapsLock, Type_ScrollLock,
+    Type_Lock0, Type_Lock1, Type_Lock2, Type_Lock3, Type_Lock4,
+    Type_Lock5, Type_Lock6, Type_Lock7, Type_Lock8, Type_Lock9,
   };
   for (size_t i = 0; i < NUMBER_OF(defaultDontCare); ++ i)
     dontcare(defaultDontCare[i]);
@@ -95,49 +96,49 @@ Modifier::Modifier()
 
 
 // add m's modifiers where this dontcare
-Modifier &Modifier::operator+=(const Modifier &m)
+void Modifier::add(const Modifier &i_m)
 {
-  for (int i = 0; i < end; i++)
+  for (int i = 0; i < Type_end; ++ i)
   {
-    if (isDontcare((Modifier::Type)i))
-      if (!m.isDontcare((Modifier::Type)i))
-	if (m.isPressed((Modifier::Type)i))
-	  press((Modifier::Type)i);
+    if (isDontcare(static_cast<Modifier::Type>(i)))
+      if (!i_m.isDontcare(static_cast<Modifier::Type>(i)))
+	if (i_m.isPressed(static_cast<Modifier::Type>(i)))
+	  press(static_cast<Modifier::Type>(i));
 	else
-	  release((Modifier::Type)i);
+	  release(static_cast<Modifier::Type>(i));
   }
-  return *this;
 }
 
 /// stream output
 std::ostream &operator<<(std::ostream &i_ost, const Modifier &i_m)
 {
-  const static
-    struct
-    {
-      Modifier::Type m_mt;
-      const char *m_symbol;
-    } mods[] =
-      {
-	{ Modifier::Up, "U-" }, { Modifier::Down, "  " },
-	{ Modifier::Shift, "S-" }, { Modifier::Alt, "A-" },
-	{ Modifier::Control, "C-" }, { Modifier::Windows, "W-" },
-	{ Modifier::ImeLock, "IL-" }, { Modifier::ImeComp, "IC-" },
-	{ Modifier::ImeComp, "I-" }, { Modifier::NumLock, "NL-" },
-	{ Modifier::CapsLock, "CL-" }, { Modifier::ScrollLock, "SL-" },
-	{ Modifier::Mod0, "M0-" }, { Modifier::Mod1, "M1-" },
-	{ Modifier::Mod2, "M2-" }, { Modifier::Mod3, "M3-" },
-	{ Modifier::Mod4, "M4-" }, { Modifier::Mod5, "M5-" },
-	{ Modifier::Mod6, "M6-" }, { Modifier::Mod7, "M7-" },
-	{ Modifier::Mod8, "M8-" }, { Modifier::Mod9, "M9-" },
-	{ Modifier::Lock0, "L0-" }, { Modifier::Lock1, "L1-" },
-	{ Modifier::Lock2, "L2-" }, { Modifier::Lock3, "L3-" },
-	{ Modifier::Lock4, "L4-" }, { Modifier::Lock5, "L5-" },
-	{ Modifier::Lock6, "L6-" }, { Modifier::Lock7, "L7-" },
-	{ Modifier::Lock8, "L8-" }, { Modifier::Lock9, "L9-" },
-      };
+  struct Mods
+  {
+    Modifier::Type m_mt;
+    const char *m_symbol;
+  };
+  
+  const static Mods mods[] =
+  {
+    { Modifier::Type_Up, "U-" }, { Modifier::Type_Down, "  " },
+    { Modifier::Type_Shift, "S-" }, { Modifier::Type_Alt, "A-" },
+    { Modifier::Type_Control, "C-" }, { Modifier::Type_Windows, "W-" },
+    { Modifier::Type_ImeLock, "IL-" }, { Modifier::Type_ImeComp, "IC-" },
+    { Modifier::Type_ImeComp, "I-" }, { Modifier::Type_NumLock, "NL-" },
+    { Modifier::Type_CapsLock, "CL-" }, { Modifier::Type_ScrollLock, "SL-" },
+    { Modifier::Type_Mod0, "M0-" }, { Modifier::Type_Mod1, "M1-" },
+    { Modifier::Type_Mod2, "M2-" }, { Modifier::Type_Mod3, "M3-" },
+    { Modifier::Type_Mod4, "M4-" }, { Modifier::Type_Mod5, "M5-" },
+    { Modifier::Type_Mod6, "M6-" }, { Modifier::Type_Mod7, "M7-" },
+    { Modifier::Type_Mod8, "M8-" }, { Modifier::Type_Mod9, "M9-" },
+    { Modifier::Type_Lock0, "L0-" }, { Modifier::Type_Lock1, "L1-" },
+    { Modifier::Type_Lock2, "L2-" }, { Modifier::Type_Lock3, "L3-" },
+    { Modifier::Type_Lock4, "L4-" }, { Modifier::Type_Lock5, "L5-" },
+    { Modifier::Type_Lock6, "L6-" }, { Modifier::Type_Lock7, "L7-" },
+    { Modifier::Type_Lock8, "L8-" }, { Modifier::Type_Lock9, "L9-" },
+  };
 
-  for (size_t i = 0; i < NUMBER_OF(mods); i++)
+  for (size_t i = 0; i < NUMBER_OF(mods); ++ i)
     if (!i_m.isDontcare(mods[i].m_mt) && i_m.isPressed(mods[i].m_mt))
       i_ost << mods[i].m_symbol;
 
@@ -152,8 +153,8 @@ std::ostream &operator<<(std::ostream &i_ost, const Modifier &i_m)
 /// stream output
 std::ostream &operator<<(std::ostream &i_ost, const ModifiedKey &i_mk)
 {
-  if (i_mk.key)
-    i_ost << i_mk.modifier << *i_mk.key;
+  if (i_mk.m_key)
+    i_ost << i_mk.m_modifier << *i_mk.m_key;
   return i_ost;
 }
 
@@ -162,40 +163,39 @@ std::ostream &operator<<(std::ostream &i_ost, const ModifiedKey &i_mk)
 // Keyboard::KeyIterator
 
 
-Keyboard::KeyIterator::KeyIterator
-(Keys *hashedKeys_, size_t lengthof_hashedKeys_)
-  : hashedKeys(hashedKeys_),
-    lengthof_hashedKeys(lengthof_hashedKeys_),
-    i((*hashedKeys).begin())
+Keyboard::KeyIterator::KeyIterator(Keys *i_hashedKeys, size_t i_hashedKeysSize)
+  : m_hashedKeys(i_hashedKeys),
+    m_hashedKeysSize(i_hashedKeysSize),
+    m_i((*m_hashedKeys).begin())
 {
-  if ((*hashedKeys).empty())
+  if ((*m_hashedKeys).empty())
     next();
 }
 
 
 void Keyboard::KeyIterator::next()
 {
-  if (lengthof_hashedKeys == 0)
+  if (m_hashedKeysSize == 0)
     return;
-  i ++;
-  if (i == (*hashedKeys).end())
+  ++ m_i;
+  if (m_i == (*m_hashedKeys).end())
   {
     do
     {
-      lengthof_hashedKeys --;
-      hashedKeys ++;
-    } while (0 < lengthof_hashedKeys && (*hashedKeys).empty());
-    if (0 < lengthof_hashedKeys)
-      i = (*hashedKeys).begin();
+      -- m_hashedKeysSize;
+      ++ m_hashedKeys;
+    } while (0 < m_hashedKeysSize && (*m_hashedKeys).empty());
+    if (0 < m_hashedKeysSize)
+      m_i = (*m_hashedKeys).begin();
   }
 }
 
 
 Key *Keyboard::KeyIterator::operator *()
 {
-  if (lengthof_hashedKeys == 0)
+  if (m_hashedKeysSize == 0)
     return NULL;
-  return &*i;
+  return &*m_i;
 }
 
 
@@ -203,76 +203,77 @@ Key *Keyboard::KeyIterator::operator *()
 // Keyboard
 
 
-Keyboard::Keys &Keyboard::getKeys(const Key &key)
+Keyboard::Keys &Keyboard::getKeys(const Key &i_key)
 {
-  assert(1 <= key.getLengthof_scanCodes());
-  return hashedKeys[key.getScanCodes()->scan % lengthof_hashedKeys];
+  ASSERT(1 <= i_key.getScanCodesSize());
+  return m_hashedKeys[i_key.getScanCodes()->m_scan % HASHED_KEYS_SIZE];
 }
 
 
 // add a key
-void Keyboard::addKey(const Key &key)
+void Keyboard::addKey(const Key &i_key)
 {
-  getKeys(key).push_front(key);
+  getKeys(i_key).push_front(i_key);
 }
 
 
 // add a key name alias
-void Keyboard::addAlias(const istring &aliasName, Key *key)
+void Keyboard::addAlias(const istring &i_aliasName, Key *i_key)
 {
-  aliases.insert(Aliases::value_type(aliasName, key));
+  m_aliases.insert(Aliases::value_type(i_aliasName, i_key));
 }
 
 
 // add a modifier key
-void Keyboard::addModifier(Modifier::Type mt, Key * key)
+void Keyboard::addModifier(Modifier::Type i_mt, Key *i_key)
 {
-  assert((int)mt < (int)Modifier::BASIC);
-  if (find(mods[mt].begin(), mods[mt].end(), key) != mods[mt].end())
+  ASSERT((int)i_mt < (int)Modifier::Type_BASIC);
+  if (find(m_mods[i_mt].begin(), m_mods[i_mt].end(), i_key)
+      != m_mods[i_mt].end())
     return; // already added
-  mods[mt].push_back(key);
+  m_mods[i_mt].push_back(i_key);
 }
 
 
 // search a key
-Key *Keyboard::searchKey(const Key &key)
+Key *Keyboard::searchKey(const Key &i_key)
 {
-  Keys &keys = getKeys(key);
-  for (Keys::iterator i = keys.begin(); i != keys.end(); i ++)
-    if ((*i).isSameScanCode(key))
+  Keys &keys = getKeys(i_key);
+  for (Keys::iterator i = keys.begin(); i != keys.end(); ++ i)
+    if ((*i).isSameScanCode(i_key))
       return &*i;
   return NULL;
 }
 
 
 // search a key (of which the key's scan code is the prefix)
-Key *Keyboard::searchPrefixKey(const Key &key)
+Key *Keyboard::searchPrefixKey(const Key &i_key)
 {
-  Keys &keys = getKeys(key);
-  for (Keys::iterator i = keys.begin(); i != keys.end(); i ++)
-    if ((*i).isPrefixScanCode(key))
+  Keys &keys = getKeys(i_key);
+  for (Keys::iterator i = keys.begin(); i != keys.end(); ++ i)
+    if ((*i).isPrefixScanCode(i_key))
       return &*i;
   return NULL;
 }
 
   
 // search a key by name
-Key *Keyboard::searchKey(const istring &name)
+Key *Keyboard::searchKey(const istring &i_name)
 {
-  Aliases::iterator i = aliases.find(name);
-  if (i != aliases.end())
+  Aliases::iterator i = m_aliases.find(i_name);
+  if (i != m_aliases.end())
     return (*i).second;
-  return searchKeyByNonAliasName(name);
+  return searchKeyByNonAliasName(i_name);
 }
 
 
 // search a key by non-alias name
-Key *Keyboard::searchKeyByNonAliasName(const istring &name)
+Key *Keyboard::searchKeyByNonAliasName(const istring &i_name)
 {
-  for (int i = 0; i < lengthof_hashedKeys; i++)
+  for (int i = 0; i < HASHED_KEYS_SIZE; ++ i)
   {
-    Keys &keys = hashedKeys[i];
-    Keys::iterator i = find(keys.begin(), keys.end(), name);
+    Keys &keys = m_hashedKeys[i];
+    Keys::iterator i = find(keys.begin(), keys.end(), i_name);
     if (i != keys.end())
       return &*i;
   }

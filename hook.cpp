@@ -2,7 +2,7 @@
 // hook.cpp
 
 
-#define __hook_cpp__
+#define _HOOK_CPP
 
 #include "misc.h"
 
@@ -24,15 +24,20 @@ using namespace std;
 // Global Variables
 
 
-DllExport HookData *hookData;		///
+DllExport HookData *g_hookData;			///
 
-static HANDLE hHookData;		///
-static HWND hwndFocus = NULL;		///
-static HINSTANCE hInstDLL;		///
-static bool isInMenu;			///
-static UINT WM_Targetted;		///
-static bool isImeLock;			///
-static bool isImeCompositioning;	///
+struct Globals
+{
+  HANDLE m_hHookData;				///
+  HWND m_hwndFocus;				/// 
+  HINSTANCE m_hInstDLL;				///
+  bool m_isInMenu;				///
+  UINT m_WM_MAYU_TARGETTED;			///
+  bool m_isImeLock;				///
+  bool m_isImeCompositioning;			///
+};
+
+static Globals g;
 
 
 // ////////////////////////////////////////////////////////////////////////////
@@ -49,18 +54,18 @@ static void unmapHookData();
 
 
 /// EntryPoint
-BOOL WINAPI DllMain(HINSTANCE hInstDLL_, DWORD fdwReason,
-		    LPVOID /* lpvReserved */)
+BOOL WINAPI DllMain(HINSTANCE i_hInstDLL, DWORD i_fdwReason,
+		    LPVOID /* i_lpvReserved */)
 {
-  switch (fdwReason)
+  switch (i_fdwReason)
   {
     case DLL_PROCESS_ATTACH:
     {
       if (!mapHookData())
 	return FALSE;
-      hInstDLL = hInstDLL_;
+      g.m_hInstDLL = i_hInstDLL;
       setlocale(LC_ALL, "");
-      WM_Targetted = RegisterWindowMessage(WM_Targetted_name);
+      g.m_WM_MAYU_TARGETTED = RegisterWindowMessage(WM_MAYU_TARGETTED_NAME);
       break;
     }
     case DLL_THREAD_ATTACH:
@@ -82,15 +87,15 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL_, DWORD fdwReason,
 /// map hook data
 static bool mapHookData()
 {
-  hHookData = CreateFileMapping((HANDLE)0xffffffff, NULL, PAGE_READWRITE,
-				0, sizeof(HookData), HOOK_DATA_NAME);
-  if (!hHookData)
+  g.m_hHookData = CreateFileMapping((HANDLE)0xffffffff, NULL, PAGE_READWRITE,
+				  0, sizeof(HookData), HOOK_DATA_NAME);
+  if (!g.m_hHookData)
     return false;
   
-  hookData =
-    (HookData *)MapViewOfFile(hHookData, FILE_MAP_READ | FILE_MAP_WRITE,
-				0, 0, sizeof(HookData));
-  if (!hookData)
+  g_hookData =
+    (HookData *)MapViewOfFile(g.m_hHookData, FILE_MAP_READ | FILE_MAP_WRITE,
+			      0, 0, sizeof(HookData));
+  if (!g_hookData)
   {
     unmapHookData();
     return false;
@@ -102,44 +107,44 @@ static bool mapHookData()
 /// unmap hook data
 static void unmapHookData()
 {
-  if (hookData)
-    if (!UnmapViewOfFile(hookData))
+  if (g_hookData)
+    if (!UnmapViewOfFile(g_hookData))
       return;
-  hookData = NULL;
-  if (hHookData)
-    CloseHandle(hHookData);
-  hHookData = NULL;
+  g_hookData = NULL;
+  if (g.m_hHookData)
+    CloseHandle(g.m_hHookData);
+  g.m_hHookData = NULL;
 }
 
 
 /// notify
-DllExport bool notify(void *data, size_t sizeof_data)
+DllExport bool notify(void *i_data, size_t i_dataSize)
 {
   HANDLE hMailslot =
-    CreateFile(mailslotNotify, GENERIC_WRITE, FILE_SHARE_READ,
+    CreateFile(NOTIFY_MAILSLOT_NAME, GENERIC_WRITE, FILE_SHARE_READ,
 	       (SECURITY_ATTRIBUTES *)NULL, OPEN_EXISTING,
 	       FILE_ATTRIBUTE_NORMAL, (HANDLE)NULL);
   if (hMailslot == INVALID_HANDLE_VALUE)
     return false;
     
   DWORD len;
-  WriteFile(hMailslot, data, sizeof_data, &len, (OVERLAPPED *)NULL);
+  WriteFile(hMailslot, i_data, i_dataSize, &len, (OVERLAPPED *)NULL);
   CloseHandle(hMailslot);
   return true;
 }
 
 
 /// get class name and title name
-static void getClassNameTitleName(HWND hwnd, bool isInMenu, 
-				  StringTool::istring *className_r,
-				  string *titleName_r)
+static void getClassNameTitleName(HWND i_hwnd, bool i_isInMenu, 
+				  StringTool::istring *o_className,
+				  string *o_titleName)
 {
-  StringTool::istring &className = *className_r;
-  string &titleName = *titleName_r;
+  StringTool::istring &className = *o_className;
+  string &titleName = *o_titleName;
   
   bool isTheFirstTime = true;
   
-  if (isInMenu)
+  if (i_isInMenu)
   {
     className = titleName = "MENU";
     isTheFirstTime = false;
@@ -150,8 +155,8 @@ static void getClassNameTitleName(HWND hwnd, bool isInMenu,
     char buf[MAX(GANA_MAX_PATH, GANA_MAX_ATOM_LENGTH)];
 
     // get class name
-    if (hwnd)
-      GetClassName(hwnd, buf, sizeof(buf));
+    if (i_hwnd)
+      GetClassName(i_hwnd, buf, sizeof(buf));
     else
       GetModuleFileName(GetModuleHandle(NULL), buf, sizeof(buf));
     buf[sizeof(buf) - 1] = '\0';
@@ -161,9 +166,9 @@ static void getClassNameTitleName(HWND hwnd, bool isInMenu,
       className = StringTool::istring(buf) + ":" + className;
     
     // get title name
-    if (hwnd)
+    if (i_hwnd)
     {
-      GetWindowText(hwnd, buf, sizeof(buf));
+      GetWindowText(i_hwnd, buf, sizeof(buf));
       buf[sizeof(buf) - 1] = '\0';
       for (char *b = buf; *b; b++)
 	if (StringTool::ismbblead_(*b) && b[1])
@@ -177,29 +182,29 @@ static void getClassNameTitleName(HWND hwnd, bool isInMenu,
       titleName = string(buf) + ":" + titleName;
 
     // next loop or exit
-    if (!hwnd)
+    if (!i_hwnd)
       break;
-    hwnd = GetParent(hwnd);
+    i_hwnd = GetParent(i_hwnd);
     isTheFirstTime = false;
   }
 }
 
 
 /// notify WM_Targetted
-static void notifyName(HWND hwnd, Notify::Type type = Notify::TypeName)
+static void notifyName(HWND i_hwnd, Notify::Type i_type = Notify::Type_name)
 {
   StringTool::istring className;
   string titleName;
-  getClassNameTitleName(hwnd, isInMenu, &className, &titleName);
+  getClassNameTitleName(i_hwnd, g.m_isInMenu, &className, &titleName);
   
   NotifySetFocus *nfc = new NotifySetFocus;
-  nfc->type = type;
-  nfc->threadId = GetCurrentThreadId();
-  nfc->hwnd = hwnd;
-  strncpy(nfc->className, className.c_str(), NUMBER_OF(nfc->className));
-  nfc->className[NUMBER_OF(nfc->className) - 1] = '\0';
-  strncpy(nfc->titleName, titleName.c_str(), NUMBER_OF(nfc->titleName));
-  nfc->titleName[NUMBER_OF(nfc->titleName) - 1] = '\0';
+  nfc->m_type = i_type;
+  nfc->m_threadId = GetCurrentThreadId();
+  nfc->m_hwnd = i_hwnd;
+  strncpy(nfc->m_className, className.c_str(), NUMBER_OF(nfc->m_className));
+  nfc->m_className[NUMBER_OF(nfc->m_className) - 1] = '\0';
+  strncpy(nfc->m_titleName, titleName.c_str(), NUMBER_OF(nfc->m_titleName));
+  nfc->m_titleName[NUMBER_OF(nfc->m_titleName) - 1] = '\0';
   notify(nfc, sizeof(*nfc));
   delete nfc;
 }
@@ -209,10 +214,10 @@ static void notifyName(HWND hwnd, Notify::Type type = Notify::TypeName)
 static void notifySetFocus()
 {
   HWND hwnd = GetFocus();
-  if (hwnd != hwndFocus)
+  if (hwnd != g.m_hwndFocus)
   {
-    hwndFocus = hwnd;
-    notifyName(hwndFocus, Notify::TypeSetFocus);
+    g.m_hwndFocus = hwnd;
+    notifyName(g.m_hwndFocus, Notify::Type_setFocus);
   }
 }
 
@@ -221,7 +226,7 @@ static void notifySetFocus()
 static void notifySync()
 {
   Notify n;
-  n.type = Notify::TypeSync;
+  n.m_type = Notify::Type_sync;
   notify(&n, sizeof(n));
 }
 
@@ -230,24 +235,24 @@ static void notifySync()
 static void notifyThreadDetach()
 {
   NotifyThreadDetach ntd;
-  ntd.type = Notify::TypeThreadDetach;
-  ntd.threadId = GetCurrentThreadId();
+  ntd.m_type = Notify::Type_threadDetach;
+  ntd.m_threadId = GetCurrentThreadId();
   notify(&ntd, sizeof(ntd));
 }
 
 
 /// notify WM_COMMAND, WM_SYSCOMMAND
 static void notifyCommand(
-  HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+  HWND i_hwnd, UINT i_message, WPARAM i_wParam, LPARAM i_lParam)
 {
-  if (hookData->doesNotifyCommand)
+  if (g_hookData->m_doesNotifyCommand)
   {
     NotifyCommand ntc;
-    ntc.type = Notify::TypeCommand;
-    ntc.hwnd = hwnd;
-    ntc.message = message;
-    ntc.wParam = wParam;
-    ntc.lParam = lParam;
+    ntc.m_type = Notify::Type_command;
+    ntc.m_hwnd = i_hwnd;
+    ntc.m_message = i_message;
+    ntc.m_wParam = i_wParam;
+    ntc.m_lParam = i_lParam;
     notify(&ntc, sizeof(ntc));
   }
 }
@@ -257,23 +262,23 @@ static void notifyCommand(
 DllExport void notifyLockState()
 {
   NotifyLockState n;
-  n.type = Notify::TypeLockState;
-  n.isNumLockToggled = !!(GetKeyState(VK_NUMLOCK) & 1);
-  n.isCapsLockToggled = !!(GetKeyState(VK_CAPITAL) & 1);
-  n.isScrollLockToggled = !!(GetKeyState(VK_SCROLL) & 1);
-  n.isImeLockToggled = isImeLock;
-  n.isImeCompToggled = isImeCompositioning;
+  n.m_type = Notify::Type_lockState;
+  n.m_isNumLockToggled = !!(GetKeyState(VK_NUMLOCK) & 1);
+  n.m_isCapsLockToggled = !!(GetKeyState(VK_CAPITAL) & 1);
+  n.m_isScrollLockToggled = !!(GetKeyState(VK_SCROLL) & 1);
+  n.m_isImeLockToggled = g.m_isImeLock;
+  n.m_isImeCompToggled = g.m_isImeCompositioning;
   notify(&n, sizeof(n));
 }
 
 
 /// hook of GetMessage
-LRESULT CALLBACK getMessageProc(int nCode, WPARAM wParam_, LPARAM lParam_)
+LRESULT CALLBACK getMessageProc(int i_nCode, WPARAM i_wParam, LPARAM i_lParam)
 {
-  if (!hookData)
+  if (!g_hookData)
     return 0;
   
-  MSG &msg = (*(MSG *)lParam_);
+  MSG &msg = (*(MSG *)i_lParam);
 
   switch (msg.message)
   {
@@ -297,43 +302,44 @@ LRESULT CALLBACK getMessageProc(int nCode, WPARAM wParam_, LPARAM lParam_)
 	  nVirtKey == VK_NUMLOCK ||
 	  nVirtKey == VK_SCROLL)
 	notifyLockState();
-      else if (scanCode == hookData->syncKey &&
-	       isExtended == hookData->syncKeyIsExtended)
+      else if (scanCode == g_hookData->m_syncKey &&
+	       isExtended == g_hookData->m_syncKeyIsExtended)
 	notifySync();
       break;
     }
     case WM_IME_STARTCOMPOSITION:
-      isImeCompositioning = true;
+      g.m_isImeCompositioning = true;
       notifyLockState();
       break;
     case WM_IME_ENDCOMPOSITION:
-      isImeCompositioning = false;
+      g.m_isImeCompositioning = false;
       notifyLockState();
       break;
     default:
-      if (msg.message == WM_Targetted)
+      if (msg.message == g.m_WM_MAYU_TARGETTED)
 	notifyName(msg.hwnd);
       break;
   }
-  return CallNextHookEx(hookData->hhook[0], nCode, wParam_, lParam_);
+  return CallNextHookEx(g_hookData->m_hHookGetMessage,
+			i_nCode, i_wParam, i_lParam);
 }
 
 
 /// hook of SendMessage
-LRESULT CALLBACK callWndProc(int nCode, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK callWndProc(int i_nCode, WPARAM i_wParam, LPARAM i_lParam)
 {
-  if (!hookData)
+  if (!g_hookData)
     return 0;
   
-  CWPSTRUCT &cwps = *(CWPSTRUCT *)lParam;
+  CWPSTRUCT &cwps = *(CWPSTRUCT *)i_lParam;
   
-  if (0 <= nCode)
+  if (0 <= i_nCode)
   {
     switch (cwps.message)
     {
       case WM_ACTIVATEAPP:
       case WM_NCACTIVATE:
-	if (wParam)
+	if (i_wParam)
 	  notifySetFocus();
 	break;
       case WM_COMMAND:
@@ -344,52 +350,54 @@ LRESULT CALLBACK callWndProc(int nCode, WPARAM wParam, LPARAM lParam)
 	notifySetFocus();
 	break;
       case WM_ACTIVATE:
-	if (LOWORD(wParam) != WA_INACTIVE)
+	if (LOWORD(i_wParam) != WA_INACTIVE)
 	  notifySetFocus();
 	break;
       case WM_ENTERMENULOOP:
-	isInMenu = true;
+	g.m_isInMenu = true;
 	notifySetFocus();
 	break;
       case WM_EXITMENULOOP:
-	isInMenu = false;
+	g.m_isInMenu = false;
 	notifySetFocus();
 	break;
       case WM_SETFOCUS:
-	isInMenu = false;
+	g.m_isInMenu = false;
 	notifySetFocus();
 	notifyLockState();
 	break;
       case WM_IME_STARTCOMPOSITION:
-	isImeCompositioning = true;
+	g.m_isImeCompositioning = true;
 	notifyLockState();
 	break;
       case WM_IME_ENDCOMPOSITION:
-	isImeCompositioning = false;
+	g.m_isImeCompositioning = false;
 	notifyLockState();
 	break;
       case WM_IME_NOTIFY:
 	if (cwps.wParam == IMN_SETOPENSTATUS)
 	  if (HIMC hIMC = ImmGetContext(cwps.hwnd))
 	  {
-	    isImeLock = !!ImmGetOpenStatus(hIMC);
+	    g.m_isImeLock = !!ImmGetOpenStatus(hIMC);
 	    ImmReleaseContext(cwps.hwnd, hIMC);
 	    notifyLockState();
 	  }
 	break;
     }
   }
-  return CallNextHookEx(hookData->hhook[1], nCode, wParam, lParam);
+  return CallNextHookEx(g_hookData->m_hHookCallWndProc, i_nCode,
+			i_wParam, i_lParam);
 }
 
 
 /// install hooks
 DllExport int installHooks()
 {
-  hookData->hhook[0] =
-    SetWindowsHookEx(WH_GETMESSAGE, (HOOKPROC)getMessageProc,  hInstDLL, 0);
-  hookData->hhook[1] =
-    SetWindowsHookEx(WH_CALLWNDPROC, (HOOKPROC)callWndProc, hInstDLL, 0);
+  g_hookData->m_hHookGetMessage =
+    SetWindowsHookEx(WH_GETMESSAGE, (HOOKPROC)getMessageProc,
+		     g.m_hInstDLL, 0);
+  g_hookData->m_hHookCallWndProc =
+    SetWindowsHookEx(WH_CALLWNDPROC, (HOOKPROC)callWndProc, g.m_hInstDLL, 0);
   return 0;
 }
 
@@ -397,11 +405,11 @@ DllExport int installHooks()
 /// uninstall hooks
 DllExport int uninstallHooks()
 {
-  if (hookData->hhook[0])
-    UnhookWindowsHookEx(hookData->hhook[0]);
-  hookData->hhook[0] = NULL;
-  if (hookData->hhook[1])
-    UnhookWindowsHookEx(hookData->hhook[1]);
-  hookData->hhook[1] = NULL;
+  if (g_hookData->m_hHookGetMessage)
+    UnhookWindowsHookEx(g_hookData->m_hHookGetMessage);
+  g_hookData->m_hHookGetMessage = NULL;
+  if (g_hookData->m_hHookCallWndProc)
+    UnhookWindowsHookEx(g_hookData->m_hHookCallWndProc);
+  g_hookData->m_hHookCallWndProc = NULL;
   return 0;
 }

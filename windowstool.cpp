@@ -15,7 +15,7 @@
 
 
 // instance handle of this application
-HINSTANCE hInst = NULL;
+HINSTANCE g_hInst = NULL;
 
 
 // ////////////////////////////////////////////////////////////////////////////
@@ -23,10 +23,10 @@ HINSTANCE hInst = NULL;
 
 
 // load resource string
-std::string loadString(UINT id)
+std::string loadString(UINT i_id)
 {
   char buf[1024];
-  if (LoadString(hInst, id, buf, sizeof(buf)))
+  if (LoadString(g_hInst, i_id, buf, sizeof(buf)))
     return std::string(buf);
   else
     return "";
@@ -34,132 +34,138 @@ std::string loadString(UINT id)
 
 
 // load small icon resource
-HICON loadSmallIcon(UINT id)
+HICON loadSmallIcon(UINT i_id)
 {
-  return (HICON)LoadImage(hInst, MAKEINTRESOURCE(id), IMAGE_ICON, 16, 16, 0);
+  return reinterpret_cast<HICON>(
+    LoadImage(g_hInst, MAKEINTRESOURCE(i_id), IMAGE_ICON, 16, 16, 0));
 }
 
 
 // load big icon resource
-HICON loadBigIcon(UINT id)
+HICON loadBigIcon(UINT i_id)
 {
-  return (HICON)LoadImage(hInst, MAKEINTRESOURCE(id), IMAGE_ICON, 32, 32, 0);
+  return reinterpret_cast<HICON>(
+    LoadImage(g_hInst, MAKEINTRESOURCE(i_id), IMAGE_ICON, 32, 32, 0));
 }
 
 
 // set small icon to the specified window.
 //  @return handle of previous icon or NULL
-HICON setSmallIcon(HWND hwnd, UINT id)
+HICON setSmallIcon(HWND i_hwnd, UINT i_id)
 {
-  HICON hicon = (id == (UINT)-1) ? NULL : loadSmallIcon(id);
-  return (HICON)SendMessage(hwnd, WM_SETICON,(WPARAM)ICON_SMALL,(LPARAM)hicon);
+  HICON hicon = (i_id == static_cast<UINT>(-1)) ? NULL : loadSmallIcon(i_id);
+  return reinterpret_cast<HICON>(
+    SendMessage(i_hwnd, WM_SETICON, static_cast<WPARAM>(ICON_SMALL),
+		reinterpret_cast<LPARAM>(hicon)));
 }
 
 
 // set big icon to the specified window.
 // @return handle of previous icon or NULL
-HICON setBigIcon(HWND hwnd, UINT id)
+HICON setBigIcon(HWND i_hwnd, UINT i_id)
 {
-  HICON hicon = (id == (UINT)-1) ? NULL : loadBigIcon(id);
-  return (HICON)SendMessage(hwnd, WM_SETICON, (WPARAM)ICON_BIG, (LPARAM)hicon);
+  HICON hicon = (i_id == static_cast<UINT>(-1)) ? NULL : loadBigIcon(i_id);
+  return reinterpret_cast<HICON>(
+    SendMessage(i_hwnd, WM_SETICON, static_cast<WPARAM>(ICON_BIG),
+		reinterpret_cast<LPARAM>(hicon)));
 }
 
 
 // remove icon from a window that is set by setSmallIcon
-void unsetSmallIcon(HWND hwnd)
+void unsetSmallIcon(HWND i_hwnd)
 {
-  HICON hicon = setSmallIcon(hwnd, -1);
+  HICON hicon = setSmallIcon(i_hwnd, -1);
   if (hicon)
     CHECK_TRUE( DestroyIcon(hicon) );
 }
 
 
 // remove icon from a window that is set by setBigIcon
-void unsetBigIcon(HWND hwnd)
+void unsetBigIcon(HWND i_hwnd)
 {
-  HICON hicon = setBigIcon(hwnd, -1);
+  HICON hicon = setBigIcon(i_hwnd, -1);
   if (hicon)
     CHECK_TRUE( DestroyIcon(hicon) );
 }
 
 
 // resize the window (it does not move the window)
-bool resizeWindow(HWND hwnd, int w, int h, bool doRepaint)
+bool resizeWindow(HWND i_hwnd, int i_w, int i_h, bool i_doRepaint)
 {
   UINT flag = SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER;
-  if (!doRepaint)
+  if (!i_doRepaint)
     flag |= SWP_NOREDRAW;
-  return !!SetWindowPos(hwnd, NULL, 0, 0, w, h, flag);
+  return !!SetWindowPos(i_hwnd, NULL, 0, 0, i_w, i_h, flag);
 }
 
 
 // get rect of the window in client coordinates
 // @return rect of the window in client coordinates
-bool getChildWindowRect(HWND hwnd, RECT *rc)
+bool getChildWindowRect(HWND i_hwnd, RECT *o_rc)
 {
-  if (!GetWindowRect(hwnd, rc))
+  if (!GetWindowRect(i_hwnd, o_rc))
     return false;
-  POINT p = { rc->left, rc->top };
-  HWND phwnd = GetParent(hwnd);
+  POINT p = { o_rc->left, o_rc->top };
+  HWND phwnd = GetParent(i_hwnd);
   if (!phwnd)
     return false;
   if (!ScreenToClient(phwnd, &p))
     return false;
-  rc->left = p.x;
-  rc->top = p.y;
-  p.x = rc->right;
-  p.y = rc->bottom;
+  o_rc->left = p.x;
+  o_rc->top = p.y;
+  p.x = o_rc->right;
+  p.y = o_rc->bottom;
   ScreenToClient(phwnd, &p);
-  rc->right = p.x;
-  rc->bottom = p.y;
+  o_rc->right = p.x;
+  o_rc->bottom = p.y;
   return true;
 }
 
 
 /// get toplevel (non-child) window
-HWND getToplevelWindow(HWND hwnd, bool *isMDI)
+HWND getToplevelWindow(HWND i_hwnd, bool *io_isMDI)
 {
-  while (hwnd)
+  while (i_hwnd)
   {
-    LONG style = GetWindowLong(hwnd, GWL_STYLE);
+    LONG style = GetWindowLong(i_hwnd, GWL_STYLE);
     if ((style & WS_CHILD) == 0)
       break;
-    if (isMDI && *isMDI)
+    if (io_isMDI && *io_isMDI)
     {
-      LONG exStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+      LONG exStyle = GetWindowLong(i_hwnd, GWL_EXSTYLE);
       if (exStyle & WS_EX_MDICHILD)
-	return hwnd;
+	return i_hwnd;
     }
-    hwnd = GetParent(hwnd);
+    i_hwnd = GetParent(i_hwnd);
   }
-  if (isMDI)
-    *isMDI = false;
-  return hwnd;
+  if (io_isMDI)
+    *io_isMDI = false;
+  return i_hwnd;
 }
 
 
 /// move window asynchronously
-void asyncMoveWindow(HWND hwnd, int x, int y)
+void asyncMoveWindow(HWND i_hwnd, int i_x, int i_y)
 {
-  SetWindowPos(hwnd, NULL, x, y, 0, 0,
+  SetWindowPos(i_hwnd, NULL, i_x, i_y, 0, 0,
 	       SWP_ASYNCWINDOWPOS | SWP_NOACTIVATE | SWP_NOOWNERZORDER |
 	       SWP_NOSIZE | SWP_NOZORDER);
 }
 
 
 /// move window asynchronously
-void asyncMoveWindow(HWND hwnd, int x, int y, int w, int h)
+void asyncMoveWindow(HWND i_hwnd, int i_x, int i_y, int i_w, int i_h)
 {
-  SetWindowPos(hwnd, NULL, x, y, w, h,
+  SetWindowPos(i_hwnd, NULL, i_x, i_y, i_w, i_h,
 	       SWP_ASYNCWINDOWPOS | SWP_NOACTIVATE | SWP_NOOWNERZORDER |
 	       SWP_NOZORDER);
 }
 
 
 /// resize asynchronously
-void asyncResize(HWND hwnd, int w, int h)
+void asyncResize(HWND i_hwnd, int i_w, int i_h)
 {
-  SetWindowPos(hwnd, NULL, 0, 0, w, h,
+  SetWindowPos(i_hwnd, NULL, 0, 0, i_w, i_h,
 	       SWP_ASYNCWINDOWPOS | SWP_NOACTIVATE | SWP_NOOWNERZORDER |
 	       SWP_NOMOVE | SWP_NOZORDER);
 }
@@ -201,49 +207,49 @@ DWORD getDllVersion(const char *i_dllname)
 
 // get edit control's text size
 // @return bytes of text
-size_t editGetTextBytes(HWND hwnd)
+size_t editGetTextBytes(HWND i_hwnd)
 {
-  return Edit_GetTextLength(hwnd);
+  return Edit_GetTextLength(i_hwnd);
 }
 
 
 // delete a line
-void editDeleteLine(HWND hwnd, size_t n)
+void editDeleteLine(HWND i_hwnd, size_t i_n)
 {
-  int len = Edit_LineLength(hwnd, n);
+  int len = Edit_LineLength(i_hwnd, i_n);
   if (len < 0)
     return;
   len += 2;
-  int index = Edit_LineIndex(hwnd, n);
-  Edit_SetSel(hwnd, index, index + len);
-  Edit_ReplaceSel(hwnd, "");
+  int index = Edit_LineIndex(i_hwnd, i_n);
+  Edit_SetSel(i_hwnd, index, index + len);
+  Edit_ReplaceSel(i_hwnd, "");
 }
   
 
 // insert text at last
-void editInsertTextAtLast(HWND hwnd, const std::string &text,
-			  size_t threshold)
+void editInsertTextAtLast(HWND i_hwnd, const std::string &i_text,
+			  size_t i_threshold)
 {
-  if (text.empty())
+  if (i_text.empty())
     return;
   
-  size_t len = editGetTextBytes(hwnd);
+  size_t len = editGetTextBytes(i_hwnd);
   
-  if (threshold < len)
+  if (i_threshold < len)
   {
-    Edit_SetSel(hwnd, 0, len / 3 * 2);
-    Edit_ReplaceSel(hwnd, "");
-    editDeleteLine(hwnd, 0);
-    len = editGetTextBytes(hwnd);
+    Edit_SetSel(i_hwnd, 0, len / 3 * 2);
+    Edit_ReplaceSel(i_hwnd, "");
+    editDeleteLine(i_hwnd, 0);
+    len = editGetTextBytes(i_hwnd);
   }
   
-  Edit_SetSel(hwnd, len, len);
+  Edit_SetSel(i_hwnd, len, len);
   
   // \n -> \r\n
-  char *buf = (char *)_alloca(text.size() * 2 + 1);
+  char *buf = (char *)_alloca(i_text.size() * 2 + 1);
   char *d = buf;
-  const char *str = text.c_str();
-  for (const char *s = str; s < str + text.size(); s++)
+  const char *str = i_text.c_str();
+  for (const char *s = str; s < str + i_text.size(); ++ s)
   {
     if (*s == '\n')
       *d++ = '\r';
@@ -251,5 +257,5 @@ void editInsertTextAtLast(HWND hwnd, const std::string &text,
   }
   *d = '\0';
   
-  Edit_ReplaceSel(hwnd, buf);
+  Edit_ReplaceSel(i_hwnd, buf);
 }

@@ -15,6 +15,13 @@ typedef unsigned char u_char;		/// unsigned char
 typedef unsigned short u_short;		/// unsigned short
 typedef unsigned long u_long;		/// unsigned long
 
+typedef char int8;
+typedef short int16;
+typedef long int32;
+typedef unsigned char u_int8;
+typedef unsigned short u_int16;
+typedef unsigned long u_int32;
+
 #  ifdef NDEBUG
 #    define ASSERT(exp)		exp
 #    define CHECK(cond, exp)	exp

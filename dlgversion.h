@@ -1,15 +1,15 @@
 // ////////////////////////////////////////////////////////////////////////////
 // dlgversion.h
 
-#ifndef __dlgversion_h__
-#define __dlgversion_h__
 
+#ifndef _DLGVERSION_H
+#  define _DLGVERSION_H
 
-#include <windows.h>
-
+#  include <windows.h>
 
 ///
-BOOL CALLBACK dlgVersion_dlgProc(HWND hwnd, UINT message,
-				 WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK dlgVersion_dlgProc(
+  HWND i_hwnd, UINT i_message, WPARAM i_wParam, LPARAM i_lParam);
 
-#endif __dlgversion_h__
+
+#endif // _DLGVERSION_H

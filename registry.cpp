@@ -12,25 +12,26 @@ using namespace std;
 
 
 // remove
-bool Registry::remove(HKEY root, const string &path, const string &name)
+bool Registry::remove(HKEY i_root, const string &i_path, const string &i_name)
 {
-  if (name.empty())
-    return RegDeleteKey(root, path.c_str()) == ERROR_SUCCESS;
+  if (i_name.empty())
+    return RegDeleteKey(i_root, i_path.c_str()) == ERROR_SUCCESS;
   HKEY hkey;
   if (ERROR_SUCCESS !=
-      RegOpenKeyEx(root, path.c_str(), 0, KEY_SET_VALUE, &hkey))
+      RegOpenKeyEx(i_root, i_path.c_str(), 0, KEY_SET_VALUE, &hkey))
     return false;
-  LONG r = RegDeleteValue(hkey, name.c_str());
+  LONG r = RegDeleteValue(hkey, i_name.c_str());
   RegCloseKey(hkey);
   return r == ERROR_SUCCESS;
 }
 
 
 // does exist the key ?
-bool Registry::doesExist(HKEY root, const string &path)
+bool Registry::doesExist(HKEY i_root, const string &i_path)
 {
   HKEY hkey;
-  if (ERROR_SUCCESS != RegOpenKeyEx(root, path.c_str(), 0, KEY_READ, &hkey))
+  if (ERROR_SUCCESS !=
+      RegOpenKeyEx(i_root, i_path.c_str(), 0, KEY_READ, &hkey))
     return false;
   RegCloseKey(hkey);
   return true;
@@ -38,181 +39,186 @@ bool Registry::doesExist(HKEY root, const string &path)
 
 
 // read DWORD
-bool Registry::read(HKEY root, const string &path,
-		    const string &name, int *value_r, int default_value)
+bool Registry::read(HKEY i_root, const string &i_path,
+		    const string &i_name, int *o_value, int i_defaultValue)
 {
   HKEY hkey;
-  if (ERROR_SUCCESS == RegOpenKeyEx(root, path.c_str(), 0, KEY_READ, &hkey))
+  if (ERROR_SUCCESS ==
+      RegOpenKeyEx(i_root, i_path.c_str(), 0, KEY_READ, &hkey))
   {
     DWORD type = REG_DWORD;
-    DWORD size = sizeof(*value_r);
-    LONG r = RegQueryValueEx(hkey, name.c_str(), NULL,
-			     &type, (BYTE *)value_r, &size);
+    DWORD size = sizeof(*o_value);
+    LONG r = RegQueryValueEx(hkey, i_name.c_str(), NULL,
+			     &type, (BYTE *)o_value, &size);
     RegCloseKey(hkey);
     if (r == ERROR_SUCCESS)
       return true;
   }
-  *value_r = default_value;
+  *o_value = i_defaultValue;
   return false;
 }
 
 
 // write DWORD
-bool Registry::write(HKEY root, const string &path, const string &name,
-		     int value)
+bool Registry::write(HKEY i_root, const string &i_path, const string &i_name,
+		     int i_value)
 {
   HKEY hkey;
   DWORD disposition;
   if (ERROR_SUCCESS !=
-      RegCreateKeyEx(root, path.c_str(), 0, "REG_SZ", REG_OPTION_NON_VOLATILE,
+      RegCreateKeyEx(i_root, i_path.c_str(), 0, "REG_SZ",
+		     REG_OPTION_NON_VOLATILE,
 		     KEY_ALL_ACCESS, NULL, &hkey, &disposition))
     return false;
-  LONG r = RegSetValueEx(hkey, name.c_str(), NULL, REG_DWORD,
-			 (BYTE *)&value, sizeof(value));
+  LONG r = RegSetValueEx(hkey, i_name.c_str(), NULL, REG_DWORD,
+			 (BYTE *)&i_value, sizeof(i_value));
   RegCloseKey(hkey);
   return r == ERROR_SUCCESS;
 }
 
 
 // read string
-bool Registry::read(HKEY root, const string &path, const string &name,
-		    string *value_r, const string &default_value)
+bool Registry::read(HKEY i_root, const string &i_path, const string &i_name,
+		    string *o_value, const string &i_defaultValue)
 {
   HKEY hkey;
-  if (ERROR_SUCCESS == RegOpenKeyEx(root, path.c_str(), 0, KEY_READ, &hkey))
+  if (ERROR_SUCCESS ==
+      RegOpenKeyEx(i_root, i_path.c_str(), 0, KEY_READ, &hkey))
   {
     DWORD type = REG_SZ;
     DWORD size = 0;
     BYTE dummy;
     if (ERROR_MORE_DATA ==
-	RegQueryValueEx(hkey, name.c_str(), NULL, &type, &dummy, &size))
+	RegQueryValueEx(hkey, i_name.c_str(), NULL, &type, &dummy, &size))
     {
       BYTE *buf = (BYTE *)_alloca(size);
       if (ERROR_SUCCESS ==
-	  RegQueryValueEx(hkey, name.c_str(), NULL, &type, buf, &size))
+	  RegQueryValueEx(hkey, i_name.c_str(), NULL, &type, buf, &size))
       {
-	*value_r = (char *)buf;
+	*o_value = (char *)buf;
 	RegCloseKey(hkey);
 	return true;
       }
     }
     RegCloseKey(hkey);
   }
-  if (!default_value.empty())
-    *value_r = default_value;
+  if (!i_defaultValue.empty())
+    *o_value = i_defaultValue;
   return false;
 }
 
 
 // write string
-bool Registry::write(HKEY root, const string &path,
-		     const string &name, const string &value)
+bool Registry::write(HKEY i_root, const string &i_path,
+		     const string &i_name, const string &i_value)
 {
   HKEY hkey;
   DWORD disposition;
   if (ERROR_SUCCESS !=
-      RegCreateKeyEx(root, path.c_str(), 0, "REG_SZ", REG_OPTION_NON_VOLATILE,
+      RegCreateKeyEx(i_root, i_path.c_str(), 0, "REG_SZ",
+		     REG_OPTION_NON_VOLATILE,
 		     KEY_ALL_ACCESS, NULL, &hkey, &disposition))
     return false;
-  RegSetValueEx(hkey, name.c_str(), NULL, REG_SZ,
-		(BYTE *)value.c_str(), value.size() + 1);
+  RegSetValueEx(hkey, i_name.c_str(), NULL, REG_SZ,
+		(BYTE *)i_value.c_str(), i_value.size() + 1);
   RegCloseKey(hkey);
   return true;
 }
 
 
 // read binary
-bool Registry::read(HKEY root, const string &path,
-		    const string &name, BYTE *value_r, DWORD sizeof_value_r,
-		    const BYTE *default_value, DWORD sizeof_default_value)
+bool Registry::read(HKEY i_root, const string &i_path,
+		    const string &i_name, BYTE *o_value, DWORD i_valueSize,
+		    const BYTE *i_defaultValue, DWORD i_defaultValueSize)
 {
-  if (value_r && 0 < sizeof_value_r)
+  if (o_value && 0 < i_valueSize)
   {
     HKEY hkey;
-    if (ERROR_SUCCESS == RegOpenKeyEx(root, path.c_str(), 0, KEY_READ, &hkey))
+    if (ERROR_SUCCESS ==
+	RegOpenKeyEx(i_root, i_path.c_str(), 0, KEY_READ, &hkey))
     {
       DWORD type = REG_BINARY;
-      LONG r = RegQueryValueEx(hkey, name.c_str(), NULL, &type,
-			       (BYTE *)value_r, &sizeof_value_r);
+      LONG r = RegQueryValueEx(hkey, i_name.c_str(), NULL, &type,
+			       (BYTE *)o_value, &i_valueSize);
       RegCloseKey(hkey);
       if (r == ERROR_SUCCESS)
 	return true;
     }
   }
-  if (default_value)
-    CopyMemory(value_r, default_value,
-	       min(sizeof_default_value, sizeof_value_r));
+  if (i_defaultValue)
+    CopyMemory(o_value, i_defaultValue,
+	       min(i_defaultValueSize, i_valueSize));
   return false;
 }
 
 
 // write binary
-bool Registry::write(HKEY root, const string &path, const string &name,
-		     const BYTE *value, DWORD sizeof_value)
+bool Registry::write(HKEY i_root, const string &i_path, const string &i_name,
+		     const BYTE *i_value, DWORD i_valueSize)
 {
-  if (!value)
+  if (!i_value)
     return false;
   HKEY hkey;
   DWORD disposition;
   if (ERROR_SUCCESS !=
-      RegCreateKeyEx(root, path.c_str(), 0, "REG_BINARY",
+      RegCreateKeyEx(i_root, i_path.c_str(), 0, "REG_BINARY",
 		     REG_OPTION_NON_VOLATILE,
 		     KEY_ALL_ACCESS, NULL, &hkey, &disposition))
     return false;
-  RegSetValueEx(hkey, name.c_str(), NULL, REG_BINARY, value, sizeof_value);
+  RegSetValueEx(hkey, i_name.c_str(), NULL, REG_BINARY, i_value, i_valueSize);
   RegCloseKey(hkey);
   return true;
 }
 
 
 ///
-static bool string2logfont(LOGFONT *lf, const string &strlf)
+static bool string2logfont(LOGFONT *o_lf, const string &i_strlf)
 {
-  char *p = (char *)_alloca(strlf.size() + 1);
-  strcpy(p, strlf.c_str());
+  char *p = (char *)_alloca(i_strlf.size() + 1);
+  strcpy(p, i_strlf.c_str());
   
   if (!(p = StringTool::mbstok_(p   , ","))) return false;
-  lf->lfHeight         =       atoi(p);
+  o_lf->lfHeight         =       atoi(p);
   if (!(p = StringTool::mbstok_(NULL, ","))) return false;
-  lf->lfWidth          =       atoi(p);
+  o_lf->lfWidth          =       atoi(p);
   if (!(p = StringTool::mbstok_(NULL, ","))) return false;
-  lf->lfEscapement     =       atoi(p);
+  o_lf->lfEscapement     =       atoi(p);
   if (!(p = StringTool::mbstok_(NULL, ","))) return false;
-  lf->lfOrientation    =       atoi(p);
+  o_lf->lfOrientation    =       atoi(p);
   if (!(p = StringTool::mbstok_(NULL, ","))) return false;
-  lf->lfWeight         =       atoi(p);
+  o_lf->lfWeight         =       atoi(p);
   if (!(p = StringTool::mbstok_(NULL, ","))) return false;
-  lf->lfItalic         = (BYTE)atoi(p);
+  o_lf->lfItalic         = (BYTE)atoi(p);
   if (!(p = StringTool::mbstok_(NULL, ","))) return false;
-  lf->lfUnderline      = (BYTE)atoi(p);
+  o_lf->lfUnderline      = (BYTE)atoi(p);
   if (!(p = StringTool::mbstok_(NULL, ","))) return false;
-  lf->lfStrikeOut      = (BYTE)atoi(p);
+  o_lf->lfStrikeOut      = (BYTE)atoi(p);
   if (!(p = StringTool::mbstok_(NULL, ","))) return false;
-  lf->lfCharSet        = (BYTE)atoi(p);
+  o_lf->lfCharSet        = (BYTE)atoi(p);
   if (!(p = StringTool::mbstok_(NULL, ","))) return false;
-  lf->lfOutPrecision   = (BYTE)atoi(p);
+  o_lf->lfOutPrecision   = (BYTE)atoi(p);
   if (!(p = StringTool::mbstok_(NULL, ","))) return false;
-  lf->lfClipPrecision  = (BYTE)atoi(p);
+  o_lf->lfClipPrecision  = (BYTE)atoi(p);
   if (!(p = StringTool::mbstok_(NULL, ","))) return false;
-  lf->lfQuality        = (BYTE)atoi(p);
+  o_lf->lfQuality        = (BYTE)atoi(p);
   if (!(p = StringTool::mbstok_(NULL, ","))) return false;
-  lf->lfPitchAndFamily = (BYTE)atoi(p);
+  o_lf->lfPitchAndFamily = (BYTE)atoi(p);
   if (!(p = StringTool::mbstok_(NULL, ","))) return false;
-  strncpy(lf->lfFaceName, p, sizeof(lf->lfFaceName));
-  lf->lfFaceName[NUMBER_OF(lf->lfFaceName) - 1] = '\0';
+  strncpy(o_lf->lfFaceName, p, sizeof(o_lf->lfFaceName));
+  o_lf->lfFaceName[NUMBER_OF(o_lf->lfFaceName) - 1] = '\0';
   return true;
 }
 
 
 // read LOGFONT
-bool Registry::read(HKEY root, const string &path, const string &name,
-		    LOGFONT *value_r, const string &default_string_value)
+bool Registry::read(HKEY i_root, const string &i_path, const string &i_name,
+		    LOGFONT *o_value, const string &i_defaultStringValue)
 {
   string buf;
-  if (!read(root, path, name, &buf) || !string2logfont(value_r, buf))
+  if (!read(i_root, i_path, i_name, &buf) || !string2logfont(o_value, buf))
   {
-    if (!default_string_value.empty())
-      string2logfont(value_r, default_string_value);
+    if (!i_defaultStringValue.empty())
+      string2logfont(o_value, i_defaultStringValue);
     return false;
   }
   return true;
@@ -220,15 +226,15 @@ bool Registry::read(HKEY root, const string &path, const string &name,
 
 
 // write LOGFONT
-bool Registry::write(HKEY root, const string &path, const string &name,
-		     const LOGFONT &value)
+bool Registry::write(HKEY i_root, const string &i_path, const string &i_name,
+		     const LOGFONT &i_value)
 {
   char buf[1024];
   _snprintf(buf, NUMBER_OF(buf), "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%s",
-	    value.lfHeight, value.lfWidth, value.lfEscapement,
-	    value.lfOrientation, value.lfWeight, value.lfItalic,
-	    value.lfUnderline, value.lfStrikeOut, value.lfCharSet,
-	    value.lfOutPrecision, value.lfClipPrecision, value.lfQuality,
-	    value.lfPitchAndFamily, value.lfFaceName);
-  return Registry::write(root, path, name, buf);
+	    i_value.lfHeight, i_value.lfWidth, i_value.lfEscapement,
+	    i_value.lfOrientation, i_value.lfWeight, i_value.lfItalic,
+	    i_value.lfUnderline, i_value.lfStrikeOut, i_value.lfCharSet,
+	    i_value.lfOutPrecision, i_value.lfClipPrecision, i_value.lfQuality,
+	    i_value.lfPitchAndFamily, i_value.lfFaceName);
+  return Registry::write(i_root, i_path, i_name, buf);
 }

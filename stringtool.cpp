@@ -24,45 +24,45 @@ char *StringTool::mbsfill(char *o_dest,  const char *i_src, size_t i_destSize)
 }
 
 
-std::string StringTool::interpretMetaCharacters(const char *str, size_t len,
-						const char *quote)
+std::string StringTool::interpretMetaCharacters(
+  const char *i_str, size_t i_len, const char *i_quote)
 {
-  char *result = (char *)_alloca(len + 1);
+  char *result = (char *)_alloca(i_len + 1);
   char *d = result;
-  const char *end = str + len;
+  const char *end = i_str + i_len;
   
-  while (str < end && *str)
+  while (i_str < end && *i_str)
   {
-    if (*str != '\\')
+    if (*i_str != '\\')
     {
-      if (_ismbblead(*str) && *(str + 1) && str + 1 < end)
-	*d++ = *str++;
-      *d++ = *str++;
+      if (_ismbblead(*i_str) && *(i_str + 1) && i_str + 1 < end)
+	*d++ = *i_str++;
+      *d++ = *i_str++;
     }
-    else if (*(str + 1) != '\0')
+    else if (*(i_str + 1) != '\0')
     {
-      str ++;
-      if (quote && strchr(quote, *str))
-	*d++ = *str++;
+      i_str ++;
+      if (i_quote && strchr(i_quote, *i_str))
+	*d++ = *i_str++;
       else
-	switch (*str)
+	switch (*i_str)
 	{
-	  case 'a': *d++ = '\x07'; str ++; break;
-	    //case 'b': *d++ = '\b'; str ++; break;
-	  case 'e': *d++ = '\x1b'; str ++; break;
-	  case 'f': *d++ = '\f'; str ++; break;
-	  case 'n': *d++ = '\n'; str ++; break;
-	  case 'r': *d++ = '\r'; str ++; break;
-	  case 't': *d++ = '\t'; str ++; break;
-	    //case 'v': *d++ = '\v'; str ++; break;
-	    //case '?': *d++ = '\x7f'; str ++; break;
-	    //case '_': *d++ = ' '; str ++; break;
-	  case '\\': *d++ = '\\'; str ++; break;
-	  case '\'': *d++ = '\''; str ++; break;
-	  case '"': *d++ = '"'; str ++; break;
+	  case 'a': *d++ = '\x07'; i_str ++; break;
+	    //case 'b': *d++ = '\b'; i_str ++; break;
+	  case 'e': *d++ = '\x1b'; i_str ++; break;
+	  case 'f': *d++ = '\f'; i_str ++; break;
+	  case 'n': *d++ = '\n'; i_str ++; break;
+	  case 'r': *d++ = '\r'; i_str ++; break;
+	  case 't': *d++ = '\t'; i_str ++; break;
+	    //case 'v': *d++ = '\v'; i_str ++; break;
+	    //case '?': *d++ = '\x7f'; i_str ++; break;
+	    //case '_': *d++ = ' '; i_str ++; break;
+	  case '\\': *d++ = '\\'; i_str ++; break;
+	  case '\'': *d++ = '\''; i_str ++; break;
+	  case '"': *d++ = '"'; i_str ++; break;
 	  case 'c': // control code, for example '\c[' is escape: '\x1b'
-	    str ++;
-	    if (str < end && *str)
+	    i_str ++;
+	    if (i_str < end && *i_str)
 	    {
 	      static const char *ctrlchar =
 		"@ABCDEFGHIJKLMNO"
@@ -74,21 +74,21 @@ std::string StringTool::interpretMetaCharacters(const char *str, size_t len,
 		"\20\21\22\23\24\25\26\27\30\31\32\33\34\35\36\37"
 		"\00\01\02\03\04\05\06\07\10\11\12\13\14\15\16\17"
 		"\20\21\22\23\24\25\26\27\30\31\32\00\00\00\00\177";
-	      if (const char *c = strchr(ctrlchar, *str))
-		*d++ = ctrlcode[c - ctrlchar], str ++;
+	      if (const char *c = strchr(ctrlchar, *i_str))
+		*d++ = ctrlcode[c - ctrlchar], i_str ++;
 	    }
 	    break;
 	  case 'x': case 'X':
 	  {
-	    str ++;
+	    i_str ++;
 	    static const char *hexchar = "0123456789ABCDEFabcdef";
 	    static int hexvalue[] = { 0, 1, 2, 3, 4, 5 ,6, 7, 8, 9,
 				      10, 11, 12, 13, 14, 15,
 				      10, 11, 12, 13, 14, 15, };
 	    int n = 0;
-	    for (const char *e = min(end, str + 2);
-		 str < e && *str; str ++)
-	      if (const char *c = strchr(hexchar, *str))
+	    for (const char *e = min(end, i_str + 2);
+		 i_str < e && *i_str; i_str ++)
+	      if (const char *c = strchr(hexchar, *i_str))
 		n = n * 16 + hexvalue[c - hexchar];
 	      else
 		break;
@@ -102,9 +102,9 @@ std::string StringTool::interpretMetaCharacters(const char *str, size_t len,
 	    static const char *octalchar = "01234567";
 	    static int octalvalue[] = { 0, 1, 2, 3, 4, 5 ,6, 7, };
 	    int n = 0;
-	    for (const char *e = min(end, str + 3);
-		 str < e && *str; str ++)
-	      if (const char *c = strchr(octalchar, *str))
+	    for (const char *e = min(end, i_str + 3);
+		 i_str < e && *i_str; i_str ++)
+	      if (const char *c = strchr(octalchar, *i_str))
 		n = n * 8 + octalvalue[c - octalchar];
 	      else
 		break;
@@ -114,9 +114,9 @@ std::string StringTool::interpretMetaCharacters(const char *str, size_t len,
 	  }
 	  default:
 	    *d++ = '\\';
-	    if (_ismbblead(*str) && *(str + 1) && str + 1 < end)
-	      *d++ = *str++;
-	    *d++ = *str++;
+	    if (_ismbblead(*i_str) && *(i_str + 1) && i_str + 1 < end)
+	      *d++ = *i_str++;
+	    *d++ = *i_str++;
 	    break;
 	}
     }
@@ -127,24 +127,24 @@ std::string StringTool::interpretMetaCharacters(const char *str, size_t len,
 
 
 // converter
-std::wstring StringTool::cast_wstring(const std::string &text)
+std::wstring StringTool::cast_wstring(const std::string &i_text)
 {
-  size_t size = ::mbstowcs(NULL, text.c_str(), text.size() + 1);
+  size_t size = ::mbstowcs(NULL, i_text.c_str(), i_text.size() + 1);
   if (size == (size_t)-1)
     return std::wstring();
   wchar_t *w_text = (wchar_t *)_alloca((size + 1) * sizeof(wchar_t));
-  ::mbstowcs(w_text, text.c_str(), text.size() + 1);
+  ::mbstowcs(w_text, i_text.c_str(), i_text.size() + 1);
   return std::wstring(w_text);
 }
 
 
 // converter
-std::string StringTool::cast_string(const std::wstring &w_text)
+std::string StringTool::cast_string(const std::wstring &i_wText)
 {
-  size_t size = ::wcstombs(NULL, w_text.c_str(), w_text.size() + 1);
+  size_t size = ::wcstombs(NULL, i_wText.c_str(), i_wText.size() + 1);
   if (size == (size_t)-1)
     return std::string();
   char *text = (char *)_alloca((size + 1) * sizeof(char));
-  ::wcstombs(text, w_text.c_str(), w_text.size() + 1);
+  ::wcstombs(text, i_wText.c_str(), i_wText.size() + 1);
   return std::string(text);
 }

@@ -32,59 +32,59 @@ void Engine::checkFocusWindow()
   if (hwndFore)
   {
     {
-      Acquire a(&cs);
-      if (currentFocusOfThread &&
-	  currentFocusOfThread->threadId == threadId &&
-	  currentFocusOfThread->hwndFocus == hwndFocus)
+      Acquire a(&m_cs);
+      if (m_currentFocusOfThread &&
+	  m_currentFocusOfThread->m_threadId == threadId &&
+	  m_currentFocusOfThread->m_hwndFocus == m_hwndFocus)
 	return;
 
-      emacsEditKillLine.reset();
+      m_emacsEditKillLine.reset();
       
       // erase dead thread
-      if (!detachedThreadIds.empty())
+      if (!m_detachedThreadIds.empty())
       {
-	for (DetachedThreadIds::iterator i = detachedThreadIds.begin();
-	     i != detachedThreadIds.end(); i ++)
+	for (DetachedThreadIds::iterator i = m_detachedThreadIds.begin();
+	     i != m_detachedThreadIds.end(); i ++)
 	{
-	  FocusOfThreads::iterator j = focusOfThreads.find((*i));
-	  if (j != focusOfThreads.end())
+	  FocusOfThreads::iterator j = m_focusOfThreads.find((*i));
+	  if (j != m_focusOfThreads.end())
 	  {
 	    FocusOfThread *fot = &((*j).second);
-	    Acquire a(&log, 1);
-	    log << "RemoveThread" << endl;
-	    log << "\tHWND:\t" << hex << (int)fot->hwndFocus
-		<< dec << endl;
-	    log << "\tTHREADID:" << fot->threadId << endl;
-	    log << "\tCLASS:\t" << fot->className << endl;
-	    log << "\tTITLE:\t" << fot->titleName << endl;
-	    log << endl;
-	    focusOfThreads.erase(j);
+	    Acquire a(&m_log, 1);
+	    m_log << "RemoveThread" << endl;
+	    m_log << "\tHWND:\t" << hex << (int)fot->m_hwndFocus
+		  << dec << endl;
+	    m_log << "\tTHREADID:" << fot->m_threadId << endl;
+	    m_log << "\tCLASS:\t" << fot->m_className << endl;
+	    m_log << "\tTITLE:\t" << fot->m_titleName << endl;
+	    m_log << endl;
+	    m_focusOfThreads.erase(j);
 	  }
 	}
-	detachedThreadIds.erase
-	  (detachedThreadIds.begin(), detachedThreadIds.end());
+	m_detachedThreadIds.erase
+	  (m_detachedThreadIds.begin(), m_detachedThreadIds.end());
       }
       
-      FocusOfThreads::iterator i = focusOfThreads.find(threadId);
-      if (i != focusOfThreads.end())
+      FocusOfThreads::iterator i = m_focusOfThreads.find(threadId);
+      if (i != m_focusOfThreads.end())
       {
-	currentFocusOfThread = &((*i).second);
-	if (!currentFocusOfThread->isConsole || 2 <= count)
+	m_currentFocusOfThread = &((*i).second);
+	if (!m_currentFocusOfThread->m_isConsole || 2 <= count)
 	{
-	  if (currentFocusOfThread->keymaps.empty())
-	    currentKeymap = NULL;
+	  if (m_currentFocusOfThread->m_keymaps.empty())
+	    m_currentKeymap = NULL;
 	  else
-	    currentKeymap = *currentFocusOfThread->keymaps.begin();
-	  hwndFocus = currentFocusOfThread->hwndFocus;
+	    m_currentKeymap = *m_currentFocusOfThread->m_keymaps.begin();
+	  m_hwndFocus = m_currentFocusOfThread->m_hwndFocus;
 	
-	  Acquire a(&log, 1);
-	  log << "FocusChanged" << endl;
-	  log << "\tHWND:\t" << hex << (int)currentFocusOfThread->hwndFocus
-	      << dec << endl;
-	  log << "\tTHREADID:" << currentFocusOfThread->threadId << endl;
-	  log << "\tCLASS:\t" << currentFocusOfThread->className << endl;
-	  log << "\tTITLE:\t" << currentFocusOfThread->titleName << endl;
-	  log << endl;
+	  Acquire a(&m_log, 1);
+	  m_log << "FocusChanged" << endl;
+	  m_log << "\tHWND:\t" << hex << (int)m_currentFocusOfThread->m_hwndFocus
+		<< dec << endl;
+	  m_log << "\tTHREADID:" << m_currentFocusOfThread->m_threadId << endl;
+	  m_log << "\tCLASS:\t" << m_currentFocusOfThread->m_className << endl;
+	  m_log << "\tTITLE:\t" << m_currentFocusOfThread->m_titleName << endl;
+	  m_log << endl;
 	  return;
 	}
       }
@@ -99,141 +99,142 @@ void Engine::checkFocusWindow()
 	if (GetWindowText(hwndFore, titleName, sizeof(titleName)) == 0)
 	  titleName[0] = '\0';
 	setFocus(hwndFore, threadId, className, titleName, true);
-	Acquire a(&log, 1);
-	log << "HWND:\t" << hex << (int)hwndFore << dec << endl;
-	log << "THREADID:" << threadId << endl;
-	log << "CLASS:\t" << className << endl;
-	log << "TITLE:\t" << titleName << endl << endl;
+	Acquire a(&m_log, 1);
+	m_log << "HWND:\t" << hex << (int)hwndFore << dec << endl;
+	m_log << "THREADID:" << threadId << endl;
+	m_log << "CLASS:\t" << className << endl;
+	m_log << "TITLE:\t" << titleName << endl << endl;
 	goto restart;
       }
     }
   }
   
-  Acquire a(&cs);
-  if (globalFocus.keymaps.empty())
+  Acquire a(&m_cs);
+  if (m_globalFocus.m_keymaps.empty())
   {
-    Acquire a(&log, 1);
-    log << "NO GLOBAL FOCUS" << endl;
-    currentFocusOfThread = NULL;
-    currentKeymap = NULL;
+    Acquire a(&m_log, 1);
+    m_log << "NO GLOBAL FOCUS" << endl;
+    m_currentFocusOfThread = NULL;
+    m_currentKeymap = NULL;
   }
   else
   {
-    Acquire a(&log, 1);
-    log << "GLOBAL FOCUS" << endl;
-    currentFocusOfThread = &globalFocus;
-    currentKeymap = globalFocus.keymaps.front();
+    Acquire a(&m_log, 1);
+    m_log << "GLOBAL FOCUS" << endl;
+    m_currentFocusOfThread = &m_globalFocus;
+    m_currentKeymap = m_globalFocus.m_keymaps.front();
   }
-  hwndFocus = NULL;
+  m_hwndFocus = NULL;
 }
 
 
 
 // is modifier pressed ?
-bool Engine::isPressed(Modifier::Type mt)
+bool Engine::isPressed(Modifier::Type i_mt)
 {
-  const Keymap::ModAssignments &ma = currentKeymap->getModAssignments(mt);
+  const Keymap::ModAssignments &ma = m_currentKeymap->getModAssignments(i_mt);
   for (Keymap::ModAssignments::const_iterator i = ma.begin();
-       i != ma.end(); i++)
-    if ((*i).key->isPressed)
+       i != ma.end(); ++ i)
+    if ((*i).m_key->m_isPressed)
       return true;
   return false;
 }
 
 
 // fix modifier key (if fixed, return true)
-bool Engine::fixModifierKey(ModifiedKey *mkey_r, Keymap::AssignMode *am_r)
+bool Engine::fixModifierKey(ModifiedKey *o_mkey, Keymap::AssignMode *o_am)
 {
-  for (int i = Modifier::begin; i != Modifier::end; i ++)
+  for (int i = Modifier::Type_begin; i != Modifier::Type_end; ++ i)
   {
     const Keymap::ModAssignments &ma =
-      currentKeymap->getModAssignments((Modifier::Type)i);
+      m_currentKeymap->getModAssignments(static_cast<Modifier::Type>(i));
     for (Keymap::ModAssignments::const_iterator j = ma.begin();
-	 j != ma.end(); j ++)
-      if (mkey_r->key == (*j).key)
+	 j != ma.end(); ++ j)
+      if (o_mkey->m_key == (*j).m_key)
       {
 	{
-	  Acquire a(&log, 1);
-	  log << "* Modifier Key" << endl;
+	  Acquire a(&m_log, 1);
+	  m_log << "* Modifier Key" << endl;
 	}
-	mkey_r->modifier.dontcare((Modifier::Type)i);
-	*am_r = (*j).assignMode;
+	o_mkey->m_modifier.dontcare(static_cast<Modifier::Type>(i));
+	*o_am = (*j).m_assignMode;
 	return true;
       }
   }
-  *am_r = Keymap::AMnotModifier;
+  *o_am = Keymap::AM_notModifier;
   return false;
 }
 
 
-// output to log
-void Engine::outputToLog(const Key *key, const ModifiedKey &mkey,
-			 int debugLevel)
+// output to m_log
+void Engine::outputToLog(const Key *i_key, const ModifiedKey &i_mkey,
+			 int i_debugLevel)
 {
   size_t i;
-  Acquire a(&log, debugLevel);
+  Acquire a(&m_log, i_debugLevel);
 
   // output scan codes
-  for (i = 0; i < key->getLengthof_scanCodes(); i++)
+  for (i = 0; i < i_key->getScanCodesSize(); ++ i)
   {
-    if (key->getScanCodes()[i].flags & ScanCode::E0) log << "E0-";
-    if (key->getScanCodes()[i].flags & ScanCode::E1) log << "E1-";
-    if (!(key->getScanCodes()[i].flags & ScanCode::E0E1)) log << "   ";
-    log << "0x" << hex << setw(2) << setfill('0')
-	<< (int)key->getScanCodes()[i].scan << dec << " ";
+    if (i_key->getScanCodes()[i].m_flags & ScanCode::E0) m_log << "E0-";
+    if (i_key->getScanCodes()[i].m_flags & ScanCode::E1) m_log << "E1-";
+    if (!(i_key->getScanCodes()[i].m_flags & ScanCode::E0E1)) m_log << "   ";
+    m_log << "0x" << hex << setw(2) << setfill('0')
+	  << static_cast<int>(i_key->getScanCodes()[i].m_scan) << dec << " ";
   }
   
-  if (!mkey.key) // key corresponds to no phisical key
+  if (!i_mkey.m_key) // key corresponds to no phisical key
   {
-    log << endl;
+    m_log << endl;
     return;
   }
   
-  log << "  " << mkey << endl;
+  m_log << "  " << i_mkey << endl;
 }
 
 
 // describe bindings
 void Engine::describeBindings()
 {
-  Acquire a(&log, 0);
+  Acquire a(&m_log, 0);
 
   Keymap::DescribedKeys dk;
   
-  for (std::list<Keymap *>::iterator i = currentFocusOfThread->keymaps.begin();
-       i != currentFocusOfThread->keymaps.end(); i ++)
-    (*i)->describe(log, &dk);
-  log << endl;
+  for (KeymapPtrList::iterator i = m_currentFocusOfThread->m_keymaps.begin();
+       i != m_currentFocusOfThread->m_keymaps.end(); i ++)
+    (*i)->describe(m_log, &dk);
+  m_log << endl;
 }
 
 
 // get current modifiers
-Modifier Engine::getCurrentModifiers(bool isPressed_)
+Modifier Engine::getCurrentModifiers(bool i_isPressed)
 {
   Modifier cmods;
-  cmods += currentLock;
+  cmods.add(m_currentLock);
 
-  cmods.press(Modifier::Shift  , isPressed(Modifier::Shift  ));
-  cmods.press(Modifier::Alt    , isPressed(Modifier::Alt    ));
-  cmods.press(Modifier::Control, isPressed(Modifier::Control));
-  cmods.press(Modifier::Windows, isPressed(Modifier::Windows));
-  cmods.press(Modifier::Up     , !isPressed_);
-  cmods.press(Modifier::Down   , isPressed_);
+  cmods.press(Modifier::Type_Shift  , isPressed(Modifier::Type_Shift  ));
+  cmods.press(Modifier::Type_Alt    , isPressed(Modifier::Type_Alt    ));
+  cmods.press(Modifier::Type_Control, isPressed(Modifier::Type_Control));
+  cmods.press(Modifier::Type_Windows, isPressed(Modifier::Type_Windows));
+  cmods.press(Modifier::Type_Up     , !i_isPressed);
+  cmods.press(Modifier::Type_Down   , i_isPressed);
 
-  for (int i = Modifier::Mod0; i <= Modifier::Mod9; i++)
-    cmods.press((Modifier::Type)i, isPressed((Modifier::Type)i));
+  for (int i = Modifier::Type_Mod0; i <= Modifier::Type_Mod9; ++ i)
+    cmods.press(static_cast<Modifier::Type>(i),
+		isPressed(static_cast<Modifier::Type>(i)));
   
   return cmods;
 }
 
 
 // generate keyboard event for a key
-void Engine::generateKeyEvent(Key *key, bool doPress, bool isByAssign)
+void Engine::generateKeyEvent(Key *i_key, bool i_doPress, bool i_isByAssign)
 {
   // check if key is event
   bool isEvent = false;
-  for (Key **e = Event::events; *e; e ++)
-    if (*e == key)
+  for (Key **e = Event::events; *e; ++ e)
+    if (*e == i_key)
     {
       isEvent = true;
       break;
@@ -241,38 +242,38 @@ void Engine::generateKeyEvent(Key *key, bool doPress, bool isByAssign)
 
   if (!isEvent)
   {
-    if (doPress &&!key->isPressedOnWin32)
-      currentKeyPressCountOnWin32 ++;
-    else if (!doPress && key->isPressedOnWin32)
-      currentKeyPressCountOnWin32 --;
-    key->isPressedOnWin32 = doPress;
+    if (i_doPress && !i_key->m_isPressedOnWin32)
+      ++ m_currentKeyPressCountOnWin32;
+    else if (!i_doPress && i_key->m_isPressedOnWin32)
+      -- m_currentKeyPressCountOnWin32;
+    i_key->m_isPressedOnWin32 = i_doPress;
     
-    if (isByAssign)
-      key->isPressedByAssign = doPress;
+    if (i_isByAssign)
+      i_key->m_isPressedByAssign = i_doPress;
     
     KEYBOARD_INPUT_DATA kid = { 0, 0, 0, 0, 0 };
-    const ScanCode *sc = key->getScanCodes();
-    for (size_t i = 0; i < key->getLengthof_scanCodes(); i++)
+    const ScanCode *sc = i_key->getScanCodes();
+    for (size_t i = 0; i < i_key->getScanCodesSize(); ++ i)
     {
-      kid.MakeCode = sc[i].scan;
-      kid.Flags = sc[i].flags;
-      if (!doPress)
+      kid.MakeCode = sc[i].m_scan;
+      kid.Flags = sc[i].m_flags;
+      if (!i_doPress)
 	kid.Flags |= KEYBOARD_INPUT_DATA::BREAK;
       DWORD len;
-      CHECK_TRUE( WriteFile(device, &kid, sizeof(kid), &len, NULL) );
+      CHECK_TRUE( WriteFile(m_device, &kid, sizeof(kid), &len, NULL) );
     }
     
-    lastPressedKey = doPress ? key : NULL;
+    m_lastPressedKey = i_doPress ? i_key : NULL;
   }
   
   {
-    Acquire a(&log, 1);
-    log << "\t\t    =>\t";
+    Acquire a(&m_log, 1);
+    m_log << "\t\t    =>\t";
   }
-  ModifiedKey mkey(key);
-  mkey.modifier.on(Modifier::Up, !doPress);
-  mkey.modifier.on(Modifier::Down, doPress);
-  outputToLog(key, mkey, 1);
+  ModifiedKey mkey(i_key);
+  mkey.m_modifier.on(Modifier::Type_Up, !i_doPress);
+  mkey.m_modifier.on(Modifier::Type_Down, i_doPress);
+  outputToLog(i_key, mkey, 1);
 }
 
 
@@ -280,45 +281,46 @@ void Engine::generateKeyEvent(Key *key, bool doPress, bool isByAssign)
 void Engine::generateEvents(Current i_c, Keymap *i_keymap, Key *i_event)
 {
   // generate
-  i_c.keymap = i_keymap;
-  i_c.mkey.key = i_event;
+  i_c.m_keymap = i_keymap;
+  i_c.m_mkey.m_key = i_event;
   if (const Keymap::KeyAssignment *keyAssign =
-      i_c.keymap->searchAssignment(i_c.mkey))
+      i_c.m_keymap->searchAssignment(i_c.m_mkey))
   {
     {
-      Acquire a(&log, 1);
-      log << endl << "           " << i_event->getName() << endl;
+      Acquire a(&m_log, 1);
+      m_log << endl << "           " << i_event->getName() << endl;
     }
-    generateKeySeqEvents(i_c, keyAssign->keySeq, PartAll);
+    generateKeySeqEvents(i_c, keyAssign->m_keySeq, Part_all);
   }
 }
 
 
 // genete modifier events
-void Engine::generateModifierEvents(const Modifier &mod)
+void Engine::generateModifierEvents(const Modifier &i_mod)
 {
   {
-    Acquire a(&log, 1);
-    log << "* Gen Modifiers\t{" << endl;
+    Acquire a(&m_log, 1);
+    m_log << "* Gen Modifiers\t{" << endl;
   }
 
-  for (int i = Modifier::begin; i < Modifier::BASIC; i++)
+  for (int i = Modifier::Type_begin; i < Modifier::Type_BASIC; ++ i)
   {
-    Keyboard::Mods &mods = setting->keyboard.getModifiers((Modifier::Type)i);
+    Keyboard::Mods &mods =
+      m_setting->m_keyboard.getModifiers(static_cast<Modifier::Type>(i));
 
-    if (mod.isDontcare((Modifier::Type)i))
+    if (i_mod.isDontcare(static_cast<Modifier::Type>(i)))
       // no need to process
-	;
-    else if (mod.isPressed((Modifier::Type)i))
+      ;
+    else if (i_mod.isPressed(static_cast<Modifier::Type>(i)))
       // we have to press this modifier
     {
       bool noneIsPressed = true;
       bool noneIsPressedByAssign = true;
-      for (Keyboard::Mods::iterator i = mods.begin(); i != mods.end(); i++)
+      for (Keyboard::Mods::iterator i = mods.begin(); i != mods.end(); ++ i)
       {
-	if ((*i)->isPressedOnWin32)
+	if ((*i)->m_isPressedOnWin32)
 	  noneIsPressed = false;
-	if ((*i)->isPressedByAssign)
+	if ((*i)->m_isPressedByAssign)
 	  noneIsPressedByAssign = false;
       }
       if (noneIsPressed)
@@ -326,8 +328,9 @@ void Engine::generateModifierEvents(const Modifier &mod)
 	if (noneIsPressedByAssign)
 	  generateKeyEvent(mods.front(), true, false);
 	else
-	  for (Keyboard::Mods::iterator i = mods.begin(); i != mods.end(); i++)
-	    if ((*i)->isPressedByAssign)
+	  for (Keyboard::Mods::iterator
+		 i = mods.begin(); i != mods.end(); ++ i)
+	    if ((*i)->m_isPressedByAssign)
 	      generateKeyEvent((*i), true, false);
       }
     }
@@ -336,15 +339,16 @@ void Engine::generateModifierEvents(const Modifier &mod)
       // we have to release this modifier
     {
       // avoid such sequences as  "Alt U-ALt" or "Windows U-Windows"
-      if (i == Modifier::Alt || i == Modifier::Windows)
+      if (i == Modifier::Type_Alt || i == Modifier::Type_Windows)
       {
-	for (Keyboard::Mods::iterator j = mods.begin(); j != mods.end(); j ++)
-	  if ((*j) == lastPressedKey)
+	for (Keyboard::Mods::iterator j = mods.begin(); j != mods.end(); ++ j)
+	  if ((*j) == m_lastPressedKey)
 	  {
 	    Keyboard::Mods *mods =
-	      &setting->keyboard.getModifiers(Modifier::Shift);
+	      &m_setting->m_keyboard.getModifiers(Modifier::Type_Shift);
 	    if (mods->size() == 0)
-	      mods = &setting->keyboard.getModifiers(Modifier::Control);
+	      mods = &m_setting->m_keyboard.getModifiers(
+		Modifier::Type_Control);
 	    if (0 < mods->size())
 	    {
 	      generateKeyEvent(mods->front(), true, false);
@@ -354,325 +358,329 @@ void Engine::generateModifierEvents(const Modifier &mod)
 	  }
       }
       
-      for (Keyboard::Mods::iterator j = mods.begin(); j != mods.end(); j ++)
+      for (Keyboard::Mods::iterator j = mods.begin(); j != mods.end(); ++ j)
       {
-	if ((*j)->isPressedOnWin32)
+	if ((*j)->m_isPressedOnWin32)
 	  generateKeyEvent((*j), false, false);
       }
     }
   }
   
   {
-    Acquire a(&log, 1);
-    log << "\t\t}" << endl;
+    Acquire a(&m_log, 1);
+    m_log << "\t\t}" << endl;
   }
 }
 
 
 // generate keyboard events for action
-void Engine::generateActionEvents(const Current &c, const Action *a,
-				  bool doPress)
+void Engine::generateActionEvents(const Current &i_c, const Action *i_a,
+				  bool i_doPress)
 {
-  Current cnew = c;
-  cnew.mkey.modifier.on(Modifier::Up, !doPress);
-  cnew.mkey.modifier.on(Modifier::Down, doPress);
+  Current cnew = i_c;
+  cnew.m_mkey.m_modifier.on(Modifier::Type_Up, !i_doPress);
+  cnew.m_mkey.m_modifier.on(Modifier::Type_Down, i_doPress);
 
-  switch (a->type)
+  switch (i_a->m_type)
   {
     // key
-    case Action::ActKey:
+    case Action::Type_key:
     {
-      const ModifiedKey &mkey = ((ActionKey *)a)->modifiedKey;
+      const ModifiedKey &mkey
+	= reinterpret_cast<ActionKey *>(
+	  const_cast<Action *>(i_a))->m_modifiedKey;
 
       // release
-      if (!doPress &&
-	  (mkey.modifier.isOn(Modifier::Up) ||
-	   mkey.modifier.isDontcare(Modifier::Up)))
-	generateKeyEvent(mkey.key, false, true);
+      if (!i_doPress &&
+	  (mkey.m_modifier.isOn(Modifier::Type_Up) ||
+	   mkey.m_modifier.isDontcare(Modifier::Type_Up)))
+	generateKeyEvent(mkey.m_key, false, true);
 
       // press
-      else if (doPress &&
-	       (mkey.modifier.isOn(Modifier::Down) ||
-		mkey.modifier.isDontcare(Modifier::Down)))
+      else if (i_doPress &&
+	       (mkey.m_modifier.isOn(Modifier::Type_Down) ||
+		mkey.m_modifier.isDontcare(Modifier::Type_Down)))
       {
-	Modifier modifier = mkey.modifier;
-	modifier += c.mkey.modifier;
+	Modifier modifier = mkey.m_modifier;
+	modifier.add(i_c.m_mkey.m_modifier);
 	generateModifierEvents(modifier);
-	generateKeyEvent(mkey.key, true, true);
+	generateKeyEvent(mkey.m_key, true, true);
       }
       break;
     }
 
     // keyseq
-    case Action::ActKeySeq:
+    case Action::Type_keySeq:
     {
-      ActionKeySeq *aks = (ActionKeySeq *)a;
-      generateKeySeqEvents(c, aks->keySeq, doPress ? PartDown : PartUp);
+      const ActionKeySeq *aks = reinterpret_cast<const ActionKeySeq *>(i_a);
+      generateKeySeqEvents(i_c, aks->m_keySeq,
+			   i_doPress ? Part_down : Part_up);
       break;
     }
 
     // function
-    case Action::ActFunction:
+    case Action::Type_function:
     {
-      ActionFunction *af = (ActionFunction *)a;
-      bool is_up = (!doPress &&
-		    (af->modifier.isOn(Modifier::Up) ||
-		     af->modifier.isDontcare(Modifier::Up)));
-      bool is_down = (doPress &&
-		      (af->modifier.isOn(Modifier::Down) ||
-		       af->modifier.isDontcare(Modifier::Down)));
+      const ActionFunction *af = reinterpret_cast<const ActionFunction *>(i_a);
+      bool is_up = (!i_doPress &&
+		    (af->m_modifier.isOn(Modifier::Type_Up) ||
+		     af->m_modifier.isDontcare(Modifier::Type_Up)));
+      bool is_down = (i_doPress &&
+		      (af->m_modifier.isOn(Modifier::Type_Down) ||
+		       af->m_modifier.isDontcare(Modifier::Type_Down)));
       if (!is_down && !is_up)
 	break;
       try
       {
 	bool doesNeedEndl = true;
 	{
-	  Acquire a(&log, 1);
-	  log << "\t\t     >\t&" << af->function->name;
+	  Acquire a(&m_log, 1);
+	  m_log << "\t\t     >\t&" << af->m_function->m_name;
 	}
-	switch (af->function->id)
+	switch (af->m_function->m_id)
 	{
 	  Default:
-	  case Function::Default:
+	  case Function::Id_Default:
 	  {
 	    {
-	      Acquire a(&log, 1);
-	      log << endl;
+	      Acquire a(&m_log, 1);
+	      m_log << endl;
 	      doesNeedEndl = false;
 	    }
 	    if (is_down)
-	      generateModifierEvents(cnew.mkey.modifier);
-	    generateKeyEvent(cnew.mkey.key, doPress, true);
+	      generateModifierEvents(cnew.m_mkey.m_modifier);
+	    generateKeyEvent(cnew.m_mkey.m_key, i_doPress, true);
 	    break;
 	  }
 	  
-	  case Function::KeymapParent:
+	  case Function::Id_KeymapParent:
 	  {
-	    cnew.keymap = c.keymap->getParentKeymap();
-	    if (!cnew.keymap)
+	    cnew.m_keymap = i_c.m_keymap->getParentKeymap();
+	    if (!cnew.m_keymap)
 	      goto Default;
 	    {
-	      Acquire a(&log, 1);
-	      log << "(" << cnew.keymap->getName() << ")" << endl;
+	      Acquire a(&m_log, 1);
+	      m_log << "(" << cnew.m_keymap->getName() << ")" << endl;
 	      doesNeedEndl = false;
 	    }
 	    generateKeyboardEvents(cnew);
 	    break;
 	  }
 
-	  case Function::KeymapWindow:
+	  case Function::Id_KeymapWindow:
 	  {
-	    cnew.keymap = currentFocusOfThread->keymaps.front();
-	    cnew.i = currentFocusOfThread->keymaps.begin();
+	    cnew.m_keymap = m_currentFocusOfThread->m_keymaps.front();
+	    cnew.m_i = m_currentFocusOfThread->m_keymaps.begin();
 	    generateKeyboardEvents(cnew);
 	    break;
 	  }
 	  
-	  case Function::OtherWindowClass:
+	  case Function::Id_OtherWindowClass:
 	  {
-	    cnew.i ++;
-	    if (cnew.i == currentFocusOfThread->keymaps.end())
+	    cnew.m_i ++;
+	    if (cnew.m_i == m_currentFocusOfThread->m_keymaps.end())
 	      goto Default;
-	    cnew.keymap = (*cnew.i);
+	    cnew.m_keymap = (*cnew.m_i);
 	    {
-	      Acquire a(&log, 1);
-	      log << "(" << cnew.keymap->getName() << ")" << endl;
+	      Acquire a(&m_log, 1);
+	      m_log << "(" << cnew.m_keymap->getName() << ")" << endl;
 	      doesNeedEndl = false;
 	    }
 	    generateKeyboardEvents(cnew);
 	    break;
 	  }
 	  
-	  case Function::Prefix:
+	  case Function::Id_Prefix:
 	  {
-	    if (doPress)
+	    if (i_doPress)
 	    {
-	      Keymap *keymap = (Keymap *)af->args[0].getData();
-	      assert( keymap );
-	      currentKeymap = keymap;
+	      Keymap *keymap = (Keymap *)af->m_args[0].getData();
+	      ASSERT( keymap );
+	      m_currentKeymap = keymap;
 
 	      // generate prefixed event
-	      generateEvents(cnew, currentKeymap, &Event::prefixed);
+	      generateEvents(cnew, m_currentKeymap, &Event::prefixed);
 		
-	      isPrefix = true;
-	      doesEditNextModifier = false;
-	      doesIgnoreModifierForPrefix = true;
-	      if (af->args.size() == 2)	// optional function argument
-		doesIgnoreModifierForPrefix = !!af->args[1].getData();
-	      Acquire a(&log, 1);
-	      log << "(" << keymap->getName() << ", " <<
-		  (doesIgnoreModifierForPrefix ? "true" : "false") << ")";
+	      m_isPrefix = true;
+	      m_doesEditNextModifier = false;
+	      m_doesIgnoreModifierForPrefix = true;
+	      if (af->m_args.size() == 2)	// optional function argument
+		m_doesIgnoreModifierForPrefix = !!af->m_args[1].getData();
+	      Acquire a(&m_log, 1);
+	      m_log << "(" << keymap->getName() << ", " <<
+		(m_doesIgnoreModifierForPrefix ? "true" : "false") << ")";
 	    }
 	    break;
 	  }
 	  
-	  case Function::Keymap:
+	  case Function::Id_Keymap:
 	  {
-	    cnew.keymap = (Keymap *)af->args[0].getData();
-	    assert( cnew.keymap );
+	    cnew.m_keymap = (Keymap *)af->m_args[0].getData();
+	    ASSERT( cnew.m_keymap );
 	    {
-	      Acquire a(&log, 1);
-	      log << "(" << cnew.keymap->getName() << ")" << endl;
+	      Acquire a(&m_log, 1);
+	      m_log << "(" << cnew.m_keymap->getName() << ")" << endl;
 	      doesNeedEndl = false;
 	    }
 	    generateKeyboardEvents(cnew);
 	    break;
 	  }
 	  
-	  case Function::Sync:
+	  case Function::Id_Sync:
 	  {
 	    if (is_down)
-	      generateModifierEvents(af->modifier);
-	    if (!doPress || currentFocusOfThread->isConsole)
+	      generateModifierEvents(af->m_modifier);
+	    if (!i_doPress || m_currentFocusOfThread->m_isConsole)
 	      break;
 	    
-	    Key *sync = setting->keyboard.getSyncKey();
-	    if (sync->getLengthof_scanCodes() == 0)
+	    Key *sync = m_setting->m_keyboard.getSyncKey();
+	    if (sync->getScanCodesSize() == 0)
 	      break;
 	    const ScanCode *sc = sync->getScanCodes();
 
 	    // set variables exported from mayu.dll
-	    hookData->syncKey = sc->scan;
-	    hookData->syncKeyIsExtended = !!(sc->flags & ScanCode::E0E1);
-	    isSynchronizing = true;
+	    g_hookData->m_syncKey = sc->m_scan;
+	    g_hookData->m_syncKeyIsExtended = !!(sc->m_flags & ScanCode::E0E1);
+	    m_isSynchronizing = true;
 	    generateKeyEvent(sync, false, false);
 	    
-	    cs.release();
-	    DWORD r = WaitForSingleObject(eSync, 5000);
+	    m_cs.release();
+	    DWORD r = WaitForSingleObject(m_eSync, 5000);
 	    if (r == WAIT_TIMEOUT)
 	    {
-	      Acquire a(&log, 0);
-	      log << " *FAILED*";
+	      Acquire a(&m_log, 0);
+	      m_log << " *FAILED*";
 	    }
-	    cs.acquire();
-	    isSynchronizing = false;
+	    m_cs.acquire();
+	    m_isSynchronizing = false;
 	    break;
 	  }
 	  
-	  case Function::Toggle:
+	  case Function::Id_Toggle:
 	  {
-	    if (!doPress)
+	    if (!i_doPress)
 	    {
-	      Modifier::Type mt = (Modifier::Type)(int)af->args[0].getData();
-	      currentLock.press(mt, !currentLock.isPressed(mt));
+	      Modifier::Type mt =
+		static_cast<Modifier::Type>((int)af->m_args[0].getData());
+	      m_currentLock.press(mt, !m_currentLock.isPressed(mt));
 	    }
 	    break;
 	  }
 
-	  case Function::EditNextModifier:
+	  case Function::Id_EditNextModifier:
 	  {
-	    if (doPress)
+	    if (i_doPress)
 	    {
-	      isPrefix = true;
-	      doesEditNextModifier = true;
-	      doesIgnoreModifierForPrefix = true;
-	      modifierForNextKey = *(Modifier *)af->args[0].getData();
+	      m_isPrefix = true;
+	      m_doesEditNextModifier = true;
+	      m_doesIgnoreModifierForPrefix = true;
+	      m_modifierForNextKey = *(Modifier *)af->m_args[0].getData();
 	    }
 	    break;
 	  }
 
-	  case Function::Variable:
+	  case Function::Id_Variable:
 	  {
-	    if (doPress)
+	    if (i_doPress)
 	    {
-	      m_variable *= af->args[0].getNumber();
-	      m_variable += af->args[1].getNumber();
+	      m_variable *= af->m_args[0].getNumber();
+	      m_variable += af->m_args[1].getNumber();
 	    }
 	    break;
 	  }
 
-	  case Function::Repeat:
+	  case Function::Id_Repeat:
 	  {
-	    KeySeq *keySeq = (KeySeq *)af->args[0].getData();
-	    if (doPress)
+	    KeySeq *keySeq = (KeySeq *)af->m_args[0].getData();
+	    if (i_doPress)
 	    {
 	      int end = m_variable;
-	      if (af->args.size() == 2)
-		end = MIN(end, af->args[1].getNumber());
+	      if (af->m_args.size() == 2)
+		end = MIN(end, af->m_args[1].getNumber());
 	      else
 		end = MIN(end, 10);
 
 	      for (int i = 0; i < end - 1; ++ i)
-		generateKeySeqEvents(c, keySeq, PartAll);
+		generateKeySeqEvents(i_c, keySeq, Part_all);
 	      if (0 < end)
-		generateKeySeqEvents(c, keySeq, PartDown);
+		generateKeySeqEvents(i_c, keySeq, Part_down);
 	    }
 	    else
-	      generateKeySeqEvents(c, keySeq, PartUp);
+	      generateKeySeqEvents(i_c, keySeq, Part_up);
 	    break;
 	  }
 	  
-	  case Function::Ignore:
+	  case Function::Id_Ignore:
 	    break;
 	    
-	  case Function::EmacsEditKillLineFunc:
+	  case Function::Id_EmacsEditKillLineFunc:
 	  {
 	    if (!is_down)
 	      break;
-	    emacsEditKillLine.func();
-	    emacsEditKillLine.doForceReset = false;
+	    m_emacsEditKillLine.func();
+	    m_emacsEditKillLine.m_doForceReset = false;
 	    break;
 	  }
 	  
-	  case Function::EmacsEditKillLinePred:
+	  case Function::Id_EmacsEditKillLinePred:
 	  {
-	    emacsEditKillLine.doForceReset = false;
+	    m_emacsEditKillLine.m_doForceReset = false;
 	    if (!is_down)
 	      break;
-	    int r = emacsEditKillLine.pred();
+	    int r = m_emacsEditKillLine.pred();
 	    KeySeq *keySeq;
 	    if (r == 1)
-	      keySeq = (KeySeq *)af->args[0].getData();
+	      keySeq = (KeySeq *)af->m_args[0].getData();
 	    else if (r == 2)
-	      keySeq = (KeySeq *)af->args[1].getData();
+	      keySeq = (KeySeq *)af->m_args[1].getData();
 	    else // r == 0
 	      break;
-	    assert(keySeq);
-	    generateKeySeqEvents(c, keySeq, PartAll);
+	    ASSERT(keySeq);
+	    generateKeySeqEvents(i_c, keySeq, Part_all);
 	    break;
 	  }
 
-	  case Function::ShellExecute:
+	  case Function::Id_ShellExecute:
 	  {
 	    if (!is_down)
 	      break;
-	    afShellExecute = af;
-	    PostMessage(hwndAssocWindow,
-			WM_engineNotify, engineNotify_shellExecute, 0);
+	    m_afShellExecute = af;
+	    PostMessage(m_hwndAssocWindow,
+			WM_APP_engineNotify, EngineNotify_shellExecute, 0);
 	    break;
 	  }
 	  
-	  case Function::LoadSetting:
+	  case Function::Id_LoadSetting:
 	  {
 	    if (!is_down)
 	      break;
-	    PostMessage(hwndAssocWindow,
-			WM_engineNotify, engineNotify_loadSetting, 0);
+	    PostMessage(m_hwndAssocWindow,
+			WM_APP_engineNotify, EngineNotify_loadSetting, 0);
 	    break;
 	  }
 	  
-	  case Function::Wait:
+	  case Function::Id_Wait:
 	  {
 	    if (!is_down)
 	      break;
-	    isSynchronizing = true;
-	    int ms = af->args[0].getNumber();
+	    m_isSynchronizing = true;
+	    int ms = af->m_args[0].getNumber();
 	    if (ms < 0 || 5000 < ms)	// too long wait
 	      break;
-	    cs.release();
+	    m_cs.release();
 	    Sleep(ms);
-	    cs.acquire();
-	    isSynchronizing = false;
+	    m_cs.acquire();
+	    m_isSynchronizing = false;
 	    break;
 	  }
 
-	  case Function::DescribeBindings:
+	  case Function::Id_DescribeBindings:
 	  {
 	    if (!is_down)
 	      break;
 	    {
-	      Acquire a(&log, 1);
-	      log << endl;
+	      Acquire a(&m_log, 1);
+	      m_log << endl;
 	    }
 	    describeBindings();
 	    break;
@@ -680,13 +688,13 @@ void Engine::generateActionEvents(const Current &c, const Action *a,
 	  
 	  default:
 	  {
-	    if (af->function->func)
+	    if (af->m_function->m_func)
 	    {
-	      Function::FuncData fd(af->args, *this);
-	      fd.id = af->function->id;
-	      fd.hwnd = currentFocusOfThread->hwndFocus;
-	      fd.isPressed = doPress;
-	      af->function->func(fd);
+	      Function::FuncData fd(af->m_args, *this);
+	      fd.m_id = af->m_function->m_id;
+	      fd.m_hwnd = m_currentFocusOfThread->m_hwndFocus;
+	      fd.m_isPressed = i_doPress;
+	      af->m_function->m_func(fd);
 	    }
 	    break;
 	  }
@@ -694,15 +702,15 @@ void Engine::generateActionEvents(const Current &c, const Action *a,
 	
 	if (doesNeedEndl)
 	{
-	  Acquire a(&log, 1);
-	  log << endl;
+	  Acquire a(&m_log, 1);
+	  m_log << endl;
 	}
       }
-      catch (ErrorMessage &e)
+      catch (ErrorMessage &i_e)
       {
-	Acquire a(&log);
-	log << "&" << af->function->name << ": invalid arguments: "
-	    << e << endl;
+	Acquire a(&m_log);
+	m_log << "&" << af->m_function->m_name << ": invalid arguments: "
+	      << i_e << endl;
       }
       break;
     }
@@ -711,301 +719,306 @@ void Engine::generateActionEvents(const Current &c, const Action *a,
 
 
 // generate keyboard events for keySeq
-void Engine::generateKeySeqEvents(const Current &c, const KeySeq *keySeq,
-				  Part part)
+void Engine::generateKeySeqEvents(const Current &i_c, const KeySeq *i_keySeq,
+				  Part i_part)
 {
-  const vector<Action *> &actions = keySeq->getActions();
+  const vector<Action *> &actions = i_keySeq->getActions();
   if (actions.empty())
     return;
-  if (part == PartUp)
-    generateActionEvents(c, actions[actions.size() - 1], false);
+  if (i_part == Part_up)
+    generateActionEvents(i_c, actions[actions.size() - 1], false);
   else
   {
     size_t i;
-    for (i = 0 ; i < actions.size() - 1; i ++)
+    for (i = 0 ; i < actions.size() - 1; ++ i)
     {
-      generateActionEvents(c, actions[i], true);
-      generateActionEvents(c, actions[i], false);
+      generateActionEvents(i_c, actions[i], true);
+      generateActionEvents(i_c, actions[i], false);
     }
-    generateActionEvents(c, actions[i], true);
-    if (part == PartAll)
-      generateActionEvents(c, actions[i], false);
+    generateActionEvents(i_c, actions[i], true);
+    if (i_part == Part_all)
+      generateActionEvents(i_c, actions[i], false);
   }
 }
 
 
 // generate keyboard events for current key
-void Engine::generateKeyboardEvents(const Current &c)
+void Engine::generateKeyboardEvents(const Current &i_c)
 {
-  if (++ generateKeyboardEventsRecursionGuard ==
-      maxGenerateKeyboardEventsRecursion)
+  if (++ m_generateKeyboardEventsRecursionGuard ==
+      MAX_GENERATE_KEYBOARD_EVENTS_RECURSION_COUNT)
   {
-    Acquire a(&log);
-    log << "error: too deep keymap recursion.  there may be a loop." << endl;
+    Acquire a(&m_log);
+    m_log << "error: too deep keymap recursion.  there may be a loop." << endl;
     return;
   }
   
-  const Keymap::KeyAssignment *keyAssign = c.keymap->searchAssignment(c.mkey);
+  const Keymap::KeyAssignment *keyAssign
+    = i_c.m_keymap->searchAssignment(i_c.m_mkey);
   if (!keyAssign)
   {
-    const KeySeq *keySeq = c.keymap->getDefaultKeySeq();
-    assert( keySeq );
-    generateKeySeqEvents(c, keySeq, c.isPressed() ? PartDown : PartUp);
+    const KeySeq *keySeq = i_c.m_keymap->getDefaultKeySeq();
+    ASSERT( keySeq );
+    generateKeySeqEvents(i_c, keySeq, i_c.isPressed() ? Part_down : Part_up);
   }
   else
   {
-    if (keyAssign->modifiedKey.modifier.isOn(Modifier::Up) ||
-	keyAssign->modifiedKey.modifier.isOn(Modifier::Down))
-      generateKeySeqEvents(c, keyAssign->keySeq, PartAll);
+    if (keyAssign->m_modifiedKey.m_modifier.isOn(Modifier::Type_Up) ||
+	keyAssign->m_modifiedKey.m_modifier.isOn(Modifier::Type_Down))
+      generateKeySeqEvents(i_c, keyAssign->m_keySeq, Part_all);
     else
-      generateKeySeqEvents(c, keyAssign->keySeq,
-			   c.isPressed() ? PartDown : PartUp);
+      generateKeySeqEvents(i_c, keyAssign->m_keySeq,
+			   i_c.isPressed() ? Part_down : Part_up);
   }
-  generateKeyboardEventsRecursionGuard --;
+  m_generateKeyboardEventsRecursionGuard --;
 }
 
 
 // generate keyboard events for current key
-void Engine::generateKeyboardEvents(const Current &c, bool isModifier)
+void Engine::generateKeyboardEvents(const Current &i_c, bool i_isModifier)
 {
   //           (1)           (2)           (3)  (4)   (1)
   // up/down:  D-            U-            D-   U-    D-
-  // keymap:   currentKeymap currentKeymap X    X     currentKeymap
+  // keymap:   m_currentKeymap m_currentKeymap X    X     m_currentKeymap
   // memo:     &Prefix(X)    ...           ...  ...   ...
-  // isPrefix: false         true          true false false
+  // m_isPrefix: false         true          true false false
   
-  bool isPhysicallyPressed = c.mkey.modifier.isPressed(Modifier::Down);
+  bool isPhysicallyPressed
+    = i_c.m_mkey.m_modifier.isPressed(Modifier::Type_Down);
   
   // for prefix key
-  Keymap *tmpKeymap = currentKeymap;
-  if (isModifier || !isPrefix) ; 
+  Keymap *tmpKeymap = m_currentKeymap;
+  if (i_isModifier || !m_isPrefix) ; 
   else if (isPhysicallyPressed)			// when (3)
-    isPrefix = false;
+    m_isPrefix = false;
   else if (!isPhysicallyPressed)		// when (2)
-    currentKeymap = currentFocusOfThread->keymaps.front();
+    m_currentKeymap = m_currentFocusOfThread->m_keymaps.front();
   
-  // for EmacsEditKillLine function
-  emacsEditKillLine.doForceReset = !isModifier;
+  // for m_emacsEditKillLine function
+  m_emacsEditKillLine.m_doForceReset = !i_isModifier;
 
   // generate key evend !
-  generateKeyboardEventsRecursionGuard = 0;
+  m_generateKeyboardEventsRecursionGuard = 0;
   if (isPhysicallyPressed)
-    generateEvents(c, c.keymap, &Event::before_key_down);
-  generateKeyboardEvents(c);
+    generateEvents(i_c, i_c.m_keymap, &Event::before_key_down);
+  generateKeyboardEvents(i_c);
   if (!isPhysicallyPressed)
-    generateEvents(c, c.keymap, &Event::after_key_up);
+    generateEvents(i_c, i_c.m_keymap, &Event::after_key_up);
       
-  // for EmacsEditKillLine function
-  if (emacsEditKillLine.doForceReset)
-    emacsEditKillLine.reset();
+  // for m_emacsEditKillLine function
+  if (m_emacsEditKillLine.m_doForceReset)
+    m_emacsEditKillLine.reset();
 
   // for prefix key
-  if (isModifier) ;
-  else if (!isPrefix)				// when (1), (4)
-    currentKeymap = currentFocusOfThread->keymaps.front();
+  if (i_isModifier)
+    ;
+  else if (!m_isPrefix)				// when (1), (4)
+    m_currentKeymap = m_currentFocusOfThread->m_keymaps.front();
   else if (!isPhysicallyPressed)		// when (2)
-    currentKeymap = tmpKeymap;
+    m_currentKeymap = tmpKeymap;
 }
 
 
 // pop all pressed key on win32
 void Engine::keyboardResetOnWin32()
 {
-  for (Keyboard::KeyIterator i = setting->keyboard.getKeyIterator();  *i; i ++)
+  for (Keyboard::KeyIterator
+	 i = m_setting->m_keyboard.getKeyIterator();  *i; ++ i)
   {
-    if ((*i)->isPressedOnWin32)
+    if ((*i)->m_isPressedOnWin32)
       generateKeyEvent((*i), false, true);
   }
 }
 
 
 // keyboard handler thread
-void Engine::keyboardHandler(void *This)
+void Engine::keyboardHandler(void *i_this)
 {
-  ((Engine *)This)->keyboardHandler();
+  reinterpret_cast<Engine *>(i_this)->keyboardHandler();
 }
 void Engine::keyboardHandler()
 {
   // initialize ok
-  CHECK_TRUE( SetEvent(eEvent) );
+  CHECK_TRUE( SetEvent(m_eEvent) );
     
   // loop
   Key key;
-  while (!doForceTerminate)
+  while (!m_doForceTerminate)
   {
     KEYBOARD_INPUT_DATA kid;
     
     DWORD len;
-    if (!ReadFile(device, &kid, sizeof(kid), &len, NULL))
+    if (!ReadFile(m_device, &kid, sizeof(kid), &len, NULL))
       continue; // TODO
 
     checkFocusWindow();
 
-    if (!setting ||	// setting has not been loaded
-	!isEnabled)	// disabled
+    if (!m_setting ||	// m_setting has not been loaded
+	!m_isEnabled)	// disabled
     {
-      WriteFile(device, &kid, sizeof(kid), &len, NULL);
+      WriteFile(m_device, &kid, sizeof(kid), &len, NULL);
       continue;
     }
     
-    Acquire a(&cs);
+    Acquire a(&m_cs);
 
-    if (!currentFocusOfThread ||
-	!currentKeymap)
+    if (!m_currentFocusOfThread ||
+	!m_currentKeymap)
     {
-      WriteFile(device, &kid, sizeof(kid), &len, NULL);
-      Acquire a(&log, 0);
-      if (!currentFocusOfThread)
-	log << "internal error: currentFocusOfThread == NULL" << endl;
-      if (!currentKeymap)
-	log << "internal error: currentKeymap == NULL" << endl;
+      WriteFile(m_device, &kid, sizeof(kid), &len, NULL);
+      Acquire a(&m_log, 0);
+      if (!m_currentFocusOfThread)
+	m_log << "internal error: m_currentFocusOfThread == NULL" << endl;
+      if (!m_currentKeymap)
+	m_log << "internal error: m_currentKeymap == NULL" << endl;
       continue;
     }
     
     Current c;
-    c.keymap = currentKeymap;
-    c.i = currentFocusOfThread->keymaps.begin();
+    c.m_keymap = m_currentKeymap;
+    c.m_i = m_currentFocusOfThread->m_keymaps.begin();
     
     // search key
     key.addScanCode(ScanCode(kid.MakeCode, kid.Flags));
-    c.mkey = setting->keyboard.searchKey(key);
-    if (!c.mkey.key)
+    c.m_mkey = m_setting->m_keyboard.searchKey(key);
+    if (!c.m_mkey.m_key)
     {
-      c.mkey.key = setting->keyboard.searchPrefixKey(key);
-      if (c.mkey.key)
+      c.m_mkey.m_key = m_setting->m_keyboard.searchPrefixKey(key);
+      if (c.m_mkey.m_key)
 	continue;
     }
 
     // press the key and update counter
-    bool isPhysicallyPressed = !(key.getScanCodes()[0].flags&ScanCode::BREAK);
-    if (c.mkey.key)
+    bool isPhysicallyPressed
+      = !(key.getScanCodes()[0].m_flags & ScanCode::BREAK);
+    if (c.m_mkey.m_key)
     {
-      if (!c.mkey.key->isPressed && isPhysicallyPressed)
-	currentKeyPressCount ++;
-      else if (c.mkey.key->isPressed && !isPhysicallyPressed)
-	currentKeyPressCount --;
-      c.mkey.key->isPressed = isPhysicallyPressed;
+      if (!c.m_mkey.m_key->m_isPressed && isPhysicallyPressed)
+	m_currentKeyPressCount ++;
+      else if (c.m_mkey.m_key->m_isPressed && !isPhysicallyPressed)
+	m_currentKeyPressCount --;
+      c.m_mkey.m_key->m_isPressed = isPhysicallyPressed;
     }
     
     // create modifiers
-    c.mkey.modifier = getCurrentModifiers(isPhysicallyPressed);
+    c.m_mkey.m_modifier = getCurrentModifiers(isPhysicallyPressed);
     Keymap::AssignMode am;
-    bool isModifier = fixModifierKey(&c.mkey, &am);
-    if (isPrefix)
+    bool isModifier = fixModifierKey(&c.m_mkey, &am);
+    if (m_isPrefix)
     {
-      if (isModifier && doesIgnoreModifierForPrefix)
-	am = Keymap::AMtrue;
-      if (doesEditNextModifier)
+      if (isModifier && m_doesIgnoreModifierForPrefix)
+	am = Keymap::AM_true;
+      if (m_doesEditNextModifier)
       {
-	Modifier modifier = modifierForNextKey;
-	modifier += c.mkey.modifier;
-	c.mkey.modifier = modifier;
+	Modifier modifier = m_modifierForNextKey;
+	modifier.add(c.m_mkey.m_modifier);
+	c.m_mkey.m_modifier = modifier;
       }
     }
     
-    if (isLogMode)
-      outputToLog(&key, c.mkey, 0);
-    else if (am == Keymap::AMtrue)
+    if (m_isLogMode)
+      outputToLog(&key, c.m_mkey, 0);
+    else if (am == Keymap::AM_true)
     {
       {
-	Acquire a(&log, 1);
-	log << "* true modifier" << endl;
+	Acquire a(&m_log, 1);
+	m_log << "* true modifier" << endl;
       }
       // true modifier doesn't generate scan code
-      outputToLog(&key, c.mkey, 1);
+      outputToLog(&key, c.m_mkey, 1);
     }
-    else if (am == Keymap::AMoneShot)
+    else if (am == Keymap::AM_oneShot)
     {
       {
-	Acquire a(&log, 1);
-	log << "* one shot modifier" << endl;
+	Acquire a(&m_log, 1);
+	m_log << "* one shot modifier" << endl;
       }
       // oneShot modifier doesn't generate scan code
-      outputToLog(&key, c.mkey, 1);
+      outputToLog(&key, c.m_mkey, 1);
       if (isPhysicallyPressed)
-	oneShotKey = c.mkey.key;
+	m_oneShotKey = c.m_mkey.m_key;
       else
       {
-	if (oneShotKey)
+	if (m_oneShotKey)
 	{
 	  Current cnew = c;
-	  cnew.mkey.modifier.off(Modifier::Up);
-	  cnew.mkey.modifier.on(Modifier::Down);
+	  cnew.m_mkey.m_modifier.off(Modifier::Type_Up);
+	  cnew.m_mkey.m_modifier.on(Modifier::Type_Down);
 	  generateKeyboardEvents(cnew, true);
 	  
 	  cnew = c;
-	  cnew.mkey.modifier.on(Modifier::Up);
-	  cnew.mkey.modifier.off(Modifier::Down);
+	  cnew.m_mkey.m_modifier.on(Modifier::Type_Up);
+	  cnew.m_mkey.m_modifier.off(Modifier::Type_Down);
 	  generateKeyboardEvents(cnew, true);
 	}
-	oneShotKey = NULL;
+	m_oneShotKey = NULL;
       }
     }
-    else if (c.mkey.key)
+    else if (c.m_mkey.m_key)
       // normal key
     {
-      outputToLog(&key, c.mkey, 1);
-      oneShotKey = NULL;
+      outputToLog(&key, c.m_mkey, 1);
+      m_oneShotKey = NULL;
       generateKeyboardEvents(c, isModifier);
     }
     
     // if counter is zero, reset modifiers and keys on win32
-    if (currentKeyPressCount <= 0)
+    if (m_currentKeyPressCount <= 0)
     {
       {
-	Acquire a(&log, 1);
-	log << "* No key is pressed" << endl;
+	Acquire a(&m_log, 1);
+	m_log << "* No key is pressed" << endl;
       }
       generateModifierEvents(Modifier());
-      if (0 < currentKeyPressCountOnWin32)
+      if (0 < m_currentKeyPressCountOnWin32)
 	keyboardResetOnWin32();
-      currentKeyPressCount = 0;
-      currentKeyPressCountOnWin32 = 0;
-      oneShotKey = NULL;
+      m_currentKeyPressCount = 0;
+      m_currentKeyPressCountOnWin32 = 0;
+      m_oneShotKey = NULL;
     }
     
     key.initialize();
   }
-  CHECK_TRUE( SetEvent(eEvent) );
+  CHECK_TRUE( SetEvent(m_eEvent) );
 }
   
 
-Engine::Engine(omsgstream &log_)
-  : hwndAssocWindow(NULL),
-    setting(NULL),
-    device(NULL),
-    didMayuStartDevice(false),
-    eEvent(NULL),
-    doForceTerminate(false),
-    isLogMode(false),
-    isEnabled(true),
-    isSynchronizing(false),
-    eSync(NULL),
-    generateKeyboardEventsRecursionGuard(0),
-    currentKeyPressCount(0),
-    currentKeyPressCountOnWin32(0),
-    lastPressedKey(NULL),
-    oneShotKey(NULL),
-    isPrefix(false),
-    currentKeymap(NULL),
-    currentFocusOfThread(NULL),
-    hwndFocus(NULL),
-    afShellExecute(NULL),
+Engine::Engine(omsgstream &i_log)
+  : m_hwndAssocWindow(NULL),
+    m_setting(NULL),
+    m_device(NULL),
+    m_didMayuStartDevice(false),
+    m_eEvent(NULL),
+    m_doForceTerminate(false),
+    m_isLogMode(false),
+    m_isEnabled(true),
+    m_isSynchronizing(false),
+    m_eSync(NULL),
+    m_generateKeyboardEventsRecursionGuard(0),
+    m_currentKeyPressCount(0),
+    m_currentKeyPressCountOnWin32(0),
+    m_lastPressedKey(NULL),
+    m_oneShotKey(NULL),
+    m_isPrefix(false),
+    m_currentKeymap(NULL),
+    m_currentFocusOfThread(NULL),
+    m_hwndFocus(NULL),
+    m_afShellExecute(NULL),
     m_variable(0),
-    log(log_)
+    m_log(i_log)
 {
   int i;
   // set default lock state
-  for (i = 0; i < Modifier::end; i++)
-    currentLock.dontcare((Modifier::Type)i);
-  for (i = Modifier::Lock0; i <= Modifier::Lock9; i++)
-    currentLock.release((Modifier::Type)i);
+  for (i = 0; i < Modifier::Type_end; ++ i)
+    m_currentLock.dontcare(static_cast<Modifier::Type>(i));
+  for (i = Modifier::Type_Lock0; i <= Modifier::Type_Lock9; ++ i)
+    m_currentLock.release(static_cast<Modifier::Type>(i));
   
-  // open mayu device
-  device = CreateFile(MAYU_DEVICE_FILE_NAME, GENERIC_READ | GENERIC_WRITE,
-		      0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  // open mayu m_device
+  m_device = CreateFile(MAYU_DEVICE_FILE_NAME, GENERIC_READ | GENERIC_WRITE,
+			0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
-  if (device == INVALID_HANDLE_VALUE)
+  if (m_device == INVALID_HANDLE_VALUE)
   {
     // start mayud
     SC_HANDLE hscm = OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT);
@@ -1016,54 +1029,54 @@ Engine::Engine(omsgstream &log_)
       {
 	StartService(hs, 0, NULL);
 	CloseServiceHandle(hs);
-	didMayuStartDevice = true;
+	m_didMayuStartDevice = true;
       }
       CloseServiceHandle(hscm);
     }
     
-    // open mayu device
-    device = CreateFile(MAYU_DEVICE_FILE_NAME, GENERIC_READ | GENERIC_WRITE,
-			0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-    if (device == INVALID_HANDLE_VALUE)
+    // open mayu m_device
+    m_device = CreateFile(MAYU_DEVICE_FILE_NAME, GENERIC_READ | GENERIC_WRITE,
+			  0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (m_device == INVALID_HANDLE_VALUE)
       throw ErrorMessage() << loadString(IDS_driverNotInstalled);
-//    throw ErrorMessage() << loadString(IDS_cannotOpenDevice);
+//    throw ErrorMessage() << loadString(IDS_cannotOpenM_Device);
   }
 
   // create event for sync
-  CHECK_TRUE( eSync = CreateEvent(NULL, FALSE, FALSE, NULL) );
+  CHECK_TRUE( m_eSync = CreateEvent(NULL, FALSE, FALSE, NULL) );
 }
 
 
 // start keyboard handler thread
 void Engine::start()
 {
-  CHECK_TRUE( eEvent = CreateEvent(NULL, FALSE, FALSE, NULL) );
+  CHECK_TRUE( m_eEvent = CreateEvent(NULL, FALSE, FALSE, NULL) );
   CHECK_TRUE( 0 <= _beginthread(keyboardHandler, 0, this) );
-  CHECK( WAIT_OBJECT_0 ==, WaitForSingleObject(eEvent, INFINITE) );
+  CHECK( WAIT_OBJECT_0 ==, WaitForSingleObject(m_eEvent, INFINITE) );
 }
 
 
 // stop keyboard handler thread
 void Engine::stop()
 {
-  if (eEvent)
+  if (m_eEvent)
   {
-    doForceTerminate = true;
+    m_doForceTerminate = true;
     do
     {
-      // cancel device ... TODO: this does not work on W2k
-      CancelIo(device);
+      // cancel m_device ... TODO: this does not work on W2k
+      CancelIo(m_device);
       //DWORD buf;
-      //DeviceIoControl(device, IOCTL_MAYU_DETOUR_CANCEL,
+      //M_DeviceIoControl(m_device, IOCTL_MAYU_DETOUR_CANCEL,
       //                &buf, sizeof(buf), &buf, sizeof(buf), &buf, NULL);
       
       // wait for message handler thread terminate
-    } while (WaitForSingleObject(eEvent, 100) != WAIT_OBJECT_0);
-    CHECK_TRUE( CloseHandle(eEvent) );
-    eEvent = NULL;
+    } while (WaitForSingleObject(m_eEvent, 100) != WAIT_OBJECT_0);
+    CHECK_TRUE( CloseHandle(m_eEvent) );
+    m_eEvent = NULL;
 
     // stop mayud
-    if (didMayuStartDevice)
+    if (m_didMayuStartDevice)
     {
       SC_HANDLE hscm = OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT);
       if (hscm)
@@ -1085,129 +1098,131 @@ void Engine::stop()
 Engine::~Engine()
 {
   stop();
-  CHECK_TRUE( CloseHandle(eSync) );
+  CHECK_TRUE( CloseHandle(m_eSync) );
   
-  // close device
-  CHECK_TRUE( CloseHandle(device) );
+  // close m_device
+  CHECK_TRUE( CloseHandle(m_device) );
 }
 
 
-// set setting
-bool Engine::setSetting(Setting *setting_)
+// set m_setting
+bool Engine::setSetting(Setting *i_setting)
 {
-  Acquire a(&cs);
-  if (isSynchronizing)
+  Acquire a(&m_cs);
+  if (m_isSynchronizing)
     return false;
 
-  if (setting)
-    for (Keyboard::KeyIterator i = setting->keyboard.getKeyIterator();
-	 *i; i ++)
+  if (m_setting)
+    for (Keyboard::KeyIterator i = m_setting->m_keyboard.getKeyIterator();
+	 *i; ++ i)
     {
-      Key *key = setting_->keyboard.searchKey(*(*i));
+      Key *key = i_setting->m_keyboard.searchKey(*(*i));
       if (key)
       {
-	key->isPressed = (*i)->isPressed;
-	key->isPressedOnWin32 = (*i)->isPressedOnWin32;
-	key->isPressedByAssign = (*i)->isPressedByAssign;
+	key->m_isPressed = (*i)->m_isPressed;
+	key->m_isPressedOnWin32 = (*i)->m_isPressedOnWin32;
+	key->m_isPressedByAssign = (*i)->m_isPressedByAssign;
       }
     }
   
-  setting = setting_;
-  if (currentFocusOfThread)
+  m_setting = i_setting;
+  if (m_currentFocusOfThread)
   {
-    for (FocusOfThreads::iterator i = focusOfThreads.begin();
-	 i != focusOfThreads.end(); i ++)
+    for (FocusOfThreads::iterator i = m_focusOfThreads.begin();
+	 i != m_focusOfThreads.end(); i ++)
     {
       FocusOfThread *fot = &(*i).second;
-      setting->keymaps.searchWindow(&fot->keymaps,
-				    fot->className, fot->titleName);
+      m_setting->m_keymaps.searchWindow(&fot->m_keymaps,
+					fot->m_className, fot->m_titleName);
     }
   }
-  setting->keymaps.searchWindow(&globalFocus.keymaps, "", "");
-  if (globalFocus.keymaps.empty())
+  m_setting->m_keymaps.searchWindow(&m_globalFocus.m_keymaps, "", "");
+  if (m_globalFocus.m_keymaps.empty())
   {
-    Acquire a(&log, 0);
-    log << "internal error: globalFocus.keymap is empty" << endl;
+    Acquire a(&m_log, 0);
+    m_log << "internal error: m_globalFocus.m_keymap is empty" << endl;
   }
-  currentFocusOfThread = &globalFocus;
-  currentKeymap = globalFocus.keymaps.front();
-  hwndFocus = NULL;
+  m_currentFocusOfThread = &m_globalFocus;
+  m_currentKeymap = m_globalFocus.m_keymaps.front();
+  m_hwndFocus = NULL;
   return true;
 }
 
 
 // focus
-bool Engine::setFocus(HWND hwndFocus_, DWORD threadId, 
-		      const char *className, const char *titleName,
-		      bool isConsole)
+bool Engine::setFocus(HWND i_hwndFocus, DWORD i_threadId, 
+		      const char *i_className, const char *i_titleName,
+		      bool i_isConsole)
 {
-  Acquire a(&cs);
-  if (isSynchronizing)
+  Acquire a(&m_cs);
+  if (m_isSynchronizing)
     return false;
-  if (hwndFocus_ == NULL)
+  if (i_hwndFocus == NULL)
     return true;
 
-  // remove newly created thread's id from detachedThreadIds
-  if (!detachedThreadIds.empty())
+  // remove newly created thread's id from m_detachedThreadIds
+  if (!m_detachedThreadIds.empty())
   {
     DetachedThreadIds::iterator i;
     do
     {
-      for (i = detachedThreadIds.begin(); i != detachedThreadIds.end(); i ++)
-	if (*i == threadId)
+      for (i = m_detachedThreadIds.begin();
+	   i != m_detachedThreadIds.end(); ++ i)
+	if (*i == i_threadId)
 	{
-	  detachedThreadIds.erase(i);
+	  m_detachedThreadIds.erase(i);
 	  break;
 	}
-    } while (i != detachedThreadIds.end());
+    } while (i != m_detachedThreadIds.end());
   }
   
   FocusOfThread *fot;
-  FocusOfThreads::iterator i = focusOfThreads.find(threadId);
-  if (i != focusOfThreads.end())
+  FocusOfThreads::iterator i = m_focusOfThreads.find(i_threadId);
+  if (i != m_focusOfThreads.end())
   {
     fot = &(*i).second;
-    if (fot->hwndFocus == hwndFocus_)
+    if (fot->m_hwndFocus == i_hwndFocus)
       return true;
   }
   else
   {
-    i = focusOfThreads.insert(
-      FocusOfThreads::value_type(threadId, FocusOfThread())).first;
+    i = m_focusOfThreads.insert(
+      FocusOfThreads::value_type(i_threadId, FocusOfThread())).first;
     fot = &(*i).second;
-    fot->threadId = threadId;
+    fot->m_threadId = i_threadId;
   }
-  fot->hwndFocus = hwndFocus_;
-  fot->isConsole = isConsole;
-  fot->className = className;
-  fot->titleName = titleName;
+  fot->m_hwndFocus = i_hwndFocus;
+  fot->m_isConsole = i_isConsole;
+  fot->m_className = i_className;
+  fot->m_titleName = i_titleName;
   
-  if (setting)
+  if (m_setting)
   {
-    setting->keymaps.searchWindow(&fot->keymaps, className, titleName);
-    assert(0 < fot->keymaps.size());
+    m_setting->m_keymaps.searchWindow(&fot->m_keymaps,
+				      i_className, i_titleName);
+    ASSERT(0 < fot->m_keymaps.size());
   }
   else
-    fot->keymaps.clear();
+    fot->m_keymaps.clear();
   return true;
 }
 
 
 // lock state
-bool Engine::setLockState(bool isNumLockToggled,
-			  bool isCapsLockToggled,
-			  bool isScrollLockToggled,
-			  bool isImeLockToggled,
-			  bool isImeCompToggled)
+bool Engine::setLockState(bool i_isNumLockToggled,
+			  bool i_isCapsLockToggled,
+			  bool i_isScrollLockToggled,
+			  bool i_isImeLockToggled,
+			  bool i_isImeCompToggled)
 {
-  Acquire a(&cs);
-  if (isSynchronizing)
+  Acquire a(&m_cs);
+  if (m_isSynchronizing)
     return false;
-  currentLock.on(Modifier::NumLock, isNumLockToggled);
-  currentLock.on(Modifier::CapsLock, isCapsLockToggled);
-  currentLock.on(Modifier::ScrollLock, isScrollLockToggled);
-  currentLock.on(Modifier::ImeLock, isImeLockToggled);
-  currentLock.on(Modifier::ImeComp, isImeCompToggled);
+  m_currentLock.on(Modifier::Type_NumLock, i_isNumLockToggled);
+  m_currentLock.on(Modifier::Type_CapsLock, i_isCapsLockToggled);
+  m_currentLock.on(Modifier::Type_ScrollLock, i_isScrollLockToggled);
+  m_currentLock.on(Modifier::Type_ImeLock, i_isImeLockToggled);
+  m_currentLock.on(Modifier::Type_ImeComp, i_isImeCompToggled);
   return true;
 }
 
@@ -1215,19 +1230,19 @@ bool Engine::setLockState(bool isNumLockToggled,
 // sync
 bool Engine::syncNotify()
 {
-  Acquire a(&cs);
-  if (!isSynchronizing)
+  Acquire a(&m_cs);
+  if (!m_isSynchronizing)
     return false;
-  CHECK_TRUE( SetEvent(eSync) );
+  CHECK_TRUE( SetEvent(m_eSync) );
   return true;
 }
 
 
 // thread detach notify
-bool Engine::threadDetachNotify(DWORD threadId)
+bool Engine::threadDetachNotify(DWORD i_threadId)
 {
-  Acquire a(&cs);
-  detachedThreadIds.push_back(threadId);
+  Acquire a(&m_cs);
+  m_detachedThreadIds.push_back(i_threadId);
   return true;
 }
 
@@ -1236,7 +1251,7 @@ bool Engine::threadDetachNotify(DWORD threadId)
 void Engine::getHelpMessages(std::string *o_helpMessage,
 			     std::string *o_helpTitle)
 {
-  Acquire a(&cs);
+  Acquire a(&m_cs);
   *o_helpMessage = m_helpMessage;
   *o_helpTitle = m_helpTitle;
 }
@@ -1245,13 +1260,13 @@ void Engine::getHelpMessages(std::string *o_helpMessage,
 // shell execute
 void Engine::shellExecute()
 {
-  Acquire a(&cs);
-  ActionFunction *af = afShellExecute;
+  Acquire a(&m_cs);
+  const ActionFunction *af = m_afShellExecute;
   
-  istring operation  = af->args[0].getString();
-  istring file       = af->args[1].getString();
-  istring parameters = af->args[2].getString();
-  istring directory  = af->args[3].getString();
+  istring operation  = af->m_args[0].getString();
+  istring file       = af->m_args[1].getString();
+  istring parameters = af->m_args[2].getString();
+  istring directory  = af->m_args[3].getString();
   if (operation.empty()) operation = "open";
   
   int r = (int)ShellExecute(NULL,
@@ -1259,11 +1274,12 @@ void Engine::shellExecute()
 			    file.empty() ? NULL : file.c_str(),
 			    parameters.empty() ? NULL : parameters.c_str(),
 			    directory.empty() ? NULL : directory.c_str(),
-			    af->args[4].getData());
+			    af->m_args[4].getData());
   if (32 < r)
     return; // success
   
-  const struct { int err; char *str; } err[] =
+  struct ErrorMessages { int m_err; char *m_str; };
+  const ErrorMessages err[] =
   {
     { 0, "The operating system is out of memory or resources." },
     { ERROR_FILE_NOT_FOUND, "The specified file was not found." },
@@ -1289,41 +1305,41 @@ void Engine::shellExecute()
   };
 
   const char *errorMessage = "Unknown error.";
-  for (size_t i = 0; i < NUMBER_OF(err); i++)
-    if (r == err[i].err)
+  for (size_t i = 0; i < NUMBER_OF(err); ++ i)
+    if (r == err[i].m_err)
     {
-      errorMessage = err[i].str;
+      errorMessage = err[i].m_str;
       break;
     }
-  Acquire b(&log, 0);
-  log <<"internal error: &ShellExecute("
-      << af->args[0] << ", "
-      << af->args[1] << ", "
-      << af->args[2] << ", "
-      << af->args[3] << ", "
-      << af->args[4] << "): " << errorMessage;
+  Acquire b(&m_log, 0);
+  m_log <<"internal error: &ShellExecute("
+	<< af->m_args[0] << ", "
+	<< af->m_args[1] << ", "
+	<< af->m_args[2] << ", "
+	<< af->m_args[3] << ", "
+	<< af->m_args[4] << "): " << errorMessage;
 }
 
 
 // command notify
 void Engine::commandNotify(
-  HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+  HWND i_hwnd, UINT i_message, WPARAM i_wParam, LPARAM i_lParam)
 {
-  Acquire b(&log, 0);
-  HWND hf = hwndFocus;
+  Acquire b(&m_log, 0);
+  HWND hf = m_hwndFocus;
   if (!hf)
     return;
 
   if (GetWindowThreadProcessId(hf, NULL) == 
-      GetWindowThreadProcessId(hwndAssocWindow, NULL))
+      GetWindowThreadProcessId(m_hwndAssocWindow, NULL))
     return;	// inhibit the investigation of MADO TSUKAI NO YUUTSU
 
   const char *target = NULL;
   int number_target = 0;
   
-  if (hwnd == hf)
+  if (i_hwnd == hf)
     target = "ToItself";
-  else if (hwnd == GetParent(hf))
+  else if (i_hwnd == GetParent(hf))
     target = "ToParentWindow";
   else
   {
@@ -1336,7 +1352,7 @@ void Engine::commandNotify(
 	break;
       h = p;
     }
-    if (hwnd == h)
+    if (i_hwnd == h)
       target = "ToMainWindow";
     else
     {
@@ -1349,37 +1365,37 @@ void Engine::commandNotify(
 	  break;
 	h = GetParent(h);
       }
-      if (hwnd == h)
+      if (i_hwnd == h)
 	target = "ToOverlappedWindow";
       else
       {
 	// number
 	HWND h = hf;
 	for (number_target = 0; h; number_target ++, h = GetParent(h))
-	  if (hwnd == h)
+	  if (i_hwnd == h)
 	    break;
 	return;
       }
     }
   }
 
-  log << "&PostMessage(";
+  m_log << "&PostMessage(";
   if (target)
-    log << target;
+    m_log << target;
   else
-    log << number_target;
-  log << ", " << message
-      << ", 0x" << hex << wParam
-      << ", 0x" << lParam << ") # hwnd = "
-      << (int)hwnd << ", "
-      << "message = " << dec;
-  if (message == WM_COMMAND)
-    log << "WM_COMMAND, ";
-  else if (message == WM_SYSCOMMAND)
-    log << "WM_SYSCOMMAND, ";
+    m_log << number_target;
+  m_log << ", " << i_message
+	<< ", 0x" << hex << i_wParam
+	<< ", 0x" << i_lParam << ") # hwnd = "
+	<< reinterpret_cast<int>(i_hwnd) << ", "
+	<< "message = " << dec;
+  if (i_message == WM_COMMAND)
+    m_log << "WM_COMMAND, ";
+  else if (i_message == WM_SYSCOMMAND)
+    m_log << "WM_SYSCOMMAND, ";
   else
-    log << message << ", ";
-  log << "wNotifyCode = " << HIWORD(wParam) << ", "
-      << "wID = " << LOWORD(wParam) << ", "
-      << "hwndCtrl = 0x" << hex << lParam << dec << endl;
+    m_log << i_message << ", ";
+  m_log << "wNotifyCode = " << HIWORD(i_wParam) << ", "
+	<< "wID = " << LOWORD(i_wParam) << ", "
+	<< "hwndCtrl = 0x" << hex << i_lParam << dec << endl;
 }

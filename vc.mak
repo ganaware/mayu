@@ -10,8 +10,10 @@
 
 # VC++ rules	###############################################################
 
-APPVER		= 4.0
+APPVER		= 5.0
 TARGETOS	= WINNT
+#TARGETLANG	= LANG_JAPANESE
+_WIN32_IE	= 0x0500
 !include <win32.mak>
 
 !ifdef nodebug

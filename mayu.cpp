@@ -45,32 +45,34 @@ using namespace std;
 ///
 class Mayu
 {
-  HWND hwndTaskTray;		/// tasktray window
-  HWND hwndLog;			/// log dialog
-  HWND hwndInvestigate;		/// investigate dialog
-  HWND hwndVersion;		/// version dialog
+  HWND m_hwndTaskTray;				/// tasktray window
+  HWND m_hwndLog;				/// log dialog
+  HWND m_hwndInvestigate;			/// investigate dialog
+  HWND m_hwndVersion;				/// version dialog
   
-  UINT WM_TaskbarRestart;	/// window message sent when taskber restarts
-  NOTIFYICONDATA ni;		/// taskbar icon data
-  bool m_canUseTasktrayBaloon;	/// 
+  UINT m_WM_TaskbarRestart;			/** window message sent when
+                                                    taskber restarts */
+  NOTIFYICONDATA m_ni;				/// taskbar icon data
+  bool m_canUseTasktrayBaloon;			/// 
 
-  omsgstream log;		/// log stream (output to log dialog's edit)
+  omsgstream m_log;				/** log stream (output to log
+						    dialog's edit) */
 
-  HANDLE mhEvent;		/// event for message handler thread
+  HANDLE m_mhEvent;				/** event for message handler
+						    thread */
 
-  HMENU hMenuTaskTray;		/// tasktray menu
+  HMENU m_hMenuTaskTray;			/// tasktray menu
   
-  Setting *setting;		/// current setting
-  bool isSettingDialogOpened;	/// is setting dialog opened ?
+  Setting *m_setting;				/// current setting
+  bool m_isSettingDialogOpened;			/// is setting dialog opened ?
   
-  Engine engine;		/// engine
+  Engine m_engine;				/// engine
 
-  /** @name ANONYMOUS */
   enum
   { 
-    WM_TASKTRAYNOTIFY = WM_APP + 101,	///
-    WM_MSGSTREAMNOTIFY = WM_APP + 102,	///
-    ID_TaskTrayIcon = 1,		///
+    WM_APP_taskTrayNotify = WM_APP + 101,	///
+    WM_APP_msgStreamNotify = WM_APP + 102,	///
+    ID_TaskTrayIcon = 1,			///
   };
 
 private:
@@ -82,7 +84,7 @@ private:
     wc.lpfnWndProc   = tasktray_wndProc;
     wc.cbClsExtra    = 0;
     wc.cbWndExtra    = sizeof(Mayu *);
-    wc.hInstance     = hInst;
+    wc.hInstance     = g_hInst;
     wc.hIcon         = NULL;
     wc.hCursor       = NULL;
     wc.hbrBackground = NULL;
@@ -92,115 +94,117 @@ private:
   }
 
   /// notify handler thread
-  static void notifyHandler(void *This)
+  static void notifyHandler(void *i_this)
   {
-    ((Mayu *)This)->notifyHandler();
+    reinterpret_cast<Mayu *>(i_this)->notifyHandler();
   }
   ///
   void notifyHandler()
   {
     HANDLE hMailslot =
-      CreateMailslot(mailslotNotify, notifyMessageSize,
+      CreateMailslot(NOTIFY_MAILSLOT_NAME, NOTIFY_MESSAGE_SIZE,
 		     MAILSLOT_WAIT_FOREVER, (SECURITY_ATTRIBUTES *)NULL);
-    assert(hMailslot != INVALID_HANDLE_VALUE);
+    ASSERT(hMailslot != INVALID_HANDLE_VALUE);
 
     // initialize ok
-    CHECK_TRUE( SetEvent(mhEvent) );
+    CHECK_TRUE( SetEvent(m_mhEvent) );
     
     // loop
     while (true)
     {
       DWORD len = 0;
-      BYTE buf[notifyMessageSize];
+      BYTE buf[NOTIFY_MESSAGE_SIZE];
       
       // wait for message
-      if (!ReadFile(hMailslot, buf, notifyMessageSize, &len,
+      if (!ReadFile(hMailslot, buf, NOTIFY_MESSAGE_SIZE, &len,
 		    (OVERLAPPED *)NULL))
 	continue;
 
-      switch (((Notify *)buf)->type)
+      switch (reinterpret_cast<Notify *>(buf)->m_type)
       {
-	case Notify::TypeMayuExit: // terminate thread
+	case Notify::Type_mayuExit:		// terminate thread
 	{
 	  CHECK_TRUE( CloseHandle(hMailslot) );
-	  CHECK_TRUE( SetEvent(mhEvent) );
+	  CHECK_TRUE( SetEvent(m_mhEvent) );
 	  return;
 	}
 	
-	case Notify::TypeSetFocus:
-	case Notify::TypeName:
+	case Notify::Type_setFocus:
+	case Notify::Type_name:
 	{
 	  NotifySetFocus *n = (NotifySetFocus *)buf;
-	  n->className[NUMBER_OF(n->className) - 1] = '\0';
-	  n->titleName[NUMBER_OF(n->titleName) - 1] = '\0';
+	  n->m_className[NUMBER_OF(n->m_className) - 1] = '\0';
+	  n->m_titleName[NUMBER_OF(n->m_titleName) - 1] = '\0';
 	  
-	  if (n->type == Notify::TypeSetFocus)
-	    engine.setFocus(n->hwnd, n->threadId,
-			    n->className, n->titleName, false);
+	  if (n->m_type == Notify::Type_setFocus)
+	    m_engine.setFocus(n->m_hwnd, n->m_threadId,
+			      n->m_className, n->m_titleName, false);
 
 	  {
-	    Acquire a(&log, 1);
-	    log << "HWND:\t" << hex << (int)n->hwnd << dec << endl;
-	    log << "THREADID:" << (int)n->threadId << endl;
+	    Acquire a(&m_log, 1);
+	    m_log << "HWND:\t" << hex << reinterpret_cast<int>(n->m_hwnd)
+		  << dec << endl;
+	    m_log << "THREADID:" << static_cast<int>(n->m_threadId) << endl;
 	  }
-	  Acquire a(&log, (n->type == Notify::TypeName) ? 0 : 1);
-	  log << "CLASS:\t" << n->className << endl;
-	  log << "TITLE:\t" << n->titleName << endl;
+	  Acquire a(&m_log, (n->m_type == Notify::Type_name) ? 0 : 1);
+	  m_log << "CLASS:\t" << n->m_className << endl;
+	  m_log << "TITLE:\t" << n->m_titleName << endl;
 	  
 	  bool isMDI = true;
-	  HWND hwnd = getToplevelWindow(n->hwnd, &isMDI);
+	  HWND hwnd = getToplevelWindow(n->m_hwnd, &isMDI);
 	  RECT rc;
 	  if (isMDI)
 	  {
 	    getChildWindowRect(hwnd, &rc);
-	    log << "MDI Window Position/Size: ("
+	    m_log << "MDI Window Position/Size: ("
 		<< rc.left << ", "<< rc.top << ") / ("
 		<< rcWidth(&rc) << "x" << rcHeight(&rc) << ")" << endl;
-	    hwnd = getToplevelWindow(n->hwnd, NULL);
+	    hwnd = getToplevelWindow(n->m_hwnd, NULL);
 	  }
 	  
 	  GetWindowRect(hwnd, &rc);
-	  log << "Toplevel Window Position/Size: ("
-	      << rc.left << ", "<< rc.top << ") / ("
-	      << rcWidth(&rc) << "x" << rcHeight(&rc) << ")" << endl;
+	  m_log << "Toplevel Window Position/Size: ("
+		<< rc.left << ", "<< rc.top << ") / ("
+		<< rcWidth(&rc) << "x" << rcHeight(&rc) << ")" << endl;
 
 	  SystemParametersInfo(SPI_GETWORKAREA, 0, (void *)&rc, FALSE);
-	  log << "Desktop Window Position/Size: ("
+	  m_log << "Desktop Window Position/Size: ("
 	      << rc.left << ", "<< rc.top << ") / ("
 	      << rcWidth(&rc) << "x" << rcHeight(&rc) << ")" << endl;
 	  
-	  log << endl;
+	  m_log << endl;
 	  break;
 	}
 	
-	case Notify::TypeLockState:
+	case Notify::Type_lockState:
 	{
 	  NotifyLockState *n = (NotifyLockState *)buf;
-	  engine.setLockState(n->isNumLockToggled,
-			      n->isCapsLockToggled,
-			      n->isScrollLockToggled,
-			      n->isImeLockToggled,
-			      n->isImeCompToggled);
+	  m_engine.setLockState(n->m_isNumLockToggled,
+				n->m_isCapsLockToggled,
+				n->m_isScrollLockToggled,
+				n->m_isImeLockToggled,
+				n->m_isImeCompToggled);
 	  break;
 	}
 
-	case Notify::TypeSync:
+	case Notify::Type_sync:
 	{
-	  engine.syncNotify();
+	  m_engine.syncNotify();
 	  break;
 	}
 
-	case Notify::TypeThreadDetach:
+	case Notify::Type_threadDetach:
 	{
 	  NotifyThreadDetach *n = (NotifyThreadDetach *)buf;
-	  engine.threadDetachNotify(n->threadId);
+	  m_engine.threadDetachNotify(n->m_threadId);
 	  break;
 	}
 
-	case Notify::TypeCommand:
+	case Notify::Type_command:
 	{
 	  NotifyCommand *n = (NotifyCommand *)buf;
-	  engine.commandNotify(n->hwnd, n->message, n->wParam, n->lParam);
+	  m_engine.commandNotify(n->m_hwnd, n->m_message,
+				 n->m_wParam, n->m_lParam);
 	  break;
 	}
       }
@@ -209,43 +213,45 @@ private:
   
   /// window procedure for tasktray
   static LRESULT CALLBACK
-  tasktray_wndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+  tasktray_wndProc(HWND i_hwnd, UINT i_message,
+		   WPARAM i_wParam, LPARAM i_lParam)
   {
-    Mayu *This = (Mayu *)GetWindowLong(hwnd, 0);
+    Mayu *This = reinterpret_cast<Mayu *>(GetWindowLong(i_hwnd, 0));
 
     if (!This)
-      switch (message)
+      switch (i_message)
       {
 	case WM_CREATE:
-	  This = (Mayu *)((CREATESTRUCT *)lParam)->lpCreateParams;
-	  SetWindowLong(hwnd, 0, (long)This);
+	  This = reinterpret_cast<Mayu *>(
+	    reinterpret_cast<CREATESTRUCT *>(i_lParam)->lpCreateParams);
+	  SetWindowLong(i_hwnd, 0, (long)This);
 	  return 0;
       }
     else
-      switch (message)
+      switch (i_message)
       {
-	case WM_MSGSTREAMNOTIFY:
+	case WM_APP_msgStreamNotify:
 	{
-	  omsgbuf *log = (omsgbuf *)lParam;
+	  omsgbuf *log = (omsgbuf *)i_lParam;
 	  const string &str = log->acquireString();
-	  editInsertTextAtLast(GetDlgItem(This->hwndLog, IDC_EDIT_log),
+	  editInsertTextAtLast(GetDlgItem(This->m_hwndLog, IDC_EDIT_log),
 			       str, 65000);
 	  log->releaseString();
 	  return 0;
 	}
 	
-	case WM_TASKTRAYNOTIFY:
+	case WM_APP_taskTrayNotify:
 	{
-	  if (wParam == ID_TaskTrayIcon)
-	    switch (lParam)
+	  if (i_wParam == ID_TaskTrayIcon)
+	    switch (i_lParam)
 	    {
 	      case WM_RBUTTONUP:
 	      {
 		POINT p;
 		CHECK_TRUE( GetCursorPos(&p) );
-		SetForegroundWindow(hwnd);
-		HMENU hMenuSub = GetSubMenu(This->hMenuTaskTray, 0);
-		if (This->engine.getIsEnabled())
+		SetForegroundWindow(i_hwnd);
+		HMENU hMenuSub = GetSubMenu(This->m_hMenuTaskTray, 0);
+		if (This->m_engine.getIsEnabled())
 		  CheckMenuItem(hMenuSub, ID_MENUITEM_disable,
 				MF_UNCHECKED | MF_BYCOMMAND);
 		else
@@ -289,13 +295,13 @@ private:
 
 		// show popup menu
 		TrackPopupMenu(hMenuSub, TPM_LEFTALIGN,
-			       p.x, p.y, 0, hwnd, NULL);
+			       p.x, p.y, 0, i_hwnd, NULL);
 		// TrackPopupMenu may fail (ERROR_POPUP_ALREADY_ACTIVE)
 		break;
 	      }
 	      
 	      case WM_LBUTTONDBLCLK:
-		SendMessage(hwnd, WM_COMMAND,
+		SendMessage(i_hwnd, WM_COMMAND,
 			    MAKELONG(ID_MENUITEM_investigate, 0), 0);
 		break;
 	    }
@@ -304,8 +310,8 @@ private:
       
 	case WM_COMMAND:
 	{
-	  int notify_code = HIWORD(wParam);
-	  int id = LOWORD(wParam);
+	  int notify_code = HIWORD(i_wParam);
+	  int id = LOWORD(i_wParam);
 	  if (notify_code == 0) // menu
 	    switch (id)
 	    {
@@ -322,42 +328,42 @@ private:
 		break;
 	      case ID_MENUITEM_investigate:
 	      {
-		ShowWindow(This->hwndLog, SW_SHOW);
-		ShowWindow(This->hwndInvestigate, SW_SHOW);
+		ShowWindow(This->m_hwndLog, SW_SHOW);
+		ShowWindow(This->m_hwndInvestigate, SW_SHOW);
 		
 		RECT rc1, rc2;
-		GetWindowRect(This->hwndInvestigate, &rc1);
-		GetWindowRect(This->hwndLog, &rc2);
+		GetWindowRect(This->m_hwndInvestigate, &rc1);
+		GetWindowRect(This->m_hwndLog, &rc2);
 
-		MoveWindow(This->hwndLog, rc1.left, rc1.bottom,
+		MoveWindow(This->m_hwndLog, rc1.left, rc1.bottom,
 			   rcWidth(&rc1), rcHeight(&rc2), TRUE);
 		
-		SetForegroundWindow(This->hwndLog);
-		SetForegroundWindow(This->hwndInvestigate);
+		SetForegroundWindow(This->m_hwndLog);
+		SetForegroundWindow(This->m_hwndInvestigate);
 		break;
 	      }
 	      case ID_MENUITEM_setting:
-		if (!This->isSettingDialogOpened)
+		if (!This->m_isSettingDialogOpened)
 		{
-		  This->isSettingDialogOpened = true;
-		  if (DialogBox(hInst, MAKEINTRESOURCE(IDD_DIALOG_setting),
+		  This->m_isSettingDialogOpened = true;
+		  if (DialogBox(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_setting),
 				NULL, dlgSetting_dlgProc))
 		    This->load();
-		  This->isSettingDialogOpened = false;
+		  This->m_isSettingDialogOpened = false;
 		}
 		break;
 	      case ID_MENUITEM_log:
-		ShowWindow(This->hwndLog, SW_SHOW);
-		SetForegroundWindow(This->hwndLog);
+		ShowWindow(This->m_hwndLog, SW_SHOW);
+		SetForegroundWindow(This->m_hwndLog);
 		break;
 	      case ID_MENUITEM_version:
-		ShowWindow(This->hwndVersion, SW_SHOW);
-		SetForegroundWindow(This->hwndVersion);
+		ShowWindow(This->m_hwndVersion, SW_SHOW);
+		SetForegroundWindow(This->m_hwndVersion);
 		break;
 	      case ID_MENUITEM_help:
 	      {
 		char buf[GANA_MAX_PATH];
-		CHECK_TRUE( GetModuleFileName(hInst, buf, NUMBER_OF(buf)) );
+		CHECK_TRUE( GetModuleFileName(g_hInst, buf, NUMBER_OF(buf)) );
 		CHECK_TRUE( PathRemoveFileSpec(buf) );
 	    
 		istring helpFilename = buf;
@@ -368,7 +374,7 @@ private:
 		break;
 	      }
 	      case ID_MENUITEM_disable:
-		This->engine.enable(!This->engine.getIsEnabled());
+		This->m_engine.enable(!This->m_engine.getIsEnabled());
 		break;
 	      case ID_MENUITEM_quit:
 		PostQuitMessage(0);
@@ -377,32 +383,32 @@ private:
 	  return 0;
 	}
 
-	case WM_engineNotify:
+	case WM_APP_engineNotify:
 	{
-	  switch (wParam)
+	  switch (i_wParam)
 	  {
-	    case engineNotify_shellExecute:
-	      This->engine.shellExecute();
+	    case EngineNotify_shellExecute:
+	      This->m_engine.shellExecute();
 	      break;
-	    case engineNotify_loadSetting:
+	    case EngineNotify_loadSetting:
 	      This->load();
 	      break;
-	    case engineNotify_helpMessage:
+	    case EngineNotify_helpMessage:
 	      This->showHelpMessage(false);
-	      if (lParam)
+	      if (i_lParam)
 		This->showHelpMessage(true);
 	      break;
-	    case engineNotify_showDlg:
+	    case EngineNotify_showDlg:
 	    {
 	      // show investigate/log window
-	      int sw = (lParam & ~Function::mayuDlgMask);
+	      int sw = (i_lParam & ~Function::MayuDlg_mask);
 	      HWND hwnd = NULL;
-	      if ((lParam & Function::mayuDlgMask)
-		  == Function::mayuDlgInvestigate)
-		hwnd = This->hwndInvestigate;
-	      else if ((lParam & Function::mayuDlgMask)
-		       == Function::mayuDlgLog)
-		hwnd = This->hwndLog;
+	      if ((i_lParam & Function::MayuDlg_mask)
+		  == Function::MayuDlg_investigate)
+		hwnd = This->m_hwndInvestigate;
+	      else if ((i_lParam & Function::MayuDlg_mask)
+		       == Function::MayuDlg_log)
+		hwnd = This->m_hwndLog;
 	      if (hwnd)
 	      {
 		ShowWindow(hwnd, sw);
@@ -426,13 +432,13 @@ private:
 	}
 	
 	default:
-	  if (message == This->WM_TaskbarRestart)
+	  if (i_message == This->m_WM_TaskbarRestart)
 	  {
 	    This->showHelpMessage(false, true);
 	    return 0;
 	  }
       }
-    return DefWindowProc(hwnd, message, wParam, lParam);
+    return DefWindowProc(i_hwnd, i_message, i_wParam, i_lParam);
   }
 
   /// load setting
@@ -441,25 +447,25 @@ private:
     Setting *newSetting = new Setting;
 
     // set symbol
-    for (int i = 1; i < __argc; i++)
+    for (int i = 1; i < __argc; ++ i)
     {
       if (__argv[i][0] == '-' && __argv[i][1] == 'D')
-	newSetting->symbols.insert(__argv[i] + 2);
+	newSetting->m_symbols.insert(__argv[i] + 2);
     }
 
-    if (!SettingLoader(&log, &log).load(newSetting))
+    if (!SettingLoader(&m_log, &m_log).load(newSetting))
     {
-      ShowWindow(hwndLog, SW_SHOW);
-      SetForegroundWindow(hwndLog);
+      ShowWindow(m_hwndLog, SW_SHOW);
+      SetForegroundWindow(m_hwndLog);
       delete newSetting;
-      Acquire a(&log, 0);
-      log << "error: failed to load." << endl;
+      Acquire a(&m_log, 0);
+      m_log << "error: failed to load." << endl;
       return;
     }
-    while (!engine.setSetting(newSetting))
+    while (!m_engine.setSetting(newSetting))
       Sleep(1000);
-    delete setting;
-    setting = newSetting;
+    delete m_setting;
+    m_setting = newSetting;
   }
 
   // メッセージを表示
@@ -467,33 +473,33 @@ private:
   {
     if (m_canUseTasktrayBaloon)
     {
-      ni.uFlags |= NIF_INFO;
+      m_ni.uFlags |= NIF_INFO;
       if (i_doesShow)
       {
 	std::string helpMessage, helpTitle;
-	engine.getHelpMessages(&helpMessage, &helpTitle);
-	StringTool::mbsfill(ni.szInfo, helpMessage.c_str(),
-			    NUMBER_OF(ni.szInfo));
-	StringTool::mbsfill(ni.szInfoTitle, helpTitle.c_str(),
-			    NUMBER_OF(ni.szInfoTitle));
-	ni.dwInfoFlags = NIIF_INFO;
+	m_engine.getHelpMessages(&helpMessage, &helpTitle);
+	StringTool::mbsfill(m_ni.szInfo, helpMessage.c_str(),
+			    NUMBER_OF(m_ni.szInfo));
+	StringTool::mbsfill(m_ni.szInfoTitle, helpTitle.c_str(),
+			    NUMBER_OF(m_ni.szInfoTitle));
+	m_ni.dwInfoFlags = NIIF_INFO;
       }
       else
-	ni.szInfo[0] = ni.szInfoTitle[0] = '\0';
-      CHECK_TRUE( Shell_NotifyIcon(i_doesAdd ? NIM_ADD : NIM_MODIFY, &ni) );
+	m_ni.szInfo[0] = m_ni.szInfoTitle[0] = '\0';
+      CHECK_TRUE( Shell_NotifyIcon(i_doesAdd ? NIM_ADD : NIM_MODIFY, &m_ni) );
     }
   }
 
 public:
   ///
   Mayu()
-    : hwndTaskTray(NULL),
-      hwndLog(NULL),
-      WM_TaskbarRestart(RegisterWindowMessage(TEXT("TaskbarCreated"))),
-      log(WM_MSGSTREAMNOTIFY),
-      setting(NULL),
-      isSettingDialogOpened(false),
-      engine(log),
+    : m_hwndTaskTray(NULL),
+      m_hwndLog(NULL),
+      m_WM_TaskbarRestart(RegisterWindowMessage(TEXT("TaskbarCreated"))),
+      m_log(WM_APP_msgStreamNotify),
+      m_setting(NULL),
+      m_isSettingDialogOpened(false),
+      m_engine(m_log),
       m_canUseTasktrayBaloon(
 	PACKVERSION(5, 0) <= getDllVersion(TEXT("shlwapi.dll")))
   {
@@ -511,63 +517,63 @@ public:
     
     // create windows, dialogs
     istring title = loadString(IDS_mayu);
-    hwndTaskTray = CreateWindow("mayuTasktray", title.c_str(),
-				WS_OVERLAPPEDWINDOW,
-				CW_USEDEFAULT, CW_USEDEFAULT, 
-				CW_USEDEFAULT, CW_USEDEFAULT, 
-				NULL, NULL, hInst, this);
-    CHECK_TRUE( hwndTaskTray );
+    m_hwndTaskTray = CreateWindow("mayuTasktray", title.c_str(),
+				  WS_OVERLAPPEDWINDOW,
+				  CW_USEDEFAULT, CW_USEDEFAULT, 
+				  CW_USEDEFAULT, CW_USEDEFAULT, 
+				  NULL, NULL, g_hInst, this);
+    CHECK_TRUE( m_hwndTaskTray );
     
-    hwndLog =
-      CreateDialogParam(hInst, MAKEINTRESOURCE(IDD_DIALOG_log), NULL,
-			dlgLog_dlgProc, (LPARAM)&log);
-    CHECK_TRUE( hwndLog );
+    m_hwndLog =
+      CreateDialogParam(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_log), NULL,
+			dlgLog_dlgProc, (LPARAM)&m_log);
+    CHECK_TRUE( m_hwndLog );
 
     DlgInvestigateData did;
-    did.m_engine = &engine;
-    did.m_hwndLog = hwndLog;
-    hwndInvestigate =
-      CreateDialogParam(hInst, MAKEINTRESOURCE(IDD_DIALOG_investigate), NULL,
+    did.m_engine = &m_engine;
+    did.m_hwndLog = m_hwndLog;
+    m_hwndInvestigate =
+      CreateDialogParam(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_investigate), NULL,
 			dlgInvestigate_dlgProc, (LPARAM)&did);
-    CHECK_TRUE( hwndInvestigate );
+    CHECK_TRUE( m_hwndInvestigate );
 
-    hwndVersion =
-      CreateDialog(hInst, MAKEINTRESOURCE(IDD_DIALOG_version), NULL,
+    m_hwndVersion =
+      CreateDialog(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_version), NULL,
 		   dlgVersion_dlgProc);
-    CHECK_TRUE( hwndVersion );
+    CHECK_TRUE( m_hwndVersion );
 
     // attach log
-    SendMessage(GetDlgItem(hwndLog, IDC_EDIT_log), EM_SETLIMITTEXT, 0, 0);
-    log.attach(hwndTaskTray);
+    SendMessage(GetDlgItem(m_hwndLog, IDC_EDIT_log), EM_SETLIMITTEXT, 0, 0);
+    m_log.attach(m_hwndTaskTray);
 
     // start keyboard handler thread
-    engine.setAssociatedWndow(hwndTaskTray);
-    engine.start();
+    m_engine.setAssociatedWndow(m_hwndTaskTray);
+    m_engine.start();
     
     // show tasktray icon
-    memset(&ni, 0, sizeof(ni));
-    ni.uID    = ID_TaskTrayIcon;
-    ni.hWnd   = hwndTaskTray;
-    ni.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
-    ni.hIcon  = loadSmallIcon(IDI_ICON_mayu);
-    ni.uCallbackMessage = WM_TASKTRAYNOTIFY;
+    memset(&m_ni, 0, sizeof(m_ni));
+    m_ni.uID    = ID_TaskTrayIcon;
+    m_ni.hWnd   = m_hwndTaskTray;
+    m_ni.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
+    m_ni.hIcon  = loadSmallIcon(IDI_ICON_mayu);
+    m_ni.uCallbackMessage = WM_APP_taskTrayNotify;
     string tip = loadString(IDS_mayu);
-    strncpy(ni.szTip, tip.c_str(), sizeof(ni.szTip));
-    ni.szTip[NUMBER_OF(ni.szTip) - 1] = '\0';
+    strncpy(m_ni.szTip, tip.c_str(), sizeof(m_ni.szTip));
+    m_ni.szTip[NUMBER_OF(m_ni.szTip) - 1] = '\0';
     if (m_canUseTasktrayBaloon)
-      ni.cbSize = sizeof(ni);
+      m_ni.cbSize = sizeof(m_ni);
     else
-      ni.cbSize = NOTIFYICONDATA_V1_SIZE;
+      m_ni.cbSize = NOTIFYICONDATA_V1_SIZE;
     showHelpMessage(false, true);
 
     // create menu
-    hMenuTaskTray = LoadMenu(hInst, MAKEINTRESOURCE(IDR_MENU_tasktray));
-    assert(hMenuTaskTray);
+    m_hMenuTaskTray = LoadMenu(g_hInst, MAKEINTRESOURCE(IDR_MENU_tasktray));
+    ASSERT(m_hMenuTaskTray);
     
     // start message handler thread
-    CHECK_TRUE( mhEvent = CreateEvent(NULL, FALSE, FALSE, NULL) );
+    CHECK_TRUE( m_mhEvent = CreateEvent(NULL, FALSE, FALSE, NULL) );
     CHECK_TRUE( 0 <= _beginthread(notifyHandler, 0, this) );
-    CHECK( WAIT_OBJECT_0 ==, WaitForSingleObject(mhEvent, INFINITE) );
+    CHECK( WAIT_OBJECT_0 ==, WaitForSingleObject(m_mhEvent, INFINITE) );
 
     // set initial lock state
     notifyLockState();
@@ -577,32 +583,32 @@ public:
   ~Mayu()
   {
     // first, detach log from edit control to avoid deadlock
-    log.detach();
+    m_log.detach();
     
     // destroy windows
-    CHECK_TRUE( DestroyWindow(hwndVersion) );
-    CHECK_TRUE( DestroyWindow(hwndInvestigate) );
-    CHECK_TRUE( DestroyWindow(hwndLog) );
-    CHECK_TRUE( DestroyWindow(hwndTaskTray) );
+    CHECK_TRUE( DestroyWindow(m_hwndVersion) );
+    CHECK_TRUE( DestroyWindow(m_hwndInvestigate) );
+    CHECK_TRUE( DestroyWindow(m_hwndLog) );
+    CHECK_TRUE( DestroyWindow(m_hwndTaskTray) );
     
     // wait for message handler thread terminate
-    Notify n = { Notify::TypeMayuExit };
+    Notify n = { Notify::Type_mayuExit };
     notify(&n, sizeof(n));
-    CHECK( WAIT_OBJECT_0 ==, WaitForSingleObject(mhEvent, INFINITE) );
-    CHECK_TRUE( CloseHandle(mhEvent) );
+    CHECK( WAIT_OBJECT_0 ==, WaitForSingleObject(m_mhEvent, INFINITE) );
+    CHECK_TRUE( CloseHandle(m_mhEvent) );
 
     // destroy menu
-    DestroyMenu(hMenuTaskTray);
+    DestroyMenu(m_hMenuTaskTray);
     
     // delete tasktray icon
-    CHECK_TRUE( Shell_NotifyIcon(NIM_DELETE, &ni) );
-    CHECK_TRUE( DestroyIcon(ni.hIcon) );
+    CHECK_TRUE( Shell_NotifyIcon(NIM_DELETE, &m_ni) );
+    CHECK_TRUE( DestroyIcon(m_ni.hIcon) );
 
     // stop keyboard handler thread
-    engine.stop();
+    m_engine.stop();
     
     // remove setting;
-    delete setting;
+    delete m_setting;
   }
   
   /// message loop
@@ -624,21 +630,21 @@ public:
       strftime(buf, NUMBER_OF(buf), "%#c", localtime(&now));
 #endif
       
-      Acquire a(&log, 0);
-      log << loadString(IDS_mayu) << " "VERSION" @ " << buf << endl;
-      CHECK_TRUE( GetModuleFileName(hInst, buf, NUMBER_OF(buf)) );
-      log << buf << endl << endl;
+      Acquire a(&m_log, 0);
+      m_log << loadString(IDS_mayu) << " "VERSION" @ " << buf << endl;
+      CHECK_TRUE( GetModuleFileName(g_hInst, buf, NUMBER_OF(buf)) );
+      m_log << buf << endl << endl;
     }
     load();
     
     MSG msg;
     while (0 < GetMessage(&msg, NULL, 0, 0))
     {
-      if (IsDialogMessage(hwndLog, &msg))
+      if (IsDialogMessage(m_hwndLog, &msg))
 	continue;
-      if (IsDialogMessage(hwndInvestigate, &msg))
+      if (IsDialogMessage(m_hwndInvestigate, &msg))
 	continue;
-      if (IsDialogMessage(hwndVersion, &msg))
+      if (IsDialogMessage(m_hwndVersion, &msg))
 	continue;
       TranslateMessage(&msg);
       DispatchMessage(&msg);
@@ -704,10 +710,10 @@ void convertRegistry()
 
 
 /// main
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
-		   LPSTR /* lpszCmdLine */, int /* nCmdShow */)
+int WINAPI WinMain(HINSTANCE i_hInstance, HINSTANCE /* i_hPrevInstance */,
+		   LPSTR /* i_lpszCmdLine */, int /* i_nCmdShow */)
 {
-  hInst = hInstance;
+  g_hInst = i_hInstance;
 
   // set locale
   CHECK_TRUE( setlocale(LC_ALL, "") );
@@ -738,10 +744,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
   {
     Mayu().messageLoop();
   }
-  catch (ErrorMessage &e)
+  catch (ErrorMessage &i_e)
   {
     string title = loadString(IDS_mayu);
-    MessageBox((HWND)NULL, e.getMessage().c_str(), title.c_str(),
+    MessageBox((HWND)NULL, i_e.getMessage().c_str(), title.c_str(),
 	       MB_OK | MB_ICONSTOP);
   }
   CHECK_FALSE( uninstallHooks() );
