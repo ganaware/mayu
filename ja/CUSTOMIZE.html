@@ -1,0 +1,832 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Frameset//EN" "http://www.w3.org/TR/REC-html40/frameset.dtd"> 
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-2022-jp">
+<link rel="stylesheet" type="text/css" href="README.css">
+<title>mayu - MANUAL - CUSTOMIZE</title>
+</head>
+
+<body class="manual">
+
+<div class="main">
+
+
+<dl>
+  <dt class="h1"><a name="CUSTOMIZE" href="MANUAL.html#CUSTOMIZE">4. customize</a>
+      
+  <dd class="d1">
+      付属の <tt>.mayu</tt> (<tt><a href="dot.mayu">dot.mayu</a></tt>) を利用すれば、エディットコントロールで Emacs 風の操作ができるようになりますが、<tt>.mayu</tt> をカスタマイズすることによって、Windows を自分の好きなキーバインディングで利用することができるようになります。<br>
+      <br>
+      <tt>.mayu</tt> は<a href="#HOME">ホームディレクトリ</a>から検索されます。<br>
+      <br>
+      <tt>.mayu</tt> は上から下へ読まれていき、重複する記述があれば、より下に書かれているものが有効になります。コメントは <tt>#</tt> ではじめます。アルファベットの大文字と小文字は区別されません。詳しい文法は <a href="../en/syntax.txt">syntax.txt</a> を参照してください。<br>
+      <br>
+      この章を読む前に、<a href="../contrib/mayu-settings.txt">contrib/mayu-settings.txt</a> を読んで付属の設定ファイルについて理解を深めておくことをお勧めします。
+      
+      <dl>
+	<dt class="h3"><a name="HOME">&diams; ホームディレクトリ</a>
+	<dd class="d3">
+	    ホームディレクトリは、
+	    
+	    <p class="sample">
+	    %HOME%<br>
+	    %HOMEDRIVE%%HOMEPATH%<br>
+	    %USERPROFILE%<br>
+	    mayu.exe のある場所<br>
+	    設定(S)... で指定したファイルのあるディレクトリ<br>
+	    </p>
+	    
+	    のどれかになります。
+      </dl>
+
+  <dt class="h2"><a name="key">i. キー割り当ての変更</a>
+      
+  <dd class="d2">
+      キー割り当てを変更するには、以下のように記述をします。
+      
+      <p class="sample"><nobr>
+      key <i>KEY</I> =&gt; <i>KEY や FUNCTION</i> …
+      </nobr></p>
+	    
+      <tt>=&gt;</tt> より左の <tt><i>KEY</i></tt> をキーボードで押すと、Windows へは <tt>=&gt;</tt> より右の <tt><i>KEY</i></tt> が順番に入力されます。また、右に <tt><i>FUNCTION</i></tt> が書かれている場合はウィンドウの最大化や移動などの機能が実行されます。<br>
+      <br>
+      <tt><i>KEY</i></tt> は<a href="#keyboard">キーボード定義</a>で定義されるもので、デフォルトでは <a href="109.mayu">109.mayu</a> 又は <a href="../en/104.mayu">104.mayu</a> で定義されている <tt><i>KEY</i></tt> が使用できます。<br>
+      <br>
+      <dl>
+	<dt class="h3"><a name="modifier">&diams; モディファイヤの指定</a>
+	<dd class="d3">
+	    ▼ <tt><i>KEY</i></tt> の前に以下のような記号を付けることによって、コントロールキーなどの状態を表現できます。また、これらをモディファイヤと呼ぶことにします。<br>
+	    <br>
+	    <tt>C-</tt> は、<kbd>[Control]</kbd> が押されていることを表します<br>
+	    <tt>M-</tt> か <tt>A-</tt> は、<kbd>[Alt]</kbd> が押されていることを表します<br>
+	    <tt>S-</tt> は、<kbd>[Shift]</kbd> が押されていることを表します<br>
+	    <tt>NL-</tt> は、<kbd>[NumLock]</kbd> がロック状態であることを表します<br>
+	    <tt>CL-</tt> は、<kbd>[CapsLock]</kbd> がロック状態であることを表します<br>
+	    <tt>SL-</tt> は、<kbd>[ScrollLock]</kbd> がロック状態であることを表します<br>
+	    <tt>IL-</tt> は、IME が on になっていることを表します<br>
+	    <tt>IC-</tt> は、IME で変換中であることを表します<br>
+	    <br>
+	    ▼ 以下のように記述すると、<kbd>[Control]</kbd> + <kbd>[A]</kbd> を押した時に、Windows へは <kbd>[HOME]</kbd> キーが入力されます。
+	    
+	    <p class="sample"><nobr>
+	    key C-A =&gt; HOME
+	    </nobr></p>
+		  
+	<dt class="h3"><a name="ignoreModifier">&diams; モディファイヤキーの無視</a>
+	<dd class="d3">
+	    ▼ 上記の例では左側に <tt>C-A</tt> と記述していますが、この記述では、ロックキーなどは押されていても押されてなくても良いと記述していることになります。たとえば、<kbd>[CapsLock]</kbd> を押したあとで <kbd>[Control]</kbd> + <kbd>[A]</kbd> を押しても、押さずに <kbd>[Control]</kbd> + <kbd>[A]</kbd> を押しても、Windows へは <kbd>[Home]</kbd> が入力されます。<br>
+	    <br>
+	    特定のモディファイヤの状態を無視したい場合は、モディファイヤに "<tt>*</tt>" をつけます。逆にモディファイヤが必ず押されていなければならない場合は付けません。またモディファイヤが必ず離されていなければならない場合は "<tt>~</tt>" を付けます。たとえば、
+	    
+	    <p class="sample"><nobr>
+	    key *S-F9 =&gt; &amp;WindowMinimize
+	    </nobr></p>
+	    
+	    このように記述すると、<kbd>[F9]</kbd> 又は <kbd>[Shift]</kbd> + <kbd>[F9]</kbd> でウィンドウを最小化することができますが、例えば、<kbd>[Control]</kbd> + <kbd>[F9]</kbd> ではできません。<br>
+	    <br>
+	    ▼ デフォルトでは、暗黙に <tt>~C-~M-~S-*NL-*CL-*SL-*IL-~IC-</tt> が指定されていることになっていますが、<a href="#defaultModifier">変更</a>できます。<br><br>
+	    ▼ また、<kbd>[Shift]</kbd> は必ず押されていてほしいがほかのモディファイヤはどうでもいいという場合は、
+	    
+	    <p class="sample"><nobr>
+	    key S-*F9 =&gt; &amp;WindowMinimize
+	    </nobr></p>
+
+	    というように <tt>*</tt> をキーの直前に記述します。"<tt>~</tt>" についても同様です。<br>
+	    
+	<dt class="h3"><a name="inputModifier">&diams; 入力されたキーと同じモディファイヤの指定</a>
+	<dd class="d3">
+	    ▼ <tt>=&gt;</tt> より右側でのモディファイヤの指定の方法です。
+
+	    <p class="sample"><nobr>
+	    key *S-A =&gt; C-*S-B
+	    </nobr></p>
+
+	    例えばこのように記述した場合、<kbd>[Shift]</kbd> + <kbd>[A]</kbd> を押すと、Windows へは <kbd>[Shift]</kbd> + <kbd>[Control]</kbd> + <kbd>[B]</kbd> が入力されます。<kbd>[A]</kbd> を押すと、Windows へは <kbd>[Control]</kbd> + <kbd>[B]</kbd> が入力されます。<br>
+	    <br>
+	    つまり、<tt>=&gt;</tt> の右側で <tt>*</tt> で指定されたモディファイヤは、キーボードで実際に入力したモディファイヤと同じになるように設定されます。<br>
+	    <br>
+	    したがって、<kbd>[A]</kbd> を <kbd>[B]</kbd> と入れ替えたい場合は、
+	    
+	    <p class="sample"><nobr>
+	    key *A =&gt; *B<br>
+	    key *B =&gt; *A
+	    </nobr></p>
+
+	    となります。
+
+	<dt class="h3"><a name="keyUpDown">&diams; キーを押す/離す</a>
+	<dd class="d3">
+	    ▼ <tt><i>KEY</i></tt> の前にモディファイヤと同じように <tt>D-</tt> と <tt>U-</tt> を付けることができます。これは、それぞれキーの押すことと離すことに対応しています。デフォルトでは <tt>*D-*U-</tt> が指定されています。例えば、
+	    <p class="sample"><nobr>
+	    key A =&gt; B C
+	    </nobr></p>
+	    
+	    という記述は、
+	    
+	    <p class="sample"><nobr>
+	    key *U-*D-A =&gt; D-B U-B D-C U-C
+	    </nobr></p>
+
+	    と同じであり、さらに次のものとも同じになります。キーリピートが起こった場合は、<tt>~U-D-A</tt> が何度も実行され、キーを離したときに <tt>U-~D-A</tt> が実行されます。
+	    
+	    <p class="sample"><nobr>
+	    key ~U-D-A =&gt; D-B U-B D-C<br>
+	    key U-~D-A =&gt; U-C
+	    </nobr></p>
+
+	<dt class="h3"><a name="defaultModifier">&diams; デフォルトモディファイヤの変更</a>
+	<dd class="d3">デフォルトでは、左側のキーには <tt>~C-~M-~S-*NL-*CL-*SL-*IL-~IC-</tt> が指定されていますが、例えばこれを変更することができます。例えば、
+	    
+	    <p class="sample"><nobr>
+	    key IC-* =
+	    </nobr></p>
+
+	    と記述すると、この文以降のデフォルトモディファイヤは <tt>~C-~M-~S-*NL-*CL-*SL-*IL-*IC-</tt> となります。
+	    
+      </dl>
+      <br>
+
+  <dt class="h2"><a name="keymap">ii. キーマップ定義</a>
+
+  <dd class="d2">
+      「窓使いの憂鬱」には、キーマップという概念があります。キーマップにカスタマイズしたいキー情報を書き込んでゆき、ウィンドウごとにキーマップを使い分けます。キーマップを定義するには、以下のどれかの文を書いてからキーを設定します。
+	    
+      <p class="sample"><nobr>
+      keymap <i>キーマップ名</i><br>
+      keymap2 <i>キーマップ名</i><br>
+      window <i>キーマップ名</i> <i>ウィンドウクラス名</i><br>
+      window <i>キーマップ名</i> ( <i>ウィンドウクラス名</i> &amp;&amp; <i>ウィンドウタイトル名</i> )<br>
+      window <i>キーマップ名</i> ( <i>ウィンドウクラス名</i> || <i>ウィンドウタイトル名</i> )<br>
+      </nobr></p>
+      
+      例えば、メモ帳で <kbd>[Control]</kbd> + <kbd>[Z]</kbd> を押すと最小化されるが、メモ帳以外のエディットコントロールで <kbd>[Control]</kbd> + <kbd>[Z]</kbd> を押すと単なる <kbd>[Z]</kbd> キーと同じになるという指定がしたい場合は、
+	    
+      <p class="sample"><nobr>
+      window EditControl /:Edit$/ : Global<br>
+      key C-Z =&gt; Z<br>
+      window Notpad /Notepad:Edit$/ : Global<br>
+      key C-Z =&gt; &amp;WindowMinimize
+      </nobr></p>
+	    
+      と記述します。ここで <tt>/Notepad:Edit$/</tt> はメモ帳の上にあるエディットコントロールの<i>ウィンドウクラス名</i>を表しています。<i>ウィンドウクラス名</i>は正規表現で記述します。<tt>: Global</tt> は<i>親キーマップ</i>を指定しています。
+      
+      <dl>
+	<dt class="h3"><a name="windowClass">&diams; ウィンドウクラス/タイトル名</a>
+	    
+	<dd class="d3">
+	    ▼ Windows の全てのウィンドウは、何らかのウィンドウクラスに属しています。例えば、メモ帳のウィンドウクラス名は <tt>Notepad</tt> で、エディットコントロールのウィンドウクラス名は <tt>Edit</tt> です。<br>
+	    <br>
+	    「窓使いの憂鬱」は、どのウィンドウでどのキーを押したらどんな動作をするか、ということを区別するために<i>ウィンドウクラス名</i>と<i>ウィンドウタイトル名</i>を用いています。そのために、「窓使いの憂鬱」ではウィンドウの重なりの状態を "<tt>:</tt>" で繋げて表現します。例えば、メモ帳の上のエディットコントロールの<i>ウィンドウクラス名</i>ならば、
+
+	    <p class="sample"><nobr>
+	    C:\winnt\system32\notepad.exe:Notepad:Edit
+	    </nobr></p>
+	    
+	    と表現します。ただし、<i>ウィンドウクラス名</i>の一番最初にはそのアプリケーションのパス名を付けています。<br>
+	    <br>
+	    ▼ <tt>window</tt> 文には、この<i>ウィンドウクラス名</i>と<i>ウィンドウタイトル名</i>を記述することができますが、<i>ウィンドウクラス名</i>全てを書く必要はなく、正規表現で省略することができます。<br>
+	    <br>
+	    例えば、<tt>/:Edit$/</tt> は全てのエディットコントロールの<i>ウィンドウクラス名</i>を表しますし、<tt>/:#32770.*:Edit$/</tt> ならば、ダイアログボックス上にある全てのエディットコントロールの<i>ウィンドウクラス名</i>を表します (<tt>#32770</tt> はダイアログボックスのウィンドウクラス名)。<br>
+	    <br>
+	    個々のウィンドウの<i>ウィンドウクラス名</i>と<i>ウィンドウタイトル名</i>を調べるには、後述の <a href="MANUAL.html#CLASSNAME">window class investigation</a> を参照してください。<br>
+	    <br>
+	    ▼ <i>ウィンドウクラス名</i>と<i>ウィンドウタイトル名</i>の両方を記述する場合は、括弧で囲みその間を <tt>&amp;&amp;</tt> か <tt>||</tt> で区切ります。<tt>&amp;&amp;</tt> の場合は、両方にマッチするようなウィンドウを表し、<tt>||</tt> の場合はどちらか一方にマッチするようなウィンドウを表します。
+		  
+	<dt class="h3"><a name="regexp">&diams; 正規表現について</a>
+	    
+	<dd class="d3">
+	    ▼ <i>ウィンドウクラス名</i>と<i>ウィンドウタイトル名</i>には正規表現が使用できます。正規表現は <tt>/.../</tt> で囲むか、<tt>\m@...@</tt>で囲みます (ただし<tt>@</tt>はどんな文字でもよし)。<br>
+	    <br>
+	    "<tt>|</tt>" Alternation<br>
+	    "<tt>*</tt>" Match 0 or more times<br>
+	    "<tt>+</tt>" Match 1 or more times<br>
+	    "<tt>?</tt>" Match 1 or 0 times<br>
+	    "<tt>.</tt>" Match any character<br>
+	    "<tt>^</tt>" Match the beginning of the string<br>
+	    "<tt>$</tt>" Match the end of the string<br>
+	    "<tt>\b</tt>" Match a word boundary<br>
+	    "<tt>\B</tt>" Match a non word boundary<br>
+	    "<tt>\w</tt>" Match a word character (<tt>[0-9a-z_]</tt>)<br>
+	    "<tt>\W</tt>" Match a non word character<br>
+	    "<tt>\s</tt>" Match a whitespace character<br>
+	    "<tt>\S</tt>" Match a non-whitespace character<br>
+	    "<tt>\d</tt>" Match a digit character<br>
+	    "<tt>\D</tt>" Match a non-digit character<br>
+	    "<tt>(</tt>" "<tt>)</tt>" Grouping<br>
+	    "<tt>[</tt>" "<tt>]</tt>" Character class<br>
+	    
+	<dt class="h3"><a name="parentKeymap">&diams; 親キーマップ</a>
+	    
+	<dd class="d3">
+	    ▼ 親キーマップとは、現在のキーマップに適切なキー割り当てが定義されていない場合に、キーを捜しに行くキーマップです。"<tt>:</tt>" の後ろに<i>親キーマップ名</i>を書きます。例えば、
+		  
+	    <p class="sample"><nobr>
+	    keymap sub : Global<br>
+	    key	C-A =&gt; &amp;WindowMinimize<br>
+	    window EditControl /:Edit$/ : sub<br>
+	    key	C-A =&gt; &amp;KeymapParent
+	    </nobr></p>
+	    
+	    と記述した場合、エディットコントロールで <kbd>[Control]</kbd> + <kbd>[A]</kbd> を入力すると、ウィンドウは最小化されます。つまり、<a href="#function_KeymapParent"><tt>&amp;KeymapParent</tt></a> を記述することで親キーマップで定義されたキーを利用することができるのです。もし、<i>親キーマップ名</i>が指定されていなければ <a href="#function_Default"><tt>&amp;Default</tt></a> 扱いとなり、ウィンドウへキーがそのまま入力されます。
+	    
+	<dt class="h3"><a name="defaultKey">&diams; デフォルトキー</a>
+	    
+	<dd class="d3">
+	    ▼ <tt>keymap</tt>、<tt>window</tt>、<tt>keymap2</tt> には、最後にキーを羅列することによってデフォルトキーを定義することができます。例えば、
+	    
+	    <p class="sample"><nobr>
+	    window EditControl /:Edit$/ : Global =&gt; A<br>
+	    key *B =&gt; *C
+	    </nobr></p>
+	    
+	    と記述すると、<kbd>[B]</kbd> を入力すると <kbd>[C]</kbd> を入力したことになるが、<kbd>[B]</kbd> 以外のキーを入力すると、<kbd>[A]</kbd> を入力したことになります。また、デフォルトキーを指定しなかった場合のデフォルトキーは、<tt>keymap</tt> と <tt>window</tt> の場合は <a href="#function_KeymapParent"><tt>&amp;KeymapParent</tt></a> で、<tt>keymap2</tt> の場合は <a href="#function_Undefined"><tt>&amp;Undefined</tt></a> になります。
+		  
+	<dt class="h3"><a name="keymap2">&diams; 二段階キーマップ</a>
+	    
+	<dd class="d3">
+	    ▼ <tt>keymap2</tt> はデフォルトキーが <a href="#function_Undefined"><tt>&amp;Undefined</tt></a> になってるようなキーマップで、主に <a href="#function_Prefix"><tt>&amp;Prefix</tt></a> を利用して 2 ストロークキーを記述する時に使用します。
+
+	<dt class="h3"><a name="initialKeymap">&diams; 初期キーマップ</a>
+	
+	<dd class="d3">
+	    ▼ <tt>.mayu</tt> の一番最初の行には、
+		  
+	    <p class="sample"><nobr>
+	    window Global ( // || // ) =&gt; &amp;OtherWindowClass<br>
+	    </nobr></p>
+	    
+	    という行が隠れていると考えて下さい。つまり、<tt>.mayu</tt> で何もキーマップを指定せずに書き始めると、<i>キーマップ名</i> <tt>Global</tt> のキーマップに対するキー定義になるということです。そして、<tt>Global</tt> キーマップのデフォルトキーは <a href="#function_OtherWindowClass"><tt>&amp;OtherWindowClass</tt></a> が設定されています。
+		  
+	    
+	<dt class="h3"><a name="conflictKeymap">&diams; 矛盾したキーマップの指定</a>
+	    
+	<dd class="d3">
+	    ▼ 同じキーマップに対する <tt>keymap</tt> や <tt>window</tt> や <tt>keymap2</tt> は何度でも指定できますが、矛盾する指定をしてはいけません。例えば、
+	    
+	    <p class="sample"><nobr>
+	    keymap Amap : Global<br>
+	    ...<br>
+	    keymap Bmap : Amap<br>
+	    ...<br>
+	    keymap Amap : Global<br>
+	    ...
+	    </nobr></p>
+	    
+	    という指定は問題ありませんが、
+	    
+	    <p class="sample"><nobr>
+	    keymap Amap : Global<br>
+	    ...<br>
+	    keymap Bmap : Amap<br>
+	    ...<br>
+	    keymap Amap : Bmap	# 矛盾<br>
+	    ...
+	    </nobr></p>
+	    
+	    という指定はしてはいけません。この場合、<tt>keymap Amap : Bmap</tt> のかわりに <tt>keymap Amap : Global</tt> が指定されたものとみなされます。エラーは出ません。
+	    
+	<dt class="h3"><a name="matchManyClasses">&diams; <tt>window</tt> に複数該当する場合</a>
+	    
+	<dd class="d3">
+	    ▼例えば、
+	    
+	    <p class="sample"><nobr>
+	    window EditControl /:Edit$/ : Global<br>
+	    key A = A space E D I T enter<br>
+	    key B = B space E D I T enter<br>
+	    window Notepad /:Notepad/ : Global<br>
+	    key A = A space N O T E P A D enter<br>
+	    key C = C space N O T E P A D enter
+	    </nobr></p>
+	    
+	    という記述をしたとします。ここで、「メモ帳」を立ち上げると、メモ帳の<i>ウィンドウクラス名</i>は
+	    
+	    <p class="sample"><nobr>
+	    C:\winnt\system32\notepad.exe:Notepad:Edit
+	    </nobr></p>
+	    
+	    となっているので、<tt>/:Edit$/</tt> と <tt>/:Notepad/</tt> は両方共もメモ帳の<i>ウィンドウクラス名</i>に該当します。この時、<kbd>[A]</kbd> を入力すると、メモ帳には「a notepad」と表示されます。これは、重複する記述があれば、より下に書かれているものが有効になるからです。しかし、<kbd>[B]</kbd> を入力した場合は、重複していないので、メモ帳には「b edit」と表示されることになります。<br>
+	    <br>
+	    ▼ <kbd>[B]</kbd> を入力した場合に、内部で行われる処理は以下のようになります。
+	    <ol>
+	      <li>まず<i>ウィンドウクラス名</i>は <tt>/:Notepad/</tt> に該当しますが、キー割り当てがないので、<tt>window</tt> のデフォルトキーである <tt>&amp;KeymapParent</tt> が採用されます。
+	      <li><tt>&amp;KeymapParent</tt> は<i>親キーマップ</i>の参照なので、<tt>Global</tt> キーマップを参照します。
+	      <li>そうすると、<tt>Global</tt> キーマップでも <kbd>[B]</kbd> の割り当てがないので、<tt>Global</tt> キーマップのデフォルトキーである、<tt>&amp;OtherWindowClass</tt> が採用されます。
+	      <li><tt>&amp;OtherWindowClass</tt> が採用されると、まず、他に該当する<i>ウィンドウクラス名</i>がないかどうか探します。もしなければ、<tt>&amp;Default</tt> 扱いとなります。この場合は <tt>/:Edit$/</tt> に該当します。
+	      <li><tt>/:Edit$/</tt> に該当したので、<tt>/:Edit$/</tt> の <kbd>[B]</kbd> が採用されます。したがって、「b edit」と表示されることとなります。
+	    </ol>
+      </dl>
+      <br>
+
+  <dt class="h2"><a name="mod">iii. モディファイヤキー割り当ての変更</a>
+
+  <dd class="d2">
+      <p class="sample"><nobr>
+      mod <i>モディファイヤキー名</i> = <i>キー名</i> …<br>
+      mod <i>モディファイヤキー名</i> += <i>キー名</i> …<br>
+      mod <i>モディファイヤキー名</i> -= <i>キー名</i> …<br>
+      </nobr></p>
+
+      最初の 3 つは、<i>キー名</i>で指定したキーをモディファイヤキーにしたり (<tt>=</tt>) 追加したり (<tt>+=</tt>) 削除したり (<tt>-=</tt>) します。各キーマップ毎に割り当てます。明示的に割り当てない場合は、親キーマップから引き継がれます。例えば、
+
+      <p class="sample"><nobr>
+      mod shift += 無変換
+      </nobr></p>
+
+      は、<kbd>[無変換]</kbd> キーを shift モディファイヤキーにします。従って、
+
+      <p class="sample"><nobr>
+      key S-A =&gt; X
+      </nobr></p>
+      
+      という記述があった場合に、<kbd>[無変換]</kbd> + <kbd>[A]</kbd> を押すと <kbd>[X]</kbd> を入力したことになります。正確には、<kbd>[無変換押す]</kbd> <kbd>[X押す]</kbd> <kbd>[X離す]</kbd> <kbd>[無変換離す]</kbd> というキーが Windows へ入力されます。これでは都合が悪いということは多いと思われるので、
+
+      <p class="sample"><nobr>
+      key *無変換 =&gt; *LShift
+      </nobr></p>
+      
+      として <kbd>[無変換]</kbd> キーを押すと <kbd>[LShift]</kbd> が入力されるように割り当てます。そうすれば、Windows へは <kbd>[LShift押す]</kbd> <kbd>[LShift離す]</kbd> <kbd>[X押す]</kbd> <kbd>[X離す]</kbd> というキーが入力されます。<br>
+      <br>
+
+      <i>モディファイヤキー名</i>には、<tt>shift</tt>, <tt>alt</tt> (<tt>meta</tt>, <tt>menu</tt>), <tt>control</tt> (<tt>ctrl</tt>), <tt>windows</tt> (<tt>win</tt>), <tt>mod0</tt>〜<tt>mod9</tt> が記述できます。括弧の中は別名です。<br>
+      <br>
+      <tt>mod0</tt>〜<tt>mod9</tt> は「窓使いの憂鬱」の中でのみ有効なモディファイヤで、例えば以下のように使用します。
+      
+      <p class="sample"><nobr>
+      mod mod0 = ↑<br>
+      key M0-← => ← ↑
+      </nobr></p>
+
+      このように割り当てると、<kbd>[↑]</kbd> を押しながら <kbd>[←]</kbd> を押すとカーソルが左斜め上へ移動することになります。
+      
+
+      <dl>
+	<dt class="h3"><a name="trueModifier">&diams; 真のモディファイヤ</a>
+	    
+	<dd class="d3">
+	    ▼ モディファイヤにしたいキーの前に "<tt>!</tt>" を付けると、<i>真のモディファイヤ</i>になります。例えば、
+	    
+	    <p class="sample"><nobr>
+	    mod shift += !無変換<br>
+	    key 無変換 =&gt; Y<br>
+	    key S-A =&gt; X
+	    </nobr></p>
+	    
+	    と記述した場合、<kbd>[無変換]</kbd> + <kbd>[A]</kbd> を押すと <kbd>[X押す]</kbd> <kbd>[X離す]</kbd> というキーが Windows へ入力されます。Windows からは、<kbd>[無変換]</kbd> キーが押されたということは分かりませんし、<kbd>[Y]</kbd> も Windows へ入力されることはありません。つまり、真のモディファイヤに定義されているキーや <tt><i>FUNCTION</i></tt> などは実行されません。<br>
+	    <br>
+	    ▼ 以下のような行を記述すると、
+	    
+	    <p class="sample"><nobr>
+	    mod !<i>モディファイヤキー名</i><br>
+	    </nobr></p>
+
+	    その<i>モディファイヤキー名</i>に割り当てられているモディファイヤを全て<i>真のモディファイヤ</i>に変更します。
+
+	<dt class="h3"><a name="oneShotModifier">&diams; One Shot モディファイヤ</a>
+	    
+	<dd class="d3">
+	    ▼ モディファイヤにしたいキーの前に "<tt>!!</tt>" を付けると、<i>One Shot モディファイヤ</i>になります。たとえば、
+	    
+	    <p class="sample"><nobr>
+	    mod shift = !!LShift<br>
+	    key S-A =&gt; X<br>
+	    key LShift =&gt; Y
+	    </nobr></p>
+	    
+	    と記述した場合、<kbd>[LShift]</kbd> を押してすぐ離した場合は、Windows へは、<kbd>[Y]</kbd> が入力されますが、<kbd>[LShift]</kbd> + <kbd>[A]</kbd> を入力した場合は、<kbd>[X]</kbd> のみが Windows へ入力されます。<br>
+	    <br>
+	    ▼ 以下のような行を記述すると、
+	    
+	    <p class="sample"><nobr>
+	    mod !!<i>モディファイヤキー名</i><br>
+	    </nobr></p>
+
+	    その<i>モディファイヤキー名</i>に割り当てられているモディファイヤを全て<i>One Shot モディファイヤ</i>に変更します。
+	    
+	<dt class="h3"><a name="lock">&diams; ロックキー</a>
+	    
+	<dd class="d3">
+	    ▼ 「窓使いの憂鬱」には、「窓使いの憂鬱」の中でのみ有効なロックキーが存在します。これらはキーのモディファイヤとして <tt>L0-</tt>〜<tt>L9-</tt> を書くことができ、<a href="#function_Toggle"><tt>&amp;Toggle</tt></a> を使うことによりトグルさせることができます。例えば、
+	    
+	    <p class="sample"><nobr>
+	    key ひらがな =&gt; &amp;Toggle(Lock0)<br>
+	    key L0-A => B
+	    </nobr></p>
+
+	    と記述すると、<kbd>[ひらがな]</kbd> キーがトグル状態になっているときに <kbd>[A]</kbd> を押すと Windows へは <kbd>[B]</kbd> が入力されます。
+      </dl>
+      <br>
+
+  <dt class="h2"><a name="keyseq" class="a2">iv. キーシーケンス定義</a>
+
+  <dd class="d2">
+      <p class="sample"><nobr>
+      keyseq <i>$キーシーケンス名</i> = <i>キー名か機能名</i> …
+      </nobr></p>
+      
+      <tt>keyseq</tt> を使うことで、一連のキー入力に対して名前を付けることができます。例えば、
+	    
+      <p class="sample"><nobr>
+      keyseq $Right2Times = Right Right<br>
+      key C-F =&gt; $Right2Times
+      </nobr></p>
+      
+      とすると、<kbd>[Control]</kbd> + <kbd>[F]</kbd> で右に二つカーソルを進めることができます。又、
+      
+      <p class="sample"><nobr>
+      key C-F =&gt; Right Right
+      </nobr></p>
+      
+      は、<tt>$Right2Times</tt> という名前が定義されないこと以外は、先の例と同じになります。
+
+  <dt class="h2"><a name="keyboard">v. キーボード定義</a>
+      
+  <dd class="d2">
+      デフォルトのキーボード定義は <a href="109.mayu">109.mayu</a> 又は <a href="../en/104.mayu">104.mayu</a> に書かれています。
+
+      <dl>
+	<dt class="h3"><a name="def_key">&diams; キー定義</a>
+
+	<dd class="d3">
+	    ▼ キーボードの物理的なキーを定義します。
+	    
+	    <p class="sample"><nobr>
+	    def key <i>キー名</i>… = <i>スキャンコード</i>…
+	    </nobr></p>
+	    
+	    キーが発生する<tt><i>スキャンコード</i></tt>を記述していきます。<tt><i>スキャンコード</i></tt>は数字で書き、<tt>E0-</tt> や <tt>E1-</tt> という拡張キーフラグをつけることができます。又、
+
+	    <p class="sample"><nobr>
+	    def key Pause = E1-0x1d 0x45
+	    </nobr></p>
+	    
+	    このように一連の<i>スキャンコード</i>を発生させるキーにはスキャンコードを書き並べます
+	    
+	<dt class="h3"><a name="def_mod">&diams; モディファイヤ定義</a>
+
+	<dd class="d3">
+	    ▼ キーボードの物理的なモディファイヤキーを定義します。
+	    
+	    <p class="sample"><nobr>
+	    def mod <i>モディファイヤ名</i> = <i>キー名</i>…
+	    </nobr></p>
+
+	    <tt><i>モディファイヤ名</i></tt>には、<tt>shift</tt>, <tt>alt</tt> (<tt>meta</tt>, <tt>menu</tt>), <tt>control</tt> (<tt>ctrl</tt>), <tt>windows</tt> (<tt>win</tt>) が記述できます。括弧の中は別名です。
+	    
+	<dt class="h3"><a name="def_sync">&diams; 同期定義</a>
+	    
+	<dd class="d3">
+	    ▼ <tt>&amp;Sync</tt> に使用する<tt><i>スキャンコード</i></tt>を定義します。
+	    
+	    <p class="sample"><nobr>
+	    def sync = <i>スキャンコード</i>…
+	    </nobr></p>
+	    
+	    <tt>&amp;Sync</tt> が実行されるとき、「窓使いの憂鬱」はこの<tt><i>スキャンコード</i></tt>を Windows に送ります。そして、各ウィンドウがこのキーが入力されたことを「窓使いの憂鬱」へ連絡してくるまで処理を中断します。このようにして同期をとるので、この<tt><i>スキャンコード</i></tt>が不正に設定されていると、同期がとれず「窓使いの憂鬱」が 5 秒ほど固まります (つまり 5 秒ほど何も入力できなくなります)。
+	    
+	<dt class="h3"><a name="def_alias">&diams; 別名定義</a>
+	    
+	<dd class="d3">
+	    ▼ キーの別名を定義します。
+	    
+	    <p class="sample"><nobr>
+	    def alias <i>別名</i> = <i>キー名</i>
+	    </nobr></p>
+
+	    別名が既存のキー名と同じだった場合は、別名のほうが優先されます。
+      </dl>
+	    
+      <br>
+
+  <dt class="h2"><a name="include">vi. ファイル読み込み</a>
+
+  <dd class="d2">
+      <p class="sample"><nobr>
+      include <i>ファイル名</i>
+      </nobr></p>
+	    
+      と書くことによって、その行に<i>ファイル名</i>で示されるファイルを挿入することができます。<i>ファイル名</i>は<a href="#HOME">ホームディレクトリ</a>から検索されます。
+      
+  <dt class="h2"><a name="cond">vii. 条件分岐</a>
+
+  <dd class="d2">
+      シンボルを定義して、そのシンボルによって条件分岐させることができます。
+      
+      <p class="sample"><nobr>
+      define <i>シンボル</i><br>
+      if ( <i>シンボル</i> )<br>
+      〜<br>
+      else<br>
+      〜<br>
+      endif
+      </nobr></p>
+
+      例えば次のように記述すると、
+      
+      <p class="sample"><nobr>
+      if ( SwapAB )<br>
+      key *A =&gt; *B<br>
+      key *B =&gt; *A<br>
+      endif<br>
+      </nobr></p>
+
+      <tt>SwapAB</tt> というシンボルが <tt>define</tt> されている場合に、<kbd>[A]</kbd> と <kbd>[B]</kbd> を入れ替えます。<br>
+      <br>
+      「窓使いの憂鬱の設定」ダイアログボックスで <tt>-Dシンボル名</tt> を書くことでシンボルを定義することができます。
+      
+  <dt class="h2"><a name="function">viii. <tt><i>FUNCTION</i></tt> リファレンス</a>
+
+  <dd class="d2">
+      <dl>
+	<dt class="h3"><a name="function_ClipboardCopy">&diams; <tt><i>FUNCTION</i> &amp;ClipboardCopy</tt></a>
+	    
+	<dd class="d3">
+	    ▼ <tt>&amp;ClipboardCopy(<i>text</i>)</tt> は、<i>text</i> をクリップボードへコピーします。
+	    
+	<dt class="h3"><a name="function_ClipboardUpcaseDowncaseWord">&diams; <tt><i>FUNCTION</i> &amp;ClipboardUpcaseWord</tt>, <tt>&amp;ClipboardDowncaseWord</tt></a>
+	    
+	<dd class="d3">
+	    ▼ クリップボードの中身の文字を大文字化 (<tt>&amp;ClipboardUpcaseWord</tt>)、小文字化 (<tt>&amp;ClipboardDowncaseWord</tt>) します。
+	    
+	<dt class="h3"><a name="function_Default">&diams; <tt><i>FUNCTION</i> &amp;Default</tt></a>
+
+	<dd class="d3">
+	    ▼ <tt>&amp;Default</tt> は、入力されたキーをそのまま Windows へ入力する <tt><i>FUNCTION</i></tt> です。そのため、「窓使いの憂鬱」を起動してない時と同じ動作が期待できます。
+	    
+	<dt class="h3"><a name="function_EditNextModifier">&diams; <tt><i>FUNCTION</i> &amp;EditNextModifier</tt></a>
+
+	<dd class="d3">
+	    ▼ <tt>&amp;EditNextModifier(<i>モディファイヤ</i>)</tt> は、次にユーザーがキーを入力した時に、<tt><i>モディファイヤ</i></tt> が押されていることにします。例えば、
+	    <p class="sample"><nobr>
+	    key ESC =&gt; &amp;EditNextModifier(M-)
+	    </nobr></p>
+	    とすると、<kbd>[Alt]</kbd> + <kbd>[X]</kbd> などを <kbd>[ESCAPE][X]</kbd> などで代用することが可能になります。
+	    
+	<dt class="h3"><a name="function_EmacsEditKillLine">&diams; <tt><i>FUNCTION</i> &amp;EmacsEditKillLinePred</tt>, <tt>&amp;EmacsEditKillLineFunc</tt></a>
+	    
+	<dd class="d3">
+	    ▼ エディットコントロールで emacs の kill-line のような機能を実現するための <tt><i>FUNCTION</i></tt> です。
+
+	<dt class="h3"><a name="function_Ignore">&diams; <tt><i>FUNCTION</i> &amp;Ignore</tt></a>
+		  
+	<dd class="d3">
+	    ▼ <tt>&amp;Ignore</tt> を指定しておくと、そのキーが押されてもなにも起こりません。
+		  
+	<dt class="h3"><a name="function_InvestigateCommand">&diams; <tt><i>FUNCTION</i> &amp;InvestigateCommand</tt></a>
+		  
+	<dd class="d3">
+	    ▼ <a href="#function_PostMessage"><tt>&amp;PostMessage</tt></a> で使用するために、ウィンドウへ送られてくる <tt>WM_COMMAND</tt> と <tt>WM_SYSCOMMAND</tt> を調べログに出力します。トグルになっていますので、調査が終わったらもう一度この <tt><i>FUNCTION</i></tt> を実行してください。さもないとアプリケーションの実行速度が遅くなる可能性があります。
+		  
+	<dt class="h3"><a name="function_Keymap">&diams; <tt><i>FUNCTION</i> &amp;Keymap</tt></a>
+		  
+	<dd class="d3">
+	    ▼ <tt>&amp;Keymap(<i>キーマップ名</i>)</tt> は別のキーマップのキーを指定する <tt><i>FUNCTION</i></tt> で、例えば、
+		  
+	    <p class="sample"><nobr>
+	    keymap sub : Global<br>
+	    key	C-A =&gt; &amp;WindowMinimize<br>
+	    window EditControl /:Edit$/ : Global<br>
+	    key	C-A =&gt; &amp;Keymap(sub)
+	    </nobr></p>
+		  
+	    というように利用します。この場合、エディットコントロールで <kbd>[Control]</kbd> + <kbd>[A]</kbd> を入力すると、最小化されます。あまり実用的な機能はないかもしれません。ループしないように気をつけて利用してください。
+
+	<dt class="h3"><a name="function_KeymapParent">&diams; <tt><i>FUNCTION</i></tt> <tt>&amp;KeymapParent</tt></a>
+		  
+	<dd class="d3">
+	    ▼ <a href="#parentKeymap">親キーマップ</a>参照。
+		  
+	<dt class="h3"><a name="function_LoadSetting">&diams; <tt><i>FUNCTION</i> &amp;LoadSetting</tt></a>
+	    
+	<dd class="d3">
+	    ▼ <tt>&amp;LoadSetting</tt> は設定ファイルを再読み込みします。<br>
+	    
+	<dt class="h3"><a name="function_MouseMove">&diams; <tt><i>FUNCTION</i> &amp;MouseMove</tt></a>
+	    
+	<dd class="d3">
+	    ▼ <tt>&amp;MouseMove(<i>dx</i>, <i>dy</i>)</tt> はマウスカーソルを x 方向に <tt><i>dx</i></tt>、y 方向に <tt><i>dy</i></tt> 移動します。
+	    
+	<dt class="h3"><a name="function_MouseWheel">&diams; <tt><i>FUNCTION</i> &amp;MouseWheel</tt></a>
+	    
+	<dd class="d3">
+	    ▼ <tt>&amp;MouseWheel(<i>delta</i>)</tt> はホイールを回します。<tt><i>delta</i></tt> を <tt>-120</tt> にするとホイールを手前に 1 つまわしたことになります。逆に <tt>120</tt> にするとホイールを奥へ 1 つまわしたことになります。
+	    
+	<dt class="h3"><a name="function_OtherWindowClass">&diams; <tt><i>FUNCTION</i></tt> <tt>&amp;OtherWindowClass</tt></a>
+		  
+	<dd class="d3">
+	    ▼ <a href="#matchManyClasses"><tt>window</tt> に複数該当する場合</a>参照。
+		  
+	<dt class="h3"><a name="function_PostMessage">&diams; <tt><i>FUNCTION</i> &amp;PostMessage</tt></a>
+		  
+	<dd class="d3">
+	    ▼ <tt>&amp;PostMessage(<i>WINDOW</i>, <i>message</i>, <i>wParam</i>, <i>lParam</i>)</tt> を使用すると、ウィンドウへメッセージを入力することができます。高度な機能なので完全に理解してから利用してください。
+	    
+	    <p class="sample"><nobr>
+	    keyseq $WM_CUT = &amp;PostMessage(ToItself, 0x0300, 0, 0)<br>
+	    window EditControl /:Edit$/ : Global<br>
+	    key C-W =&gt; $WM_CUT
+	    </nobr></p>
+
+	    と書くと、一部のウィンドウで <kbd>[Control]</kbd> + <kbd>[W]</kbd> でカットできるようになります。<br>
+	    <br>
+	    <tt><i>WINDOW</i></tt> には、メッセージを送る先のウィンドウを指定します。以下の種類があります。
+
+	    <p class="sample"><table>
+	      <tr><td><tt>ToItself</tt></td><td class="normal">… そのウィンドウ自身</td>
+	      <tr><td><tt>ToMainWindow</tt></td><td class="normal">… 最も親のウィンドウ</td>
+	      <tr><td><tt>ToOverlappedWindow</tt></td><td class="normal">… 子でない最初のウィンドウ</td>
+	      <tr><td><tt>ToParentWindow</tt></td><td class="normal">… 親ウィンドウ</td>
+	      <tr><td><tt><i>正の数</i></tt></td><td class="normal"><nobr>… 1:親ウィンドウ 2:親の親 3:親の親の親…</nobr></td>
+	    </table></p>
+	    どのようなメッセージを送ればよいかは Spy++ などで調べられますが、<tt>WM_COMMAND</tt> と <tt>WM_SYSCOMMAND</tt> については <a href="#function_InvestigateCommand"><tt>&amp;InvestigateCommand</tt></a> で調べることができます。
+	    
+	<dt class="h3"><a name="function_Prefix">&diams; <tt><i>FUNCTION</i> &amp;Prefix</tt></a>
+	    
+	<dd class="d3">
+	    ▼ <tt>&amp;Prefix(<i>キーマップ名</i>, <i>モディファイヤの扱い</i>)</tt> はプレフィックスキーを指定する <tt><i>FUNCTION</i></tt> で、例えば、
+		  
+	    <p class="sample"><nobr>
+	    keymap2 NotepadC-X<br>
+	    mod !shift !alt !control !windows<br>
+	    key	C-C =&gt; &amp;WindowClose<br>
+	    window Notepad /:Notepad:Edit$/ : Global<br>
+	    key	C-X =&gt; &amp;Prefix(NotepadC-X)<br>
+	    </nobr></p>
+		  
+	    というように記述しておくと、メモ帳で <kbd>[Control]</kbd> + <kbd>[C]</kbd> <kbd>[Control]</kbd> + <kbd>[X]</kbd> と続けて入力するとメモ帳を終了することができます。<br>
+	    <br>
+	    <tt><i>モディファイヤの扱い</i></tt> は省略可能な引数で <tt>true</tt> か <tt>false</tt> を指定します。省略すると <tt>true</tt> が指定されたとみなされます。<tt>true</tt> が指定された場合、<tt><i>キーマップ名</i></tt> で指示されるキーマップは
+	    <p class="sample"><nobr>
+	    mod !shift !alt !control !windows
+	    </nobr></p>
+	    が指定されたものとして扱われます。<br>
+	    <br>
+	    <a href="#keymap2"><tt>keymap2</tt></a> を利用しているときには、デフォルトキーが <a href="#function_Undefined"><tt>&amp;Undefined</tt></a> になっているので、モディファイヤを入力した時にもベルが鳴るはずですが、このように <tt>true</tt> を指定しておけば鳴らなくなります。(<a href="#mod"><tt>mod</tt></a> を参照)
+	    
+	<dt class="h3"><a name="function_ShellExecute">&diams; <tt><i>FUNCTION</i> &amp;ShellExecute</tt></a>
+		  
+	<dd class="d3">
+	    ▼ <tt>&amp;ShellExecute(<i>OPERATION</i>, <i>FILE</i>, <i>PARAMETERS</i>, <i>DIRECTORY</i>, <i>SHOWCOMMAND</i>)</tt> はプログラムを実行できます。<br>
+	    <br>
+	    <ul>
+	      <li><tt><i>OPERATION</i></tt> ではファイルに対してどのような操作をするかを指示し、通常 <tt>open</tt> を指定します。
+	      <li><tt><i>FILE</i></tt> にはファイルか実行ファイルを書きます。
+	      <li><tt><i>PARAMETERS</i></tt> には <tt><i>FILE</i></tt> に実行ファイルを書いたときにオプションを記述します。
+	      <li><tt><i>DIRECTORY</i></tt> は作業ディレクトリを指定します。
+	      <li><tt><i>SHOWCOMMAND</i></tt> には <tt>ShowNormal</tt> を指定します。
+	    </ul>
+	    <br>
+	    コントロールパネルを開く例:
+	    <p class="sample"><nobr>
+	    key M-B =&gt; &amp;ShellExecute("open", "C:\\winnt\\system32\\Control.exe",,, ShowNormal)
+	    </nobr></p>
+	    システムのプロパティを開く例:
+	    <p class="sample"><nobr>
+	    key M-C =&gt; &amp;ShellExecute("open", "C:/winnt/system32/Control.exe", "sysdm.cpl",, ShowNormal)
+	    </nobr></p>
+	    インターネットエクスプローラで「窓使いの憂鬱」のほめぱげを開く例:
+	    <p class="sample"><nobr>
+	    key M-I =&gt; &amp;ShellExecute("open", "C:\\Program Files\\Plus!\\Microsoft Internet\\IEXPLORE.EXE\", "http://mayu.sourceforge.net",, ShowNormal)<br>
+	    key M-H =&gt; &amp;ShellExecute("open", "http://mayu.sourceforge.net",,, ShowNormal)
+	    </nobr></p>
+	    canyon.mid を演奏する例:
+	    <p class="sample"><nobr>
+	    key M-R =&gt; &amp;ShellExecute("play", "C:\\winnt\\Media\\canyon.mid",,, ShowNormal)
+	    </nobr></p>
+
+	<dt class="h3"><a name="function_Sync">&diams; <tt><i>FUNCTION</i> &amp;Sync</tt></a>
+	<dd class="d3">
+	    ▼ 基本的に、Windows へのキー入力と <tt><i>FUNCTION</i></tt> は非同期に実行されます。つまりキー入力と <tt><i>FUNCTION</i></tt> の実行順序は不明です。例えば、
+
+	    <p class="sample"><nobr>
+	    key C-A =&gt; A &amp;WindowMinimize
+	    </nobr></p>
+
+	    このように記述して <kbd>[Control]</kbd> + <kbd>[A]</kbd> を入力すると、Windows へ <tt>A</tt> が入力されるのが先か、<tt>&amp;WindowMinimize</tt> が実行されるのが先かは不明です。そこで、以下のように記述すればちゃんと順序が守られることを保証できます。
+	    
+	    <p class="sample"><nobr>
+	    key C-A =&gt; A &amp;Sync &amp;WindowMinimize
+	    </nobr></p>
+
+	    ▼ また、<tt><i>FUNCTION</i></tt> には<a href="#modifier">モディファイヤ</a>を指定することが可能ですが、<tt><i>FUNCTION</i></tt> とモディファイヤキー入力が非同期に実行されるため通常は意味がありません。しかし、<tt>&amp;Sync</tt> を使えばモディファイヤキーの指定に意味が出てきます。
+
+	    <p class="sample"><nobr>
+	    window Explorer /Explorer\.exe/ : Global<br>
+	    key C-S-Z =&gt; &amp;Sync &amp;WindowMaximize # ウィンドウの最大化<br>
+	    key C-A-Z =&gt; C-&amp;Sync *&amp;WindowMaximize # ウィンドウの全画面化<br>
+	    </nobr></p>
+
+	    前者の指定では、ウィンドウを最大化するときに <kbd>[Control]</kbd> と <kbd>[Shift]</kbd> が入力されていないようにしています。後者では、<kbd>[Control]</kbd> は入力されるが、<kbd>[Alt]</kbd> は入力されていないようにします。<br>
+	    <br>
+	    ▼ <a href="#def_sync"><tt>def sync</tt></a> 参照。
+
+	<dt class="h3"><a name="function_Toggle">&diams; <tt><i>FUNCTION</i> &amp;Toggle</tt></a>
+		  
+	<dd class="d3">
+	    ▼ <tt>&amp;Toggle(<i>LockN</i>)</tt> はロックキーをトグルします。<tt>&amp;Toggle(Lock0)</tt>〜<tt>&amp;Toggle(Lock9)</tt> が利用できます。
+
+	<dt class="h3"><a name="function_Undefined">&diams; <tt><i>FUNCTION</i> &amp;Undefined</tt></a>
+		  
+	<dd class="d3">
+	    ▼ <tt>&amp;Undefined</tt> を指定しておくと、キーに何も割り当てられていないことになります。もしそのキーが押されると、ベルが鳴ります。
+		  
+	<dt class="h3"><a name="function_VK">&diams; <tt><i>FUNCTION</i> &amp;VK</tt></a>
+	    
+	<dd class="d3">
+	    ▼ <tt>&amp;VK(<i>VIRTUALKEY</i>)</tt> は仮想キーを Windows へ入力します。仮想キーには、物理的なキーボードから入力できないキーも存在しますのでそのようなキーの入力に使用します。仮想キーを調べるには、<a href="MANUAL.html#KEYNAME">key investigation</a> を参照してください。例えば、
+	    <p class="sample"><nobr>
+	    key 変換 => &amp;VK(F13)
+	    </nobr></p>
+	    と記述すると <kbd>[変換]</kbd> キーを押すと <kbd>[F13]</kbd> を入力できます。又、<tt>E-</tt> を付けると拡張キーを表し、<tt>D-</tt> はキーを押す、<tt>U-</tt> はキーを離すことを表します。<br>
+	    <br>
+	    ▼ <tt><i>VIRTUALKEY</i></tt> に <tt>LButton</tt>、<tt>MButton</tt>、<tt>RButton</tt> を指定することによって、マウスのボタンをシミュレートすることができます。<br>
+	    <br>
+	    ▼ この <tt><i>FUNCTION</i></tt> を利用するときは、必ず最後にキーを離していることを確認してください (つまり最後に <tt>&amp;VK(U-F13)</tt> などを書いておく)。さもないと、そのキーが押されっぱなしになります。
+	    
+	<dt class="h3"><a name="function_Wait">&diams; <tt><i>FUNCTION</i> &amp;Wait</tt></a>
+	    
+	<dd class="d3">
+	    ▼ <tt>&amp;Wait(<i>MILLISECOND</i>)</tt> は <tt><i>MILLISECOND</i></tt> ミリ秒だけ待ちます。その間はキーを入力することはできません。最大 5 秒待つことができます。
+	    
+	<dt class="h3"><a name="function_WindowCling">&diams; <tt><i>FUNCTION</i> &amp;WindowClingToLeft</tt>, <tt>&amp;WindowClingToRight</tt>, <tt>&amp;WindowClingToTop</tt>, <tt>&amp;WindowClingToBottom</tt>, </a>
+	    
+	<dd class="d3">
+	    ▼ これらの <tt><i>FUNCTION</i></tt> は、ウィンドウのそれぞれの辺が、画面のそれぞれの辺にくっつくように移動させます。引数に <tt>MDI</tt> を指定すると、MDI 子ウィンドウを操作します。
+	    
+	<dt class="h3"><a name="function_WindowClose">&diams; <tt><i>FUNCTION</i> &amp;WindowClose</tt></a>
+	    
+	<dd class="d3">
+	    ▼ <tt>&amp;WindowClose</tt> はウィンドウを閉じます。引数に <tt>MDI</tt> を指定すると、MDI 子ウィンドウを操作します。
+	    
+	<dt class="h3"><a name="function_WindowIdentify">&diams; <tt><i>FUNCTION</i> &amp;WindowIdentify</tt></a>
+	    
+	<dd class="d3">
+	    ▼ <tt>&amp;WindowIdentify</tt> は、ウィンドウのウィンドウクラス名とタイトルを調べログに出力します。
+	    
+	<dt class="h3"><a name="function_WindowMaxMinHVMax">&diams; <tt><i>FUNCTION</i> &amp;WindowMinimize</tt>, <tt>&amp;WindowMaximize</tt>, <tt>&amp;WindowHMaximize</tt>, <tt>&amp;WindowVMaximize</tt></a>
+	    
+	<dd class="d3">
+	    ▼ ウィンドウを最小化 (<tt>&amp;WindowMinimize</tt>)、最大化 (<tt>&amp;WindowMaximize</tt>)、横に最大化 (<tt>&amp;WindowHMaximize</tt>)、縦に最大化 (<tt>&amp;WindowVMaximize</tt>) します。引数に <tt>MDI</tt> を指定すると、MDI 子ウィンドウを操作します。
+	    
+	<dt class="h3"><a name="function_WindowMove">&diams; <tt><i>FUNCTION</i> &amp;WindowMove</tt></a>
+	    
+	<dd class="d3">
+	    ▼ <tt>&amp;WindowMove(<i>dx</i>, <i>dy</i>)</tt> はウインドウを x 方向に <tt><i>dx</i></tt>、y 方向に <tt><i>dy</i></tt> 移動します。<tt>MDI</tt> を引数の最後に追加指定すると、MDI 子ウィンドウを操作します。
+	    
+	<dt class="h3"><a name="function_WindowMoveVisibly">&diams; <tt><i>FUNCTION</i> &amp;WindowMoveVisibly</tt></a>
+	    
+	<dd class="d3">
+	    ▼ <tt>&amp;WindowMoveVisibly</tt> はウィンドウ全体が画面に表示されるような位置までウィンドウを移動します。引数に <tt>MDI</tt> を指定すると、MDI 子ウィンドウを操作します。
+	    
+	<dt class="h3"><a name="function_WindowRiseLower">&diams; <tt><i>FUNCTION</i> &amp;WindowRaise</tt>, <tt>&amp;WindowLower</tt></a>
+	    
+	<dd class="d3">
+	    ▼ ウィンドウを一番上へ (<tt>&amp;WindowRise</tt>)、一番下へ (<tt>&amp;WindowLower</tt>) 移動します。引数に <tt>MDI</tt> を指定すると、MDI 子ウィンドウを操作します。
+	    
+	<dt class="h3"><a name="function_WindowRedraw">&diams; <tt><i>FUNCTION</i> &amp;WindowRedraw</tt></a>
+	    
+	<dd class="d3">
+	    ▼ <tt>&amp;WindowRedraw</tt> は、ウィンドウを強制的に再描画させます。
+	    
+	<dt class="h3"><a name="function_WindowSetAlpha">&diams; <tt><i>FUNCTION</i> &amp;WindowSetAlpha</tt></a>
+	    
+	<dd class="d3">
+	    ▼ <tt>&amp;WindowSetAlpha(<i>alpha</i>)</tt> は、ウィンドウを半透明化、又は半透明化解除をします。トグルになっています。<tt><i>alpha</i></tt> は半透明の度合いを表し、<tt>0</tt> で透明、<tt>100</tt> で不透明になります。<tt>-1</tt> を指定すると、半透明化されているウィンドウを全て不透明状態に戻します。
+	    
+	<dt class="h3"><a name="function_WindowToggleTopMost">&diams; <tt><i>FUNCTION</i> &amp;WindowToggleTopMost</tt></a>
+	    
+	<dd class="d3">
+	    ▼ <tt>&amp;WindowToggleTopMost</tt> は、ウィンドウの最前面フラグをトグルします。
+	    
+      </dl>
+      <br>
+  <dt class="h2"><a name="compile">ix. ビルド</a>
+
+  <dd class="d2">
+      まず、<tt>source.cab</tt> を「窓使いの憂鬱」をインストールしたディレクトリでディレクトリ付きで展開します。<br>
+      <br>
+      Visual C++ 6.0 を使う場合は、コマンドプロンプトで
+      <p class="sample">
+      C:\mayu&gt; nmake -f mayu-vc.mak nodebug=1
+      </p>
+      とします。Visual C++ 6.0 のコンパイラなどにパスが通っている必要があります。Windows2000 DDK をダウンロードしてくれば、<tt>d</tt> ディレクトリ以下にあるドライバをビルドすることができます (その方法は書きませんので適当にやってください)。<br>
+      <br>
+      Borland C++ 5.5 を使う場合は、コマンドプロンプトで
+      <p class="sample">
+      C:\mayu&gt; make -f mayu-bcc.mak nodebug=1
+      </p>
+      とします。Borland C++ 5.5 のコンパイラなどにパスが通っている必要があります。また、<tt>bcc.mak</tt> の冒頭の注意に従ってライブラリパスに <tt>lib/psdk</tt> を含めてください。ドライバをビルドする方法は不明です。<br>
+      <br>
+      どちらのコンパイラを使う場合でも、<tt>nodebug=1</tt> を削除すれば、デバッグ情報を生成します。何かパッチを作ったらぜひ作者までお知らせください。
+
+</ol>
+
+<br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br>
+
+</body>
+</html>

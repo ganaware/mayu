@@ -37,7 +37,12 @@ OBJS_1		=			\
 
 RES_1		= mayu.res
 
-LIBS_1		= $(guixlibsmt) mayu.lib shell32.lib shlwapi.lib comctl32.lib
+LIBS_1		=		\
+		$(guixlibsmt)	\
+		shell32.lib	\
+		shlwapi.lib	\
+		comctl32.lib	\
+		mayu.lib	\
 
 EXTRADEP_1	= mayu.lib
 
@@ -56,24 +61,62 @@ DLL_3		= mayu.dll
 
 # distribution	###############################################################
 
-DISTRIB_SETTINGS= 104.mayu 104on109.mayu 109.mayu 109on104.mayu		\
-		  default.mayu emacsedit.mayu dot.mayu			\
+DISTRIB_SETTINGS =						\
+					en\104.mayu		\
+		ja\104on109.mayu	en\104on109.mayu	\
+		ja\109.mayu		en\109.mayu		\
+					en\109on104.mayu	\
+		ja\default.mayu		en\default.mayu		\
+		ja\emacsedit.mayu	en\emacsedit.mayu	\
+		ja\dot.mayu		en\dot.mayu		\
 
-DISTRIB_MANUAL	= README.html CONTENTS.html CUSTOMIZE.html MANUAL.html	\
-		  README.css syntax.txt					\
+DISTRIB_MANUAL	=						\
+		ja\README.html		en\README.html		\
+		ja\CONTENTS.html	en\CONTENTS.html	\
+		ja\CUSTOMIZE.html	en\CUSTOMIZE.html	\
+		ja\MANUAL.html		en\MANUAL.html		\
+		ja\README.css		en\README.css		\
+					en\syntax.txt		\
 
-DISTRIB_CONTRIBS= contrib\mayu-settings.txt contrib\dvorak.mayu		\
+DISTRIB_CONTRIBS =				\
+		contrib\mayu-settings.txt	\
+		contrib\dvorak.mayu		\
 
-DISTRIB		= $(TARGET_1) $(TARGET_2)				\
-		  mayud.sys mayudnt4.sys setup.exe			\
-		  $(DISTRIB_SETTINGS) $(DISTRIB_MANUAL)			\
-		  $(DISTRIB_CONTRIBS)					\
+DISTRIB		=			\
+		$(TARGET_1)		\
+		$(TARGET_2)		\
+		mayud.sys		\
+		mayudnt4.sys		\
+		setup.exe		\
+		$(DISTRIB_SETTINGS)	\
+		$(DISTRIB_MANUAL)	\
+		$(DISTRIB_CONTRIBS)	\
 
-DISTRIBSRC	= Makefile *.mak *.cpp *.h *.rc regexp.html		\
-		  s\Makefile s\*.mak s\*.cpp s\*.h s\*.rc s\*.lib 	\
-		  r\*							\
-		  d\Makefile d\SOURCES d\*.c d\README.txt d\test.reg 	\
-		  d\nt4\Makefile d\nt4\SOURCES d\nt4\*.c		\
+DISTRIBSRC	=		\
+		Makefile	\
+		*.mak		\
+		*.cpp		\
+		*.h		\
+		*.rc		\
+		regexp.html	\
+				\
+		s\Makefile	\
+		s\*.mak		\
+		s\*.cpp		\
+		s\*.h		\
+		s\*.rc		\
+		s\*.lib 	\
+				\
+		r\*		\
+				\
+		d\Makefile	\
+		d\SOURCES	\
+		d\*.c		\
+		d\README.txt	\
+		d\test.reg 	\
+		d\nt4\Makefile	\
+		d\nt4\SOURCES	\
+		d\nt4\*.c	\
 
 CAB		= s\cab32.exe
 

@@ -1,0 +1,88 @@
+body			{ color:#ffffff; background-color:#000000;
+			  font-size:medium; font-family:"ＭＳ Ｐゴシック";  }
+
+/* contents */
+
+.contents A:link	{ color:#ffffff; text-decoration:none; }
+.contents A:visited	{ color:#ffffff; text-decoration:none; }
+.contents A:active	{ color:#ffffff; text-decoration:underline; }
+
+.contents		{ margin:0; }
+
+.section		{ color:#ffffff; background-color:#555555;
+			  text-indent:-2ex;
+			  padding:0.3ex; padding-left:3ex;
+			  margin-top:0.5ex; margin-bottom:0.5ex;
+			  font-family:"Arial"; font-weight:bold;
+			  font-size:small; 
+			}
+
+.subsection		{ font-size:x-small; text-indent:-2ex; 
+			  padding-left:4ex; background-color:#222222;
+			  margin-top:0.5ex; margin-bottom:0.5ex; }
+
+.subsection tt		{ color:#ffdddd; font-family:"ＭＳ ゴシック";
+			  font-size:x-small; }
+
+.subsubsection		{ font-size:x-small; margin-left:6ex;
+			  text-indent:-2ex; }
+.subsubsection tt	{ color:#ffdddd; font-family:"ＭＳ ゴシック";
+			  font-size:x-small; }
+
+/* manual */
+
+.manual A:link		{ color:#ffffdd; text-decoration:underline; }
+.manual A:visited	{ color:#ffffdd; text-decoration:underline; }
+.manual A:active	{ color:#ffffdd; text-decoration:underline; }
+
+.manual			{ margin:0; }
+
+.title			{ font-family:"ＭＳ Ｐ明朝"; background-color:#222222;
+			  padding:0.5ex; font-size:xx-large; }
+
+.copyright		{ font-family:"Arial"; padding:1ex;
+			  font-weight:bold; font-size:small; }
+
+ul			{ margin-top:1ex; margin-bottom:1ex; }
+ol			{ margin-top:1ex; margin-bottom:1ex; }
+tt			{ color:#ffdddd; font-family:"ＭＳ ゴシック";
+			  font-size:x-small; }
+
+.h1			{ color:#ffffff; background-color:#555555;
+			  text-indent:-2ex;
+			  padding:0.3ex; padding-left:3ex;
+			  margin-top:0.5ex; margin-bottom:0.5ex;
+			  font-family:"Arial"; font-weight:bold; }
+.h1 A:link		{ color:#ffffff; text-decoration:none; }
+.h1 A:visited		{ color:#ffffff; text-decoration:none; }
+.h1 A:active		{ color:#ffffff; text-decoration:underline; }
+
+.d1			{ margin-right:2ex; margin-top:2ex; margin-bottom:4ex;
+			  font-size:small; }
+
+.h2			{ font-size:small; text-indent:-2ex;
+			  padding:1ex; padding-left:4ex;
+			  background-color:#222222;
+			  margin-top:1ex; margin-bottom:1ex; }
+
+.d2			{ font-size:small; margin-right:2ex;
+			  margin-top:1ex; margin-bottom:3ex; }
+
+.h3			{ font-size:small; 
+			  padding-left:1ex; background-color:#222222;
+			  margin-top:1ex; margin-bottom:1ex; }
+
+.d3			{ font-size:small; margin-right:2ex;
+			  margin-top:1ex; margin-bottom:3ex; }
+
+kbd			{ font-family:"Arial"; font-weight:bold;
+			  color:#ddffdd; 
+			  font-size:x-small; }
+
+.sample			{ font-family:"ＭＳ ゴシック"; font-size:x-small;
+			  margin:0.5ex; margin-left:1.5ex; padding:0.5ex;
+			  color:#ffdddd;  border-color:#222222; border-width:2;
+			  border-style: solid solid solid solid; }
+
+.bug			{ font-family:"Arial"; font-weight:bold;
+			  color:#ff0000; }

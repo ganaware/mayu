@@ -2,7 +2,6 @@
 <html lang="ja">
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=iso-2022-jp">
-<link rev="made" href="mailto:nayuta@users.sourceforge.net">
 <link rel="stylesheet" type="text/css" href="README.css">
 <title>mayu - MANUAL - CUSTOMIZE</title>
 </head>
@@ -20,9 +19,9 @@
       <br>
       <tt>.mayu</tt> は<a href="#HOME">ホームディレクトリ</a>から検索されます。<br>
       <br>
-      <tt>.mayu</tt> は上から下へ読まれていき、重複する記述があれば、より下に書かれているものが有効になります。コメントは <tt>#</tt> ではじめます。アルファベットの大文字と小文字は区別されません。詳しい文法は <a href="syntax.txt">syntax.txt</a> を参照してください。<br>
+      <tt>.mayu</tt> は上から下へ読まれていき、重複する記述があれば、より下に書かれているものが有効になります。コメントは <tt>#</tt> ではじめます。アルファベットの大文字と小文字は区別されません。詳しい文法は <a href="../en/syntax.txt">syntax.txt</a> を参照してください。<br>
       <br>
-      この章を読む前に、<a href="contrib/mayu-settings.txt">contrib/mayu-settings.txt</a> を読んで付属の設定ファイルについて理解を深めておくことをお勧めします。
+      この章を読む前に、<a href="../contrib/mayu-settings.txt">contrib/mayu-settings.txt</a> を読んで付属の設定ファイルについて理解を深めておくことをお勧めします。
       
       <dl>
 	<dt class="h3"><a name="HOME">&diams; ホームディレクトリ</a>
@@ -33,7 +32,7 @@
 	    %HOME%<br>
 	    %HOMEDRIVE%%HOMEPATH%<br>
 	    %USERPROFILE%<br>
-	    mayu.exeのある場所<br>
+	    mayu.exe のある場所<br>
 	    設定(S)... で指定したファイルのあるディレクトリ<br>
 	    </p>
 	    
@@ -51,7 +50,7 @@
 	    
       <tt>=&gt;</tt> より左の <tt><i>KEY</i></tt> をキーボードで押すと、Windows へは <tt>=&gt;</tt> より右の <tt><i>KEY</i></tt> が順番に入力されます。また、右に <tt><i>FUNCTION</i></tt> が書かれている場合はウィンドウの最大化や移動などの機能が実行されます。<br>
       <br>
-      <tt><i>KEY</i></tt> は<a href="#keyboard">キーボード定義</a>で定義されるもので、デフォルトでは <a href="109.mayu">109.mayu</a> 又は <a href="104.mayu">104.mayu</a> で定義されている <tt><i>KEY</i></tt> が使用できます。<br>
+      <tt><i>KEY</i></tt> は<a href="#keyboard">キーボード定義</a>で定義されるもので、デフォルトでは <a href="109.mayu">109.mayu</a> 又は <a href="../en/104.mayu">104.mayu</a> で定義されている <tt><i>KEY</i></tt> が使用できます。<br>
       <br>
       <dl>
 	<dt class="h3"><a name="modifier">&diams; モディファイヤの指定</a>
@@ -205,11 +204,10 @@
 	    "<tt>.</tt>" Match any character<br>
 	    "<tt>^</tt>" Match the beginning of the string<br>
 	    "<tt>$</tt>" Match the end of the string<br>
-	    "<tt>\&lt;</tt>" Match the beggining of a word<br>
-	    "<tt>\&gt;</tt>" Match the end of a word<br>
 	    "<tt>\b</tt>" Match a word boundary<br>
+	    "<tt>\B</tt>" Match a non word boundary<br>
 	    "<tt>\w</tt>" Match a word character (<tt>[0-9a-z_]</tt>)<br>
-	    "<tt>\W</tt>" Match a non-word character<br>
+	    "<tt>\W</tt>" Match a non word character<br>
 	    "<tt>\s</tt>" Match a whitespace character<br>
 	    "<tt>\S</tt>" Match a non-whitespace character<br>
 	    "<tt>\d</tt>" Match a digit character<br>
@@ -444,7 +442,7 @@
   <dt class="h2"><a name="keyboard">v. キーボード定義</a>
       
   <dd class="d2">
-      デフォルトのキーボード定義は <a href="109.mayu">109.mayu</a> 又は <a href="104.mayu">104.mayu</a> に書かれています。
+      デフォルトのキーボード定義は <a href="109.mayu">109.mayu</a> 又は <a href="../en/104.mayu">104.mayu</a> に書かれています。
 
       <dl>
 	<dt class="h3"><a name="def_key">&diams; キー定義</a>
@@ -507,7 +505,7 @@
       include <i>ファイル名</i>
       </nobr></p>
 	    
-      と書くことによって、その行に<i>ファイル名</i>で示されるファイルを挿入することができます。<i>ファイル名</i>は<a href="MANUAL.html#HOME">ホームディレクトリ</a>から検索されます。
+      と書くことによって、その行に<i>ファイル名</i>で示されるファイルを挿入することができます。<i>ファイル名</i>は<a href="#HOME">ホームディレクトリ</a>から検索されます。
       
   <dt class="h2"><a name="cond">vii. 条件分岐</a>
 
