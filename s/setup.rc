@@ -128,15 +128,14 @@ BEGIN
     IDS_shortcutName        "窓使いの憂鬱"
     IDS_keyboard109         "日本語 109 (106) キーボード"
     IDS_keyboard104         "英語 104 (101) キーボード"
-    IDS_keyboard109usb      "(日本語 109 (106) USB キーボードα版)"
-    IDS_keyboard104usb      "(英語 104(101) USB キーボードα版)"
-    IDS_usbWarning          "警告 : USB ドライバはα版です。十分テストがされていません。\r\nどうしても必要でなければ使用しないでください。"
+    IDS_keyboard109usb      "日本語 109 (106) USB キーボード"
+    IDS_keyboard104usb      "英語 104 (101) USB キーボード"
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_note01              "「窓使いの憂鬱」をインストールしたらぜひメーリングリストに参加してください。参加方法は README.html に書かれています。\r\n\r\n"
-    IDS_note02              "標準でないキーボードドライバを利用していると WindowsNT/2000 が青画面になって終了してしまうことがあります。"
+    IDS_note02              "標準でないキーボードドライバを利用していると Windows が青画面になって終了してしまうことがあります。"
     IDS_note03              "そのような場合は、標準でないドライバをアンインストールしてください。"
     IDS_note04              "標準でないドライバとは、ロジテックマウスに付属のドライバや AltIME のドライバなどです。"
     IDS_copyFinishUsb       "インストールが終了しました。\nコンピュータを再起動する必要があります。\n今すぐ再起動しますか?"
@@ -245,15 +244,14 @@ BEGIN
     IDS_shortcutName        "MADO TSUKAI NO YUUTSU"
     IDS_keyboard109         "Japanese 109 (106) Keyboard"
     IDS_keyboard104         "Standard 104 (101) Keyboard"
-    IDS_keyboard109usb      "(Japanese 109 (106) USB Keybaord ALPHA)"
-    IDS_keyboard104usb      "(Standard 104(101) USB Keyboard ALPHA)"
-    IDS_usbWarning          "WARNING : USB Driver is experimental.  Do not use it unless you know what you are doing!"
+    IDS_keyboard109usb      "Japanese 109 (106) USB Keybaord"
+    IDS_keyboard104usb      "Standard 104 (101) USB Keyboard"
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_note01              "* After installing MADO TSUKAI NO YUUTSU, please subscribe MADO TSUKAI NO YUUTSU mailing list.  Details are written in README.html.\r\n"
-    IDS_note02              "* WindowsNT/2000 may hang up, if you are using a non-standard keybaord driver. "
+    IDS_note02              "* Windows may hang up, if you are using a non-standard keybaord driver. "
     IDS_note03              "In that case, please uninstall the non-standard keybaord driver.\r\n"
     IDS_note04              "* Non-standrd keybaord drivers are such as that of Logitech Mouse, and that of AltIME.\r\n"
     IDS_copyFinishUsb       "Install complete.  Do you want to reboot now?"

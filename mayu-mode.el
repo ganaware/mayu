@@ -1,6 +1,6 @@
 ;;; mayu-mode.el --- mayu setting editing commands for Emacs
 
-;;; Copyright (C) 2000-2001 TAGA Nayuta <nayuta@ganaware.org>
+;;; Copyright (C) 2000-2003 TAGA Nayuta <nayuta@ganaware.org>
 
 ;; Author: TAGA Nayuta <nayuta@ganaware.org>
 ;; Maintainer: TAGA Nayuta <nayuta@ganaware.org>

@@ -24,7 +24,6 @@
 #define IDS_keyboard109usb              20
 #define IDS_keyboard104usb              21
 #define IDS_readFromHomeDirectory       22
-#define IDS_usbWarning                  22
 #define IDS_note01                      32
 #define IDS_note02                      33
 #define IDS_note03                      34

@@ -257,7 +257,7 @@ BEGIN
     IDS_mayuPathName        "名前"
     IDS_mayuPath            "設定ファイル名"
     IDS_mayuSymbols         "シンボル"
-    IDS_version             "窓使いの憂鬱 %s\r\n  %s\r\n\r\nCopyright (C) 1999-2001,\r\n  TAGA Nayuta <nayuta@users.sourceforge.net>\r\n\r\nbuilt by %s\r\n  %s\r\n  %s\r\n\r\n  %s\r\n"
+    IDS_version             "窓使いの憂鬱 %s\r\n  %s\r\n\r\nCopyright (C) 1999-2003,\r\n  TAGA Nayuta <nayuta@users.sourceforge.net>\r\n\r\nbuilt by %s\r\n  %s\r\n  %s\r\n\r\n  %s\r\n"
     IDS_homepage            "http://mayu.sourceforge.net"
 END
 
@@ -498,7 +498,7 @@ BEGIN
     IDS_mayuPathName        "Name"
     IDS_mayuPath            "Setting Filename"
     IDS_mayuSymbols         "Symbols"
-    IDS_version             "MADO TSUKAI NO YUUTSU %s\r\n  %s\r\n\r\nCopyright (C) 1999-2001,\r\n  TAGA Nayuta <nayuta@users.sourceforge.net>\r\n\r\nbuilt by %s\r\n  %s\r\n  %s\r\n\r\n  %s\r\n"
+    IDS_version             "MADO TSUKAI NO YUUTSU %s\r\n  %s\r\n\r\nCopyright (C) 1999-2003,\r\n  TAGA Nayuta <nayuta@users.sourceforge.net>\r\n\r\nbuilt by %s\r\n  %s\r\n  %s\r\n\r\n  %s\r\n"
     IDS_homepage            "http://mayu.sourceforge.net"
 END
 

@@ -25,7 +25,7 @@ namespace Installer
     {
       ALL,
       W9x, // W95, W98,
-      NT,  NT4, W2k,
+      NT,  NT4, W2k,				// W2k includes XP
     };
     
     enum Destination

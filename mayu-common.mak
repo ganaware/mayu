@@ -134,6 +134,7 @@ DISTRIB_CONTRIBS =				\
 		contrib\keitai.mayu		\
 		contrib\ax.mayu			\
 		contrib\98x1.mayu		\
+		contrib\DVORAKon109.mayu	\
 
 !if "$(TARGETOS)" == "WINNT"
 DISTRIB_DRIVER	=				\

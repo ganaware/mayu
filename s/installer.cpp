@@ -329,7 +329,7 @@ namespace Installer
       case SetupFile::NT4:
 	return (ver.dwPlatformId == VER_PLATFORM_WIN32_NT &&
 		ver.dwMajorVersion == 4);
-      case SetupFile::W2k:
+      case SetupFile::W2k:			// W2k, XP, ...
 	return (ver.dwPlatformId == VER_PLATFORM_WIN32_NT &&
 		5 <= ver.dwMajorVersion);
     }

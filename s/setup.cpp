@@ -32,7 +32,7 @@ using namespace Installer;
 
 enum
 {
-  Flag_UsbTest = 1 << 1,
+  Flag_Usb = 1 << 1,
 };
 u_int32 g_flags = SetupFile::Normal;
 
@@ -42,10 +42,10 @@ const SetupFile::Data g_setupFiles[] =
 {
   // same name
 #define SN(i_kind, i_os, i_from, i_destination)			\
-  { i_kind, i_os, Normal|Flag_UsbTest, _T(i_from), i_destination, _T(i_from) }
+  { i_kind, i_os, Normal|Flag_Usb, _T(i_from), i_destination, _T(i_from) }
   // different name
 #define DN(i_kind, i_os, i_from, i_destination, i_to)	\
-  { i_kind, i_os, Normal|Flag_UsbTest, _T(i_from), i_destination, _T(i_to) }
+  { i_kind, i_os, Normal|Flag_Usb, _T(i_from), i_destination, _T(i_to) }
   
   // executables
   SN(Dll , ALL, "mayu.dll"	     , ToDest),
@@ -57,8 +57,8 @@ const SetupFile::Data g_setupFiles[] =
   SN(File, NT , "mayud.sys"	     , ToDest),
   SN(File, NT , "mayudusb.sys"	     , ToDest),
   SN(File, NT , "mayudnt4.sys"	     , ToDest),
-  { File, W2k, Normal,       _T("mayud.sys"),    ToDriver, _T("mayud.sys") },
-  { File, W2k, Flag_UsbTest, _T("mayudusb.sys"), ToDriver, _T("mayud.sys") },
+  { File, W2k, Normal,	 _T("mayud.sys"),    ToDriver, _T("mayud.sys") },
+  { File, W2k, Flag_Usb, _T("mayudusb.sys"), ToDriver, _T("mayud.sys") },
   DN(File, NT4, "mayudnt4.sys"	     , ToDriver, "mayud.sys"),
 #elif defined(_WIN95)
   SN(File, W9x, "mayud.vxd"	     , ToDest),
@@ -98,7 +98,7 @@ const SetupFile::Data g_setupFiles[] =
   SN(Dir , ALL, "contrib"	     , ToDest), // mkdir
   DN(File, ALL, "mayu-settings.txt"  , ToDest, "contrib\\mayu-settings.txt"),
   DN(File, ALL, "dvorak.mayu"	     , ToDest, "contrib\\dvorak.mayu"      ),
-  DN(File, ALL, "dvorak109.mayu"     , ToDest, "contrib\\dvorak109.mayu"   ),
+  DN(File, ALL, "DVORAKon109.mayu"   , ToDest, "contrib\\DVORAKon109.mayu" ),
   DN(File, ALL, "keitai.mayu"	     , ToDest, "contrib\\keitai.mayu"      ),
   DN(File, ALL, "ax.mayu"	     , ToDest, "contrib\\ax.mayu"          ),
   DN(File, ALL, "98x1.mayu"	     , ToDest, "contrib\\98x1.mayu"        ),
@@ -161,7 +161,7 @@ void driverServiceError(DWORD i_err)
 #  define MAYUD_DRIVER_KEY _T("System\\CurrentControlSet\\Services\\mayud")
 #  define MAYUD_FILTER_KEY _T("System\\CurrentControlSet\\Control\\Class\\{4D36E96B-E325-11CE-BFC1-08002BE10318}")
 
-bool createUsbDriverServiceExperimentally()
+bool createUsbDriverService()
 {
   {
     Registry reg(HKEY_LOCAL_MACHINE, MAYUD_DRIVER_KEY);
@@ -181,7 +181,7 @@ bool createUsbDriverServiceExperimentally()
   return true;
 }
 
-void removeUsbDriverServiceExperimentally()
+void removeUsbDriverService()
 {
   Registry::remove(HKEY_LOCAL_MACHINE, MAYUD_DRIVER_KEY _T("\\Security"));
   Registry::remove(HKEY_LOCAL_MACHINE, MAYUD_DRIVER_KEY _T("\\Enum"));
@@ -235,9 +235,9 @@ private:
 
 #if defined(_WINNT)
     // driver
-    if (g_flags == Flag_UsbTest)
+    if (g_flags == Flag_Usb)
     {
-      if (!createUsbDriverServiceExperimentally())
+      if (!createUsbDriverService())
       {
 	removeFiles(g_setupFiles, NUMBER_OF(g_setupFiles), g_flags, g_destDir);
 	return 1;
@@ -292,7 +292,7 @@ private:
     createUninstallInformation(_T("mayu"), g_resource->loadString(IDS_mayu),
 			       g_destDir + _T("\\setup.exe -u"));
 
-    if (g_flags == Flag_UsbTest)
+    if (g_flags == Flag_Usb)
     {
       if (message(IDS_copyFinishUsb, MB_YESNO | MB_ICONQUESTION, m_hwnd)
 	  == IDYES)
@@ -345,8 +345,6 @@ private:
     setBigIcon(m_hwnd, IDI_ICON_mayu);
     Edit_SetText(GetDlgItem(m_hwnd, IDC_EDIT_path), g_destDir.c_str());
     HWND hwndCombo = GetDlgItem(m_hwnd, IDC_COMBO_keyboard);
-    ComboBox_AddString(hwndCombo, g_resource->loadString(IDS_keyboard109));
-    ComboBox_AddString(hwndCombo, g_resource->loadString(IDS_keyboard104));
     if (checkOs(SetupFile::W2k))
     {
       ComboBox_AddString(hwndCombo,
@@ -354,6 +352,8 @@ private:
       ComboBox_AddString(hwndCombo,
 			 g_resource->loadString(IDS_keyboard104usb));
     }
+    ComboBox_AddString(hwndCombo, g_resource->loadString(IDS_keyboard109));
+    ComboBox_AddString(hwndCombo, g_resource->loadString(IDS_keyboard104));
     ComboBox_SetCurSel(hwndCombo,
 		       (g_keyboardKind == KEYBOARD_KIND_109) ? 0 : 1);
     tstring note = g_resource->loadString(IDS_note01);
@@ -414,30 +414,41 @@ private:
 	  m_doRegisterToStartUp =
 	    (IsDlgButtonChecked(m_hwnd, IDC_CHECK_registerStartUp) ==
 	     BST_CHECKED);
-	  switch (ComboBox_GetCurSel(GetDlgItem(m_hwnd, IDC_COMBO_keyboard)))
-	  {
-	    case 0:
-	      g_keyboardKind = KEYBOARD_KIND_109;
-	      g_flags = SetupFile::Normal;
-	      break;
-	    case 1:
-	      g_keyboardKind = KEYBOARD_KIND_104;
-	      g_flags = SetupFile::Normal;
-	      break;
-	    case 2:
-	      g_keyboardKind = KEYBOARD_KIND_109;
-	      g_flags = Flag_UsbTest;
-	      break;
-	    case 3:
-	      g_keyboardKind = KEYBOARD_KIND_104;
-	      g_flags = Flag_UsbTest;
-	      break;
-	  };
 
-	  if (g_flags == Flag_UsbTest)
+	  int curSel =
+	    ComboBox_GetCurSel(GetDlgItem(m_hwnd, IDC_COMBO_keyboard));
+	  g_flags = SetupFile::Normal;
+	  if (checkOs(SetupFile::W2k))
+	  {
+	    switch (curSel)
+	    {
+	      case 0:
+		g_keyboardKind = KEYBOARD_KIND_109;
+		g_flags = Flag_Usb;
+		break;
+	      case 1:
+		g_keyboardKind = KEYBOARD_KIND_104;
+		g_flags = Flag_Usb;
+		break;
+	      case 2: g_keyboardKind = KEYBOARD_KIND_109; break;
+	      case 3: g_keyboardKind = KEYBOARD_KIND_104; break;
+	    };
+	  }
+	  else
+	  {
+	    switch (curSel)
+	    {
+	      case 0: g_keyboardKind = KEYBOARD_KIND_109; break;
+	      case 1: g_keyboardKind = KEYBOARD_KIND_104; break;
+	    };
+	  }
+
+#if 0
+	  if (g_flags == Flag_Usb)
 	    if (message(IDS_usbWarning, MB_OKCANCEL | MB_ICONWARNING, m_hwnd)
 		== IDCANCEL)
 	      return TRUE;
+#endif
 	  
 	  if (createDirectories(g_destDir.c_str()))
 	    EndDialog(m_hwnd, install());
@@ -506,9 +517,9 @@ int uninstall()
   int isUsbDriver;
   Registry::read(DIR_REGISTRY_ROOT, _T("isUsbDriver"), &isUsbDriver, 0);
   if (isUsbDriver)
-    g_flags = Flag_UsbTest;
-  if (g_flags == Flag_UsbTest)
-    removeUsbDriverServiceExperimentally();
+    g_flags = Flag_Usb;
+  if (g_flags == Flag_Usb)
+    removeUsbDriverService();
   else
   {
     DWORD err = removeDriverService(_T("mayud"));
