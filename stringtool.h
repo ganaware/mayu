@@ -79,6 +79,9 @@ tstring interpretMetaCharacters(const _TCHAR *i_str, size_t i_len,
 				const _TCHAR *i_quote = NULL,
 				bool i_doesUseRegexpBackReference = false);
 
+/// add session id to i_str
+tstring addSessionId(const _TCHAR *i_str);
+
 /// copy
 size_t strlcpy(char *o_dest, const char *i_src, size_t i_destSize);
 /// copy

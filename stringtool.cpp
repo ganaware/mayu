@@ -353,6 +353,20 @@ tstring interpretMetaCharacters(const _TCHAR *i_str, size_t i_len,
 }
 
 
+// add session id to i_str
+tstring addSessionId(const _TCHAR *i_str)
+{
+    DWORD sessionId;
+    tstring s(i_str);
+    if (ProcessIdToSessionId(GetCurrentProcessId(), &sessionId)) {
+	_TCHAR buf[20];
+	_sntprintf(buf, NUMBER_OF(buf), _T("%u"), sessionId);
+	s += buf;
+    }
+    return s;
+}
+
+
 #ifdef _MBCS
 // escape regexp special characters in MBCS trail bytes
 std::string guardRegexpFromMbcs(const char *i_str)
