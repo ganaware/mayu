@@ -153,6 +153,53 @@ tostream &operator<<(tostream &i_ost, const Modifier &i_m)
 }
 
 
+/// stream output
+tostream &operator<<(tostream &i_ost, Modifier::Type i_type)
+{
+  const _TCHAR *modNames[] =
+  {
+    _T("Shift"), 
+    _T("Alt"), 
+    _T("Control"), 
+    _T("Windows"), 
+    _T("Up"), 
+    _T("Down"), 
+    _T("Repeat"), 
+    _T("ImeLock"), 
+    _T("ImeComp"), 
+    _T("NumLock"), 
+    _T("CapsLock"), 
+    _T("ScrollLock"), 
+    _T("Mod0"), 
+    _T("Mod1"), 
+    _T("Mod2"), 
+    _T("Mod3"), 
+    _T("Mod4"), 
+    _T("Mod5"), 
+    _T("Mod6"), 
+    _T("Mod7"), 
+    _T("Mod8"), 
+    _T("Mod9"), 
+    _T("Lock0"), 
+    _T("Lock1"), 
+    _T("Lock2"), 
+    _T("Lock3"), 
+    _T("Lock4"), 
+    _T("Lock5"), 
+    _T("Lock6"), 
+    _T("Lock7"), 
+    _T("Lock8"), 
+    _T("Lock9"), 
+  };
+
+  int i = static_cast<int>(i_type);
+  if (0 <= i && i < NUMBER_OF(modNames))
+    i_ost << modNames[i];
+  
+  return i_ost;
+}
+
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // ModifiedKey
 

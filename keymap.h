@@ -212,7 +212,22 @@ public:
   };
   typedef std::list<ModAssignment> ModAssignments; ///
 
-  typedef std::list<ModifiedKey> DescribedKeys;	/// 
+  /// parameter for describe();
+  class DescribeParam
+  {
+  private:
+    typedef std::list<ModifiedKey> DescribedKeys;
+    typedef std::list<const Keymap *> DescribedKeymap;
+    friend class Keymap;
+
+  private:
+    DescribedKeys m_dk;
+    DescribedKeymap m_dkeymap;
+    bool m_doesDescribeModifiers;
+
+  public:
+    DescribeParam() : m_doesDescribeModifiers(true) { }
+  };
   
 private:
   /// key assignments (hashed by first scan code)
@@ -240,7 +255,7 @@ private:
   KeyAssignments &getKeyAssignments(const ModifiedKey &i_mk);
   ///
   const KeyAssignments &getKeyAssignments(const ModifiedKey &i_mk) const;
-  
+
 public:
   ///
   Keymap(Type i_type,
@@ -279,8 +294,8 @@ public:
   { return m_modAssignments[i_mt]; }
 
   /// describe
-  void describe(tostream &i_ost, DescribedKeys *o_mk) const;
-
+  void describe(tostream &i_ost, DescribeParam *i_dp) const;
+  
   /// set default keySeq and parent keymap if default keySeq has not been set
   bool setIfNotYet(KeySeq *i_keySeq, Keymap *i_parentKeymap);
 };

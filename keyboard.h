@@ -257,6 +257,10 @@ public:
 };
 
 
+/// stream output
+tostream &operator<<(tostream &i_ost, Modifier::Type i_type);
+
+
 ///
 class ModifiedKey
 {

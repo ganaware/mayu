@@ -5,6 +5,7 @@
 #include "keymap.h"
 #include "errormessage.h"
 #include "stringtool.h"
+#include "setting.h"
 #include <algorithm>
 
 
@@ -380,7 +381,6 @@ void Keymap::adjustModifier(Keyboard &i_keyboard)
 	}
       }
     }
-    break_for:
 
     // erase redundant modifiers
     for (ModAssignments::iterator j = mos.begin(); j != mos.end(); ++ j)
@@ -402,9 +402,19 @@ void Keymap::adjustModifier(Keyboard &i_keyboard)
   }
 }
 
+
 // describe
-void Keymap::describe(tostream &i_ost, DescribedKeys *o_dk) const
+void Keymap::describe(tostream &i_ost, DescribeParam *i_dp) const
 {
+  // Is this keymap already described ?
+  {
+    DescribeParam::DescribedKeymap::iterator
+      i = std::find(i_dp->m_dkeymap.begin(), i_dp->m_dkeymap.end(), this);
+    if (i != i_dp->m_dkeymap.end())
+      return;					// yes!
+    i_dp->m_dkeymap.push_back(this);
+  }
+
   switch (m_type)
   {
     case Type_keymap:
@@ -428,6 +438,35 @@ void Keymap::describe(tostream &i_ost, DescribedKeys *o_dk) const
     i_ost << _T(" : ") << m_parentKeymap->m_name;
   i_ost << _T(" => ") << *m_defaultKeySeq << std::endl;
 
+  // describe modifiers
+  if (i_dp->m_doesDescribeModifiers)
+  {
+    for (int t = Modifier::Type_begin; t != Modifier::Type_end; ++ t)
+    {
+      Modifier::Type type = static_cast<Modifier::Type>(t);
+      const Keymap::ModAssignments &ma = getModAssignments(type);
+      if (ma.size())
+      {
+	i_ost << _T(" mod ") << type << _T("\t= ");
+	for (Keymap::ModAssignments::const_iterator
+	       j = ma.begin(); j != ma.end(); ++ j)
+	{
+	  switch (j->m_assignMode)
+	  {
+	    case Keymap::AM_true: i_ost << _T("!"); break;
+	    case Keymap::AM_oneShot: i_ost << _T("!!"); break;
+	    case Keymap::AM_oneShotRepeatable: i_ost << _T("!!!"); break;
+	    default:
+	      break;
+	  }
+	  i_ost << *j->m_key << _T(" ");
+	}
+	i_ost << std::endl;
+      }
+    }
+    i_dp->m_doesDescribeModifiers = false;
+  }
+  
   typedef std::vector<KeyAssignment> SortedKeyAssignments;
   SortedKeyAssignments ska;
   for (size_t i = 0; i < HASHED_KEY_ASSIGNMENT_SIZE; ++ i)
@@ -439,22 +478,29 @@ void Keymap::describe(tostream &i_ost, DescribedKeys *o_dk) const
   std::sort(ska.begin(), ska.end());
   for (SortedKeyAssignments::iterator i = ska.begin(); i != ska.end(); ++ i)
   {
-    if (o_dk)
-    {
-      DescribedKeys::iterator
-	j = std::find(o_dk->begin(), o_dk->end(), i->m_modifiedKey);
-      if (j != o_dk->end())
-	continue;
-    }
-    i_ost << _T(" key ") << i->m_modifiedKey << _T("\t=> ")
-	  << *i->m_keySeq << std::endl;
-    if (o_dk)
-      o_dk->push_back(i->m_modifiedKey);
-  }
-  i_ost << std::endl;
+    // Is this key assignment already described ?
+    DescribeParam::DescribedKeys::iterator
+      j = std::find(i_dp->m_dk.begin(), i_dp->m_dk.end(), i->m_modifiedKey);
+    if (j != i_dp->m_dk.end())
+      continue;					// yes!
 
+    // check if the key is an event
+    Key **e;
+    for (e = Event::events; *e; ++ e)
+      if (i->m_modifiedKey.m_key == *e)
+	break;
+    if (*e)
+      i_ost << _T(" event ") << *i->m_modifiedKey.m_key;
+    else
+      i_ost << _T(" key ") << i->m_modifiedKey;
+    i_ost << _T("\t=> ") << *i->m_keySeq << std::endl;
+    i_dp->m_dk.push_back(i->m_modifiedKey);
+  }
+
+  i_ost << std::endl;
+  
   if (m_parentKeymap)
-    m_parentKeymap->describe(i_ost, o_dk);
+    m_parentKeymap->describe(i_ost, i_dp);
 }
 
 // set default keySeq and parent keymap if default keySeq has not been set
