@@ -109,7 +109,7 @@ DEPENDFLAGS	= --cpp=bcc32 -p"$$(OUT_DIR)\\" $(DEPENDIGNORE) $(CPPFLAGS)
 	$(CC) $(CPPFLAGS) -n$(OUT_DIR) /c $&.cpp
 
 {}.rc{$(OUT_DIR)}.res:
-	$(RC) $(RFLAGS) /r $&
+	$(RC) $(RFLAGS) /r /istub $&
 	$(MV) $&.res $(OUT_DIR)\$&.res
 
 
