@@ -24,16 +24,18 @@
 #define IDS_mayuPathName                25
 #define IDS_mayuPath                    26
 #define IDS_mayuSymbols                 27
+#define IDS_version                     28
+#define IDS_homepage                    29
 #define IDC_CURSOR_target               101
 #define IDD_DIALOG_editSetting          102
-#define IDI_ICON_mayu_disabled          102
 #define IDD_DIALOG_investigate          103
 #define IDD_DIALOG_log                  104
 #define IDD_DIALOG_setting              105
 #define IDD_DIALOG_version              106
 #define IDI_ICON_mayu                   107
 #define IDI_ICON_mayu_file              108
-#define IDR_MENU_tasktray               109
+#define IDI_ICON_mayu_disabled          109
+#define IDR_MENU_tasktray               110
 #define IDC_BUTTON_add                  1001
 #define IDC_BUTTON_browse               1002
 #define IDC_BUTTON_changeFont           1003
@@ -60,6 +62,7 @@
 #define IDC_STATIC_symbolsComment       1024
 #define IDC_STATIC_url                  1025
 #define IDC_STATIC_version              1026
+#define IDC_EDIT_builtBy                1027
 #define ID_MENUITEM_quit                40001
 #define ID_MENUITEM_reload              40002
 #define ID_MENUITEM_setting             40003
@@ -76,7 +79,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        103
 #define _APS_NEXT_COMMAND_VALUE         40012
-#define _APS_NEXT_CONTROL_VALUE         1027
+#define _APS_NEXT_CONTROL_VALUE         1028
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
