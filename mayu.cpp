@@ -463,7 +463,7 @@ private:
     m_setting = newSetting;
   }
 
-  // メッセージを表示
+  // show message (a baloon from the task tray icon)
   void showHelpMessage(bool i_doesShow = true)
   {
     if (m_canUseTasktrayBaloon)
@@ -483,7 +483,7 @@ private:
     }
   }
   
-  // アイコンを変更
+  // change the task tray icon
   void showTasktrayIcon(bool i_doesAdd = false)
   {
     m_ni.hIcon  = m_tasktrayIcon[m_engine.getIsEnabled() ? 1 : 0];
