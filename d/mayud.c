@@ -20,9 +20,8 @@ typedef struct _DetourDeviceExtension
 {
   PDRIVER_DISPATCH MajorFunction[IRP_MJ_MAXIMUM_FUNCTION];
   
-  PDEVICE_OBJECT filterDevObj;
-  
   KSPIN_LOCK lock; // lock below datum
+  PDEVICE_OBJECT filterDevObj;
   LONG isOpen;
   BOOLEAN wasCleanupInitiated; //
   PIRP irpq;
@@ -46,6 +45,7 @@ typedef struct _FilterDeviceExtension
 
 
 NTSTATUS DriverEntry       (IN PDRIVER_OBJECT, IN PUNICODE_STRING);
+NTSTATUS mayuAddDevice     (IN PDRIVER_OBJECT, IN PDEVICE_OBJECT);
 VOID mayuUnloadDriver      (IN PDRIVER_OBJECT);
 VOID mayuDetourReadCancel (IN PDEVICE_OBJECT, IN PIRP);
 
@@ -111,9 +111,7 @@ NTSTATUS DriverEntry(IN PDRIVER_OBJECT driverObject,
   BOOLEAN is_symbolicLinkCreated = FALSE;
   ULONG i;
   PDEVICE_OBJECT detourDevObj = NULL;
-  PDEVICE_OBJECT filterDevObj = NULL;
   DetourDeviceExtension *detourDevExt = NULL;
-  FilterDeviceExtension *filterDevExt = NULL;
   
   UNREFERENCED_PARAMETER(registryPath);
 
@@ -141,20 +139,10 @@ NTSTATUS DriverEntry(IN PDRIVER_OBJECT driverObject,
     detourDevObj->Flags |= DO_POWER_PAGABLE;
 #endif // !MAYUD_NT4
 
-    // create filter device
-    status = IoCreateDevice(driverObject, sizeof(FilterDeviceExtension),
-			    NULL, FILE_DEVICE_KEYBOARD,
-			    0, FALSE, &filterDevObj);
-    if (!NT_SUCCESS(status)) goto error;
-    filterDevObj->Flags |= DO_BUFFERED_IO;
-#ifndef MAYUD_NT4
-    filterDevObj->Flags |= DO_POWER_PAGABLE;
-#endif // !MAYUD_NT4
-    
     // initialize detour device extension
     detourDevExt = (DetourDeviceExtension*)detourDevObj->DeviceExtension;
     RtlZeroMemory(detourDevExt, sizeof(DetourDeviceExtension));
-    detourDevExt->filterDevObj = filterDevObj;
+    detourDevExt->filterDevObj = NULL;
 
     KeInitializeSpinLock(&detourDevExt->lock);
     detourDevExt->isOpen = FALSE;
@@ -163,17 +151,6 @@ NTSTATUS DriverEntry(IN PDRIVER_OBJECT driverObject,
     status = KqInitialize(&detourDevExt->readQue);
     if (!NT_SUCCESS(status)) goto error;
     
-    // initialize filter device extension
-    filterDevExt = (FilterDeviceExtension*)filterDevObj->DeviceExtension;
-    RtlZeroMemory(filterDevExt, sizeof(FilterDeviceExtension));
-    filterDevExt->detourDevObj = detourDevObj;
-    filterDevExt->kbdClassDevObj = NULL;
-
-    KeInitializeSpinLock(&filterDevExt->lock);
-    filterDevExt->irpq = NULL;
-    status = KqInitialize(&filterDevExt->readQue);
-    if (!NT_SUCCESS(status)) goto error;
-
     // create symbolic link for detour
     status =
       IoCreateSymbolicLink(&MayuDetourWin32DeviceName, &MayuDetourDeviceName);
@@ -183,14 +160,14 @@ NTSTATUS DriverEntry(IN PDRIVER_OBJECT driverObject,
     // attach filter device to keyboard class device
     {
       PFILE_OBJECT f;
+      PDEVICE_OBJECT kbdClassDevObj;
       
       status = IoGetDeviceObjectPointer(&KeyboardClassDeviceName,
 					FILE_ALL_ACCESS, &f,
-					&filterDevExt->kbdClassDevObj);
+					&kbdClassDevObj);
       if (!NT_SUCCESS(status)) goto error;
       ObDereferenceObject(f);
-      status = IoAttachDeviceByPointer(filterDevObj,
-				       filterDevExt->kbdClassDevObj);
+      status = mayuAddDevice(driverObject, kbdClassDevObj);
       
       // why cannot I do below ?
 //      status = IoAttachDevice(filterDevObj, &KeyboardClassDeviceName,
@@ -202,24 +179,17 @@ NTSTATUS DriverEntry(IN PDRIVER_OBJECT driverObject,
     for (i = 0; i < IRP_MJ_MAXIMUM_FUNCTION; i++)
     {
       detourDevExt->MajorFunction[i] = _IopInvalidDeviceRequest;
-      filterDevExt->MajorFunction[i] =
-	(filterDevExt->kbdClassDevObj->DriverObject->MajorFunction[i]
-	 == _IopInvalidDeviceRequest) ?
-	_IopInvalidDeviceRequest : filterPassThrough;
     }
-    
+
     detourDevExt->MajorFunction[IRP_MJ_READ] = detourRead;
     detourDevExt->MajorFunction[IRP_MJ_WRITE] = detourWrite;
     detourDevExt->MajorFunction[IRP_MJ_CREATE] = detourCreate;
     detourDevExt->MajorFunction[IRP_MJ_CLOSE] = detourClose;
     detourDevExt->MajorFunction[IRP_MJ_CLEANUP] = detourCleanup;
     detourDevExt->MajorFunction[IRP_MJ_DEVICE_CONTROL] = detourDeviceControl;
-    
-    filterDevExt->MajorFunction[IRP_MJ_READ] = filterRead;
 
 #ifndef MAYUD_NT4
     detourDevExt->MajorFunction[IRP_MJ_POWER] = detourPower;
-    filterDevExt->MajorFunction[IRP_MJ_POWER] = filterPower;
 #endif // !MAYUD_NT4
   }
   
@@ -229,11 +199,6 @@ NTSTATUS DriverEntry(IN PDRIVER_OBJECT driverObject,
   {
     if (is_symbolicLinkCreated)
       IoDeleteSymbolicLink(&MayuDetourWin32DeviceName);
-    if (filterDevObj)
-    {
-      KqFinalize(&filterDevExt->readQue);
-      IoDeleteDevice(filterDevObj);
-    }
     if (detourDevObj)
     {
       KqFinalize(&detourDevExt->readQue);
@@ -243,6 +208,69 @@ NTSTATUS DriverEntry(IN PDRIVER_OBJECT driverObject,
   return status;
 }
 
+NTSTATUS mayuAddDevice(IN PDRIVER_OBJECT driverObject,
+		       IN PDEVICE_OBJECT kbdClassDevObj)
+{
+  NTSTATUS status;
+  PDEVICE_OBJECT detourDevObj;
+  PDEVICE_OBJECT filterDevObj;
+  DetourDeviceExtension *detourDevExt;
+  FilterDeviceExtension *filterDevExt;
+  ULONG i;
+
+  // create filter device
+  status = IoCreateDevice(driverObject, sizeof(FilterDeviceExtension),
+			  NULL, FILE_DEVICE_KEYBOARD,
+			  0, FALSE, &filterDevObj);
+  if (!NT_SUCCESS(status)) return status;
+  filterDevObj->Flags |= DO_BUFFERED_IO;
+#ifndef MAYUD_NT4
+  filterDevObj->Flags |= DO_POWER_PAGABLE;
+#endif // !MAYUD_NT4
+
+  // initialize filter device extension
+  filterDevExt = (FilterDeviceExtension*)filterDevObj->DeviceExtension;
+  RtlZeroMemory(filterDevExt, sizeof(FilterDeviceExtension));
+
+  KeInitializeSpinLock(&filterDevExt->lock);
+  filterDevExt->irpq = NULL;
+  status = KqInitialize(&filterDevExt->readQue);
+  if (!NT_SUCCESS(status)) goto error;
+
+  detourDevObj = driverObject->DeviceObject;
+  while (detourDevObj->NextDevice) {
+    detourDevObj = detourDevObj->NextDevice;
+  }
+  filterDevExt->detourDevObj = detourDevObj;
+  detourDevExt = (DetourDeviceExtension*)detourDevObj->DeviceExtension;
+  if (!detourDevExt->filterDevObj) {
+    detourDevExt->filterDevObj = filterDevObj;
+  }
+
+  filterDevExt->kbdClassDevObj = kbdClassDevObj;
+  status = IoAttachDeviceByPointer(filterDevObj, kbdClassDevObj);
+  if (!NT_SUCCESS(status)) goto error;
+
+  for (i = 0; i < IRP_MJ_MAXIMUM_FUNCTION; i++) {
+    filterDevExt->MajorFunction[i] =
+      (filterDevExt->kbdClassDevObj->DriverObject->MajorFunction[i]
+       == _IopInvalidDeviceRequest) ?
+      _IopInvalidDeviceRequest : filterPassThrough;
+  }
+  filterDevExt->MajorFunction[IRP_MJ_READ] = filterRead;
+#ifndef MAYUD_NT4
+  filterDevExt->MajorFunction[IRP_MJ_POWER] = filterPower;
+#endif // !MAYUD_NT4
+
+  return STATUS_SUCCESS;
+
+ error:
+  if (filterDevObj) {
+      KqFinalize(&filterDevExt->readQue);
+      IoDeleteDevice(filterDevObj);
+  }
+  return status;
+}
 
 // unload driver
 VOID mayuUnloadDriver(IN PDRIVER_OBJECT driverObject)
@@ -386,6 +414,7 @@ NTSTATUS filterReadCompletion(IN PDEVICE_OBJECT deviceObject,
 
       irp->IoStatus.Status = STATUS_CANCELLED;
       irp->IoStatus.Information = 0;
+      detourDevExt->filterDevObj = deviceObject;
     }
 
     if (detourDevExt->irpq) {
@@ -546,33 +575,42 @@ NTSTATUS detourWrite(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
     status = STATUS_SUCCESS;
   else if (len % sizeof(KEYBOARD_INPUT_DATA))
     status = STATUS_INVALID_PARAMETER;
-  else
+  else {
     // write to filter que
-  {
     KIRQL cancelIrql, currentIrql;
     PIRP irpCancel;
-    FilterDeviceExtension *filterDevExt =
-      (FilterDeviceExtension*)detourDevExt->filterDevObj->DeviceExtension;
-    
-    // enque filter que
-    KeAcquireSpinLock(&filterDevExt->lock, &currentIrql);
-    IoAcquireCancelSpinLock(&cancelIrql);
-    
-    len /= sizeof(KEYBOARD_INPUT_DATA);
-    len = KqEnque(&filterDevExt->readQue,
-		  (KEYBOARD_INPUT_DATA *)irp->AssociatedIrp.SystemBuffer,
-		  len);
-    irp->IoStatus.Information = len * sizeof(KEYBOARD_INPUT_DATA);
-    irpSp->Parameters.Write.Length = irp->IoStatus.Information;
-    IoReleaseCancelSpinLock(cancelIrql);
-    // cancel filter irp
-    if (filterDevExt->irpq) {
-      IoCancelIrp(filterDevExt->irpq);
-      filterDevExt->irpq = NULL;
-    }
-    KeReleaseSpinLock(&filterDevExt->lock, currentIrql);
+    PDEVICE_OBJECT filterDevObj;
 
-    status = STATUS_SUCCESS;
+    KeAcquireSpinLock(&detourDevExt->lock, &currentIrql);
+    filterDevObj = detourDevExt->filterDevObj;
+    KeReleaseSpinLock(&detourDevExt->lock, currentIrql);
+    // enque filter que
+    if (filterDevObj) {
+      FilterDeviceExtension *filterDevExt =
+	(FilterDeviceExtension*)filterDevObj->DeviceExtension;
+
+      KeAcquireSpinLock(&filterDevExt->lock, &currentIrql);
+      IoAcquireCancelSpinLock(&cancelIrql);
+
+      len /= sizeof(KEYBOARD_INPUT_DATA);
+      len = KqEnque(&filterDevExt->readQue,
+		    (KEYBOARD_INPUT_DATA *)irp->AssociatedIrp.SystemBuffer,
+		    len);
+      irp->IoStatus.Information = len * sizeof(KEYBOARD_INPUT_DATA);
+      irpSp->Parameters.Write.Length = irp->IoStatus.Information;
+      IoReleaseCancelSpinLock(cancelIrql);
+      // cancel filter irp
+      if (filterDevExt->irpq) {
+	IoCancelIrp(filterDevExt->irpq);
+	filterDevExt->irpq = NULL;
+      }
+      KeReleaseSpinLock(&filterDevExt->lock, currentIrql);
+      status = STATUS_SUCCESS;
+    } else {
+      irp->IoStatus.Information = 0;
+      irpSp->Parameters.Write.Length = irp->IoStatus.Information;
+      status = STATUS_CANCELLED;
+    }
   }
   IoCompleteRequest(irp, IO_NO_INCREMENT);
   return status;
