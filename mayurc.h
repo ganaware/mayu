@@ -54,7 +54,6 @@
 #define IDC_STATIC_version              1010
 #define IDC_STATIC_url                  1011
 #define IDC_CHECK_detail                1012
-#define IDC_STATIC_url2                 1012
 #define IDC_BUTTON_clearLog             1013
 #define IDC_LIST_mayuPaths              1014
 #define ID_MENUITEM_quit                40001

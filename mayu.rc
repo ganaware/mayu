@@ -96,10 +96,10 @@ BEGIN
     CONTROL         "Copyright (C) 1999-2000, ",IDC_STATIC,"Static",
                     SS_LEFTNOWORDWRAP | WS_GROUP,32,20,164,8
     LTEXT           "  TAGA Nayuta <nayuta@users.sourceforge.net>",
-                    IDC_STATIC_url,32,32,164,8
+                    IDC_STATIC,32,32,164,8
     PUSHBUTTON      "最新バージョンのダウンロード(&D)",IDC_BUTTON_download,
                     32,60,100,14
-    LTEXT           "http://mayu.sourceforge.net",IDC_STATIC_url2,32,44,164,
+    LTEXT           "http://mayu.sourceforge.net",IDC_STATIC_url,32,44,164,
                     8
 END
 
@@ -351,10 +351,10 @@ BEGIN
     CONTROL         "Copyright (C) 1999-2000, ",IDC_STATIC,"Static",
                     SS_LEFTNOWORDWRAP | WS_GROUP,32,20,164,8
     LTEXT           "  TAGA Nayuta <nayuta@users.sourceforge.net>",
-                    IDC_STATIC_url,32,32,164,8
+                    IDC_STATIC,32,32,164,8
     PUSHBUTTON      "&Download The Latest Version",IDC_BUTTON_download,
                     32,60,100,14
-    LTEXT           "http://mayu.sourceforge.net",IDC_STATIC_url2,32,44,164,
+    LTEXT           "http://mayu.sourceforge.net",IDC_STATIC_url,32,44,164,
                     8
 END
 
