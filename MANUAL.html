@@ -168,28 +168,10 @@ Copyright &copy; 1999-2000, <a href="http://www.ganaware.org" target="_top">TAGA
       <ul>
 	<li><span class="bug">[仕様]</span> コマンドプロンプトではロックキーとIMEの状態を区別することができません。また、コマンドプロンプトのプロパティに対しては無力です。
 	<li><span class="bug">[仕様]</span> Windows2000 では、「窓使いの憂鬱」を終了させたあとに何かのキーを押さないと終了しません。
+	<li><a href="http://sourceforge.net/pm/task.php?group_id=5403&group_project_id=7606&func=browse&set=open&order=priority" target="_top">TO DO</a> は SourceForge で管理されています。
 	    
-	<li><code>window ASTEC-X ( /:ASTEC-X$/ &amp;&amp; /[xk]term/ ) : Global</code> がうまくはたらかない気がする
-	<li>正規表現ルーチンの詳しい説明
-	<li>FUNCTION へのモディファイヤがきかない
-	<li>WindowsRaiseLower, WindowNextFocusや, WindowPreviousFocus を作る。
-	<li>cmkey のようなマウスイベントの置き換え機能をつける。
-	<li>セットアップの UNICODE 化。
-	<li>レイアウトの分離。
-	<li>FUNCTION の分離・型自動。
-	<li>どぼらっくの指定をもっとスマートにする。
 	<li><a href="http://www.microsoft.com/japan/support/kb/articles/J054/8/50.htm" target="_top">USB キーボードデバイス接続後に英語 101 キーボード配列になる</a>
 	    
-	<li>各国語キーボード対応。各言語のディレクトリをホームディレクトリに加える。キー設定は settings/* に移動(?)
-	<li>iexpress を使う。
-	<li>USB キーボードでは動作しないので WDM ドライバを作る (めんどくさいな…)。
-	<li>インストーラは、AltIME が入っていたら警告を出す。
-	<li>インストーラは、ロジテックマウスが入っていたら警告を出す。
-	<li>Logiteck のキーボードドライバを使っているときにも動くようにする。
-	<li>マルチプロセッサマシンでごくたまにおちるようだ。
-	<li>ドライバのセキュリティに関しての調査・実装。
-	<li>(誰か hack してくれないかな…(まぢ
-	<li>(誰かかわいい女の子なマスコットキャラとか描いてくれないかな(ぉ
       </ul>
 
   <dt class="h1"><a name="RELATEDWORK">9. related work</a>
@@ -203,6 +185,10 @@ Copyright &copy; 1999-2000, <a href="http://www.ganaware.org" target="_top">TAGA
 	<dd class="d2">わたくしが勝手にライバルだと思っているソフトです。「窓使いの憂鬱」のほうがカスタマイズの自由度は高いのですが、猫まねきには GUI がついていて初心者にもやさしいかもしれません。「窓使いの憂鬱」にない機能も存在します。シェアウェア。
 	<dt class="h2"><a href="http://www.microsoft.com/windows2000/library/resources/reskit/rktour/pro/pro_tools.asp#R" target="_top">RemapKey</a> (for WindowsNT)
 	<dd class="d2">キーボードのスキャンコードを入れ替えます。「窓使いの憂鬱」を使えばほぼ必要ありません (窓使いの憂鬱ではログイン画面でのキーを変更することができませんが RemapKey ではできます) 。現在は Windows2000 のリソースキットに収録されています。
+
+	<dt class="h2"><a href="http://www.geocities.co.jp/SiliconValley-PaloAlto/4205/MetaX.html" target="_top">MetaX</a>
+	<dd class="d2">cmkey + αみたいな感じのソフトです。コンセプト的に「窓使いの憂鬱」や cmkey と非常によく似ていますが、より emacs 的な設定ファイルを書き、ミニバッファのようなものが存在します。プログラム中で cmkey と同様の方法をとっていると思われるため、例えば、CTRL/CAPS 入替の機能を持っていないといった限界が存在します。
+	    
 	<dt class="h2">
 	    <a href="http://www.vector.co.jp/soft/win95/util/se026760.html" target="_top">Easy Punch</a> / 
 	    <a href="http://hp.vector.co.jp/authors/VA008030/" target="_top">IME Start</a> / 
@@ -318,6 +304,7 @@ Copyright &copy; 1999-2000, <a href="http://www.ganaware.org" target="_top">TAGA
 	      <li>正規表現ライブラリを <a href="http://ourworld.compuserve.com/homepages/John_Maddock/regexpp.htm" target="_top">Regex++</a> に変更した。
 	      <li>いろいろ変えた結果多分 bcc32 ではコンパイルできなくなった。少し修正するだけだと思うが。
 	      <li><a href="contrib/ax.mayu"><code>contrib/ax.mayu</code></a> を追加。(Thanks to KAWABE Nobukazu)
+	      <li><a href="#RELATEDWORK">related work</a> に MetaX を追加。
 	    </ul>
 	<dt>2000/12/17 version 3.18
 	<dd>
