@@ -29,7 +29,7 @@
 		
 	    <dd class="d2">
 		<div>
-		  <p>まず、タスクトレイメニューの「選択」の「 (ホームディレクトリから) 」で使われる自分用の設定ファイル、<code>.mayu</code> ファイルを作ります。</p>
+		  <p>まず、タスクトレイメニューの「選択」の「 (ホームディレクトリから) 」で使われる自分用の設定ファイル、<code>.mayu</code> ファイルを作ります。(インストールディレクトリのdot.mayuに書き加えていってもカスタマイズは可能ですが、バージョンアップ時に上書きされてしまいますので、お薦めできません。)</p>
 
 		  <p>まず、環境変数 <code>HOME</code> で、<a href="../CUSTOMIZE.html#HOME">ホームディレクトリ</a>の位置を指定します。ホームディレクトリは、例えばあなたの名前が mayu であれば、「<code>c:\home\mayu</code>」のようなディレクトリを作るのが UNIX 風でお薦めです。</p>
 
@@ -146,12 +146,12 @@
 	    <dd class="d2">
 		<div>
 		  
-		  <p>つぎに、他のアプリケーションでの動きはそのままで、Internet Explorer についてのみ、<kbd>[Shift]</kbd> + <kbd>[↑]</kbd>/<kbd>[↓]</kbd> キーで、<kbd>[PageUp]</kbd>/<kbd>[PageDown]</kbd> の動きをさせたいとします。<code>.mayu</code> の設定は以下のようになります。</p>
+		  <p>つぎに、他のアプリケーションでの動きはそのままで、Internet Explorer についてのみ、<kbd>[↑]</kbd>/<kbd>[↓]</kbd> キーで、<kbd>[PageUp]</kbd>/<kbd>[PageDown]</kbd> の動きをさせたいとします。<code>.mayu</code> の設定は以下のようになります。</p>
 		  
 		  <p class="sample">
 		  window	InternetExplorer /iexplore\.exe/ : Global<br>
-		  key     S-↑ =&gt; PageUp<br>
-		  key     S-↓ =&gt; PageDown<br>
+		  key       ↑ =&gt; PageUp<br>
+		  key       ↓ =&gt; PageDown<br>
 		  </p>
 		  
 		  <p>1 行目の、<code>window キーマップ名 ウィンドウクラス名 : 親キーマップ</code> というのは、以降の指定は特定のウインドウについてのみ有効とする、という指示です。キーマップ名は適当な名前で、親キーマップはデフォルトのキーマップを指定します。(Emacs っぽくするなら <code>EmacsMove</code> や <code>EmacsEdit</code> に、そうでなければ <code>Global</code> にすればよいでしょう)</p>
@@ -169,6 +169,28 @@
 		  
 		  <p>この <code>CLASS</code> の部分から特徴的な文字列を抽出し、<a href="../CUSTOMIZE.html#regexp">正規表現</a>と呼ばれる記法で <code>/文字列/</code> のように書けば OK です。正規表現がよくわからない場合も、<code>\</code> と <code>.</code> についてはそれぞれ <code>\\</code> と <code>\.</code> と書くことに注意していればそれほど問題はないはずです。</p>
 		  
+		  <p>参照: <a href="../CUSTOMIZE.html#windowClass">ウィンドウクラス/タイトル名</a>・<a href="../CUSTOMIZE.html#regexp">正規表現</a></p>
+		</div>
+		
+	    <dt class="h2"><a name="modifier">v. キーがモディファイヤキーと共に押された場合に置き換えてみる</a>
+
+	    <dd class="d2">
+		<div>
+		  
+		  <p>
+Internet Explorerの動きを前章のようにしましたが、
+気に入らなかったので（当然不便でしょう）、
+<kbd>[Shift]</kbd>+<kbd>[↑]</kbd>/<kbd>[↓]</kbd>で、
+<kbd>[PageUp]</kbd>/<kbd>[PageDown]</kbd>の動きに変更したくなったとします。
+<code>.mayu</code>の設定は以下のようになります。
+</p>
+		  
+		  <p class="sample">
+		  window	InternetExplorer /iexplore\.exe/ : Global<br>
+		  key     S-↑ =&gt; PageUp<br>
+		  key     S-↓ =&gt; PageDown<br>
+		  </p>
+		  
 		  <p>2, 3 行目のキーの指定については、やはりスキャンコードの調査で調べます。<kbd>[Shift]</kbd> + <kbd>[↓]</kbd> を打つと、次のようになるはずです。</p>
 		  
 		  <p class="sample">
@@ -180,12 +202,20 @@
 		  0x2a   U-LeftShift<br>
 		  </p>
 		  
-		  <p>1, 6 行目は <kbd>[Shift]</kbd> キーの押し/離しです。2, 5 行目のような表示があるかもしれませんが、無視してください (参照：<a href="../MANUAL.html#faq">FAQ</a>)。3, 4 行目から、<code>S-↓</code> が書くべきキー名ということになります。ここの <code>S-</code> というのは、<kbd>[Shift]</kbd> が押されている、というキーの状態を表す記号です。<kbd>[Shift]</kbd> キー以外にも、<kbd>[Windows]</kbd> や <kbd>[Alt]</kbd> や <kbd>[Control]</kbd> の状態、また <kbd>[CapsLock]</kbd> や <kbd>[NumLock]</kbd> などのキーがロック状態にあるかどうかもやはり同様です。これらの特別なキーを、「窓使いの憂鬱」では、モディファイヤと呼んでいます。</p>
+		  <p>1, 6 行目は <kbd>[Shift]</kbd> キーの押し/離しです。2, 5 行目のような表示があるかもしれませんが、無視してください (参照：<a href="../MANUAL.html#faq">FAQ</a>)。3, 4 行目から、<code>S-↓</code> が書くべきキー名ということになります。ここの <code>S-</code> というのは、<kbd>[Shift]</kbd> が押されている、というキーの状態を表す記号です。<kbd>[Shift]</kbd> キー以外にも、<kbd>[Windows]</kbd> や <kbd>[Alt]</kbd> や <kbd>[Control]</kbd> の状態、また <kbd>[CapsLock]</kbd> や <kbd>[NumLock]</kbd> などのキーがロック状態にあるかどうかもやはり同様です。これらの特別なキーを、「窓使いの憂鬱」では、モディファイヤと呼んでいます。
+キー割り当て変更は、このようにモディファイヤを含めて指定することができます。
+  </p>
+<p>
+逆にいうと、前章までのキー割り当て変更では
+モディファイヤを何も指定していませんから、
+<kbd>[Shift]</kbd>などが押されていると
+キーイベントの置き換えを行いません。
+</p>
 		  
-		  <p>参照: <a href="../CUSTOMIZE.html#windowClass">ウィンドウクラス/タイトル名</a>・<a href="../CUSTOMIZE.html#regexp">正規表現</a>・<a href="../CUSTOMIZE.html#modifier">モディファイヤの指定</a></p>
+		  <p>参照: <a href="../CUSTOMIZE.html#modifier">モディファイヤの指定</a> ・ <a href="../CUSTOMIZE.html#">モディファイヤキーの無視</a></p>
 		</div>
 		
-	    <dt class="h2"><a name="modifier">v. モディファイヤになっているキーを置き換える</a>
+	    <dt class="h2"><a name="mod">vi. モディファイヤになっているキーを置き換える</a>
 		
 	    <dd class="d2">
 		<div>
@@ -203,12 +233,12 @@
 		  <p>参照: <a href="../CUSTOMIZE.html#mod">モディファイヤキー割り当ての変更</a></p>
 		</div>
 		
-	    <dt class="h2"><a name="more">vi. より高度な設定</a>
+	    <dt class="h2"><a name="more">vii. より高度な設定</a>
 		
 	    <dd class="d2">
 		<div>
 		  
-		  <p>ここまで読めばもうチュートリアルは卒業です。自分好みの設定をあれこれ書き加えていくうちに、上にある各リンクの内容に目を通す必要が出てくるはずですが、そうしているうちにマニュアルの見方にも慣れてくるはずです。</p>
+		  <p>ここまで読めばもうチュートリアルは卒業です。5,6章が難しいかもしれませんが、習うより慣れろで、調査ウインドウであれこれ試してみてください。自分好みの設定をあれこれ書き加えていくうちに、上にある各リンクの内容に目を通す必要が出てくるはずですが、そうしているうちにマニュアルの見方にも慣れてくるはずです。</p>
 		  
 		  <p>さらなる機能としては、<a href="../CUSTOMIZE.html#function_prefix">2 ストロークキーの設定</a>、<a href="../CUSTOMIZE.html#oneShotModifier">OneShot モディファイヤ</a>、<a href="../CUSTOMIZE.html#function">豊富な関数群</a>、<a href="../CUSTOMIZE.html#def_subst">代用定義</a>などがあります。これらは必要な場合のみ目を通せば十分です。</p>
 		</div>
