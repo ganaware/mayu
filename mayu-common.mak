@@ -81,6 +81,7 @@ LIBS_1		=			\
 		$(guixlibsmt)		\
 		shell32.lib		\
 		comctl32.lib		\
+		wtsapi32.lib		\
 		$(OUT_DIR)\mayu.lib	\
 
 EXTRADEP_1	= $(OUT_DIR)\mayu.lib
