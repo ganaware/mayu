@@ -300,10 +300,12 @@ window	Notepad /:Notepad:Edit$/ : EmacsEdit
 
 window	ASTEC-X /:ASTEC-X$/ : Global
  key C-Yen		=> &Default
- key S-Insert		=> $ASTEC-X/copy-to-x S-Insert
- key C-V		=> $ASTEC-X/copy-to-x C-V
- key C-Y		=> $ASTEC-X/copy-to-x C-Y
-
+ key *IC-IL-C-Yen	=> $ToggleIME		# IME‚ªƒIƒ“‚È‚ç‚ÎIME‚ðƒIƒt
+ if ( GANA )
+   key S-Insert		=> $ASTEC-X/copy-to-x S-Insert  ## (experimental) ##
+   key C-V		=> $ASTEC-X/copy-to-x C-V       ## (experimental) ##
+   key C-Y		=> $ASTEC-X/copy-to-x C-Y       ## (experimental) ##
+ endif
 
 ## Becky! Internet Mail .......................................................
 ## http://www.rimarts.co.jp/index-j.html
@@ -506,3 +508,9 @@ endif
 window AcrobatReader /AcroRd32.exe:.*:MDIClient:/ : EmacsMove
  key Space		=> PageDown
  key BS			=> PageUp
+
+
+## Edmax ......................................................................
+## http://www.bekkoame.ne.jp/~t.mzaki/
+
+window EdMax-edit /edmax\.exe:.*Afx:400000:b:0:1900010:0$/ : EmacsEdit
