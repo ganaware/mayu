@@ -1,4 +1,4 @@
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // windowstool.h
 
 
@@ -15,19 +15,20 @@
 extern HINSTANCE g_hInst;
 
 
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // resource
 
 /// load resource string
 extern tstring loadString(UINT i_id);
 
-/// load small/big icon resource (it must be deleted by DestroyIcon())
+/// load small icon resource (it must be deleted by DestroyIcon())
 extern HICON loadSmallIcon(UINT i_id);
-///
+
+///load big icon resource (it must be deleted by DestroyIcon())
 extern HICON loadBigIcon(UINT i_id);
 
 
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // window
 
 /// resize the window (it does not move the window)
@@ -40,13 +41,15 @@ extern bool getChildWindowRect(HWND i_hwnd, RECT *o_rc);
 /** set small icon to the specified window.
     @return handle of previous icon or NULL */
 extern HICON setSmallIcon(HWND i_hwnd, UINT i_id);
+
 /** set big icon to the specified window.
     @return handle of previous icon or NULL */
 extern HICON setBigIcon(HWND i_hwnd, UINT i_id);
 
-/// remove icon from a window that is set by setSmallIcon/setBigIcon
+/// remove icon from a window that is set by setSmallIcon
 extern void unsetSmallIcon(HWND i_hwnd);
-///
+
+/// remove icon from a window that is set by setBigIcon
 extern void unsetBigIcon(HWND i_hwnd);
 
 /// get toplevel (non-child) window
@@ -63,29 +66,35 @@ extern void asyncResize(HWND i_hwnd, int i_w, int i_h);
 
 /// get dll version
 extern DWORD getDllVersion(const _TCHAR *i_dllname);
-#define PACKVERSION(major,minor) MAKELONG(minor,major)
+#define PACKVERSION(major, minor) MAKELONG(minor, major)
 
-// ////////////////////////////////////////////////////////////////////////////
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // dialog
 
 /// get/set GWL_USERDATA
-template <class T> static T getUserData(HWND i_hwnd, T *i_wc)
-{ return (*i_wc = reinterpret_cast<T>(GetWindowLong(i_hwnd, GWL_USERDATA))); }
+template <class T> inline T getUserData(HWND i_hwnd, T *i_wc)
+{
+  return (*i_wc = reinterpret_cast<T>(GetWindowLong(i_hwnd, GWL_USERDATA)));
+}
+
 ///
-template <class T> static T setUserData(HWND i_hwnd, T i_wc)
+template <class T> inline T setUserData(HWND i_hwnd, T i_wc)
 {
   SetWindowLong(i_hwnd, GWL_USERDATA, reinterpret_cast<long>(i_wc));
   return i_wc;
 }
 
 
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // RECT
 
 ///
 inline int rcWidth(const RECT *i_rc) { return i_rc->right - i_rc->left; }
+
 ///
 inline int rcHeight(const RECT *i_rc) { return i_rc->bottom - i_rc->top; }
+
 ///
 inline bool isRectInRect(const RECT *i_rcin, const RECT *i_rcout)
 {
@@ -96,16 +105,26 @@ inline bool isRectInRect(const RECT *i_rcin, const RECT *i_rcout)
 }
 
 
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // edit control
 
 /// returns bytes of text
 extern size_t editGetTextBytes(HWND i_hwnd);
+
 /// delete a line
 extern void editDeleteLine(HWND i_hwnd, size_t i_n);
+
 /// insert text at last
 extern void editInsertTextAtLast(HWND i_hwnd, const tstring &i_text,
 				 size_t i_threshold);
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Windows2000 specific API
+
+/// SetLayeredWindowAttributes API
+extern BOOL (WINAPI *setLayeredWindowAttributes)
+  (HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags);
 
 
 #endif // _WINDOWSTOOL_H

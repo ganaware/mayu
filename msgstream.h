@@ -1,17 +1,16 @@
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // msgstream.h
 
 
 #ifndef _MSGSTREAM_H
 #  define _MSGSTREAM_H
 
-
 #  include "misc.h"
 #  include "stringtool.h"
 #  include "multithread.h"
 
 
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // msgstream
 
 /** msgstream.
@@ -34,7 +33,7 @@ template<class T, size_t SIZE = 1024,
 class basic_msgbuf : public std::basic_streambuf<T, TR>, public SyncObject
 {
 public:
-  typedef std::basic_string<T, TR, A> String;
+  typedef std::basic_string<T, TR, A> String;	/// 
   
 private:
   HWND m_hwnd;					/** window handle for
@@ -164,7 +163,6 @@ public:
     return TR::not_eof(0);
   }
 
-
   // sync object
   
   /// begin writing
@@ -191,28 +189,32 @@ public:
 };
 
 
+///
 template<class T, size_t SIZE = 1024,
   class TR = std::char_traits<T>, class A = std::allocator<T> >
 class basic_omsgstream : public std::basic_ostream<T, TR>, public SyncObject
 {
 public:
-  typedef std::basic_ostream<T, TR> Super;
-  typedef basic_msgbuf<T, SIZE, TR, A> StreamBuf;
-  typedef std::basic_string<T, TR, A> String;
+  typedef std::basic_ostream<T, TR> Super;	/// 
+  typedef basic_msgbuf<T, SIZE, TR, A> StreamBuf; /// 
+  typedef std::basic_string<T, TR, A> String;	/// 
   
 private:
-  StreamBuf m_streamBuf;
+  StreamBuf m_streamBuf;			/// 
 
 public:
+  ///
   explicit basic_omsgstream(UINT i_messageId, HWND i_hwnd = 0)
     : Super(&m_streamBuf), m_streamBuf(i_messageId, i_hwnd)
   {
   }
   
+  ///
   virtual ~basic_omsgstream()
   {
   }
   
+  ///
   StreamBuf *rdbuf() const
   {
     return const_cast<StreamBuf *>(&m_streamBuf);
@@ -267,6 +269,7 @@ public:
   }
 
   // sync object
+  
   /// begin writing
   virtual void acquire()
   {
@@ -286,7 +289,8 @@ public:
   }
 };
 
+///
 typedef basic_omsgstream<_TCHAR> tomsgstream;
 
 
-#endif // _MSGSTREAM_H
+#endif // !_MSGSTREAM_H

@@ -1,5 +1,6 @@
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // registry.h
+
 
 #ifndef _REGISTRY_H
 #  define _REGISTRY_H
@@ -7,7 +8,7 @@
 #  include "stringtool.h"
 
 
-///
+/// registry access class
 class Registry
 {
   HKEY m_root;					/// registry root
@@ -31,69 +32,70 @@ public:
   /// does exist the key ?
   bool doesExist() const { return doesExist(m_root, m_path); }
 
-  /// DWORD
+  /// read DWORD
   bool read(const tstring &i_name, int *o_value, int i_defaultValue = 0)
     const
   { return read(m_root, m_path, i_name, o_value, i_defaultValue); }
-  ///
+  /// write DWORD
   bool write(const tstring &i_name, int i_value) const
   { return write(m_root, m_path, i_name, i_value); }
  
-  /// tstring
+  /// read tstring
   bool read(const tstring &i_name, tstring *o_value, 
 	    const tstring &i_defaultValue = _T("")) const
   { return read(m_root, m_path, i_name, o_value, i_defaultValue); }
-  ///
+  /// write tstring
   bool write(const tstring &i_name, const tstring &i_value) const
   { return write(m_root, m_path, i_name, i_value); }
 
-  /// binary
+  /// read binary data
   bool read(const tstring &i_name, BYTE *o_value, DWORD i_valueSize,
 	    const BYTE *i_defaultValue = NULL, DWORD i_defaultValueSize = 0)
     const
   { return read(m_root, m_path, i_name, o_value, i_valueSize, i_defaultValue,
 		i_defaultValueSize); }
-  ///
+  /// write binary data
   bool write(const tstring &i_name, const BYTE *i_value,
 	     DWORD i_valueSize) const
   { return write(m_root, m_path, i_name, i_value, i_valueSize); }
 
 public:
-  
-  ///
-#define Registry_path \
-  HKEY i_root, const tstring &i_path, const tstring &i_name
-  
   /// remove
-  static bool remove(Registry_path = _T(""));
+  static bool remove(HKEY i_root, const tstring &i_path,
+		     const tstring &i_name = _T(""));
   
   /// does exist the key ?
   static bool doesExist(HKEY i_root, const tstring &i_path);
   
-  /// DWORD
-  static bool read(Registry_path, int *o_value, int i_defaultValue = 0);
-  ///
-  static bool write(Registry_path, int i_value);
+  /// read DWORD
+  static bool read(HKEY i_root, const tstring &i_path, const tstring &i_name,
+		   int *o_value, int i_defaultValue = 0);
+  /// write DWORD
+  static bool write(HKEY i_root, const tstring &i_path, const tstring &i_name,
+		    int i_value);
 
-  /// tstring
-  static bool read(Registry_path, tstring *o_value,
-		   const tstring &i_defaultValue = _T(""));
-  ///
-  static bool write(Registry_path, const tstring &i_value);
+  /// read tstring
+  static bool read(HKEY i_root, const tstring &i_path, const tstring &i_name,
+		   tstring *o_value, const tstring &i_defaultValue = _T(""));
+  /// write tstring
+  static bool write(HKEY i_root, const tstring &i_path, const tstring &i_name,
+		    const tstring &i_value);
   
-  /// binary
-  static bool read(Registry_path, BYTE *o_value, DWORD i_valueSize,
+  /// read binary data
+  static bool read(HKEY i_root, const tstring &i_path, const tstring &i_name,
+		   BYTE *o_value, DWORD i_valueSize,
 		   const BYTE *i_defaultValue = NULL,
 		   DWORD i_defaultValueSize = 0);
-  ///
-  static bool write(Registry_path, const BYTE *i_value, DWORD i_valueSize);
+  /// write binary data
+  static bool write(HKEY i_root, const tstring &i_path, const tstring &i_name,
+		    const BYTE *i_value, DWORD i_valueSize);
   /// read LOGFONT
-  static bool read(Registry_path, LOGFONT *o_value,
-		   const tstring &i_defaultStringValue);
+  static bool read(HKEY i_root, const tstring &i_path, const tstring &i_name,
+		   LOGFONT *o_value, const tstring &i_defaultStringValue);
   /// write LOGFONT
-  static bool write(Registry_path, const LOGFONT &i_value);
-#undef Registry_path
+  static bool write(HKEY i_root, const tstring &i_path, const tstring &i_name,
+		    const LOGFONT &i_value);
 };
 
 
-#endif // _REGISTRY_H
+#endif // !_REGISTRY_H

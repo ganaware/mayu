@@ -1,10 +1,9 @@
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // hook.h
 
 
 #ifndef _HOOK_H
 #  define _HOOK_H
-
 
 #  include "misc.h"
 #  include <tchar.h>
@@ -108,7 +107,7 @@ extern DllImport int installHooks();
 extern DllImport int uninstallHooks();
 extern DllImport bool notify(void *data, size_t sizeof_data);
 extern DllImport void notifyLockState();
-#  endif // _HOOK_CPP
+#  endif // !_HOOK_CPP
 
 
-#endif // _HOOK_H
+#endif // !_HOOK_H

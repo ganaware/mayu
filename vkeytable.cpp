@@ -1,17 +1,15 @@
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // vkeytable.cpp
 
 
 #include "vkeytable.h"
-
-#include <windows.h>
 #include <ime.h>
 
 
-#define VK(name) { VK_##name, _T(#name) }
-
+// Vkey table (terminated by NULL)
 const VKeyTable g_vkeyTable[] =
 {
+#define VK(name) { VK_##name, _T(#name) }
   VK(LBUTTON),				// 01 LButton
   VK(RBUTTON),				// 02 RButton
   VK(CANCEL),				// 03 Break
@@ -157,4 +155,5 @@ const VKeyTable g_vkeyTable[] =
   VK(DBE_ENTERDLGCONVERSIONMODE),	// FD
   VK(PA1),				// FD
   { 0, NULL },
+#undef VK
 };

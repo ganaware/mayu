@@ -1,4 +1,4 @@
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // setting.cpp
 
 
@@ -8,7 +8,7 @@
 #include <algorithm>
 
 
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // KeySeq
 
 
@@ -117,19 +117,7 @@ tostream &operator<<(tostream &i_ost, const KeySeq &i_ks)
       {
 	const ActionFunction *af =
 	  reinterpret_cast<const ActionFunction *>(*i);
-	i_ost << af->m_modifier << *af->m_function;
-	if (af->m_args.size())
-	{
-	  i_ost << _T("(");
-	  for (ActionFunction::Args::const_iterator
-		 i = af->m_args.begin(); i != af->m_args.end(); ++ i)
-	  {
-	    if (i != af->m_args.begin())
-	      i_ost << _T(", ");
-	    i_ost << *i;
-	  }
-	  i_ost << _T(")");
-	}
+	i_ost << af->m_modifier << af->m_functionData;
 	break;
       }
     }
@@ -139,7 +127,7 @@ tostream &operator<<(tostream &i_ost, const KeySeq &i_ks)
 }
 
 
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Keymap
 
 
@@ -149,7 +137,15 @@ Keymap::KeyAssignments &Keymap::getKeyAssignments(const ModifiedKey &i_mk)
   return m_hashedKeyAssignments[i_mk.m_key->getScanCodes()->m_scan %
 			       HASHED_KEY_ASSIGNMENT_SIZE];
 }
-  
+
+const Keymap::KeyAssignments &
+Keymap::getKeyAssignments(const ModifiedKey &i_mk) const
+{
+  ASSERT(1 <= i_mk.m_key->getScanCodesSize());
+  return m_hashedKeyAssignments[i_mk.m_key->getScanCodes()->m_scan %
+			       HASHED_KEY_ASSIGNMENT_SIZE];
+}
+
 
 Keymap::Keymap(Type i_type,
 	       const tstringi &i_name,
@@ -223,10 +219,10 @@ void Keymap::addModifier(Modifier::Type i_mt, AssignOperator i_ao,
   
 // search
 const Keymap::KeyAssignment *
-Keymap::searchAssignment(const ModifiedKey &i_mk)
+Keymap::searchAssignment(const ModifiedKey &i_mk) const
 {
-  KeyAssignments &ka = getKeyAssignments(i_mk);
-  for (KeyAssignments::iterator i = ka.begin(); i != ka.end(); ++ i)
+  const KeyAssignments &ka = getKeyAssignments(i_mk);
+  for (KeyAssignments::const_iterator i = ka.begin(); i != ka.end(); ++ i)
     if ((*i).m_modifiedKey.m_key == i_mk.m_key &&
 	(*i).m_modifiedKey.m_modifier.doesMatch(i_mk.m_modifier))
       return &(*i);
@@ -347,7 +343,7 @@ void Keymap::adjustModifier(Keyboard &i_keyboard)
   }
 }
 
-/// describe
+// describe
 void Keymap::describe(tostream &i_ost, DescribedKeys *o_dk) const
 {
   switch (m_type)
@@ -392,7 +388,7 @@ void Keymap::describe(tostream &i_ost, DescribedKeys *o_dk) const
 
 
 
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Keymaps
 
 
@@ -446,7 +442,7 @@ void Keymaps::adjustModifier(Keyboard &i_keyboard)
 }
 
 
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // KeySeqs
 
 

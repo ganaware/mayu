@@ -1,4 +1,4 @@
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // layoutmanager.cpp
 
 
@@ -8,7 +8,7 @@
 #include <windowsx.h>
 
 
-///
+//
 LayoutManager::LayoutManager(HWND i_hwnd)
   : m_hwnd(i_hwnd),
     m_smallestRestriction(RESTRICT_NONE),
@@ -16,8 +16,8 @@ LayoutManager::LayoutManager(HWND i_hwnd)
 {
 }
 
-/** restrict the smallest size of the window to the current size of it or
-    specified by i_size */
+// restrict the smallest size of the window to the current size of it or
+// specified by i_size
 void LayoutManager::restrictSmallestSize(Restrict i_restrict, SIZE *i_size)
 {
   m_smallestRestriction = i_restrict;
@@ -33,8 +33,8 @@ void LayoutManager::restrictSmallestSize(Restrict i_restrict, SIZE *i_size)
 }
 
 
-/** restrict the largest size of the window to the current size of it or
-    specified by i_size */
+// restrict the largest size of the window to the current size of it or
+// specified by i_size
 void LayoutManager::restrictLargestSize(Restrict i_restrict, SIZE *i_size)
 {
   m_largestRestriction = i_restrict;
@@ -49,7 +49,7 @@ void LayoutManager::restrictLargestSize(Restrict i_restrict, SIZE *i_size)
   }
 }
 
-
+//
 bool LayoutManager::addItem(HWND i_hwnd, Origin i_originLeft,
 			    Origin i_originTop,
 			    Origin i_originRight, Origin i_originBottom)
@@ -74,6 +74,7 @@ bool LayoutManager::addItem(HWND i_hwnd, Origin i_originLeft,
   return true;
 }
 
+//
 void LayoutManager::adjust() const
 {
   for (Items::const_iterator i = m_items.begin(); i != m_items.end(); ++ i)
@@ -112,7 +113,7 @@ void LayoutManager::adjust() const
 }
 
 
-/// draw size box
+// draw size box
 BOOL LayoutManager::wmPaint()
 {
   PAINTSTRUCT ps;
@@ -126,7 +127,8 @@ BOOL LayoutManager::wmPaint()
   return TRUE;
 }
 
-/// size restriction
+
+// size restriction
 BOOL LayoutManager::wmSizing(int i_edge, RECT *io_rc)
 {
   switch (i_edge)
@@ -184,7 +186,8 @@ BOOL LayoutManager::wmSizing(int i_edge, RECT *io_rc)
   return TRUE;
 }
 
-/// hittest for size box
+
+// hittest for size box
 BOOL LayoutManager::wmNcHitTest(int i_x, int i_y)
 {
   POINT p = { i_x, i_y };
@@ -200,7 +203,8 @@ BOOL LayoutManager::wmNcHitTest(int i_x, int i_y)
   return FALSE;
 }
 
-/// WM_SIZE
+
+// WM_SIZE
 BOOL LayoutManager::wmSize(DWORD /* i_fwSizeType */, short /* i_nWidth */,
 			   short /* i_nHeight */)
 {
@@ -210,7 +214,8 @@ BOOL LayoutManager::wmSize(DWORD /* i_fwSizeType */, short /* i_nWidth */,
   return TRUE;
 }
 
-/// forward message
+
+// forward message
 BOOL LayoutManager::defaultWMHandler(UINT i_message,
 				     WPARAM i_wParam, LPARAM i_lParam)
 {

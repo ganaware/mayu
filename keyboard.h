@@ -1,10 +1,9 @@
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // keyboard.h
 
 
 #ifndef _KEYBOARD_H
 #  define _KEYBOARD_H
-
 
 #  include "misc.h"
 #  include "driver.h"
@@ -376,4 +375,4 @@ public:
 };
 
 
-#endif // _KEYBOARD_H
+#endif // !_KEYBOARD_H

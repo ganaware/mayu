@@ -1,16 +1,14 @@
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // dlglog.cpp
 
 
 #include "misc.h"
-
 #include "mayu.h"
 #include "mayurc.h"
 #include "registry.h"
 #include "windowstool.h"
 #include "msgstream.h"
 #include "layoutmanager.h"
-
 #include <windowsx.h>
 
 
@@ -149,7 +147,7 @@ public:
 };
 
 
-///
+//
 BOOL CALLBACK dlgLog_dlgProc(HWND i_hwnd, UINT i_message,
 			     WPARAM i_wParam, LPARAM i_lParam)
 {

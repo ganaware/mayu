@@ -1,4 +1,3 @@
-							    -*- fundamental -*-
 ###############################################################################
 #
 # mayu file syntax version 0.04 by GANA
@@ -33,7 +32,7 @@
 
 	<MAYU_FILE> : ( <LINE> <COMMENT>? <CRLF> )*
 	<LINE> :
-		| <COND_SYMBOL>
+		  <COND_SYMBOL>
 		| <INCLUDE>
 		| <KEYBOARD_DEFINITION>
 		| <KEYMAP_DEFINITION>
@@ -51,16 +50,16 @@
 #
 
 	<number> :
-		| /[-+]?[0-9]+/		# decimal
+		  /[-+]?[0-9]+/		# decimal
 		| /[-+]?0[0-9]+/	# octal
 		| /[-+]?0x[0-9a-f]+/	# hexadecimal
 
 	<bool> :
-		| false			# false
+		  "false"		# false
 		| <string>		# true
 
 	<string> :
-		| /([/?_a-z]|\MBCS|\EC)([-+/?_a-z0-9]|\MBCS|\EC)*/
+		  /([/?_a-z]|\MBCS|\EC)([-+/?_a-z0-9]|\MBCS|\EC)*/
 		| /"([^"]|\MBCS|\EC)*"/
 		| /'([^']|\MBCS|\EC)*'/
 	# \MBCS : Multi Byte Character (such as Shift_JIS)
@@ -73,10 +72,10 @@
 	#	| "\t"	# horizontal tab
 	#	| "\\"	# \
 	#	| /\\[0-7][0-7]?[0-7]?/	# character as octal
-	#	| /\\x[0-9a-f][0-9a-f]/	# character as hexadecimal 
+	#	| /\\x[0-9a-f][0-9a-f]/	# character as hexadecimal
 
 	<regexp> :
-		| /\REGEXP/
+		  /\REGEXP/
 		| \m@\REGEXP@		# @ can be any character
 	# \REGEXP :
 	#	| "|"		# Alternation
@@ -121,8 +120,8 @@
 # KEYBOARD DEFINITION
 #
 
-	<KEYBOARD_DEFINITION> :
-		| "def" <DEFINE_KEY>
+	<KEYBOARD_DEFINITION>
+		: "def" <DEFINE_KEY>
 		| "def" <DEFINE_MODIFIER>
 		| "def" <DEFINE_LOCK>
 		| "def" <DEFINE_SYNC_KEY>
@@ -130,8 +129,8 @@
 
 	<DEFINE_KEY> : "key" <KEY_NAMES> "=" <SCAN_CODES>
 
-	<KEY_NAMES> :
-		| "(" <KEY_NAME>+ ")"
+	<KEY_NAMES>
+		: "(" <KEY_NAME>+ ")"
 		| <KEY_NAME>+
 	<KEY_NAME> : <string>
 	<SCAN_CODES> : <SCAN_CODE> <SCAN_CODE>? <SCAN_CODE>? <SCAN_CODE>?
@@ -139,8 +138,8 @@
 	<SCAN_CODE_EXTENTION> : "E0-" | "E1-"
 
 	<DEFINE_MODIFIER> : "mod" <BASIC_MODIFIER_NAME> "=" <KEY_NAME>*
-	<BASIC_MODIFIER_NAME> : 
-		| "shift"
+	<BASIC_MODIFIER_NAME>
+		: "shift"
 		| "alt" | "meta" | "menu"
 		| "control" | "ctrl"
 		| "windows" | "win"
@@ -154,24 +153,24 @@
 
 	<DEFINE_ALIAS> : "alias" <ALIAS_NAME> "=" <KEY_NAME>
 	<ALIAS_NAME> : <string>
-	<ALIASED_KEY_NAME> :
-		| <ALIAS_NAME>
+	<ALIASED_KEY_NAME>
+		: <ALIAS_NAME>
 		| <KEY_NAME>
 
 #
 # KEYMAP DEFINITION
 #
 
-	<KEYMAP_DEFINITION> :
-		| "keymap" <KEYMAP_NAME> <KEYMAP_PARENT>? <KEYSEQ_DEFAULT>?
+	<KEYMAP_DEFINITION>
+		: "keymap" <KEYMAP_NAME> <KEYMAP_PARENT>? <KEYSEQ_DEFAULT>?
 		| "keymap2" <KEYMAP_NAME> <KEYMAP_PARENT>? <KEYSEQ_DEFAULT>?
 		| "window" <KEYMAP_NAME> <WINDOW>? <KEYMAP_PARENT>? \
 							<KEYSEQ_DEFAULT>?
 	<KEYMAP_NAME> : <string>
 	<KEYMAP_PARENT> : ":" <KEYMAP_NAME>
 	<KEYSEQ_DEFAULT> : "=>" <KEY_SEQUENCE>
-	<WINDOW> :
-		| <WINDOW_CLASS_NAME>
+	<WINDOW>
+		: <WINDOW_CLASS_NAME>
 		| "(" <WINDOW_CLASS_NAME> "&&" <WINDOW_TITLE_NAME> ")"
 		| "(" <WINDOW_CLASS_NAME> "||" <WINDOW_TITLE_NAME> ")"
 	<WINDOW_CLASS_NAME> : <regexp>
@@ -181,12 +180,12 @@
 # KEY TO KEY SEQUENCE ASSIGNMENT
 #
 
-	<KEY_ASSIGN> :
-		| "key" <ASSIGN_MODIFIED_KEY_NAME>+ "=>" <KEY_SEQUENCE>
+	<KEY_ASSIGN>
+		: "key" <ASSIGN_MODIFIED_KEY_NAME>+ "=>" <KEY_SEQUENCE>
 		| "key" <ASSIGN_MODIFIER>* "=" <KEYSEQ_MODIFIER>*
 	<ASSIGN_MODIFIED_KEY_NAME> : <ASSIGN_MODIFIER>* <ALIASED_KEY_NAME>
-	<ASSIGN_MODIFIER> :
-		| <KEYSEQ_MODIFIER>
+	<ASSIGN_MODIFIER>
+		: <KEYSEQ_MODIFIER>
 		| "IL-"		# if IME on
 		| "IC-" | "I-"	# if IME on and compositioning
 		| "NL-"		# if Num Lock on
@@ -199,10 +198,10 @@
 # EVENT TO KEY SEQUENCE ASSIGNMENT
 #
 
-	<EVENT_ASSIGN> :
-		| "event" <EVENT_NAME> "=>" <KEY_SEQUENCE>
-	<EVENT_NAME> :
-		| "prefixed"
+	<EVENT_ASSIGN>
+		: "event" <EVENT_NAME> "=>" <KEY_SEQUENCE>
+	<EVENT_NAME>
+		: "prefixed"
 		| "before-key-down"
 		| "after-key-up"
 
@@ -210,15 +209,15 @@
 # MODIFIER ASSIGNMENT
 #
 
-	<MODIFIER_ASSIGNMENT> :
-		| "mod" ( <ASSIGN_MODE> <MODIFIER_NAME> )* \
+	<MODIFIER_ASSIGNMENT>
+		: "mod" ( <ASSIGN_MODE> <MODIFIER_NAME> )* \
 			<MODIFIER_NAME> <ASSIGN_OP> \
 					( <ASSIGN_MODE>? <ALIASED_KEY_NAME> )+
 	<MODIFIER_NAME> : <BASIC_MODIFIER_NAME> | /mod[0-9]/
 
 	<ASSIGN_OP> : "=" | "-=" | "+="
-	<ASSIGN_MODE> :
-		| "!"		# true modifier (doesn't generate scan code)
+	<ASSIGN_MODE>
+		: "!"		# true modifier (doesn't generate scan code)
 		| "!!"		# one shot modifier
 
 #
@@ -227,21 +226,21 @@
 
 	<KEYSEQ_DEFINITION> : "keyseq" "$" <KEYSEQ_NAME> "=" <KEY_SEQUENCE>
 	<KEY_SEQUENCE> : <ACTION>+
-	<ACTION> : 
-		| <KEYSEQ_MODIFIED_KEY_NAME>
+	<ACTION>
+		: <KEYSEQ_MODIFIED_KEY_NAME>
 		| "$" <KEYSEQ_NAME>
 		| <KEYSEQ_MODIFIER>* "&" <FUNCTION_NAME> <ARGUMENTS>?
 		| "(" <KEY_SEQUENCE> ")"
 	<ARGUMENTS> : "(" ( <ARGUMENT> ( "," <ARGUMENT> )* )? ")"
 	<KEYSEQ_MODIFIED_KEY_NAME> : <KEYSEQ_MODIFIER>* <ALIASED_KEY_NAME>
-	<KEYSEQ_MODIFIER> :
-		| <BASIC_MODIFIER>
+	<KEYSEQ_MODIFIER>
+		: <BASIC_MODIFIER>
 		| "U-"		# up
 		| "D-"		# down
 	<KEYSEQ_NAME> : <string>
 	<FUNCTION_NAME> : <string>
-	<ARGUMENT> :
-		| <KEYMAP_NAME>
+	<ARGUMENT>
+		: <KEYMAP_NAME>
 		| "$" <KEYSEQ_NAME> | "(" <KEY_SEQUENCE> ")"
 		| <ARGUMENT_LOCK>
 		| <string>
@@ -252,23 +251,27 @@
 		| <ASSIGN_MODIFIER>*
 		| <bool>
 
-	<ARGUMENT_LOCK> :		# &Toggle()
-		| /lock\d/
+	<ARGUMENT_LOCK> : /lock\d/	# &Toggle()
 
-	<ARGUMENT_VK> :			# &VK()
-		| <VK_MODIFIER>* <VK_NAME>
+	<ARGUMENT_VK>			# &VK()
+		: <VK_MODIFIER>* <VK_NAME>
 	<VK_MODIFIER> : "E-" | "U-" | "D-"
 	<VK_NAME> : <string>
 
-	<ARGUMENT_SHOW_WINDOW> :	# &ShellExecute()
-		| "HIDE" | "MAXIMIZE" | "MINIMIZE" | "RESTORE" | "SHOW"
+	<ARGUMENT_SHOW_WINDOW>		# &ShellExecute()
+		: "HIDE" | "MAXIMIZE" | "MINIMIZE" | "RESTORE" | "SHOW"
 		| "SHOWDEFAULT" | "SHOWMAXIMIZED" | "SHOWMINIMIZED"
 		| "SHOWMINNOACTIVE" | "SHOWNA" | "SHOWNOACTIVATE"
 		| "SHOWNORMAL"
 
-	<ARGUMENT_WINDOW> :		# &PostMessage()
-		| <number>
+	<ARGUMENT_WINDOW>		# &PostMessage()
+		: <number>
 		| "toOverlappedWindow"
-		{ "toMainWindow"
-		{ "toItself"
-		{ "toParentWindow"
+		| "toMainWindow"
+		| "toItself"
+		| "toParentWindow"
+
+# Local Variables:
+# mode: text
+# eval: (progn	(font-lock-mode) (font-lock-add-keywords  nil '(("#.*$" . font-lock-comment-face) ("\\\\$" (0 font-lock-warning-face)) ("/\\(\\[[^]\n]*\\]\\|[^/\n]\\)*/" (0 font-lock-string-face)) ("'[^'\n]*'" (0 font-lock-string-face)) ("\"[^\"\n]*\"" (0 font-lock-string-face)) ("<\\([A-Za-z_][A-Za-z_0-9]*\\)>"  (1 font-lock-constant-face)) ("[*?+]" (0 font-lock-keyword-face)) )) (font-lock-fontify-buffer))
+# End:

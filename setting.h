@@ -1,4 +1,4 @@
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // setting.h
 
 
@@ -12,7 +12,7 @@
 #  include <set>
 
 
-///
+/// this class contains all of loaded settings
 class Setting
 {
 public:
@@ -24,8 +24,8 @@ public:
   Keymaps m_keymaps;				///
   KeySeqs m_keySeqs;				///
   Symbols m_symbols;				///
-  Modifiers m_modifiers;			///
 };
+
 
 ///
 namespace Event
@@ -40,9 +40,23 @@ namespace Event
   extern Key *events[];
 }
 
+
 ///
 class SettingLoader
 {
+#  define FUNCTION_FRIEND
+#  include "functions.h"
+#  undef FUNCTION_FRIEND
+  
+public:
+  ///
+  class FunctionCreator
+  {
+  public:
+    const char *m_name;				/// 
+    FunctionData *m_creator;			/// 
+  };
+
 private:
   typedef std::vector<Token> Tokens;		///
   typedef std::vector<tstringi> Prefixes;	///
@@ -76,12 +90,14 @@ private:
   bool isEOL();					/// is there no more tokens ?
   Token *getToken();				/// get next token
   Token *lookToken();				/// look next token
+  bool getOpenParen(bool i_doesThrow, const _TCHAR *i_name); /// argument "("
+  bool getCloseParen(bool i_doesThrow, const _TCHAR *i_name); /// argument ")"
   
   void load_LINE();				/// &lt;LINE&gt;
   void load_DEFINE();				/// &lt;DEFINE&gt;
   void load_IF();				/// &lt;IF&gt;
-  void load_ELSE(bool i_isElseIf,
-		 const tstringi &i_token);	/// &lt;ELSE&gt; &lt;ELSEIF&gt;
+  void load_ELSE(bool i_isElseIf, const tstringi &i_token);
+						/// &lt;ELSE&gt; &lt;ELSEIF&gt;
   bool load_ENDIF(const tstringi &i_token);	/// &lt;ENDIF&gt;
   void load_INCLUDE();				/// &lt;INCLUDE&gt;
   void load_SCAN_CODES(Key *o_key);		/// &lt;SCAN_CODES&gt;
@@ -90,11 +106,25 @@ private:
   void load_DEFINE_SYNC_KEY();			/// &lt;DEFINE_SYNC_KEY&gt;
   void load_DEFINE_ALIAS();			/// &lt;DEFINE_ALIAS&gt;
   void load_KEYBOARD_DEFINITION();		/// &lt;KEYBOARD_DEFINITION&gt;
-  Modifier load_MODIFIER(Modifier::Type i_mode,
-			 Modifier i_modifier);	/// &lt;..._MODIFIER&gt;
+  Modifier load_MODIFIER(Modifier::Type i_mode, Modifier i_modifier);
+						/// &lt;..._MODIFIER&gt;
   Key *load_KEY_NAME();				/// &lt;KEY_NAME&gt;
-  void load_KEYMAP_DEFINITION(
-    const Token *i_which);			/// &lt;KEYMAP_DEFINITION&gt;
+  void load_KEYMAP_DEFINITION(const Token *i_which);
+						/// &lt;KEYMAP_DEFINITION&gt;
+  void load_ARGUMENT(bool *o_arg);		/// &lt;ARGUMENT&gt;
+  void load_ARGUMENT(int *o_arg);		/// &lt;ARGUMENT&gt;
+  void load_ARGUMENT(unsigned int *o_arg);	/// &lt;ARGUMENT&gt;
+  void load_ARGUMENT(long *o_arg);		/// &lt;ARGUMENT&gt;
+  void load_ARGUMENT(tstring *o_arg);		/// &lt;ARGUMENT&gt;
+  void load_ARGUMENT(VKey *o_arg);		/// &lt;ARGUMENT_VK&gt;
+  void load_ARGUMENT(ToWindowType *o_arg);	/// &lt;ARGUMENT_WINDOW&gt;
+  void load_ARGUMENT(GravityType *o_arg);	/// &lt;ARGUMENT&gt;
+  void load_ARGUMENT(MayuDialogType *o_arg);	/// &lt;ARGUMENT&gt;
+  void load_ARGUMENT(ModifierLockType *o_arg);	/// &lt;ARGUMENT_LOCK&gt;
+  void load_ARGUMENT(ShowCommandType *o_arg);	///&lt;ARGUMENT_SHOW_WINDOW&gt;
+  void load_ARGUMENT(Modifier *o_arg);		/// &lt;ARGUMENT&gt;
+  void load_ARGUMENT(const Keymap **o_arg);	/// &lt;ARGUMENT&gt;
+  void load_ARGUMENT(const KeySeq **o_arg);	/// &lt;ARGUMENT&gt;
   KeySeq *load_KEY_SEQUENCE(const tstringi &i_name = _T(""),
 			    bool i_isInParen = false); /// &lt;KEY_SEQUENCE&gt;
   void load_KEY_ASSIGN();			/// &lt;KEY_ASSIGN&gt;
@@ -126,4 +156,4 @@ public:
 extern void getHomeDirectories(std::list<tstringi> *o_path);
 
 
-#endif // _SETTING_H
+#endif // !_SETTING_H

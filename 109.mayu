@@ -8,6 +8,9 @@ define KBD109
 define KBD112
 
 
+
+
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 109 日本語キーボード定義
 #
@@ -28,6 +31,7 @@ def key CircumflexAccent Caret		=    0x0d # ^~
 def key BackSpace BS Back		=    0x0e
 def key Tab				=    0x0f
 def key Q				=    0x10
+def key ScanPreviousTrack PreviousTrack	= E0-0x10 # (Media Player)
 def key W				=    0x11
 def key E				=    0x12
 def key R				=    0x13
@@ -37,6 +41,7 @@ def key U				=    0x16
 def key I				=    0x17
 def key O				=    0x18
 def key P				=    0x19
+def key ScanNextTrack NextTrack		= E0-0x19 # (Media Player)
 def key CommercialAt Atmark		=    0x1a # @`
 def key LeftSquareBracket OpenBracket	=    0x1b # [{
 def key Enter Return			=    0x1c
@@ -47,10 +52,14 @@ def key Pause				= E1-0x1d 0x45 # Pause
 def key A				=    0x1e
 def key S				=    0x1f
 def key D				=    0x20
+def key Mute				= E0-0x20 # (Media Player)
 def key F				=    0x21
+def key ALCalculator			= E0-0x21 # (N/A) Calculator 
 def key G				=    0x22
+def key Play/Pause			= E0-0x22 # (Media Player)
 def key H				=    0x23
 def key J				=    0x24
+def key Stop				= E0-0x24 # (Media Player)
 def key K				=    0x25
 def key L				=    0x26
 def key Semicolon			=    0x27 # ;+
@@ -62,10 +71,13 @@ def key RightSquareBracket CloseBracket	=    0x2b # ]}
 def key Z				=    0x2c
 def key X				=    0x2d
 def key C				=    0x2e
+def key VolumeDecrement VolumeDown	= E0-0x2e
 def key V				=    0x2f
 def key B				=    0x30
+def key VolumeIncrement VolumeUp	= E0-0x30
 def key N				=    0x31
 def key M				=    0x32
+def key ACHome Internet			= E0-0x32 # (Internet Explorer)
 def key Comma				=    0x33 # ,<
 def key FullStop Period			=    0x34 # .>
 def key Solidus Slash			=    0x35 # /?
@@ -114,6 +126,7 @@ def key Insert				= E0-0x52
 def key NumFullStop NumPeriod		=    0x53 # テンキー .
 def key Delete Del			= E0-0x53
 def key SysRq				=    0x54
+
 def key F11				=    0x57
 def key F12				=    0x58
 def key LeftWindows LWindows LWin	= E0-0x5b
@@ -122,6 +135,15 @@ def key Applications Apps		= E0-0x5d
 def key PowerOff			= E0-0x5e # Power off  (112 キーボード)
 def key Sleep				= E0-0x5f # Sleep      (112 キーボード)
 def key WakeUp				= E0-0x63 # Wake up    (112 キーボード)
+def key ACSearch			= E0-0x65 # (Internet Explorer)
+def key ACBookmarks			= E0-0x66 # (Internet Explorer)
+def key ACRefresh			= E0-0x67 # (Internet Explorer)
+def key ACStop				= E0-0x68 # (Internet Explorer)
+def key ACForward			= E0-0x69 # (Internet Explorer)
+def key ACBack				= E0-0x6a # (Internet Explorer)
+def key ALLocalBrowser			= E0-0x6b # (N/A) My Computer 
+def key ALEmailReader Email		= E0-0x6c
+def key ALConsumerControlConfiguration	= E0-0x6d # (N/A) Media Player
 def key ひらがな Hiragana		=    0x70 # ひらがな カタカナ ローマ字
 def key ReverseSolidus BackSlash	=    0x73 # ＼_
 def key 変換 Convert			=    0x79 # 変換(次候補) 前候補 全候補

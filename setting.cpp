@@ -1,4 +1,4 @@
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // setting.cpp
 
 
@@ -107,7 +107,7 @@ void getHomeDirectories(std::list<tstringi> *o_pathes)
 }
 
 
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // SettingLoader
 
 
@@ -133,6 +133,36 @@ Token *SettingLoader::lookToken()
   if (isEOL())
     throw ErrorMessage() << _T("too few words.");
   return &*m_ti;
+}
+
+
+// argument "("
+bool SettingLoader::getOpenParen(bool i_doesThrow, const _TCHAR *i_name)
+{
+  if (!isEOL() && lookToken()->isOpenParen())
+  {
+    getToken();
+    return true;
+  }
+  if (i_doesThrow)
+    throw ErrorMessage() << _T("there must be `(' after `&")
+			 << i_name << _T("'.");
+  return false;
+}
+
+
+// argument ")"
+bool SettingLoader::getCloseParen(bool i_doesThrow, const _TCHAR *i_name)
+{
+  if (!isEOL() && lookToken()->isCloseParen())
+  {
+    getToken();
+    return true;
+  }
+  if (i_doesThrow)
+    throw ErrorMessage() << _T("`&")  << i_name
+			 << _T("': too many arguments.");
+  return false;
 }
 
 
@@ -491,16 +521,14 @@ void SettingLoader::load_KEYMAP_DEFINITION(const Token *i_which)
 
   if (keySeq == NULL)
   {
-    Function::Id id;
-    if (type == Keymap::Type_keymap && !isKeymap2)
-      id = Function::Id_KeymapParent;
-    else if (type == Keymap::Type_keymap && !isKeymap2)
-      id = Function::Id_Undefined;
-    else // (type == Keymap::Type_windowAnd || type == Keymap::Type_windowOr)
-      id = Function::Id_KeymapParent;
     ActionFunction af;
-    af.m_function = Function::search(id);
-    ASSERT( af.m_function );
+    if (type == Keymap::Type_keymap && !isKeymap2)
+      af.m_functionData = createFunctionData(_T("KeymapParent"));
+    else if (type == Keymap::Type_keymap && !isKeymap2)
+      af.m_functionData = createFunctionData(_T("Undefined"));
+    else // (type == Keymap::Type_windowAnd || type == Keymap::Type_windowOr)
+      af.m_functionData = createFunctionData(_T("KeymapParent"));
+    ASSERT( af.m_functionData );
     keySeq = m_setting->m_keySeqs.add(KeySeq(name->getString()).add(af));
   }
   
@@ -508,6 +536,173 @@ void SettingLoader::load_KEYMAP_DEFINITION(const Token *i_which)
     m_setting->m_keymaps.add(
       Keymap(type, name->getString(), windowClassName, windowTitleName,
 	     keySeq, parentKeymap));
+}
+
+
+// &lt;ARGUMENT&gt;
+void SettingLoader::load_ARGUMENT(bool *o_arg)
+{
+  *o_arg = !(*getToken() == _T("false"));
+}
+
+
+// &lt;ARGUMENT&gt;
+void SettingLoader::load_ARGUMENT(int *o_arg)
+{
+  *o_arg = getToken()->getNumber();
+}
+
+
+// &lt;ARGUMENT&gt;
+void SettingLoader::load_ARGUMENT(unsigned int *o_arg)
+{
+  *o_arg = getToken()->getNumber();
+}
+
+
+// &lt;ARGUMENT&gt;
+void SettingLoader::load_ARGUMENT(long *o_arg)
+{
+  *o_arg = getToken()->getNumber();
+}
+
+
+// &lt;ARGUMENT&gt;
+void SettingLoader::load_ARGUMENT(tstring *o_arg)
+{
+  *o_arg = getToken()->getString();
+}
+
+
+// &lt;ARGUMENT_VK&gt;
+void SettingLoader::load_ARGUMENT(VKey *o_arg)
+{
+  Token *t = getToken();
+  int vkey = 0;
+  while (true)
+  {
+    if (t->isNumber()) { vkey |= static_cast<BYTE>(t->getNumber()); break; }
+    else if (*t == _T("E-")) vkey |= VKey_extended;
+    else if (*t == _T("U-")) vkey |= VKey_released;
+    else if (*t == _T("D-")) vkey |= VKey_pressed;
+    else
+    {
+      const VKeyTable *vkt;
+      for (vkt = g_vkeyTable; vkt->m_name; ++ vkt)
+	if (*t == vkt->m_name)
+	  break;
+      if (!vkt->m_name)
+	throw ErrorMessage() << _T("`") << *t
+			     << _T("': unknown virtual key name.");
+      vkey |= vkt->m_code;
+      break;
+    }
+    t = getToken();
+  }
+  if (!(vkey & VKey_released) && !(vkey & VKey_pressed))
+    vkey |= VKey_released | VKey_pressed;
+  *o_arg = static_cast<VKey>(vkey);
+}
+
+
+// &lt;ARGUMENT_WINDOW&gt;
+void SettingLoader::load_ARGUMENT(ToWindowType *o_arg)
+{
+  Token *t = getToken();
+  if (t->isNumber())
+  {
+    if (ToWindowType_toBegin <= t->getNumber())
+    {
+      *o_arg = static_cast<ToWindowType>(t->getNumber());
+      return;
+    }
+  }
+  else if (getTypeValue(o_arg, t->getString()))
+    return;
+  throw ErrorMessage() << _T("`") << *t << _T("': invalid target window.");
+}
+
+
+// &lt;ARGUMENT&gt;
+void SettingLoader::load_ARGUMENT(GravityType *o_arg)
+{
+  Token *t = getToken();
+  if (getTypeValue(o_arg, t->getString()))
+    return;
+  throw ErrorMessage() << _T("`") << *t << _T("': unknown gravity symbol.");
+}
+
+
+// &lt;ARGUMENT&gt;
+void SettingLoader::load_ARGUMENT(MayuDialogType *o_arg)
+{
+  Token *t = getToken();
+  if (getTypeValue(o_arg, t->getString()))
+    return;
+  throw ErrorMessage() << _T("`") << *t << _T("': unknown dialog box.");
+}
+
+
+// &lt;ARGUMENT_LOCK&gt;
+void SettingLoader::load_ARGUMENT(ModifierLockType *o_arg)
+{
+  Token *t = getToken();
+  if (getTypeValue(o_arg, t->getString()))
+    return;
+  throw ErrorMessage() << _T("`") << *t << _T("': unknown lock name.");
+}
+
+
+// &lt;ARGUMENT_SHOW_WINDOW&gt;
+void SettingLoader::load_ARGUMENT(ShowCommandType *o_arg)
+{
+  Token *t = getToken();
+  if (getTypeValue(o_arg, t->getString()))
+    return;
+  throw ErrorMessage() << _T("`") << *t << _T("': unknown show command.");
+}
+
+
+// &lt;ARGUMENT&gt;
+void SettingLoader::load_ARGUMENT(Modifier *o_arg)
+{
+  Modifier modifier;
+  for (int i = Modifier::Type_begin; i != Modifier::Type_end; ++ i)
+    modifier.dontcare(static_cast<Modifier::Type>(i));
+  *o_arg = load_MODIFIER(Modifier::Type_ASSIGN, modifier);
+}
+
+
+// &lt;ARGUMENT&gt;
+void SettingLoader::load_ARGUMENT(const Keymap **o_arg)
+{
+  Token *t = getToken();
+  const Keymap *&keymap = *o_arg;
+  keymap = m_setting->m_keymaps.searchByName(t->getString());
+  if (!keymap)
+    throw ErrorMessage() << _T("`") << *t << _T("': unknown keymap name.");
+}
+
+
+// &lt;ARGUMENT&gt;
+void SettingLoader::load_ARGUMENT(const KeySeq **o_arg)
+{
+  Token *t = getToken();
+  const KeySeq *&keySeq = *o_arg;
+  if (t->isOpenParen())
+  {
+    keySeq = load_KEY_SEQUENCE(_T(""), true);
+    getToken(); // close paren
+  }
+  else if (*t == _T("$"))
+  {
+    t = getToken();
+    keySeq = m_setting->m_keySeqs.searchByName(t->getString());
+    if (!keySeq)
+      throw ErrorMessage() << _T("`$") << *t << _T("': unknown keyseq name.");
+  }
+  else
+    throw ErrorMessage() << _T("`") << *t << _T("': it is not keyseq.");
 }
 
 
@@ -548,290 +743,11 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const tstringi &i_name,
       // search function
       ActionFunction af;
       af.m_modifier = modifier;
-      af.m_function = Function::search(t->getString());
-      if (af.m_function == NULL)
+      af.m_functionData = createFunctionData(t->getString());
+      if (af.m_functionData == NULL)
 	throw ErrorMessage() << _T("`&") << *t
 			     << _T("': unknown function name.");
-
-      // get arguments
-      const _TCHAR *type = af.m_function->m_argType;
-      if (type == NULL)
-	// no argument
-      {
-	if (!isEOL() && lookToken()->isOpenParen())
-	{
-	  getToken();
-	  if (!getToken()->isCloseParen())
-	    throw ErrorMessage() << _T("`&") << af.m_function->m_name
-				 << _T("': too many arguments.");
-	}
-      }
-      else if (isEOL() && *type == _T('&'))
-	;
-      else
-	// has some arguments
-      {
-	if (!lookToken()->isOpenParen())
-	{
-	  if (*type == _T('&'))
-	    goto ok;
-	  throw ErrorMessage() << _T("there must be `(' after `&")
-			       << af.m_function->m_name << _T("'.");
-	}
-	
-	getToken();
-	
-	for (; *type; type ++)
-	{
-	  t = lookToken();
-	  if (*type == _T('&'))
-	    if (t->isCloseParen())
-	      break;
-	    else
-	      type ++;
-	  
-	  if (t->isCloseParen())
-	    throw ErrorMessage() << _T("`&")  << af.m_function->m_name
-				 << _T("': too few arguments.");
-	  switch (*type)
-	  {
-	    case _T('K'): // keymap
-	    {
-	      getToken();
-	      Keymap *keymap =
-		m_setting->m_keymaps.searchByName(t->getString());
-	      if (!keymap)
-		throw ErrorMessage() << _T("`") << *t
-				     << _T("': unknown keymap name.");
-	      t->setData((long)keymap);
-	      break;
-	    }
-
-	    case _T('S'): // keyseq
-	    {
-	      getToken();
-	      KeySeq *keySeq;
-	      if (t->isOpenParen())
-	      {
-		keySeq = load_KEY_SEQUENCE(_T(""), true);
-		getToken(); // close paren
-	      }
-	      else if (*t == _T("$"))
-	      {
-		t = getToken();
-		keySeq =
-		  m_setting->m_keySeqs.searchByName(t->getString());
-		if (!keySeq)
-		  throw ErrorMessage() << _T("`$") << *t
-				       << _T("': unknown keyseq name.");
-	      }
-	      else
-		throw ErrorMessage() << _T("`") << *t
-				     << _T("': it is not keyseq.");
-	      t->setData((long)keySeq);
-	      break;
-	    }
-
-	    case _T('l'): // /lock\d/
-	    {
-	      getToken();
-	      const static struct { const _TCHAR *s; Modifier::Type mt; }
-	      map[] =
-	      {
-		{ _T("lock0"), Modifier::Type_Lock0 },
-		{ _T("lock1"), Modifier::Type_Lock1 },
-		{ _T("lock2"), Modifier::Type_Lock2 },
-		{ _T("lock3"), Modifier::Type_Lock3 },
-		{ _T("lock4"), Modifier::Type_Lock4 },
-		{ _T("lock5"), Modifier::Type_Lock5 },
-		{ _T("lock6"), Modifier::Type_Lock6 },
-		{ _T("lock7"), Modifier::Type_Lock7 },
-		{ _T("lock8"), Modifier::Type_Lock8 },
-		{ _T("lock9"), Modifier::Type_Lock9 },
-	      };
-	      int i;
-	      for (i = 0; i < NUMBER_OF(map); i++)
-		if (*t == map[i].s)
-		{
-		  t->setData((long)map[i].mt);
-		  break;
-		}
-	      if (i == NUMBER_OF(map))
-		throw ErrorMessage() << _T("`") << *t
-				     << _T("' unknown lock name.");
-	      break;
-	    }
-
-	    case _T('s'): // string
-	      getToken();
-	      t->getString();
-	      break;
-
-	    case _T('d'): // digit
-	      getToken();
-	      t->getNumber();
-	      break;
-
-	    case _T('V'): // vkey
-	    {
-	      getToken();
-	      long vkey = 0;
-	      while (true)
-	      {
-		if (t->isNumber()) { vkey |= (BYTE)t->getNumber(); break; }
-		else if (*t == _T("E-")) vkey |= Function::VK_extended;
-		else if (*t == _T("U-")) vkey |= Function::VK_up;
-		else if (*t == _T("D-")) vkey |= Function::VK_down;
-		else
-		{
-		  const VKeyTable *vkt;
-		  for (vkt = g_vkeyTable; vkt->m_name; vkt ++)
-		    if (*t == vkt->m_name)
-		      break;
-		  if (!vkt->m_name)
-		    throw ErrorMessage() << _T("`") << *t
-					 << _T("': unknown virtual key name.");
-		  vkey |= vkt->m_code;
-		  break;
-		}
-		t = getToken();
-	      }
-	      if (!(vkey & Function::VK_up) && !(vkey & Function::VK_down))
-		vkey |= Function::VK_up | Function::VK_down;
-	      t->setData(vkey);
-	      break;
-	    }
-
-	    case _T('w'): // window
-	    {
-	      getToken();
-	      if (t->isNumber())
-	      {
-		if (t->getNumber() < Function::PM_toBegin)
-		  throw ErrorMessage() << _T("`") << *t
-				       << _T("': invalid target window");
-		t->setData(t->getNumber());
-		break;
-	      }
-	      const struct { int window; const _TCHAR *name; } window[] =
-	      {
-		{ Function::PM_toOverlappedWindow, _T("toOverlappedWindow") },
-		{ Function::PM_toMainWindow, _T("toMainWindow") },
-		{ Function::PM_toItself, _T("toItself") },
-		{ Function::PM_toParentWindow, _T("toParentWindow") },
-	      };
-	      int i;
-	      for (i = 0; i < NUMBER_OF(window); i++)
-		if (*t == window[i].name)
-		{
-		  t->setData(window[i].window);
-		  break;
-		}
-	      if (i == NUMBER_OF(window))
-		throw ErrorMessage() << _T("`") << *t
-				     << _T("': invalid target window.");
-	      break;
-	    }
-	    
-	    case _T('W'): // showWindow
-	    {
-	      getToken();
-	      struct ShowType { int m_show; const _TCHAR *m_name; };
-	      static const ShowType show[] =
-	      {
-#define SHOW(name) { SW_##name, _T(#name) }
-		SHOW(HIDE), SHOW(MAXIMIZE), SHOW(MINIMIZE), SHOW(RESTORE),
-		SHOW(SHOW), SHOW(SHOWDEFAULT), SHOW(SHOWMAXIMIZED),
-		SHOW(SHOWMINIMIZED), SHOW(SHOWMINNOACTIVE), SHOW(SHOWNA),
-		SHOW(SHOWNOACTIVATE), SHOW(SHOWNORMAL),
-#undef SHOW
-	      };
-	      t->setData(SW_SHOW);
-	      int i;
-	      for (i = 0; i < NUMBER_OF(show); ++ i)
-		if (*t == show[i].m_name)
-		{
-		  t->setData(show[i].m_show);
-		  break;
-		}
-	      if (i == NUMBER_OF(show))
-		throw ErrorMessage() << _T("`") << *t
-				     << _T("': unknown show command.");
-	      break;
-	    }
-
-	    case _T('G'): // gravity
-	    {
-	      getToken();
-	      const struct { int m_gravity; const _TCHAR *m_name; } gravity[] =
-	      {
-		Function::Gravity_C, _T("C"), 
-		Function::Gravity_N, _T("N"), Function::Gravity_E, _T("E"),
-		Function::Gravity_W, _T("W"), Function::Gravity_S, _T("S"),
-		Function::Gravity_NW, _T("NW"), Function::Gravity_NW, _T("WN"),
-		Function::Gravity_NE, _T("NE"), Function::Gravity_NE, _T("EN"),
-		Function::Gravity_SW, _T("SW"), Function::Gravity_SW, _T("WS"),
-		Function::Gravity_SE, _T("SE"), Function::Gravity_SE, _T("ES"),
-	      };
-	      t->setData(Function::Gravity_NW);
-	      int i;
-	      for (i = 0; i < NUMBER_OF(gravity); i++)
-		if (*t == gravity[i].m_name)
-		{
-		  t->setData(gravity[i].m_gravity);
-		  break;
-		}
-	      if (i == NUMBER_OF(gravity))
-		throw ErrorMessage() << _T("`") << *t
-				     << _T("': unknown gravity symbol.");
-	      break;
-	    }
-
-	    case _T('b'): // bool
-	    {
-	      getToken();
-	      if (*t == _T("false"))
-		t->setData(0);
-	      else
-		t->setData(1);
-	      break;
-	    }
-
-	    case _T('D'): // dialog
-	    {
-	      getToken();
-	      if (*t == _T("Investigate"))
-		t->setData(Function::MayuDlg_investigate);
-	      else if (*t == _T("Log"))
-		t->setData(Function::MayuDlg_log);
-	      else
-		throw ErrorMessage() << _T("`") << *t
-				     << _T("': unknown dialog box.");
-	      break;
-	    }
-
-	    case _T('M'): // modifier
-	    {
-	      Modifier modifier;
-	      for (int i = Modifier::Type_begin; i != Modifier::Type_end; i ++)
-		modifier.dontcare((Modifier::Type)i);
-	      modifier = load_MODIFIER(Modifier::Type_ASSIGN, modifier);
-	      m_setting->m_modifiers.push_front(modifier);
-	      t->setData((long)&*m_setting->m_modifiers.begin());
-	      break;
-	    }
-
-	    case _T('&'): // rest is optional
-	    default:
-	      throw ErrorMessage() << _T("internal error.");
-	  }
-	  af.m_args.push_back(*t);
-	}
-	if (!getToken()->isCloseParen())
-	  throw ErrorMessage() << _T("`&")  << af.m_function->m_name
-			       << _T("': too many arguments.");
-	ok: ;
-      }
+      af.m_functionData->load(this);
       keySeq.add(af);
     }
     else // <KEYSEQ_MODIFIED_KEY_NAME>
@@ -1529,8 +1445,8 @@ bool SettingLoader::load(Setting *i_setting, const tstringi &i_filename)
 
   // create global keymap's default keySeq
   ActionFunction af;
-  af.m_function = Function::search(Function::Id_OtherWindowClass);
-  ASSERT( af.m_function );
+  af.m_functionData = createFunctionData(_T("OtherWindowClass"));
+  ASSERT( af.m_functionData );
   KeySeq *globalDefault = m_setting->m_keySeqs.add(KeySeq(_T("")).add(af));
   
   // add default keymap
@@ -1565,5 +1481,5 @@ bool SettingLoader::load(Setting *i_setting, const tstringi &i_filename)
 
 
 std::vector<tstringi> *SettingLoader::m_prefixes; // m_prefixes terminal symbol
-size_t SettingLoader::m_prefixesRefCcount;	// reference count of
-						// m_prefixes
+size_t SettingLoader::m_prefixesRefCcount;	/* reference count of
+						   m_prefixes */

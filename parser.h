@@ -1,4 +1,4 @@
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // parser.h
 
 
@@ -97,9 +97,11 @@ public:
 class Parser
 {
 public:
+  ///
   typedef std::vector<Token> Tokens;
   
 private:
+  ///
   typedef std::vector<tstringi> Prefixes;
   
 private:
@@ -130,4 +132,4 @@ public:
 };
 
 
-#endif // _PARSER_H
+#endif // !_PARSER_H

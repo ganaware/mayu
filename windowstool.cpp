@@ -1,4 +1,4 @@
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // windowstool.cpp
 
 
@@ -10,7 +10,7 @@
 #include <malloc.h>
 
 
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Global variables
 
 
@@ -18,7 +18,7 @@
 HINSTANCE g_hInst = NULL;
 
 
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Functions
 
 
@@ -50,7 +50,7 @@ HICON loadBigIcon(UINT i_id)
 
 
 // set small icon to the specified window.
-//  @return handle of previous icon or NULL
+// @return handle of previous icon or NULL
 HICON setSmallIcon(HWND i_hwnd, UINT i_id)
 {
   HICON hicon = (i_id == static_cast<UINT>(-1)) ? NULL : loadSmallIcon(i_id);
@@ -122,7 +122,7 @@ bool getChildWindowRect(HWND i_hwnd, RECT *o_rc)
 }
 
 
-/// get toplevel (non-child) window
+// get toplevel (non-child) window
 HWND getToplevelWindow(HWND i_hwnd, bool *io_isMDI)
 {
   while (i_hwnd)
@@ -144,7 +144,7 @@ HWND getToplevelWindow(HWND i_hwnd, bool *io_isMDI)
 }
 
 
-/// move window asynchronously
+// move window asynchronously
 void asyncMoveWindow(HWND i_hwnd, int i_x, int i_y)
 {
   SetWindowPos(i_hwnd, NULL, i_x, i_y, 0, 0,
@@ -153,7 +153,7 @@ void asyncMoveWindow(HWND i_hwnd, int i_x, int i_y)
 }
 
 
-/// move window asynchronously
+// move window asynchronously
 void asyncMoveWindow(HWND i_hwnd, int i_x, int i_y, int i_w, int i_h)
 {
   SetWindowPos(i_hwnd, NULL, i_x, i_y, i_w, i_h,
@@ -162,7 +162,7 @@ void asyncMoveWindow(HWND i_hwnd, int i_x, int i_y, int i_w, int i_h)
 }
 
 
-/// resize asynchronously
+// resize asynchronously
 void asyncResize(HWND i_hwnd, int i_w, int i_h)
 {
   SetWindowPos(i_hwnd, NULL, 0, 0, i_w, i_h,
@@ -171,7 +171,7 @@ void asyncResize(HWND i_hwnd, int i_w, int i_h)
 }
 
 
-/// get dll version
+// get dll version
 DWORD getDllVersion(const _TCHAR *i_dllname)
 {
   DWORD dwVersion = 0;
@@ -201,7 +201,8 @@ DWORD getDllVersion(const _TCHAR *i_dllname)
   return dwVersion;
 }
 
-// ////////////////////////////////////////////////////////////////////////////
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // edit control
 
 
@@ -259,3 +260,27 @@ void editInsertTextAtLast(HWND i_hwnd, const tstring &i_text,
   
   Edit_ReplaceSel(i_hwnd, buf.get());
 }
+
+
+// initialize layerd window
+static BOOL WINAPI initalizeLayerdWindow(
+  HWND i_hwnd, COLORREF i_crKey, BYTE i_bAlpha, DWORD i_dwFlags)
+{
+  HMODULE hModule = GetModuleHandle(_T("user32.dll"));
+  if (!hModule)
+    return FALSE;
+  setLayeredWindowAttributes =
+    reinterpret_cast<BOOL (WINAPI *)(HWND, COLORREF, BYTE, DWORD)>(
+      GetProcAddress(hModule, "SetLayeredWindowAttributes"));
+  if (setLayeredWindowAttributes)
+    return setLayeredWindowAttributes(i_hwnd, i_crKey, i_bAlpha, i_dwFlags);
+  else
+    return FALSE;
+}
+
+
+// SetLayeredWindowAttributes API
+BOOL (WINAPI *setLayeredWindowAttributes)
+  (HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags)
+  = initalizeLayerdWindow;
+

@@ -1,4 +1,4 @@
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // mayu.cpp
 
 
@@ -35,7 +35,7 @@
 #define ID_MENUITEM_reloadBegin _APS_NEXT_COMMAND_VALUE
 
 
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Mayu
 
 
@@ -405,14 +405,18 @@ private:
 	    case EngineNotify_showDlg:
 	    {
 	      // show investigate/log window
-	      int sw = (i_lParam & ~Function::MayuDlg_mask);
+	      int sw = (i_lParam & ~MayuDialogType_mask);
 	      HWND hwnd = NULL;
-	      if ((i_lParam & Function::MayuDlg_mask)
-		  == Function::MayuDlg_investigate)
-		hwnd = This->m_hwndInvestigate;
-	      else if ((i_lParam & Function::MayuDlg_mask)
-		       == Function::MayuDlg_log)
-		hwnd = This->m_hwndLog;
+	      switch (static_cast<MayuDialogType>(
+		i_lParam & MayuDialogType_mask))
+	      {
+		case MayuDialogType_investigate:
+		  hwnd = This->m_hwndInvestigate;
+		  break;
+		case MayuDialogType_log:
+		  hwnd = This->m_hwndLog;
+		  break;
+	      }
 	      if (hwnd)
 	      {
 		ShowWindow(hwnd, sw);
@@ -658,7 +662,7 @@ public:
 };
 
 
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Functions
 
 

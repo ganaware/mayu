@@ -1,9 +1,8 @@
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // dlginvestigate.cpp
 
 
 #include "misc.h"
-
 #include "engine.h"
 #include "focus.h"
 #include "hook.h"
@@ -13,7 +12,6 @@
 #include "windowstool.h"
 #include "vkeytable.h"
 #include "dlginvestigate.h"
-
 #include <iomanip>
 
 
@@ -151,7 +149,7 @@ public:
 };
 
 
-///
+//
 BOOL CALLBACK dlgInvestigate_dlgProc(HWND i_hwnd, UINT i_message,
 				     WPARAM i_wParam, LPARAM i_lParam)
 {

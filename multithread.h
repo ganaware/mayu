@@ -1,10 +1,9 @@
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // multithread.h
 
 
 #ifndef _MULTITHREAD_H
 #  define _MULTITHREAD_H
-
 
 #  include <windows.h>
 
@@ -43,6 +42,7 @@ public:
 class Acquire
 {
   SyncObject *m_so;	///
+  
 public:
   ///
   Acquire(SyncObject *i_so) : m_so(i_so) { m_so->acquire(); }
@@ -53,4 +53,4 @@ public:
 };
 
 
-#endif // _MULTITHREAD_H
+#endif // !_MULTITHREAD_H

@@ -1,4 +1,4 @@
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // engine.h
 
 
@@ -17,6 +17,7 @@ enum
   WM_APP_engineNotify = WM_APP + 110,
 };
 
+
 ///
 enum EngineNotify
 {
@@ -33,10 +34,10 @@ class Engine
 private:
   enum
   {
-    MAX_GENERATE_KEYBOARD_EVENTS_RECURSION_COUNT = 64,		///
+    MAX_GENERATE_KEYBOARD_EVENTS_RECURSION_COUNT = 64, ///
   };
 
-  typedef Keymaps::KeymapPtrList KeymapPtrList;
+  typedef Keymaps::KeymapPtrList KeymapPtrList;	/// 
   
   /// focus of a thread
   class FocusOfThread
@@ -62,7 +63,7 @@ private:
   class Current
   {
   public:
-    Keymap *m_keymap;		/// current keymap
+    const Keymap *m_keymap;			/// current keymap
     ModifiedKey m_mkey;		/// current processing key that user inputed
     				/// index in currentFocusOfThread-&gt;keymaps
     Keymaps::KeymapPtrList::iterator m_i;
@@ -72,6 +73,8 @@ private:
     bool isPressed() const
     { return m_mkey.m_modifier.isOn(Modifier::Type_Down); }
   };
+
+  friend class FunctionParam;
   
   /// part of keySeq
   enum Part
@@ -81,7 +84,30 @@ private:
     Part_down,					///
   };
 
-public:
+  ///
+  class EmacsEditKillLine
+  {
+    tstring m_buf;	/// previous kill-line contents
+
+  public:
+    bool m_doForceReset;	///
+  
+  private:
+    ///
+    HGLOBAL makeNewKillLineBuf(const _TCHAR *i_data, int *i_retval);
+
+  public:
+    ///
+    void reset() { m_buf.resize(0); }
+    /** EmacsEditKillLineFunc.
+	clear the contents of the clopboard
+	at that time, confirm if it is the result of the previous kill-line
+    */
+    void func();
+    /// EmacsEditKillLinePred
+    int pred();
+  };
+
   /// window positon for &amp;WindowHMaximize, &amp;WindowVMaximize
   class WindowPosition
   {
@@ -108,7 +134,7 @@ public:
   typedef std::list<WindowPosition> WindowPositions;
   
   typedef std::list<HWND> WindowsWithAlpha; /// windows for &amp;WindowSetAlpha
-  
+
 private:
   CriticalSection m_cs;				/// criticalSection
   
@@ -156,7 +182,7 @@ private:
       <dd>currentKeyamp becoms *Current::i
       </dl>
   */
-  Keymap * volatile m_currentKeymap;		/// current keymap
+  const Keymap * volatile m_currentKeymap;	/// current keymap
   FocusOfThreads /*volatile*/ m_focusOfThreads;	///
   FocusOfThread * volatile m_currentFocusOfThread; ///
   FocusOfThread m_globalFocus;			///
@@ -167,7 +193,6 @@ private:
   EmacsEditKillLine m_emacsEditKillLine;	/// for &amp;EmacsEditKillLine
   const ActionFunction *m_afShellExecute;	/// for &amp;ShellExecute
   
-public:
   WindowPositions m_windowPositions;		///
   WindowsWithAlpha m_windowsWithAlpha;		///
   
@@ -175,6 +200,8 @@ public:
   tstring m_helpTitle;				/// for &amp;HelpMessage
   int m_variable;				/// for &amp;Variable,
 						///  &amp;Repeat
+  
+public:
   tomsgstream &m_log;				/** log stream (output to log
                                                     dialog's edit) */
   
@@ -199,7 +226,7 @@ private:
   void generateModifierEvents(const Modifier &i_mod);
   
   /// genete event
-  void generateEvents(Current i_c, Keymap *i_keymap, Key *i_event);
+  void generateEvents(Current i_c, const Keymap *i_keymap, Key *i_event);
   
   /// generate keyboard event
   void generateKeyEvent(Key *i_key, bool i_doPress, bool i_isByAssign);
@@ -222,6 +249,131 @@ private:
 
   // describe bindings
   void describeBindings();
+
+private:
+  // BEGINING OF FUNCTION DEFINITION
+  /// send a default key to Windows
+  void funcDefault(FunctionParam *i_param);
+  /// use a corresponding key of a parent keymap
+  void funcKeymapParent(FunctionParam *i_param);
+  /// use a corresponding key of a current window
+  void funcKeymapWindow(FunctionParam *i_param);
+  /// use a corresponding key of an other window class, or use a default key
+  void funcOtherWindowClass(FunctionParam *i_param);
+  /// prefix key
+  void funcPrefix(FunctionParam *i_param, const Keymap *i_keymap,
+		  bool i_doesIgnoreModifiers = true);
+  /// other keymap's key
+  void funcKeymap(FunctionParam *i_param, const Keymap *i_keymap);
+  /// sync
+  void funcSync(FunctionParam *i_param);
+  /// toggle lock
+  void funcToggle(FunctionParam *i_param, ModifierLockType i_lock);
+  /// edit next user input key's modifier
+  void funcEditNextModifier(FunctionParam *i_param,
+			    const Modifier &i_modifier);
+  /// variable
+  void funcVariable(FunctionParam *i_param, int i_mag, int i_inc);
+  /// repeat N times
+  void funcRepeat(FunctionParam *i_param, const KeySeq *i_keySeq,
+		  int i_max = 10);
+  /// undefined (bell)
+  void funcUndefined(FunctionParam *i_param);
+  /// ignore
+  void funcIgnore(FunctionParam *i_param);
+  /// post message
+  void funcPostMessage(FunctionParam *i_param, ToWindowType i_window,
+		       UINT i_message, WPARAM i_wParam, LPARAM i_lParam);
+  /// ShellExecute
+  void funcShellExecute(FunctionParam *i_param, const tstring &i_operation,
+			const tstring &i_file, const tstring &i_parameters,
+			const tstring &i_directory,
+			ShowCommandType i_showCommand);
+  /// load setting
+  void funcLoadSetting(FunctionParam *i_param);
+  /// virtual key
+  void funcVK(FunctionParam *i_param, VKey i_vkey);
+  /// wait
+  void funcWait(FunctionParam *i_param, int i_milliSecond);
+  /// investigate WM_COMMAND, WM_SYSCOMMAND
+  void funcInvestigateCommand(FunctionParam *i_param);
+  /// show mayu dialog box
+  void funcMayuDialog(FunctionParam *i_param, MayuDialogType i_dialog,
+		      ShowCommandType i_showCommand);
+  /// describe bindings
+  void funcDescribeBindings(FunctionParam *i_param);
+  /// show help message
+  void funcHelpMessage(FunctionParam *i_param, const tstring &i_title = _T(""),
+		       const tstring &i_message = _T(""));
+  /// show variable
+  void funcHelpVariable(FunctionParam *i_param, const tstring &i_title);
+  /// raise window
+  void funcWindowRaise(FunctionParam *i_param, bool i_isMdi = false);
+  /// lower window
+  void funcWindowLower(FunctionParam *i_param, bool i_isMdi = false);
+  /// minimize window
+  void funcWindowMinimize(FunctionParam *i_param, bool i_isMdi = false);
+  /// maximize window
+  void funcWindowMaximize(FunctionParam *i_param, bool i_isMdi = false);
+  /// maximize window horizontally
+  void funcWindowHMaximize(FunctionParam *i_param, bool i_isMdi = false);
+  /// maximize window virtically
+  void funcWindowVMaximize(FunctionParam *i_param, bool i_isMdi = false);
+  /// maximize window virtically or horizontally
+  void funcWindowHVMaximize(FunctionParam *i_param, bool i_isHorizontal,
+			    bool i_isMdi = false);
+  /// move window
+  void funcWindowMove(FunctionParam *i_param, int i_dx, int i_dy,
+		      bool i_isMdi = false);
+  /// move window to ...
+  void funcWindowMoveTo(FunctionParam *i_param, GravityType i_gravityType,
+			int i_dx, int i_dy, bool i_isMdi = false);
+  /// move window visibly
+  void funcWindowMoveVisibly(FunctionParam *i_param, bool i_isMdi = false);
+  ///
+  void funcWindowClingToLeft(FunctionParam *i_param, bool i_isMdi = false);
+  ///
+  void funcWindowClingToRight(FunctionParam *i_param, bool i_isMdi = false);
+  ///
+  void funcWindowClingToTop(FunctionParam *i_param, bool i_isMdi = false);
+  ///
+  void funcWindowClingToBottom(FunctionParam *i_param, bool i_isMdi = false);
+  /// close window
+  void funcWindowClose(FunctionParam *i_param, bool i_isMdi = false);
+  /// toggle top-most flag of the window
+  void funcWindowToggleTopMost(FunctionParam *i_param);
+  /// identify the window
+  void funcWindowIdentify(FunctionParam *i_param);
+  /// set alpha blending parameter to the window
+  void funcWindowSetAlpha(FunctionParam *i_param, int i_alpha);
+  /// redraw the window
+  void funcWindowRedraw(FunctionParam *i_param);
+  /// resize window to
+  void funcWindowResizeTo(FunctionParam *i_param,
+			  int i_width, int i_height, bool i_isMdi = false);
+  /// move the mouse cursor
+  void funcMouseMove(FunctionParam *i_param, int i_dx, int i_dy);
+  /// send a mouse-wheel-message to Windows
+  void funcMouseWheel(FunctionParam *i_param, int i_delta);
+  /// convert the contents of the Clipboard to upper case or lower case
+  void funcClipboardChangeCase(FunctionParam *i_param,
+			       bool i_doesConvertToUpperCase);
+  /// convert the contents of the Clipboard to upper case
+  void funcClipboardUpcaseWord(FunctionParam *i_param);
+  /// convert the contents of the Clipboard to lower case
+  void funcClipboardDowncaseWord(FunctionParam *i_param);
+  /// set the contents of the Clipboard to the string
+  void funcClipboardCopy(FunctionParam *i_param, const tstring &i_text);
+  ///
+  void funcEmacsEditKillLinePred(FunctionParam *i_param,
+				 const KeySeq *i_keySeq1,
+				 const KeySeq *i_keySeq2);
+  ///
+  void funcEmacsEditKillLineFunc(FunctionParam *i_param);
+  // END OF FUNCTION DEFINITION
+#  define FUNCTION_FRIEND
+#  include "functions.h"
+#  undef FUNCTION_FRIEND
   
 public:
   ///
@@ -283,4 +435,16 @@ public:
 };
 
 
-#endif // _ENGINE_H
+///
+class FunctionParam
+{
+public:
+  bool m_isPressed;				/// is key pressed ?
+  HWND m_hwnd;					/// 
+  Engine::Current m_c;				/// new context
+  bool m_doesNeedEndl;				/// need endl ?
+  const ActionFunction *m_af;			/// 
+};
+
+
+#endif // !_ENGINE_H

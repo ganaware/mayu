@@ -208,8 +208,8 @@ window	MDI	/:MDIClient:/ : Global
 window	MayuInvestigate /mayu\.exe:#32770:mayuFocus$/ : KeymapDefault
 
 # ƒƒOƒEƒBƒ“ƒhƒE
-window	MayuLog ( /mayu\.exe:#32770:/ && /ƒƒO - ‘‹Žg‚¢‚Ì—JŸT/ ): KeymapDefault
- key C-G		=> $WindowClose
+#window	MayuLog ( /mayu\.exe:#32770:/ && /ƒƒO - ‘‹Žg‚¢‚Ì—JŸT/ ): KeymapDefault
+# key C-G		=> $WindowClose
 
 
 ## Console ....................................................................
@@ -254,9 +254,9 @@ window	MicrosoftJava	/:Microsoft VM For Java\(TM\) Host Window Class:/ \
 
 
 ## Emacs ......................................................................
-## http://www.cs.washington.edu/homes/voelker/ntemacs.html
+## http://www.gnu.org/software/emacs/windows/ntemacs.html
 
-keymap Emacen : Global
+keymap Emacsen : Global
  key C-Yen		=> &Default
  if ( MAP-ESCAPE-TO-META )			# ESC ‚ª M- ‚É‚È‚é‚Ì‚ð‘jŽ~‚·‚é
    if ( KBD109 ) and ( ! KBD104on109 )
@@ -267,10 +267,10 @@ keymap Emacen : Global
    endif
  endif
 
-window	Meadow	/:Meadow$/ : Emacen
+window	Meadow	/:Meadow$/ : Emacsen
  key IC-M-X		=> $ToggleIME M-X
-window	MULE	/:MULE$/ : Emacen
-window	Emacs	/:Emacs$/ : Emacen
+window	MULE	/:MULE$/ : Emacsen
+window	Emacs	/:Emacs$/ : Emacsen
 
 
 ## Notepad ....................................................................

@@ -1,4 +1,4 @@
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // stringtool.h
 
 
@@ -13,26 +13,38 @@
 #  include <boost/regex.hpp>
 
 
+/// string for generic international text
 typedef std::basic_string<_TCHAR> tstring;
+/// istream for generic international text
 typedef std::basic_istream<_TCHAR> tistream;
+/// ostream for generic international text
 typedef std::basic_ostream<_TCHAR> tostream;
+/// streambuf for for generic international text
 typedef std::basic_streambuf<_TCHAR> tstreambuf;
+/// stringstream for generic international text
 typedef std::basic_stringstream<_TCHAR> tstringstream;
+/// ifstream for generic international text
 typedef std::basic_ifstream<_TCHAR> tifstream;
+/// reg_expression for generic international text
 typedef boost::reg_expression<_TCHAR> tregex;
+/// match_results for generic international text
 typedef boost::match_results<const _TCHAR *> tcmatch;
 
 
+/// identical to tcmatch except for str()
 class tcmatch_results : public tcmatch
 {
 public:
+  /** returns match result as tstring.
+      match_results<const _TCHAR *>::operator[]() returns a instance of
+      sub_mtch<const _TCHAR *>.  So, we convert sub_mtch<const _TCHAR *> to
+      tstring. */
   tstring str(tcmatch::size_type i_n) const
   {
     return static_cast<tstring>(
       static_cast<const tcmatch *>(this)->operator[](i_n));
   }
 };
-
 
 
 /// interpret meta characters such as \n
@@ -44,7 +56,7 @@ tstring interpretMetaCharacters(const _TCHAR *i_str, size_t i_len,
 size_t strlcpy(char *o_dest, const char *i_src, size_t i_destSize);
 /// copy
 size_t mbslcpy(unsigned char *o_dest, const unsigned char *i_src,
-		       size_t i_destSize);
+	       size_t i_destSize);
 /// copy
 size_t wcslcpy(wchar_t *o_dest, const wchar_t *i_src, size_t i_destSize);
 /// copy
@@ -98,54 +110,58 @@ public:
   const tstring &getString() const { return *this; }
 };
 
-///
-inline bool operator<(const tstringi &i_wsi, const TCHAR *i_s)
-{ return i_wsi.compare(i_s) < 0; }
-///
-inline bool operator<(const TCHAR *i_s, const tstringi &i_wsi)
-{ return 0 < i_wsi.compare(i_s); }
-///
-inline bool operator<(const tstringi &i_wsi, const tstring &i_s)
-{ return i_wsi.compare(i_s) < 0; }
-///
-inline bool operator<(const tstring &i_s, const tstringi &i_wsi)
-{ return 0 < i_wsi.compare(i_s); }
-///
-inline bool operator<(const tstringi &i_wsi1, const tstringi &i_wsi2)
-{ return i_wsi1.compare(i_wsi2) < 0; }
+/// case insensitive string comparison
+inline bool operator<(const tstringi &i_str1, const TCHAR *i_str2)
+{ return i_str1.compare(i_str2) < 0; }
+/// case insensitive string comparison
+inline bool operator<(const TCHAR *i_str1, const tstringi &i_str2)
+{ return 0 < i_str2.compare(i_str1); }
+/// case insensitive string comparison
+inline bool operator<(const tstringi &i_str1, const tstring &i_str2)
+{ return i_str1.compare(i_str2) < 0; }
+/// case insensitive string comparison
+inline bool operator<(const tstring &i_str1, const tstringi &i_str2)
+{ return 0 < i_str2.compare(i_str1); }
+/// case insensitive string comparison
+inline bool operator<(const tstringi &i_str1, const tstringi &i_str2)
+{ return i_str1.compare(i_str2) < 0; }
 
-///
-inline bool operator==(const TCHAR *i_s, const tstringi &i_wsi)
-{ return i_wsi.compare(i_s) == 0; }
-///
-inline bool operator==(const tstringi &i_wsi, const TCHAR *i_s)
-{ return i_wsi.compare(i_s) == 0; }
-///
-inline bool operator==(const tstring &i_s, const tstringi &i_wsi)
-{ return i_wsi.compare(i_s) == 0; }
-///
-inline bool operator==(const tstringi &i_wsi, const tstring &i_s)
-{ return i_wsi.compare(i_s) == 0; }
-///
-inline bool operator==(const tstringi &i_wsi1, const tstringi &i_wsi2)
-{ return i_wsi1.compare(i_wsi2) == 0; }
-  
+/// case insensitive string comparison
+inline bool operator==(const TCHAR *i_str1, const tstringi &i_str2)
+{ return i_str2.compare(i_str1) == 0; }
+/// case insensitive string comparison
+inline bool operator==(const tstringi &i_str1, const TCHAR *i_str2)
+{ return i_str1.compare(i_str2) == 0; }
+/// case insensitive string comparison
+inline bool operator==(const tstring &i_str1, const tstringi &i_str2)
+{ return i_str2.compare(i_str1) == 0; }
+/// case insensitive string comparison
+inline bool operator==(const tstringi &i_str1, const tstring &i_str2)
+{ return i_str1.compare(i_str2) == 0; }
+/// case insensitive string comparison
+inline bool operator==(const tstringi &i_str1, const tstringi &i_str2)
+{ return i_str1.compare(i_str2) == 0; }
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // workarounds for Borland C++
-///
-inline bool operator!=(const TCHAR *i_s, const tstringi &i_wsi)
-{ return i_wsi.compare(i_s) != 0; }
-///
-inline bool operator!=(const tstringi &i_wsi, const TCHAR *i_s)
-{ return i_wsi.compare(i_s) != 0; }
-///
-inline bool operator!=(const tstring &i_s, const tstringi &i_wsi)
-{ return i_wsi.compare(i_s) != 0; }
-///
-inline bool operator!=(const tstringi &i_wsi, const tstring &i_s)
-{ return i_wsi.compare(i_s) != 0; }
-///
-inline bool operator!=(const tstringi &i_wsi1, const tstringi &i_wsi2)
-{ return i_wsi1.compare(i_wsi2) != 0; }
 
 
-#endif // _STRINGTOOL_H
+/// case insensitive string comparison
+inline bool operator!=(const TCHAR *i_str1, const tstringi &i_str2)
+{ return i_str2.compare(i_str1) != 0; }
+/// case insensitive string comparison
+inline bool operator!=(const tstringi &i_str1, const TCHAR *i_str2)
+{ return i_str1.compare(i_str2) != 0; }
+/// case insensitive string comparison
+inline bool operator!=(const tstring &i_str1, const tstringi &i_str2)
+{ return i_str2.compare(i_str1) != 0; }
+/// case insensitive string comparison
+inline bool operator!=(const tstringi &i_str1, const tstring &i_str2)
+{ return i_str1.compare(i_str2) != 0; }
+/// case insensitive string comparison
+inline bool operator!=(const tstringi &i_str1, const tstringi &i_str2)
+{ return i_str1.compare(i_str2) != 0; }
+
+
+#endif // !_STRINGTOOL_H

@@ -1,4 +1,4 @@
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // errormessage.h
 
 
@@ -25,11 +25,19 @@ public:
   {
     return m_ost.str();
   }
-  
+
   /// add message
   template<class T> ErrorMessage &operator<<(const T &i_value)
   {
     m_ost << i_value;
+    return *this;
+  }
+
+  /// ios manipulator 
+  template<> ErrorMessage &operator<<(
+    std::ios_base &(*i_manip)(std::ios_base&))
+  {
+    m_ost << i_manip;
     return *this;
   }
 
@@ -75,4 +83,4 @@ public:
 };
 
 
-#endif // _ERRORMESSAGE_H
+#endif // !_ERRORMESSAGE_H

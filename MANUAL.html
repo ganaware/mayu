@@ -45,8 +45,8 @@ Copyright &copy; 1999-2001, <a href="http://www.ganaware.org" target="_top">TAGA
       <p>しかし、次のような危険性があります。</p>
       
       <ul>
-	<li><em>標準でない</em> キーボードドライバを利用していると WindowsNT/2000 が青画面になって終了してしまうことがあります。そのような場合は、標準でないドライバをアンインストールするか、「窓使いの憂鬱」の利用をあきらめるしかありません。
-	<li>標準でないドライバとは、ロジテックマウスに付属のドライバや AltIME のドライバなどです。
+	<li><strong>標準でない</strong> キーボードドライバを利用していると WindowsNT/2000 が青画面になって終了してしまうことがあります。そのような場合は、標準でないドライバをアンインストールするか、「窓使いの憂鬱」の利用をあきらめるしかありません。
+	<li>標準でないドライバとは、<strong>ロジテックマウス</strong>に付属のドライバや <strong>AltIME</strong> のドライバなどです。
       </ul>
       
   <dt class="h1"><a name="INSTALL">2. install</a>
@@ -56,8 +56,9 @@ Copyright &copy; 1999-2001, <a href="http://www.ganaware.org" target="_top">TAGA
       <ol class="decimal">
 	<li>窓使いの憂鬱以外のキーボードカスタマイズソフトを利用している場合はアンインストールします。
 	    <ul>
-	      <li>たとえば、AltIME や RemapKey や「猫まねき」などです。
-	      <li>特に AltIME を使用していた場合は、<a href="#FAQ">FAQ</a> の最初の項目をよく読んでください。
+	      <li>たとえば、<strong>AltIME</strong> や <strong>RemapKey</strong> や<strong>「猫まねき」</strong>などです。
+	      <li>特に <strong>AltIME</strong> を使用していた場合は、<a href="#FAQ">FAQ</a> の最初の項目をよく読んでください。
+	      <li><a href="http://www.pgpi.org/products/pgp/versions/freeware/win32/7.0.3/" target="_top"><strong>PGPi</strong></a> を利用しているとうまく動かないようです。
 	    </ul>
 	<li>以前のバージョンの「窓使いの憂鬱」を利用している場合は、終了させます。
 	    <ul>
@@ -168,6 +169,8 @@ Copyright &copy; 1999-2001, <a href="http://www.ganaware.org" target="_top">TAGA
       <ul>
 	<li><span class="bug">[仕様]</span> コマンドプロンプトではロックキーとIMEの状態を区別することができません。また、コマンドプロンプトのプロパティに対しては無力です。
 	<li><span class="bug">[仕様]</span> Windows2000 では、「窓使いの憂鬱」を終了させたあとに何かのキーを押さないと終了しません。
+	<li><span class="bug">[バグ]</span> <a href="http://www.pgpi.org/products/pgp/versions/freeware/win32/7.0.3/" target="_top">PGPi</a> を利用しているとうまく動かないようです。
+	    
 	<li>TODO や Known Bug は<a href="http://sourceforge.net/pm/task.php?group_id=5403&group_project_id=7606&func=browse&set=open&order=priority" target="_top">SourceForge</a> で管理されています。
 	    
 	<li><a href="http://www.microsoft.com/japan/support/kb/articles/J054/8/50.htm" target="_top">USB キーボードデバイス接続後に英語 101 キーボード配列になる</a>
@@ -309,6 +312,7 @@ Copyright &copy; 1999-2001, <a href="http://www.ganaware.org" target="_top">TAGA
 	      <li>いろいろ変えた結果多分 bcc32 ではコンパイルできなくなった。少し修正するだけだと思うが。
 	      <li><a href="contrib/ax.mayu"><code>contrib/ax.mayu</code></a> を追加。(Thanks to KAWABE Nobukazu)
 	      <li><a href="#RELATEDWORK">related work</a> に MetaX を追加。
+	      <li><a href="CUSTOMIZE.html#defaultModifier">デフォルトモディファイヤの変更</a>のサンプルが間違っていたので直した。(<code>key IC-* =</code> ではなく <code>key *IC- =</code> が正しい)
 	    </ul>
 	<dt>2000/12/17 version 3.18
 	<dd>

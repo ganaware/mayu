@@ -1,14 +1,12 @@
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // dlgeditsetting.cpp
 
 
 #include "misc.h"
-
 #include "mayurc.h"
 #include "windowstool.h"
 #include "dlgeditsetting.h"
 #include "layoutmanager.h"
-
 #include <windowsx.h>
 
 
@@ -152,6 +150,7 @@ public:
 };
 
 
+//
 BOOL CALLBACK dlgEditSetting_dlgProc(HWND i_hwnd, UINT i_message,
 				     WPARAM i_wParam, LPARAM i_lParam)
 {

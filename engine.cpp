@@ -1,4 +1,4 @@
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // engine.cpp
 
 
@@ -282,7 +282,7 @@ void Engine::generateKeyEvent(Key *i_key, bool i_doPress, bool i_isByAssign)
 
 
 // genete event
-void Engine::generateEvents(Current i_c, Keymap *i_keymap, Key *i_event)
+void Engine::generateEvents(Current i_c, const Keymap *i_keymap, Key *i_event)
 {
   // generate
   i_c.m_keymap = i_keymap;
@@ -382,10 +382,6 @@ void Engine::generateModifierEvents(const Modifier &i_mod)
 void Engine::generateActionEvents(const Current &i_c, const Action *i_a,
 				  bool i_doPress)
 {
-  Current cnew = i_c;
-  cnew.m_mkey.m_modifier.on(Modifier::Type_Up, !i_doPress);
-  cnew.m_mkey.m_modifier.on(Modifier::Type_Down, i_doPress);
-
   switch (i_a->m_type)
   {
     // key
@@ -433,294 +429,31 @@ void Engine::generateActionEvents(const Current &i_c, const Action *i_a,
       bool is_down = (i_doPress &&
 		      (af->m_modifier.isOn(Modifier::Type_Down) ||
 		       af->m_modifier.isDontcare(Modifier::Type_Down)));
+
       if (!is_down && !is_up)
 	break;
-      try
+      
       {
-	bool doesNeedEndl = true;
-	{
-	  Acquire a(&m_log, 1);
-	  m_log << _T("\t\t     >\t&") << af->m_function->m_name;
-	}
-	switch (af->m_function->m_id)
-	{
-	  Default:
-	  case Function::Id_Default:
-	  {
-	    {
-	      Acquire a(&m_log, 1);
-	      m_log << std::endl;
-	      doesNeedEndl = false;
-	    }
-	    if (is_down)
-	      generateModifierEvents(cnew.m_mkey.m_modifier);
-	    generateKeyEvent(cnew.m_mkey.m_key, i_doPress, true);
-	    break;
-	  }
-	  
-	  case Function::Id_KeymapParent:
-	  {
-	    cnew.m_keymap = i_c.m_keymap->getParentKeymap();
-	    if (!cnew.m_keymap)
-	      goto Default;
-	    {
-	      Acquire a(&m_log, 1);
-	      m_log << _T("(") << cnew.m_keymap->getName()
-		    << _T(")") << std::endl;
-	      doesNeedEndl = false;
-	    }
-	    generateKeyboardEvents(cnew);
-	    break;
-	  }
-
-	  case Function::Id_KeymapWindow:
-	  {
-	    cnew.m_keymap = m_currentFocusOfThread->m_keymaps.front();
-	    cnew.m_i = m_currentFocusOfThread->m_keymaps.begin();
-	    generateKeyboardEvents(cnew);
-	    break;
-	  }
-	  
-	  case Function::Id_OtherWindowClass:
-	  {
-	    cnew.m_i ++;
-	    if (cnew.m_i == m_currentFocusOfThread->m_keymaps.end())
-	      goto Default;
-	    cnew.m_keymap = (*cnew.m_i);
-	    {
-	      Acquire a(&m_log, 1);
-	      m_log << _T("(") << cnew.m_keymap->getName()
-		    << _T(")") << std::endl;
-	      doesNeedEndl = false;
-	    }
-	    generateKeyboardEvents(cnew);
-	    break;
-	  }
-	  
-	  case Function::Id_Prefix:
-	  {
-	    if (i_doPress)
-	    {
-	      Keymap *keymap = (Keymap *)af->m_args[0].getData();
-	      ASSERT( keymap );
-	      m_currentKeymap = keymap;
-
-	      // generate prefixed event
-	      generateEvents(cnew, m_currentKeymap, &Event::prefixed);
-		
-	      m_isPrefix = true;
-	      m_doesEditNextModifier = false;
-	      m_doesIgnoreModifierForPrefix = true;
-	      if (af->m_args.size() == 2)	// optional function argument
-		m_doesIgnoreModifierForPrefix = !!af->m_args[1].getData();
-	      Acquire a(&m_log, 1);
-	      m_log << _T("(") << keymap->getName() << _T(", ")
-		    << (m_doesIgnoreModifierForPrefix
-			? _T("true") : _T("false"))
-		    << _T(")");
-	    }
-	    break;
-	  }
-	  
-	  case Function::Id_Keymap:
-	  {
-	    cnew.m_keymap = (Keymap *)af->m_args[0].getData();
-	    ASSERT( cnew.m_keymap );
-	    {
-	      Acquire a(&m_log, 1);
-	      m_log << _T("(") << cnew.m_keymap->getName()
-		    << _T(")") << std::endl;
-	      doesNeedEndl = false;
-	    }
-	    generateKeyboardEvents(cnew);
-	    break;
-	  }
-	  
-	  case Function::Id_Sync:
-	  {
-	    if (is_down)
-	      generateModifierEvents(af->m_modifier);
-	    if (!i_doPress || m_currentFocusOfThread->m_isConsole)
-	      break;
-	    
-	    Key *sync = m_setting->m_keyboard.getSyncKey();
-	    if (sync->getScanCodesSize() == 0)
-	      break;
-	    const ScanCode *sc = sync->getScanCodes();
-
-	    // set variables exported from mayu.dll
-	    g_hookData->m_syncKey = sc->m_scan;
-	    g_hookData->m_syncKeyIsExtended = !!(sc->m_flags & ScanCode::E0E1);
-	    m_isSynchronizing = true;
-	    generateKeyEvent(sync, false, false);
-	    
-	    m_cs.release();
-	    DWORD r = WaitForSingleObject(m_eSync, 5000);
-	    if (r == WAIT_TIMEOUT)
-	    {
-	      Acquire a(&m_log, 0);
-	      m_log << _T(" *FAILED*");
-	    }
-	    m_cs.acquire();
-	    m_isSynchronizing = false;
-	    break;
-	  }
-	  
-	  case Function::Id_Toggle:
-	  {
-	    if (!i_doPress)
-	    {
-	      Modifier::Type mt =
-		static_cast<Modifier::Type>((int)af->m_args[0].getData());
-	      m_currentLock.press(mt, !m_currentLock.isPressed(mt));
-	    }
-	    break;
-	  }
-
-	  case Function::Id_EditNextModifier:
-	  {
-	    if (i_doPress)
-	    {
-	      m_isPrefix = true;
-	      m_doesEditNextModifier = true;
-	      m_doesIgnoreModifierForPrefix = true;
-	      m_modifierForNextKey = *(Modifier *)af->m_args[0].getData();
-	    }
-	    break;
-	  }
-
-	  case Function::Id_Variable:
-	  {
-	    if (i_doPress)
-	    {
-	      m_variable *= af->m_args[0].getNumber();
-	      m_variable += af->m_args[1].getNumber();
-	    }
-	    break;
-	  }
-
-	  case Function::Id_Repeat:
-	  {
-	    KeySeq *keySeq = (KeySeq *)af->m_args[0].getData();
-	    if (i_doPress)
-	    {
-	      int end = m_variable;
-	      if (af->m_args.size() == 2)
-		end = MIN(end, af->m_args[1].getNumber());
-	      else
-		end = MIN(end, 10);
-
-	      for (int i = 0; i < end - 1; ++ i)
-		generateKeySeqEvents(i_c, keySeq, Part_all);
-	      if (0 < end)
-		generateKeySeqEvents(i_c, keySeq, Part_down);
-	    }
-	    else
-	      generateKeySeqEvents(i_c, keySeq, Part_up);
-	    break;
-	  }
-	  
-	  case Function::Id_Ignore:
-	    break;
-	    
-	  case Function::Id_EmacsEditKillLineFunc:
-	  {
-	    if (!is_down)
-	      break;
-	    m_emacsEditKillLine.func();
-	    m_emacsEditKillLine.m_doForceReset = false;
-	    break;
-	  }
-	  
-	  case Function::Id_EmacsEditKillLinePred:
-	  {
-	    m_emacsEditKillLine.m_doForceReset = false;
-	    if (!is_down)
-	      break;
-	    int r = m_emacsEditKillLine.pred();
-	    KeySeq *keySeq;
-	    if (r == 1)
-	      keySeq = (KeySeq *)af->m_args[0].getData();
-	    else if (r == 2)
-	      keySeq = (KeySeq *)af->m_args[1].getData();
-	    else // r == 0
-	      break;
-	    ASSERT(keySeq);
-	    generateKeySeqEvents(i_c, keySeq, Part_all);
-	    break;
-	  }
-
-	  case Function::Id_ShellExecute:
-	  {
-	    if (!is_down)
-	      break;
-	    m_afShellExecute = af;
-	    PostMessage(m_hwndAssocWindow,
-			WM_APP_engineNotify, EngineNotify_shellExecute, 0);
-	    break;
-	  }
-	  
-	  case Function::Id_LoadSetting:
-	  {
-	    if (!is_down)
-	      break;
-	    PostMessage(m_hwndAssocWindow,
-			WM_APP_engineNotify, EngineNotify_loadSetting, 0);
-	    break;
-	  }
-	  
-	  case Function::Id_Wait:
-	  {
-	    if (!is_down)
-	      break;
-	    m_isSynchronizing = true;
-	    int ms = af->m_args[0].getNumber();
-	    if (ms < 0 || 5000 < ms)	// too long wait
-	      break;
-	    m_cs.release();
-	    Sleep(ms);
-	    m_cs.acquire();
-	    m_isSynchronizing = false;
-	    break;
-	  }
-
-	  case Function::Id_DescribeBindings:
-	  {
-	    if (!is_down)
-	      break;
-	    {
-	      Acquire a(&m_log, 1);
-	      m_log << std::endl;
-	    }
-	    describeBindings();
-	    break;
-	  }
-	  
-	  default:
-	  {
-	    if (af->m_function->m_func)
-	    {
-	      Function::FuncData fd(af->m_args, *this);
-	      fd.m_id = af->m_function->m_id;
-	      fd.m_hwnd = m_currentFocusOfThread->m_hwndFocus;
-	      fd.m_isPressed = i_doPress;
-	      af->m_function->m_func(fd);
-	    }
-	    break;
-	  }
-	}
-	
-	if (doesNeedEndl)
-	{
-	  Acquire a(&m_log, 1);
-	  m_log << std::endl;
-	}
+	Acquire a(&m_log, 1);
+	m_log << _T("\t\t     >\t") << af->m_functionData;
       }
-      catch (ErrorMessage &i_e)
+      
+      FunctionParam param;
+      param.m_isPressed = i_doPress;
+      param.m_hwnd = m_currentFocusOfThread->m_hwndFocus;
+      param.m_c = i_c;
+      param.m_doesNeedEndl = true;
+      param.m_af = af;
+      
+      param.m_c.m_mkey.m_modifier.on(Modifier::Type_Up, !i_doPress);
+      param.m_c.m_mkey.m_modifier.on(Modifier::Type_Down, i_doPress);
+
+      af->m_functionData->exec(this, &param);
+      
+      if (param.m_doesNeedEndl)
       {
-	Acquire a(&m_log);
-	m_log << _T("&") << af->m_function->m_name
-	      << _T(": invalid arguments: ") << i_e << std::endl;
+	Acquire a(&m_log, 1);
+	m_log << std::endl;
       }
       break;
     }
@@ -788,17 +521,17 @@ void Engine::generateKeyboardEvents(const Current &i_c)
 // generate keyboard events for current key
 void Engine::generateKeyboardEvents(const Current &i_c, bool i_isModifier)
 {
-  //           (1)           (2)           (3)  (4)   (1)
-  // up/down:  D-            U-            D-   U-    D-
-  // keymap:   m_currentKeymap m_currentKeymap X    X     m_currentKeymap
-  // memo:     &Prefix(X)    ...           ...  ...   ...
-  // m_isPrefix: false         true          true false false
+  //             (1)             (2)             (3)  (4)   (1)
+  // up/down:    D-              U-              D-   U-    D-
+  // keymap:     m_currentKeymap m_currentKeymap X    X     m_currentKeymap
+  // memo:       &Prefix(X)      ...             ...  ...   ...
+  // m_isPrefix: false           true            true false false
   
   bool isPhysicallyPressed
     = i_c.m_mkey.m_modifier.isPressed(Modifier::Type_Down);
   
   // for prefix key
-  Keymap *tmpKeymap = m_currentKeymap;
+  const Keymap *tmpKeymap = m_currentKeymap;
   if (i_isModifier || !m_isPrefix) ; 
   else if (isPhysicallyPressed)			// when (3)
     m_isPrefix = false;
@@ -808,7 +541,7 @@ void Engine::generateKeyboardEvents(const Current &i_c, bool i_isModifier)
   // for m_emacsEditKillLine function
   m_emacsEditKillLine.m_doForceReset = !i_isModifier;
 
-  // generate key evend !
+  // generate key event !
   m_generateKeyboardEventsRecursionGuard = 0;
   if (isPhysicallyPressed)
     generateEvents(i_c, i_c.m_keymap, &Event::before_key_down);
@@ -1270,89 +1003,12 @@ bool Engine::threadDetachNotify(DWORD i_threadId)
 }
 
 
-/// get help message
+// get help message
 void Engine::getHelpMessages(tstring *o_helpMessage, tstring *o_helpTitle)
 {
   Acquire a(&m_cs);
   *o_helpMessage = m_helpMessage;
   *o_helpTitle = m_helpTitle;
-}
-
-
-// shell execute
-void Engine::shellExecute()
-{
-  Acquire a(&m_cs);
-  const ActionFunction *af = m_afShellExecute;
-  
-  tstringi operation  = af->m_args[0].getString();
-  tstringi file       = af->m_args[1].getString();
-  tstringi parameters = af->m_args[2].getString();
-  tstringi directory  = af->m_args[3].getString();
-  if (operation.empty()) operation = _T("open");
-  
-  int r = (int)ShellExecute(NULL,
-			    operation.c_str(),
-			    file.empty() ? NULL : file.c_str(),
-			    parameters.empty() ? NULL : parameters.c_str(),
-			    directory.empty() ? NULL : directory.c_str(),
-			    af->m_args[4].getData());
-  if (32 < r)
-    return; // success
-  
-  struct ErrorMessages { int m_err; _TCHAR *m_str; };
-  const ErrorMessages err[] =
-  {
-    { 0,
-      _T("The operating system is out of memory or resources.") },
-    { ERROR_FILE_NOT_FOUND,
-      _T("The specified file was not found.") },
-    { ERROR_PATH_NOT_FOUND,
-      _T("The specified path was not found.") },
-    { ERROR_BAD_FORMAT,
-      _T("The .exe file is invalid ")
-      _T("(non-Win32R .exe or error in .exe image).") },
-    { SE_ERR_ACCESSDENIED,
-      _T("The operating system denied access to the specified file.") },
-    { SE_ERR_ASSOCINCOMPLETE,
-      _T("The file name association is incomplete or invalid.") },
-    { SE_ERR_DDEBUSY,
-      _T("The DDE transaction could not be completed ")
-      _T("because other DDE transactions were being processed. ") },
-    { SE_ERR_DDEFAIL,
-      _T("The DDE transaction failed.") },
-    { SE_ERR_DDETIMEOUT,
-      _T("The DDE transaction could not be completed ")
-      _T("because the request timed out.") },
-    { SE_ERR_DLLNOTFOUND,
-      _T("The specified dynamic-link library was not found.")},
-    { SE_ERR_FNF,
-      _T("The specified file was not found.") },
-    { SE_ERR_NOASSOC,
-      _T("There is no application associated ")
-      _T("with the given file name extension.") },
-    { SE_ERR_OOM,
-      _T("There was not enough memory to complete the operation.") },
-    { SE_ERR_PNF,
-      _T("The specified path was not found.") },
-    { SE_ERR_SHARE,
-      _T("A sharing violation occurred.") },
-  };
-
-  const _TCHAR *errorMessage = _T("Unknown error.");
-  for (size_t i = 0; i < NUMBER_OF(err); ++ i)
-    if (r == err[i].m_err)
-    {
-      errorMessage = err[i].m_str;
-      break;
-    }
-  Acquire b(&m_log, 0);
-  m_log << _T("internal error: &ShellExecute(")
-	<< af->m_args[0] << _T(", ")
-	<< af->m_args[1] << _T(", ")
-	<< af->m_args[2] << _T(", ")
-	<< af->m_args[3] << _T(", ")
-	<< af->m_args[4] << _T("): ") << errorMessage;
 }
 
 

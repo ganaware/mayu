@@ -1,10 +1,9 @@
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // registry.cpp
 
 
 #include "registry.h"
 #include "stringtool.h"
-
 #include <malloc.h>
 
 
@@ -169,7 +168,7 @@ bool Registry::write(HKEY i_root, const tstring &i_path, const tstring &i_name,
 }
 
 
-///
+//
 static bool string2logfont(LOGFONT *o_lf, const tstring &i_strlf)
 {
   // -13,0,0,0,400,0,0,0,128,1,2,1,1,Terminal

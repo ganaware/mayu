@@ -1,10 +1,9 @@
-// ////////////////////////////////////////////////////////////////////////////
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // keymap.h
 
 
 #ifndef _KEYMAP_H
 #  define _KEYMAP_H
-
 
 #  include "keyboard.h"
 #  include "function.h"
@@ -65,16 +64,12 @@ public:
 class ActionFunction : public Action
 {
 public:
-  typedef std::vector<Token> Args;
-  
-public:
   Modifier m_modifier;				/// modifier for &Sync
-  Function const *m_function;			/// function
-  Args m_args;					/// arguments
+  FunctionData *m_functionData;			/// function data
 
 public:
   ///
-  ActionFunction() : Action(Action::Type_function), m_function(NULL) { }
+  ActionFunction() : Action(Action::Type_function), m_functionData(NULL) { }
 };
 
 
@@ -82,7 +77,7 @@ public:
 class KeySeq
 {
 public:
-  typedef std::vector<Action *> Actions;
+  typedef std::vector<Action *> Actions;	/// 
 
 private:
   Actions m_actions;				///
@@ -137,18 +132,19 @@ public:
   ///
   enum AssignOperator
   {
-    AO_new,		/// =
-    AO_add,		/// +=
-    AO_sub,		/// -=
-    AO_overwrite,	/// !, !!
+    AO_new,					/// =
+    AO_add,					/// +=
+    AO_sub,					/// -=
+    AO_overwrite,				/// !, !!
   };
   ///
   enum AssignMode
   {
-    AM_notModifier,	///    not modifier
-    AM_normal,		///    normal modifier
-    AM_true,		/// !  true modifier(doesn't generate scan code)
-    AM_oneShot,		/// !! one shot modifier
+    AM_notModifier,				///    not modifier
+    AM_normal,					///    normal modifier
+    AM_true,					/** !  true modifier(doesn't
+                                                    generate scan code) */
+    AM_oneShot,					/// !! one shot modifier
   };
   
   /// key assignment
@@ -165,7 +161,7 @@ public:
     ///
     KeyAssignment(const KeyAssignment &i_o)
       : m_modifiedKey(i_o.m_modifiedKey), m_keySeq(i_o.m_keySeq) { }
-
+    ///
     bool operator<(const KeyAssignment &i_o) const
     { return m_modifiedKey < i_o.m_modifiedKey; }
   };
@@ -192,16 +188,6 @@ private:
 private:
   KeyAssignments m_hashedKeyAssignments[HASHED_KEY_ASSIGNMENT_SIZE];	///
   
-  // lock assignments
-//    class LockAssignment
-//    {
-//    public:
-//      AssignOperator assignOperator;
-//      AssignMode assignMode;
-//      ModifiedKey mkey;
-//    };
-//    std::list<LockAssignment> lockAssignments;
-
   /// modifier assignments
   ModAssignments m_modAssignments[Modifier::Type_ASSIGN];
 
@@ -216,6 +202,8 @@ private:
 private:
   ///
   KeyAssignments &getKeyAssignments(const ModifiedKey &i_mk);
+  ///
+  const KeyAssignments &getKeyAssignments(const ModifiedKey &i_mk) const;
   
 public:
   ///
@@ -234,7 +222,7 @@ public:
 		   AssignMode i_am, Key *i_key);
   
   /// search
-  const KeyAssignment *searchAssignment(const ModifiedKey &i_mk);
+  const KeyAssignment *searchAssignment(const ModifiedKey &i_mk) const;
 
   /// get
   const KeySeq *getDefaultKeySeq() const { return m_defaultKeySeq; }
@@ -263,10 +251,10 @@ public:
 class Keymaps
 {
 public:
-  typedef std::list<Keymap *> KeymapPtrList;
+  typedef std::list<Keymap *> KeymapPtrList;	/// 
   
 private:
-  typedef std::list<Keymap> KeymapList;
+  typedef std::list<Keymap> KeymapList;		/// 
 
 private:
   KeymapList m_keymapList;			/** pointer into keymaps may
@@ -310,4 +298,4 @@ public:
 };
 
 
-#endif // _KEYMAP_H
+#endif // !_KEYMAP_H

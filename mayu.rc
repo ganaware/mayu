@@ -94,7 +94,7 @@ BEGIN
     DEFPUSHBUTTON   "•Â‚¶‚é",IDOK,136,60,50,14
     ICON            IDI_ICON_mayu,IDC_STATIC,8,20,20,20
     LTEXT           "‘‹Žg‚¢‚Ì—JŸT %s",IDC_STATIC_version,32,8,164,8
-    CONTROL         "Copyright (C) 1999-2000, ",IDC_STATIC,"Static",
+    CONTROL         "Copyright (C) 1999-2001, ",IDC_STATIC,"Static",
                     SS_LEFTNOWORDWRAP | WS_GROUP,32,20,164,8
     LTEXT           "  TAGA Nayuta <nayuta@users.sourceforge.net>",
                     IDC_STATIC,32,32,164,8
@@ -348,7 +348,7 @@ BEGIN
     DEFPUSHBUTTON   "&Close",IDOK,136,60,50,14
     ICON            IDI_ICON_mayu,IDC_STATIC,8,20,20,20
     LTEXT           "MADO TSUKAI NO YUUTSU %s",IDC_STATIC_version,32,8,164,8
-    CONTROL         "Copyright (C) 1999-2000, ",IDC_STATIC,"Static",
+    CONTROL         "Copyright (C) 1999-2001, ",IDC_STATIC,"Static",
                     SS_LEFTNOWORDWRAP | WS_GROUP,32,20,164,8
     LTEXT           "  TAGA Nayuta <nayuta@users.sourceforge.net>",
                     IDC_STATIC,32,32,164,8
