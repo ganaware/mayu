@@ -91,7 +91,6 @@ private:
   {
       switch (cd->dwData)
       {
-	
 	case Notify::Type_setFocus:
 	case Notify::Type_name:
 	{
@@ -205,7 +204,6 @@ private:
 	  return This->notifyHandler(cd);
 	}
         case WM_QUERYENDSESSION:
-	  setTaskTrayHwnd(NULL);
 	  PostQuitMessage(0);
 	  return TRUE;
 	case WM_APP_msgStreamNotify:
@@ -356,7 +354,6 @@ private:
 		This->showTasktrayIcon();
 		break;
 	      case ID_MENUITEM_quit:
-		setTaskTrayHwnd(NULL);
 		PostQuitMessage(0);
 		break;
 	    }
@@ -589,6 +586,9 @@ public:
   {
     // first, detach log from edit control to avoid deadlock
     m_log.detach();
+   
+    // stop notify from mayu.dll
+    setTaskTrayHwnd(NULL);
     
     // destroy windows
     CHECK_TRUE( DestroyWindow(m_hwndVersion) );

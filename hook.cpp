@@ -397,6 +397,7 @@ LRESULT CALLBACK callWndProc(int i_nCode, WPARAM i_wParam, LPARAM i_lParam)
 /// install hooks
 DllExport int installHooks()
 {
+  g_hookData->m_hwndTaskTray = NULL;
   g_hookData->m_hHookGetMessage =
     SetWindowsHookEx(WH_GETMESSAGE, (HOOKPROC)getMessageProc,
 		     g.m_hInstDLL, 0);
