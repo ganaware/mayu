@@ -30,8 +30,7 @@
 #define IDC_EDIT_path                   1000
 #define IDC_BUTTON_browse               1001
 #define IDC_CHECK_registerStartMenu     1002
-#define IDC_CHECK_registerStartUp       1002
-#define IDC_CHECK_registerStartMenu2    1003
+#define IDC_CHECK_registerStartUp       1003
 #define IDC_COMBO_keyboard              1004
 #define IDC_EDIT_note                   1005
 

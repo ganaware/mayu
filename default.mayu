@@ -172,7 +172,7 @@ keymap2 MDI-WindowOperation
  key C-S-A-Up		=> &WindowMove(0, -1, MDI)	#	〃
  key C-S-A-Down		=> &WindowMove(0, 1, MDI)	#	〃
  key C-S-A C-S-B C-A-A	=> &WindowClingToLeft(MDI)	# ウィンドウ左に寄せる
- key C-S-F C-S-F C-A-E	=> &WindowClingToRight(MDI)	# ウィンドウ右に寄せる
+ key C-S-E C-S-F C-A-E	=> &WindowClingToRight(MDI)	# ウィンドウ右に寄せる
  key C-S-P     C-A-P	=> &WindowClingToTop(MDI)	# ウィンドウ上に寄せる
  key C-S-N     C-A-N	=> &WindowClingToBottom(MDI)	# ウィンドウ下に寄せる
  key C-S-V     C-A-V	=> &WindowMoveVisibly(MDI)	# ウィンドウ見える位置

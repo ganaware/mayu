@@ -63,7 +63,7 @@ BEGIN
     ICON            IDI_ICON_mayu,IDC_STATIC,8,120,18,21
     GROUPBOX        "",IDC_STATIC,35,100,192,56
     CONTROL         "All Users のスタートメニューに登録(&A)",
-                    IDC_CHECK_registerStartMenu2,"Button",BS_AUTOCHECKBOX | 
+                    IDC_CHECK_registerStartMenu,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,44,110,176,10
     CONTROL         "個人のスタートアップに登録(&S)",
                     IDC_CHECK_registerStartUp,"Button",BS_AUTOCHECKBOX | 
@@ -166,7 +166,7 @@ BEGIN
     ICON            IDI_ICON_mayu,IDC_STATIC,8,120,18,21
     GROUPBOX        "",IDC_STATIC,35,100,192,56
     CONTROL         "Create shortcut in the Start Menu of &All Users.",
-                    IDC_CHECK_registerStartMenu2,"Button",BS_AUTOCHECKBOX | 
+                    IDC_CHECK_registerStartMenu,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,44,110,176,10
     CONTROL         "Create shortcut in your &Startup Menu.",
                     IDC_CHECK_registerStartUp,"Button",BS_AUTOCHECKBOX | 

@@ -30,6 +30,7 @@ class Engine
   
   // engine thread state
   HANDLE device;		// mayu device
+  bool didMayuStartDevice;	// Did the mayu start the mayu-device ?
   HANDLE eEvent;		// event for engine thread
   bool volatile doForceTerminate;// terminate engine thread
   bool volatile isLogMode;	// is logging mode ?

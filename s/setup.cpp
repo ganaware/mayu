@@ -256,8 +256,9 @@ static bool createService()
   SC_HANDLE hs =
     CreateService(hscm, "mayud", getString(IDS_mayud),
 		  SERVICE_START | SERVICE_STOP, SERVICE_KERNEL_DRIVER,
-		  SERVICE_DEMAND_START, SERVICE_ERROR_IGNORE,
-		  mayud.c_str(), NULL, NULL, NULL, NULL, NULL);
+		  SERVICE_AUTO_START, SERVICE_ERROR_IGNORE,
+		  mayud.c_str(), NULL, NULL,
+		  "+Keyboard Class\0", NULL, NULL);
   if (hs == NULL)
   {
     switch (GetLastError())
@@ -293,29 +294,39 @@ static bool removeService()
     {
       case ERROR_ACCESS_DENIED:
 	message(IDS_notAdministrator, MB_OK | MB_ICONSTOP);
-	return false;
+	goto error;
       default:
 	message(IDS_error, MB_OK | MB_ICONSTOP);
-	return false;
+	goto error;
     }
   }
 
+  SERVICE_STATUS ss;
+  ControlService(hs, SERVICE_CONTROL_STOP, &ss);
+  
   if (!DeleteService(hs))
   {
     switch (GetLastError())
     {
       case ERROR_ACCESS_DENIED:
 	message(IDS_notAdministrator, MB_OK | MB_ICONSTOP);
-	return false;
+	goto error;
       case ERROR_SERVICE_MARKED_FOR_DELETE:
 	message(IDS_alreadyUninstalled, MB_OK | MB_ICONSTOP);
-	return true;
+	goto error;
       default:
 	message(IDS_error, MB_OK | MB_ICONSTOP);
-	return false;
+	goto error;
     }
   }
+  CloseServiceHandle(hs);
+  CloseServiceHandle(hscm);
   return true;
+  
+  error:
+  CloseServiceHandle(hs);
+  CloseServiceHandle(hscm);
+  return false;
 }
 
 

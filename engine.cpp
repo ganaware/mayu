@@ -891,6 +891,7 @@ Engine::Engine(omsgstream &log_)
   : hwndAssocWindow(NULL),
     setting(NULL),
     device(NULL),
+    didMayuStartDevice(false),
     eEvent(NULL),
     doForceTerminate(false),
     isLogMode(false),
@@ -916,25 +917,33 @@ Engine::Engine(omsgstream &log_)
   for (i = Modifier::Lock0; i <= Modifier::Lock9; i++)
     currentLock.release((Modifier::Type)i);
   
-  // start mayud
-  SC_HANDLE hscm = OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT);
-  if (hscm)
-  {
-    SC_HANDLE hs = OpenService(hscm, MAYU_DRIVER_NAME, SERVICE_START);
-    if (hs)
-    {
-      StartService(hs, 0, NULL);
-      CloseServiceHandle(hs);
-    }
-    CloseServiceHandle(hscm);
-  }
-
   // open mayu device
   device = CreateFile(MAYU_DEVICE_FILE_NAME, GENERIC_READ | GENERIC_WRITE,
 		      0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
   if (device == INVALID_HANDLE_VALUE)
-    throw ErrorMessage() << loadString(IDS_driverNotInstalled);
+  {
+    // start mayud
+    SC_HANDLE hscm = OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT);
+    if (hscm)
+    {
+      SC_HANDLE hs = OpenService(hscm, MAYU_DRIVER_NAME, SERVICE_START);
+      if (hs)
+      {
+	StartService(hs, 0, NULL);
+	CloseServiceHandle(hs);
+	didMayuStartDevice = true;
+      }
+      CloseServiceHandle(hscm);
+    }
+    
+    // open mayu device
+    device = CreateFile(MAYU_DEVICE_FILE_NAME, GENERIC_READ | GENERIC_WRITE,
+			0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (device == INVALID_HANDLE_VALUE)
+      throw ErrorMessage() << loadString(IDS_driverNotInstalled);
 //    throw ErrorMessage() << loadString(IDS_cannotOpenDevice);
+  }
 
   // create event for sync
   _true( eSync = CreateEvent(NULL, FALSE, FALSE, NULL) );
@@ -970,17 +979,20 @@ void Engine::stop()
     eEvent = NULL;
 
     // stop mayud
-    SC_HANDLE hscm = OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT);
-    if (hscm)
+    if (didMayuStartDevice)
     {
-      SC_HANDLE hs = OpenService(hscm, MAYU_DRIVER_NAME, SERVICE_STOP);
-      if (hs)
+      SC_HANDLE hscm = OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT);
+      if (hscm)
       {
-	SERVICE_STATUS ss;
-	ControlService(hs, SERVICE_CONTROL_STOP, &ss);
-	CloseServiceHandle(hs);
+	SC_HANDLE hs = OpenService(hscm, MAYU_DRIVER_NAME, SERVICE_STOP);
+	if (hs)
+	{
+	  SERVICE_STATUS ss;
+	  ControlService(hs, SERVICE_CONTROL_STOP, &ss);
+	  CloseServiceHandle(hs);
+	}
+	CloseServiceHandle(hscm);
       }
-      CloseServiceHandle(hscm);
     }
   }
 }
