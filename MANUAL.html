@@ -38,7 +38,6 @@ Copyright &copy; 1999-2001, <a href="http://www.ganaware.org" target="_top">TAGA
 	<li>キーボードドライバレベルでのカスタマイズが可能なため、Control キーや Windows キーをはじめ任意のキーを自由にカスタマイズできます。
 	<li>より安定しています。
 	<li>マウスイベントを置き換えることはできません。
-	<li>USB キーボードでは利用できません。
       </ul>
       
       <p>しかし、次のような危険性があります。</p>
@@ -170,9 +169,9 @@ Emacs汚染度が低かったりすると戸惑うことでしょう。<a
 	      <tr class="symbol"><th>シンボル</th><td><code>-DUSE104;-DUSE109on104</code></td></tr>
 	    </table>
 	<dt class="h2">Q9. 「窓使いの憂鬱」では USB キーボードは使えないのですか。
-	<dd class="d2"><p>現在のところ使えません。対応するつもりではありますが、いつになるかはわかりません。</p>
+	<dd class="d2"><p>小林義明さんが Windows2000 用のドライバを書いてくださったので、USB 用の mayu ドライバを利用すれば使用することができます。現在はまだテスト中なので <a href="#SUPPORT">メーリングリスト</a> で問い合わせてください。又 Win9x では普通に使用できます。</p>
 	<dt class="h2">Q10. 「窓使いの憂鬱」は Windows95/98/ME では使えないのですか。
-	<dd class="d2"><p>小林義明さんがドライバを書いてくれたので、バージョン 3.19 から使用できるようになりました。</p>
+	<dd class="d2"><p>小林義明さんがドライバを書いてくださったので、バージョン 3.19 から使用できるようになりました。</p>
 	<dt class="h2">Q11. Win9xで終了できません。そういうもんですか。
 	<dd class="d2"><p>そういうもんです。Shiftでも連打すれば終わります。</p>
 
@@ -328,12 +327,18 @@ Emacs汚染度が低かったりすると戸惑うことでしょう。<a
   <dd class="d1">
       <div>
       <dl class="history">
-	<dt>2001/??/?? 3.24 (Next Release) (BETA)
+	<dt>2001/08/05 3.24
 	<dd>
 	    <ul>
-	      <li><a href="default.mayu"><code>default.mayu</code></a> で、<kbd>[英数]</kbd> を <kbd>[Control]</kbd> として使用している場合に <code>C-Q</code> が正しく働かない問題を修正。version 3.19 で修正したものと原因は同じ。
+	      <li><a href="default.mayu"><code>default.mayu</code></a> で、<kbd>[英数]</kbd> を <kbd>[Control]</kbd> として使用している場合に <code>C-Q</code> が正しく働かない問題を修正。version 3.19 で修正したものと原因は同じ。(Thanks to hanawa)
 	      <li>Windows9x のドライバを更新。青画面でも操作できるようになりました。(Thanks to 小林)
 	      <li><a href="CUSTOMIZE.html#oneShotModifier">One Shot モディファイヤ</a>であると宣言したキーが押されている間にキーが押された時のみ、モディファイヤとして扱われるようにした。今までは、離された時にもモディファイヤ扱いになっていた。
+	      <li>一時停止にしたときにタスクトレイのアイコンを変化させるようにした。
+	      <li><a href="CUSTOMIZE.html#keyRepeat"><code>R-</code></a> を新設。(Thanks to hanawa)
+	      <li><a href="http://www.borland.co.jp/cppbuilder/freecompiler/index.html" target="_top">Borland C++ 5.5.1</a> で<a href="CUSTOMIZE.html#compile">ビルド</a>できるようにした。
+	      <li><a href="CUSTOMIZE.html#oneShotModifier">One Shot モディファイヤ</a>を離したときに有効なモディファイヤは押したときと同じになるようにした。
+	      <li>USB 対応ドライバは今回は収録していません。
+	      <li>BETA ではないです。
 	    </ul>
 	<dt>2001/07/06 3.23 (BETA)
 	<dd>

@@ -282,7 +282,7 @@ bool getTypeValue(ModifierLockType *o_type, const tstring &i_name)
 // ShowCommandType
 
 
-// ModifierLockType table
+// ShowCommandType table
 typedef TypeTable<ShowCommandType> TypeTable_ShowCommandType;
 static const TypeTable_ShowCommandType g_showCommandTypeTable[] =
 {
@@ -360,7 +360,7 @@ bool getTypeValue(TargetWindowType *o_type, const tstring &i_name)
 // BooleanType
 
 
-// ModifierLockType table
+// BooleanType table
 typedef TypeTable<BooleanType> TypeTable_BooleanType;
 static const TypeTable_BooleanType g_booleanType[] =
 {
@@ -386,6 +386,40 @@ bool getTypeValue(BooleanType *o_type, const tstring &i_name)
 {
   return getTypeValue(o_type, i_name, g_booleanType,
 		      NUMBER_OF(g_booleanType));
+}
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// LogicalOperatorType
+
+
+// LogicalOperatorType table
+typedef TypeTable<LogicalOperatorType> TypeTable_LogicalOperatorType;
+static const TypeTable_LogicalOperatorType g_logicalOperatorType[] =
+{
+  { LogicalOperatorType_or, _T("||") },
+  { LogicalOperatorType_and,  _T("&&")  },
+};
+
+
+// stream output
+tostream &operator<<(tostream &i_ost, LogicalOperatorType i_data)
+{
+  tstring name;
+  if (getTypeName(&name, i_data, g_logicalOperatorType,
+		  NUMBER_OF(g_logicalOperatorType)))
+    i_ost << name;
+  else
+    i_ost << _T("(LogicalOperatorType internal error)");
+  return i_ost;
+}
+
+
+// get value of LogicalOperatorType
+bool getTypeValue(LogicalOperatorType *o_type, const tstring &i_name)
+{
+  return getTypeValue(o_type, i_name, g_logicalOperatorType,
+		      NUMBER_OF(g_logicalOperatorType));
 }
 
 
@@ -933,6 +967,69 @@ void Engine::shellExecute()
 }
 
 
+struct EnumWindowsForSetForegroundWindowParam
+{
+  const FunctionData_SetForegroundWindow *m_fd;
+  HWND m_hwnd;
+
+public:
+  EnumWindowsForSetForegroundWindowParam(
+    const FunctionData_SetForegroundWindow *i_fd)
+    : m_fd(i_fd),
+      m_hwnd(NULL)
+  {
+  }
+};
+
+
+/// enum windows for SetForegroundWindow
+static BOOL CALLBACK enumWindowsForSetForegroundWindow(
+  HWND i_hwnd, LPARAM i_lParam)
+{
+  EnumWindowsForSetForegroundWindowParam &ep =
+    *reinterpret_cast<EnumWindowsForSetForegroundWindowParam *>(i_lParam);
+
+  _TCHAR name[GANA_MAX_ATOM_LENGTH];
+  if (!GetClassName(i_hwnd, name, NUMBER_OF(name)))
+    return TRUE;
+  tcmatch_results what;
+  if (!boost::regex_search(name, what, ep.m_fd->m_windowClassName))
+    if (ep.m_fd->m_logicalOp == LogicalOperatorType_and)
+      return TRUE;				// match failed
+
+  if (ep.m_fd->m_logicalOp == LogicalOperatorType_and)
+  {
+    if (GetWindowText(i_hwnd, name, NUMBER_OF(name)) == 0)
+      name[0] = _T('\0');
+    if (!boost::regex_search(name, what,
+			     ep.m_fd->m_windowTitleName))
+      return TRUE;				// match failed
+  }
+
+  ep.m_hwnd = i_hwnd;
+  return FALSE;
+}
+
+
+/// SetForegroundWindow
+void Engine::funcSetForegroundWindow(FunctionParam *i_param, const tregex &,
+				     LogicalOperatorType , const tregex &)
+{
+  if (!i_param->m_isPressed)
+    return;
+  EnumWindowsForSetForegroundWindowParam
+    ep(static_cast<const FunctionData_SetForegroundWindow *>(
+      i_param->m_af->m_functionData));
+  EnumWindows(enumWindowsForSetForegroundWindow,
+	      reinterpret_cast<LPARAM>(&ep));
+  if (ep.m_hwnd)
+    PostMessage(m_hwndAssocWindow,
+		WM_APP_engineNotify, EngineNotify_setForegroundWindow,
+		reinterpret_cast<LPARAM>(ep.m_hwnd));
+
+}
+
+
 // load setting
 void Engine::funcLoadSetting(FunctionParam *i_param, const tstring &i_name)
 {
@@ -1354,8 +1451,9 @@ void Engine::funcWindowIdentify(FunctionParam *i_param)
   }
   if (!ok)
   {
-    UINT WM_MAYU_TARGETTED = RegisterWindowMessage(WM_MAYU_TARGETTED_NAME);
-    CHECK_TRUE( PostMessage(i_param->m_hwnd, WM_MAYU_TARGETTED, 0, 0) );
+    UINT WM_MAYU_MESSAGE = RegisterWindowMessage(WM_MAYU_MESSAGE_NAME);
+    CHECK_TRUE( PostMessage(i_param->m_hwnd, WM_MAYU_MESSAGE,
+			    MayuMessage_notifyName, 0) );
   }
 }
 

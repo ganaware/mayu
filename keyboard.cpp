@@ -82,7 +82,7 @@ Modifier::Modifier()
   ASSERT(Type_end <= (sizeof(MODIFIERS) * 8));
   static const Type defaultDontCare[] =
   {
-    Type_Up, Type_Down,
+    Type_Up, Type_Down, Type_Repeat,
     Type_ImeLock, Type_ImeComp, Type_NumLock, Type_CapsLock, Type_ScrollLock,
     Type_Lock0, Type_Lock1, Type_Lock2, Type_Lock3, Type_Lock4,
     Type_Lock5, Type_Lock6, Type_Lock7, Type_Lock8, Type_Lock9,
@@ -117,9 +117,10 @@ tostream &operator<<(tostream &i_ost, const Modifier &i_m)
   
   const static Mods mods[] =
   {
-    { Modifier::Type_Up, _T("U-") }, { Modifier::Type_Down, _T("  ") },
+    { Modifier::Type_Up, _T("U-") }, { Modifier::Type_Down, _T("D-") },
     { Modifier::Type_Shift, _T("S-") }, { Modifier::Type_Alt, _T("A-") },
     { Modifier::Type_Control, _T("C-") }, { Modifier::Type_Windows, _T("W-") },
+    { Modifier::Type_Repeat, _T("R-") },
     { Modifier::Type_ImeLock, _T("IL-") },
     { Modifier::Type_ImeComp, _T("IC-") },
     { Modifier::Type_ImeComp, _T("I-") },
@@ -141,6 +142,12 @@ tostream &operator<<(tostream &i_ost, const Modifier &i_m)
   for (size_t i = 0; i < NUMBER_OF(mods); ++ i)
     if (!i_m.isDontcare(mods[i].m_mt) && i_m.isPressed(mods[i].m_mt))
       i_ost << mods[i].m_symbol;
+#if 0
+    else if (!i_m.isDontcare(mods[i].m_mt) && i_m.isPressed(mods[i].m_mt))
+      i_ost << _T("~") << mods[i].m_symbol;
+    else
+      i_ost << _T("*") << mods[i].m_symbol;
+#endif
 
   return i_ost;
 }

@@ -23,9 +23,11 @@
 #    define setmode _setmode
 #    define for if (false) ; else for
 
+#    define stati64_t _stati64
+
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Borland C++ 5.5 
+// Borland C++ 5.5.1
 
 #  elif defined(__BORLANDC__)
 
@@ -44,6 +46,25 @@
 #    pragma warn -8060
 #    pragma warn -8070
 #    pragma warn -8084
+
+#    ifdef _UNICODE
+extern wchar_t **_wargv;
+#    endif
+
+#    ifdef _MBCS
+#      define _istcntrl iscntrl
+#    endif
+
+#    include <windows.h>
+#    include <tchar.h>
+
+extern "C"
+{
+  int WINAPI _tWinMain(HINSTANCE i_hInstance, HINSTANCE i_hPrevInstance,
+		       LPTSTR i_lpszCmdLine, int i_nCmdShow);
+}
+
+#    define stati64_t stati64
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

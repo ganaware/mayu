@@ -1,6 +1,8 @@
 #!/usr/bin/perl -w
 # -*- cperl -*-
 
+binmode STDOUT;
+
 while (<>) {
   last if (m#BEGINING OF FUNCTION DEFINITION#);
 }

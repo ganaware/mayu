@@ -13,18 +13,20 @@ DEPENDIGNORE	= --ignore=$(BOOST_DIR)
 !include <vc.mak>
 !include <mayu-common.mak>
 
-DEFINES		= $(COMMON_DEFINES) -DVERSION=""""$(VERSION)""""
+DEFINES		= $(COMMON_DEFINES) -DVERSION=""""$(VERSION)"""" \
+		-DLOGNAME=""""$(LOGNAME)"""" \
+		-DCOMPUTERNAME=""""$(COMPUTERNAME)""""
 # INCLUDES	= -I$(BOOST_DIR)	# make -f mayu-vc.mak depend fails ...
 
 LDFLAGS_1	=						\
 		$(guilflags)					\
 		/PDB:$(TARGET_1).pdb				\
-		/LIBPATH:$(BOOST_DIR)/libs/regex/lib/vc6	\
+		/LIBPATH:$(BOOST_DIR)/libs/regex/build/vc6	\
 
 LDFLAGS_2	=						\
 		$(dlllflags)					\
 		/PDB:$(TARGET_2).pdb				\
-		/LIBPATH:$(BOOST_DIR)/libs/regex/lib/vc6	\
+		/LIBPATH:$(BOOST_DIR)/libs/regex/build/vc6	\
 
 $(TARGET_1):	$(OBJS_1) $(RES_1) $(EXTRADEP_1)
 	$(link) -out:$@ $(ldebug) $(LDFLAGS_1) $(OBJS_1) $(LIBS_1) $(RES_1)
@@ -36,13 +38,16 @@ $(TARGET_3):	$(DLL_3)
 
 REGEXPP_XCFLAGS	= $(REGEXPP_XCFLAGS) XCFLAGS=-D_WCTYPE_INLINE_DEFINED
 
+clean::
+		-$(RM) mayu.aps mayu.opt vc6.pdb
+
 boost:
-		cd $(BOOST_DIR)/libs/regex/lib/
+		cd $(BOOST_DIR)/libs/regex/build/
 		$(MAKE) -f vc6.mak $(REGEXPP_XCFLAGS)
 		cd ../../../../mayu
 
 distclean::	clean
-		cd $(BOOST_DIR)/libs/regex/lib/
+		cd $(BOOST_DIR)/libs/regex/build/
 		-$(MAKE) -k -f vc6.mak clean
 		cd ../../../../mayu
 
@@ -63,6 +68,9 @@ batch_clean:
 		cd s
 		-$(MAKE) -k -f setup-vc.mak batch_clean
 		cd ..
+
+batch_distclean: batch_clean
+		-$(MAKE) -k -f mayu-vc.mak TARGETOS=WINNT distclean
 
 batch_distrib: batch
 		-$(MAKE) -k -f mayu-vc.mak TARGETOS=WINNT nodebug=1 distrib

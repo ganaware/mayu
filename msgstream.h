@@ -34,6 +34,7 @@ class basic_msgbuf : public std::basic_streambuf<T, TR>, public SyncObject
 {
 public:
   typedef std::basic_string<T, TR, A> String;	/// 
+  typedef std::basic_streambuf<T, TR> Super;	///
   
 private:
   HWND m_hwnd;					/** window handle for
@@ -123,7 +124,7 @@ public:
   int getDebugLevel() const { return m_debugLevel; }
   
   // for stream
-  virtual int_type overflow(int_type i_c = TR::eof())
+  Super::int_type overflow(Super::int_type i_c = TR::eof())
   {
     if (sync() == TR::eof()) // sync before new buffer created below
       return TR::eof();

@@ -204,6 +204,30 @@ DWORD getDllVersion(const _TCHAR *i_dllname)
 }
 
 
+// workaround of SetForegroundWindow
+bool setForegroundWindow(HWND i_hwnd)
+{
+  int nForegroundID = GetWindowThreadProcessId(GetForegroundWindow(), NULL);
+  int nTargetID = GetWindowThreadProcessId(i_hwnd, NULL);
+  
+  //if (!AttachThreadInput(nTargetID, nForegroundID, TRUE))
+  //return false;
+  AttachThreadInput(nTargetID, nForegroundID, TRUE);
+
+  DWORD sp_time;
+  SystemParametersInfo(SPI_GETFOREGROUNDLOCKTIMEOUT, 0, &sp_time, 0);
+  SystemParametersInfo(SPI_SETFOREGROUNDLOCKTIMEOUT, 0, (void *)0, 0);
+
+  SetForegroundWindow(i_hwnd);
+
+  SystemParametersInfo(SPI_SETFOREGROUNDLOCKTIMEOUT, 0, (void *)sp_time, 0);
+  
+  AttachThreadInput(nTargetID, nForegroundID, FALSE);
+  return true;
+}
+
+
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // edit control
 
@@ -262,6 +286,10 @@ void editInsertTextAtLast(HWND i_hwnd, const tstring &i_text,
   
   Edit_ReplaceSel(i_hwnd, buf.get());
 }
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Windows2000 specific API
 
 
 // initialize layerd window

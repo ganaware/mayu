@@ -537,3 +537,8 @@ window AcrobatReader /AcroRd32.exe:.*:MDIClient:/ : EmacsMove
 ## http://www.bekkoame.ne.jp/~t.mzaki/
 
 window EdMax-edit /edmax\.exe:.*Afx:400000:b:0:1900010:0$/ : EmacsEdit
+
+
+## VisualBasic ................................................................
+
+window VBTextBox /:ThunderRT6FormDC:(ThunderRT6TextBox|RichTextWndClass)$/ : EmacsEdit

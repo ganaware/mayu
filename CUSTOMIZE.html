@@ -133,6 +133,24 @@
 		  </p>
 		  </div>
 
+	      <dt class="h3"><a name="keyRepeat">キーリピートした</a>
+	      <dd class="d3">
+		  <div>
+		  <p><code>=&gt;</code> より左の <code><em>KEY</em></code> の前にモディファイヤと同じように <code>R-</code> を付けることができます。これは、キーリピートが発生したことを表します。デフォルトでは <code>*R-</code> が指定されています。例えば、</p>
+		  
+		  <p class="sample">
+		  key A =&gt; B<br>
+		  key R-A =&gt; C
+		  </p>
+		  
+		    <p class="continue">という記述をすると、<kbd>[A]</kbd> を押しつづけると、</p>
+		  
+		    <p class="sample">
+		    BCCCCCCCCCCCCCCCCCCCCC
+		    </p>
+
+		    と入力されます。とてもややこしいのであまり使わないようにしましょう。
+
 	      <dt class="h3"><a name="defaultModifier">デフォルトモディファイヤの変更</a>
 	      <dd class="d3">
 		  <div>
@@ -1151,8 +1169,8 @@
 		  <div>
 		  <dl>
 		    <dt class="h4">コンパイラ
-		    <dd class="d4"><div><p>現在対応しているコンパイラは Visual C++ 6.0 SP4 <!--又は Borland C++ 5.5 -->です。</p></div>
-		    <dt class="h4">Platform SDK
+		    <dd class="d4"><div><p>現在対応しているコンパイラは Visual C++ 6.0 SP5 又は <a href="http://www.borland.co.jp/cppbuilder/freecompiler/index.html">Borland C++ 5.5.1</a> です。</p></div>
+		    <dt class="h4">Platform SDK (Visual C++ を利用する場合)
 		    <dd class="d4"><div><p>Windows 2000 に対応したものが必要です。MSDN で配布されていますし、マイクロソフトの<a href="http://www.microsoft.com/msdownload/platformsdk/setuplauncher.htm" target="_top">サイト</a>でも配布されています。</p></div>
 		    <dt class="h4">DDK
 		    <dd class="d4"><div><p>デバイスドライバをビルドする場合のみ必要になります。MSDN で配布されていますし、マイクロソフトの<a href="http://www.microsoft.com/ddk/" target="_top">サイト</a>でも配布されています。</p></div>
@@ -1161,7 +1179,7 @@
 		    <dt class="h4">Perl</a>
 		    <dd class="d4"><div><p>いくつかの作業の為に <a href="http://www.activestate.com/Products/ActivePerl/" target="_top">ActivePerl</a> が必要です。<code>perl.exe</code> にパスを通しておいてください。Cygwin の Perl でもちゃんと動くかどうかは試してないので分かりません。</p></div>
 		    <dt class="h4">bash, cvs, fileutils, sed, tar
-		    <dd class="d4"><div><p>配布パッケージを作成するためにのみ <a href="http://www.cygwin.com/" target="_top">Cygwin</a> の bash, fileutils, sed, tar 必要です。また、cvs は Cygwin のものを使用することをおすすめします。さもないと改行コードの違いによるトラブルが起こるかもしれません。mayu のソースの改行コードはすべて LF のみになっています。</p></div>
+		    <dd class="d4"><div><p>配布パッケージを作成するためにのみ <a href="http://www.cygwin.com/" target="_top">Cygwin</a> の bash, fileutils, sed, tar が必要です。また、cvs は Cygwin のものを使用することをおすすめします。さもないと改行コードの違いによるトラブルが起こるかもしれません。mayu のソースの改行コードはすべて LF のみになっています。</p></div>
 		  </dl>
 		  </div>
 	      <dt class="h3"><a name="compile_source">ソースの展開</a>
@@ -1219,27 +1237,26 @@
 		    <dt class="h4">Visual C++ 6.0 の場合
 		    <dd class="d4">
 			<div>
-			<p>Visual C++ 6.0 のコンパイラなどにパスを通しておいて、以下のようにします。
-			</p>
-			<p class="sample">
-			C:\Program Files\mayu&gt; nmake
-			</p>
-			<p><code>out_win9x/</code>, <code>out_win9x_debug/</code>, <code>out_winnt/</code>, <code>out_winnt_debug/</code> の各ディレクトリに実行ファイルが作成されます。</p>
-			<p><code>d/</code>, <code>d_win9x/</code> ディレクトリ以下にはドライバのソースが入っているので、必要なら適当にコンパイルしてください。</p>
+			  <p>Visual C++ 6.0 のコンパイラなどにパスを通しておいて、以下のようにします。
+			  </p>
+			  <p class="sample">
+			  mayu-3.??&gt; nmake
+			  </p>
+			  <p><code>out_win9x/</code>, <code>out_win9x_debug/</code>, <code>out_winnt/</code>, <code>out_winnt_debug/</code> の各ディレクトリに実行ファイルが作成されます。</p>
+			  <p><code>d/</code>, <code>d_win9x/</code> ディレクトリ以下にはドライバのソースが入っているので、必要なら適当にコンパイルしてください。</p>
 			</div>
-<!--
-		    <dt class="h4">Borland C++ 5.5 の場合
+			
+		    <dt class="h4"><a href="http://www.borland.co.jp/cppbuilder/freecompiler/index.html">Borland C++ Compiler 5.5.1</a> の場合
 		    <dd class="d4">
 			<div>
-			<p><em>(3.19 では未サポート)</em> Borland C++ 5.5 のコンパイラなどにパスを通しておいて、さらに <code>bcc.mak</code> の冒頭の注意に従ってライブラリパスに <code>lib/psdk</code> を含めてください。</p>
-			<p class="sample">
-			C:\Program Files\mayu&gt; make F=mayu-bcc.mak
-			</p>
-			<p>Windows9x 用にコンパイルするには、<code>TARGETOS=WIN95</code> を引数に追加します。</p>
-			<p><code>s</code> ディレクトリ以下のインストーラをコンパイルすることはできますが、<code>d</code> ディレクトリ以下にのドライバをコンパイルする方法は不明です。</p>
+			  <p>Borland C++ 5.5.1 のコンパイラなどにパスを通しておいて、さらに <code>bcc.mak</code> の冒頭の注意に従ってライブラリパスに <code>lib/psdk</code> を含めてください。</p>
+			  <p class="sample">
+			  mayu-3.??&gt; set INCLUDE=C:\borland\bcc55\include<br>
+			  mayu-3.??&gt; make -f mayu-bcc.mak batch
+			  </p>
+			  <p><code>s</code> ディレクトリ以下のインストーラをコンパイルすることはできますが、<code>d</code> ディレクトリ以下にのドライバをコンパイルする方法は不明です。</p>
 			</div>
-			-->
-			</div>
+		      </div>
 	    </div>
       </dl>
       </div>

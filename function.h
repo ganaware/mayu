@@ -189,4 +189,18 @@ extern tostream &operator<<(tostream &i_ost, BooleanType i_data);
 extern bool getTypeValue(BooleanType *o_type, const tstring &i_name);
 
 
+///
+enum LogicalOperatorType
+{
+  LogicalOperatorType_or	= 0, /// 
+  LogicalOperatorType_and	= 1, /// 
+};
+
+/// stream output
+extern tostream &operator<<(tostream &i_ost, LogicalOperatorType i_data);
+  
+// get value of LogicalOperatorType
+extern bool getTypeValue(LogicalOperatorType *o_type, const tstring &i_name);
+
+
 #endif // !_FUNCTION_H

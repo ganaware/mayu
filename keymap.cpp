@@ -297,11 +297,11 @@ bool Keymap::doesSameWindow(const tstringi i_className,
   if (m_type == Type_keymap)
     return false;
 
-  if (boost::regex_search(i_className, tcmatch_results(), m_windowClass))
+  tcmatch_results what;
+  if (boost::regex_search(i_className, what, m_windowClass))
   {
     if (m_type == Type_windowAnd)
-      return boost::regex_search(i_titleName,
-				 tcmatch_results(), m_windowTitle);
+      return boost::regex_search(i_titleName, what, m_windowTitle);
     else // type == Type_windowOr
       return true;
   }
@@ -310,8 +310,7 @@ bool Keymap::doesSameWindow(const tstringi i_className,
     if (m_type == Type_windowAnd)
       return false;
     else // type == Type_windowOr
-      return boost::regex_search(i_titleName, tcmatch_results(),
-				 m_windowTitle);
+      return boost::regex_search(i_titleName, what, m_windowTitle);
   }
 }
 

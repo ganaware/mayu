@@ -59,6 +59,8 @@ DEPENDFLAGS	= --cpp=vc --ignore="$(INCLUDE)" -p"$$(OUT_DIR)\\"	\
 		$(DEPENDIGNORE) -GX $(cdebug) $(cflags) $(cvarsmt)	\
 		$(DEFINES) $(INCLUDES) $(DEBUG_FLAG)
 
+CLEAN		= $(OUT_DIR)\*.pdb
+
 
 # tools		###############################################################
 

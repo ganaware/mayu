@@ -11,6 +11,7 @@
 #  include <string>
 #  include <iosfwd>
 #  include <boost/regex.hpp>
+#  include <stdio.h>				// for snprintf
 
 
 /// string for generic international text
@@ -164,6 +165,13 @@ inline bool operator!=(const tstringi &i_str1, const tstring &i_str2)
 /// case insensitive string comparison
 inline bool operator!=(const tstringi &i_str1, const tstringi &i_str2)
 { return i_str1.compare(i_str2) != 0; }
+
+
+/// stream output
+extern tostream &operator<<(tostream &i_ost, const tregex &i_data);
+
+/// get lower string
+extern tstring toLower(const tstring &i_str);
 
 
 #endif // !_STRINGTOOL_H

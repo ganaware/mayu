@@ -17,9 +17,7 @@ DEPENDIGNORE	= --ignore=$(BOOST_DIR)
 LDFLAGS_1	=						\
 		$(guilflags)					\
 		/PDB:$(TARGET_1).pdb				\
-		/LIBPATH:$(BOOST_DIR)/libs/regex/lib/vc6	\
-
-LDFLAGS_2	= $(conlflags)
+		/LIBPATH:$(BOOST_DIR)/libs/regex/build/vc6	\
 
 $(TARGET_1):	$(OBJS_1) $(RES_1) $(EXTRADEP_1)
 	$(link) -out:$@ $(ldebug) $(LDFLAGS_1) $(OBJS_1) $(LIBS_1) $(RES_1)

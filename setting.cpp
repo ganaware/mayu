@@ -364,7 +364,7 @@ Modifier SettingLoader::load_MODIFIER(Modifier::Type i_mode,
   {
     t = lookToken();
 
-    const static struct { const _TCHAR *s; Modifier::Type mt; } map[] =
+    const static struct { const _TCHAR *m_s; Modifier::Type m_mt; } map[] =
     {
       // <BASIC_MODIFIER>
       { _T("S-"),  Modifier::Type_Shift },
@@ -376,6 +376,7 @@ Modifier SettingLoader::load_MODIFIER(Modifier::Type i_mode,
       { _T("U-"),  Modifier::Type_Up },
       { _T("D-"),  Modifier::Type_Down },
       // <ASSIGN_MODIFIER>
+      { _T("R-"),  Modifier::Type_Repeat },
       { _T("IL-"), Modifier::Type_ImeLock },
       { _T("IC-"), Modifier::Type_ImeComp },
       { _T("I-"),  Modifier::Type_ImeComp },
@@ -405,10 +406,10 @@ Modifier SettingLoader::load_MODIFIER(Modifier::Type i_mode,
     };
 
     for (int i = 0; i < NUMBER_OF(map); ++ i)
-      if (*t == map[i].s)
+      if (*t == map[i].m_s)
       {
 	getToken();
-	Modifier::Type mt = map[i].mt;
+	Modifier::Type mt = map[i].m_mt;
 	if (static_cast<int>(i_mode) <= static_cast<int>(mt))
 	  throw ErrorMessage() << _T("`") << *t
 			       << _T("': invalid modifier at this context.");
@@ -465,6 +466,10 @@ Modifier SettingLoader::load_MODIFIER(Modifier::Type i_mode,
     i_modifier.dontcare(Modifier::Type_Up);
     i_modifier.dontcare(Modifier::Type_Down);
   }
+
+  // fix repeat
+  if (!isModifierSpecified.isOn(Modifier::Type_Repeat))
+    i_modifier.dontcare(Modifier::Type_Repeat);
   return i_modifier;
 }
 
@@ -610,6 +615,13 @@ void SettingLoader::load_ARGUMENT(tstring *o_arg)
 }
 
 
+// &lt;ARGUMENT&gt;
+void SettingLoader::load_ARGUMENT(tregex *o_arg)
+{
+  *o_arg = getToken()->getRegexp();
+}
+
+
 // &lt;ARGUMENT_VK&gt;
 void SettingLoader::load_ARGUMENT(VKey *o_arg)
 {
@@ -731,6 +743,16 @@ void SettingLoader::load_ARGUMENT(BooleanType *o_arg)
 
 
 // &lt;ARGUMENT&gt;
+void SettingLoader::load_ARGUMENT(LogicalOperatorType *o_arg)
+{
+  Token *t = getToken();
+  if (getTypeValue(o_arg, t->getString()))
+    return;
+  throw ErrorMessage() << _T("`") << *t << _T("': must be 'or' or 'and'.");
+}
+
+
+// &lt;ARGUMENT&gt;
 void SettingLoader::load_ARGUMENT(Modifier *o_arg)
 {
   Modifier modifier;
@@ -840,7 +862,7 @@ void SettingLoader::load_KEY_ASSIGN()
   {
     getToken();
     m_defaultKeySeqModifier = load_MODIFIER(Modifier::Type_KEYSEQ,
-					  m_defaultKeySeqModifier);
+					    m_defaultKeySeqModifier);
     m_defaultAssignModifier = mkey.m_modifier;
     return;
   }
@@ -1122,10 +1144,18 @@ static bool prefixSortPred(const tstringi &i_a, const tstringi &i_b)
 bool readFile(tstring *o_data, const tstringi &i_filename)
 {
   // get size of file
+#if 0
+  // bcc's _wstat cannot obtain file size
   struct _stat sbuf;
   if (_tstat(i_filename.c_str(), &sbuf) < 0 || sbuf.st_size == 0)
     return false;
-
+#else
+  // so, we use _wstati64 for bcc
+  struct stati64_t sbuf;
+  if (_tstati64(i_filename.c_str(), &sbuf) < 0 || sbuf.st_size == 0)
+    return false;
+#endif
+  
   // open
   FILE *fp = _tfopen(i_filename.c_str(), _T("rb"));
   if (!fp)
@@ -1245,7 +1275,7 @@ bool readFile(tstring *o_data, const tstringi &i_filename)
 
   // assume ascii
   o_data->resize(sbuf.st_size);
-  for (size_t i = 0; i < sbuf.st_size; ++ i)
+  for (off_t i = 0; i < sbuf.st_size; ++ i)
     (*o_data)[i] = buf.get()[i];
   fclose(fp);
   return true;
@@ -1261,7 +1291,10 @@ void SettingLoader::load(const tstringi &i_filename)
   if (!readFile(&data, m_currentFilename))
   {
     Acquire a(m_soLog);
-    *m_log << m_currentFilename << _T(" : error: file not found");
+    *m_log << m_currentFilename << _T(" : error: file not found") << std::endl;
+#if 1
+    *m_log << data << std::endl;
+#endif
     m_isThereAnyError = true;
     return;
   }
@@ -1277,7 +1310,7 @@ void SettingLoader::load(const tstringi &i_filename)
       _T("S-"), _T("A-"), _T("M-"), _T("C-"),	// <BASIC_MODIFIER>
       _T("W-"), _T("*"), _T("~"),
       _T("U-"), _T("D-"),			// <KEYSEQ_MODIFIER>
-      _T("IL-"), _T("IC-"), _T("I-"),		// <ASSIGN_MODIFIER>
+      _T("R-"), _T("IL-"), _T("IC-"), _T("I-"),	// <ASSIGN_MODIFIER>
       _T("NL-"), _T("CL-"), _T("SL-"),
       _T("M0-"), _T("M1-"), _T("M2-"), _T("M3-"), _T("M4-"),
       _T("M5-"), _T("M6-"), _T("M7-"), _T("M8-"), _T("M9-"), 

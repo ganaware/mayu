@@ -8,13 +8,17 @@
 ###############################################################################
 
 
+INCLUDES	= -I$(BOOST_DIR)
+DEPENDIGNORE	= --ignore=$(BOOST_DIR)
+
 !include <bcc.mak>
 !include <mayu-common.mak>
 
-DEFINES		= $(COMMON_DEFINES) -DVERSION="\"$(VERSION)\""
+DEFINES		= $(COMMON_DEFINES) -DVERSION="\"$(VERSION)\"" \
+		-DLOGNAME="\"$(LOGNAME)\"" -DCOMPUTERNAME="\"$(COMPUTERNAME)\""
 
-LDFLAGS_1	= $(guilflags) $(guiobjs)
-LDFLAGS_2	= $(dlllflags) $(dllobjs)
+LDFLAGS_1	= $(guilflags) $(guiobjs) -L..\boost\libs\regex\build\bcb5
+LDFLAGS_2	= $(dlllflags) $(dllobjs) -L..\boost\libs\regex\build\bcb5
 
 $(TARGET_1):	$(OBJS_1) $(RES_1) $(EXTRADEP_1)
 	$(LD) $(LDFLAGS_1) $(OBJS_1),$(TARGET_1),,$(LIBS_1),,$(RES_1)
@@ -25,6 +29,36 @@ $(TARGET_2):	$(OBJS_2) $(RES_2) $(EXTRADEP_2)
 $(TARGET_3):	$(DLL_3)
 
 boost:
-		cd $(BOOST_DIR)/libs/regex/lib/
-		$(MAKE) -f bc55.mak
+		cd $(BOOST_DIR)/libs/regex/build/
+		$(MAKE) -i -f bc55.mak
 		cd ../../../../mayu
+
+distclean::	clean
+		cd $(BOOST_DIR)/libs/regex/build/
+		-$(MAKE) -i -f bc55.mak clean
+		cd ../../../../mayu
+
+batch:
+		-$(MAKE) -i -f mayu-bcc.mak TARGETOS=WINNT nodebug=1
+		-$(MAKE) -i -f mayu-bcc.mak TARGETOS=WINNT
+		-$(MAKE) -i -f mayu-bcc.mak TARGETOS=WIN95 nodebug=1
+		-$(MAKE) -i -f mayu-bcc.mak TARGETOS=WIN95
+		cd s
+		-$(MAKE) -i -f setup-bcc.mak batch
+		cd ..
+
+batch_clean:
+		-$(MAKE) -i -f mayu-bcc.mak TARGETOS=WINNT nodebug=1 clean
+		-$(MAKE) -i -f mayu-bcc.mak TARGETOS=WINNT clean
+		-$(MAKE) -i -f mayu-bcc.mak TARGETOS=WIN95 nodebug=1 clean
+		-$(MAKE) -i -f mayu-bcc.mak TARGETOS=WIN95 clean
+		cd s
+		-$(MAKE) -i -f setup-bcc.mak batch_clean
+		cd ..
+
+batch_distclean:	batch_clean
+		-$(MAKE) -i -f mayu-bcc.mak TARGETOS=WINNT distclean
+
+batch_distrib: batch
+		-$(MAKE) -i -f mayu-bcc.mak TARGETOS=WINNT nodebug=1 distrib
+		-$(MAKE) -i -f mayu-bcc.mak TARGETOS=WIN95 nodebug=1 distrib

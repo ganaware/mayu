@@ -145,7 +145,8 @@ bool Parser::getLine(tstringi *o_line)
     {
       case _T('\n'):
 #ifdef UNICODE
-      case _T('\x2028'):	//  (U+2028)
+      case 0x2028:
+	//case _T('\x2028'):	//  (U+2028)
 #endif
 	end = m_ptr;
 	++ m_ptr;
@@ -164,7 +165,8 @@ bool Parser::getLine(tstringi *o_line)
     }
   got_line_end:
   ++ m_internalLineNumber;
-  o_line->assign(begin, end);
+  // o_line->assign(begin, end);		// why bcc cannot link this ?
+  o_line->assign(begin, end - begin);		// workarond for bcc
   return true;
 }
 

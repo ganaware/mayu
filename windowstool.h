@@ -67,6 +67,8 @@ extern void asyncResize(HWND i_hwnd, int i_w, int i_h);
 extern DWORD getDllVersion(const _TCHAR *i_dllname);
 #define PACKVERSION(major, minor) MAKELONG(minor, major)
 
+// workaround of SetForegroundWindow
+extern bool setForegroundWindow(HWND i_hwnd);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // dialog

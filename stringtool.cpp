@@ -255,7 +255,7 @@ tstring interpretMetaCharacters(const _TCHAR *i_str, size_t i_len,
 				      10, 11, 12, 13, 14, 15,
 				      10, 11, 12, 13, 14, 15, };
 	    bool brace = false;
-	    if (i_str < end && *i_str == _L('{'))
+	    if (i_str < end && *i_str == _T('{'))
 	    {
 	      i_str ++;
 	      brace = true;
@@ -266,7 +266,7 @@ tstring interpretMetaCharacters(const _TCHAR *i_str, size_t i_len,
 		n = n * 16 + hexvalue[c - hexchar];
 	      else
 		break;
-	    if (i_str < end && *i_str == _L('}') && brace)
+	    if (i_str < end && *i_str == _T('}') && brace)
 	      i_str ++;
 	    if (0 < n)
 	      *d++ = static_cast<_TCHAR>(n);
@@ -349,4 +349,26 @@ std::string to_string(const std::wstring &i_str)
   Array<char> result(size + 1);
   wcstombs(result.get(), i_str.c_str(), i_str.size() + 1);
   return std::string(result.get());
+}
+
+
+/// stream output
+tostream &operator<<(tostream &i_ost, const tregex &i_data)
+{
+  return i_ost << i_data.str();
+}
+
+
+/// get lower string
+tstring toLower(const tstring &i_str)
+{
+  tstring str(i_str);
+  for (size_t i = 0; i < str.size(); ++ i)
+  {
+    if (_ismbblead(str[i]))
+      ++ i;
+    else
+      str[i] = tolower(i);
+  }
+  return str;
 }

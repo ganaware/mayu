@@ -117,6 +117,7 @@ private:
   void load_ARGUMENT(unsigned int *o_arg);	/// &lt;ARGUMENT&gt;
   void load_ARGUMENT(long *o_arg);		/// &lt;ARGUMENT&gt;
   void load_ARGUMENT(tstring *o_arg);		/// &lt;ARGUMENT&gt;
+  void load_ARGUMENT(tregex *o_arg);		/// &lt;ARGUMENT&gt;
   void load_ARGUMENT(VKey *o_arg);		/// &lt;ARGUMENT_VK&gt;
   void load_ARGUMENT(ToWindowType *o_arg);	/// &lt;ARGUMENT_WINDOW&gt;
   void load_ARGUMENT(GravityType *o_arg);	/// &lt;ARGUMENT&gt;
@@ -127,6 +128,7 @@ private:
   void load_ARGUMENT(TargetWindowType *o_arg);
 					/// &lt;ARGUMENT_TARGET_WINDOW_TYPE&gt;
   void load_ARGUMENT(BooleanType *o_arg);	/// &lt;bool&gt;
+  void load_ARGUMENT(LogicalOperatorType *o_arg);/// &lt;ARGUMENT&gt;
   void load_ARGUMENT(Modifier *o_arg);		/// &lt;ARGUMENT&gt;
   void load_ARGUMENT(const Keymap **o_arg);	/// &lt;ARGUMENT&gt;
   void load_ARGUMENT(const KeySeq **o_arg);	/// &lt;ARGUMENT&gt;

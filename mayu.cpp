@@ -6,6 +6,7 @@
 
 
 #include "misc.h"
+#include "compiler_specific_func.h"
 #include "dlginvestigate.h"
 #include "dlglog.h"
 #include "dlgsetting.h"
@@ -47,6 +48,7 @@ class Mayu
   UINT m_WM_TaskbarRestart;			/** window message sent when
                                                     taskber restarts */
   NOTIFYICONDATA m_ni;				/// taskbar icon data
+  HICON m_tasktrayIcon[2];			/// taskbar icon
   bool m_canUseTasktrayBaloon;			/// 
 
   tomsgstream m_log;				/** log stream (output to log
@@ -296,7 +298,7 @@ private:
 		    mii.fState =
 		      MFS_ENABLED | ((mayuIndex == index) ? MFS_CHECKED : 0);
 		    mii.wID = ID_MENUITEM_reloadBegin + index;
-		    tstringi name = what[1];
+		    tstringi name(what.str(1));
 		    mii.dwTypeData = const_cast<_TCHAR *>(name.c_str());
 		    mii.cch = name.size();
 		    
@@ -384,6 +386,7 @@ private:
 	      }
 	      case ID_MENUITEM_disable:
 		This->m_engine.enable(!This->m_engine.getIsEnabled());
+		This->showTasktrayIcon();
 		break;
 	      case ID_MENUITEM_quit:
 		PostQuitMessage(0);
@@ -438,6 +441,16 @@ private:
 	      }
 	      break;
 	    }
+	    case EngineNotify_setForegroundWindow:
+	      // FIXME: completely useless. why ?
+	      setForegroundWindow(reinterpret_cast<HWND>(i_lParam));
+	      {
+		Acquire a(&This->m_log, 1);
+		This->m_log << _T("setForegroundWindow(0x")
+			    << std::hex << i_lParam << std::dec << _T(")")
+			    << std::endl;
+	      }
+	      break;
 	    default:
 	      break;
 	  }
@@ -447,7 +460,7 @@ private:
 	default:
 	  if (i_message == This->m_WM_TaskbarRestart)
 	  {
-	    This->showHelpMessage(false, true);
+	    This->showTasktrayIcon(true);
 	    return 0;
 	  }
       }
@@ -482,7 +495,7 @@ private:
   }
 
   // メッセージを表示
-  void showHelpMessage(bool i_doesShow = true, bool i_doesAdd = false)
+  void showHelpMessage(bool i_doesShow = true)
   {
     if (m_canUseTasktrayBaloon)
     {
@@ -497,13 +510,16 @@ private:
       }
       else
 	m_ni.szInfo[0] = m_ni.szInfoTitle[0] = _T('\0');
-      CHECK_TRUE( Shell_NotifyIcon(i_doesAdd ? NIM_ADD : NIM_MODIFY, &m_ni) );
+      CHECK_TRUE( Shell_NotifyIcon(NIM_MODIFY, &m_ni) );
     }
-    else
-    {
-      if (i_doesAdd)
-	CHECK_TRUE( Shell_NotifyIcon(NIM_ADD, &m_ni) );
-    }
+  }
+  
+  // アイコンを変更
+  void showTasktrayIcon(bool i_doesAdd = false)
+  {
+    m_ni.hIcon  = m_tasktrayIcon[m_engine.getIsEnabled() ? 1 : 0];
+    m_ni.szInfo[0] = m_ni.szInfoTitle[0] = _T('\0');
+    CHECK_TRUE( Shell_NotifyIcon(i_doesAdd ? NIM_ADD : NIM_MODIFY, &m_ni) );
   }
 
 public:
@@ -568,11 +584,13 @@ public:
     m_engine.start();
     
     // show tasktray icon
+    m_tasktrayIcon[0] = loadSmallIcon(IDI_ICON_mayu_disabled);
+    m_tasktrayIcon[1] = loadSmallIcon(IDI_ICON_mayu);
     std::memset(&m_ni, 0, sizeof(m_ni));
     m_ni.uID    = ID_TaskTrayIcon;
     m_ni.hWnd   = m_hwndTaskTray;
     m_ni.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
-    m_ni.hIcon  = loadSmallIcon(IDI_ICON_mayu);
+    m_ni.hIcon  = m_tasktrayIcon[1];
     m_ni.uCallbackMessage = WM_APP_taskTrayNotify;
     tstring tip = loadString(IDS_mayu);
     tcslcpy(m_ni.szTip, tip.c_str(), NUMBER_OF(m_ni.szTip));
@@ -583,7 +601,7 @@ public:
     }
     else
       m_ni.cbSize = NOTIFYICONDATA_V1_SIZE;
-    showHelpMessage(false, true);
+    showTasktrayIcon(true);
 
     // create menu
     m_hMenuTaskTray = LoadMenu(g_hInst, MAKEINTRESOURCE(IDR_MENU_tasktray));
@@ -621,7 +639,8 @@ public:
     
     // delete tasktray icon
     CHECK_TRUE( Shell_NotifyIcon(NIM_DELETE, &m_ni) );
-    CHECK_TRUE( DestroyIcon(m_ni.hIcon) );
+    CHECK_TRUE( DestroyIcon(m_tasktrayIcon[1]) );
+    CHECK_TRUE( DestroyIcon(m_tasktrayIcon[0]) );
 
     // stop keyboard handler thread
     m_engine.stop();
@@ -629,32 +648,37 @@ public:
     // remove setting;
     delete m_setting;
   }
-  
+
   /// message loop
   WPARAM messageLoop()
   {
     // banner
     {
-      time_t now;
-      time(&now);
       _TCHAR buf[1024];
-#ifdef __BORLANDC__
-#pragma message("\t\t****\tAfter std::ostream() is called,  ")
-#pragma message("\t\t****\tstrftime(... \"%%#c\" ...) fails.")
-#pragma message("\t\t****\tWhy ? Bug of Borland C++ 5.5 ?   ")
-#pragma message("\t\t****\t                         - nayuta")
-      _tcsftime(buf, NUMBER_OF(buf),
-		_T("%Y/%m/%d %H:%M:%S (Compiled by Borland C++)"),
-		localtime(&now));
-#else
-      _tcsftime(buf, NUMBER_OF(buf), _T("%#c"), localtime(&now));
-#endif
       
       Acquire a(&m_log, 0);
-      m_log << loadString(IDS_mayu) << _T(" ") _T(VERSION) _T(" @ ")
-	    << buf << std::endl;
+      m_log << _T("------------------------------------------------------------") << std::endl;
+      m_log << loadString(IDS_mayu) << _T(" ") _T(VERSION);
+#ifndef NDEBUG
+      m_log << _T(" (DEBUG)");
+#endif
+#ifdef _UNICODE
+      m_log << _T(" (UNICODE)");
+#endif
+      m_log << std::endl;
+      m_log << _T("  built by ")
+	    << _T(LOGNAME) << _T("@") << toLower(_T(COMPUTERNAME))
+	    << _T(" (") << _T(__DATE__) <<  _T(" ")
+	    << _T(__TIME__) << _T(", ")
+	    << getCompilerVersionString() << _T(")") << std::endl;
       CHECK_TRUE( GetModuleFileName(g_hInst, buf, NUMBER_OF(buf)) );
-      m_log << buf << std::endl << std::endl;
+      m_log << buf << std::endl;
+      m_log << _T("------------------------------------------------------------") << std::endl;
+
+      time_t now;
+      time(&now);
+      _tcsftime(buf, NUMBER_OF(buf), _T("%#c"), localtime(&now));
+      m_log << _T("log begins ") << buf << std::endl;
     }
     load();
     

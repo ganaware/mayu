@@ -381,8 +381,8 @@ int uninstall()
 }
 
 
-int WINAPI WinMain(HINSTANCE i_hInstance, HINSTANCE /* hPrevInstance */,
-		   LPSTR /* lpszCmdLine */, int /* nCmdShow */)
+int WINAPI _tWinMain(HINSTANCE i_hInstance, HINSTANCE /* hPrevInstance */,
+		     LPTSTR /* lpszCmdLine */, int /* nCmdShow */)
 {
   CoInitialize(NULL);
   

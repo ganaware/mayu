@@ -160,8 +160,9 @@ public:
     Type_Up = Type_BASIC,			/// &lt;KEYSEQ_MODIFIER&gt;
     Type_Down,					/// &lt;KEYSEQ_MODIFIER&gt;
     Type_KEYSEQ,				///
-    
-    Type_ImeLock = Type_KEYSEQ,			/// &lt;ASSIGN_MODIFIER&gt;
+
+    Type_Repeat = Type_KEYSEQ,			/// &lt;ASSIGN_MODIFIER&gt;
+    Type_ImeLock,				/// &lt;ASSIGN_MODIFIER&gt;
     Type_ImeComp,				/// &lt;ASSIGN_MODIFIER&gt;
     Type_NumLock,				/// &lt;ASSIGN_MODIFIER&gt;
     Type_CapsLock,				/// &lt;ASSIGN_MODIFIER&gt;
@@ -274,7 +275,10 @@ public:
   ///
   bool operator==(const ModifiedKey &i_mk) const
   { return m_modifier == i_mk.m_modifier && m_key == i_mk.m_key; }
-
+  ///
+  bool operator!=(const ModifiedKey &i_mk) const
+  { return !operator==(i_mk); }
+  
   /// stream output
   friend tostream &operator<<(tostream &i_ost, const ModifiedKey &i_mk);
 

@@ -8,20 +8,30 @@
 ###############################################################################
 
 
+INCLUDES	= -I$(BOOST_DIR)
+DEPENDIGNORE	= --ignore=$(BOOST_DIR)
+
 !include <../bcc.mak>
 !include <setup-common.mak>
 
-LDFLAGS_1	= $(guilflags) $(guiobjs)
-LDFLAGS_2	= $(conlflags) $(conobjs)
+LDFLAGS_1	= $(guilflags) $(guiobjs) -L..\..\boost\libs\regex\build\bcb5
 
 $(TARGET_1):	$(OBJS_1) $(RES_1) $(EXTRADEP_1)
 	$(LD) $(LDFLAGS_1) $(OBJS_1),$(TARGET_1),,$(LIBS_1),,$(RES_1)
 
-$(TARGET_2):	$(OBJS_2) $(RES_2) $(EXTRADEP_2)
-	$(LD) $(LDFLAGS_2) $(OBJS_2),$(TARGET_2),,$(LIBS_2) cab32-bcc.lib,,\
-		$(RES_2)
-
 strres.h:	setup.rc
 	cmd /c grep -q- IDS setup.rc | \
-	sed "s/\(IDS[a-zA-Z0-9_]*\)[^""]*\("".*\)$$/\1, _T(\2),/" | \
+	sed "s/\(IDS[a-zA-Z0-9_]*\)[^""]*\("".*\)$$/ \1, _T(\2) ,/" | \
 	sed "s/^File.*$//" > strres.h
+
+batch:
+		-$(MAKE) -f setup-bcc.mak TARGETOS=WINNT nodebug=1
+		-$(MAKE) -f setup-bcc.mak TARGETOS=WINNT
+		-$(MAKE) -f setup-bcc.mak TARGETOS=WIN95 nodebug=1
+		-$(MAKE) -f setup-bcc.mak TARGETOS=WIN95
+
+batch_clean:
+		-$(MAKE) -f setup-bcc.mak TARGETOS=WINNT nodebug=1 clean
+		-$(MAKE) -f setup-bcc.mak TARGETOS=WINNT clean
+		-$(MAKE) -f setup-bcc.mak TARGETOS=WIN95 nodebug=1 clean
+		-$(MAKE) -f setup-bcc.mak TARGETOS=WIN95 clean

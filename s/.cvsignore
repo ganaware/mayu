@@ -2,4 +2,6 @@ strres.h
 *.aps
 *.opt
 *.tgz
+*.pdb
 out_*
+outbcc_*

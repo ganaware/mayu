@@ -19,14 +19,14 @@
 class DlgInvestigate
 {
   HWND m_hwnd;					///
-  UINT m_WM_MAYU_TARGETTED;			///
+  UINT m_WM_MAYU_MESSAGE;			///
   DlgInvestigateData m_data;			/// 
   
 public:
   ///
   DlgInvestigate(HWND i_hwnd)
     : m_hwnd(i_hwnd),
-      m_WM_MAYU_TARGETTED(RegisterWindowMessage(WM_MAYU_TARGETTED_NAME))
+      m_WM_MAYU_MESSAGE(RegisterWindowMessage(WM_MAYU_MESSAGE_NAME))
   {
     m_data.m_engine = NULL;
     m_data.m_hwndLog = NULL;
@@ -104,7 +104,8 @@ public:
       }
     }
     if (!ok)
-      CHECK_TRUE( PostMessage(i_hwndTarget, m_WM_MAYU_TARGETTED, 0, 0) );
+      CHECK_TRUE( PostMessage(i_hwndTarget, m_WM_MAYU_MESSAGE,
+			      MayuMessage_notifyName, 0) );
     return TRUE;
   }
   

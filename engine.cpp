@@ -215,8 +215,16 @@ void Engine::describeBindings()
 }
 
 
+// update m_lastPressedKey
+void Engine::updateLastPressedKey(Key *i_key)
+{
+  m_lastPressedKey[1] = m_lastPressedKey[0];
+  m_lastPressedKey[0] = i_key;
+}
+
+
 // get current modifiers
-Modifier Engine::getCurrentModifiers(bool i_isPressed)
+Modifier Engine::getCurrentModifiers(Key *i_key, bool i_isPressed)
 {
   Modifier cmods;
   cmods.add(m_currentLock);
@@ -227,6 +235,16 @@ Modifier Engine::getCurrentModifiers(bool i_isPressed)
   cmods.press(Modifier::Type_Windows, isPressed(Modifier::Type_Windows));
   cmods.press(Modifier::Type_Up     , !i_isPressed);
   cmods.press(Modifier::Type_Down   , i_isPressed);
+
+  cmods.press(Modifier::Type_Repeat , false);
+  if (m_lastPressedKey[0] == i_key)
+  {
+    if (i_isPressed)
+      cmods.press(Modifier::Type_Repeat, true);
+    else
+      if (m_lastPressedKey[1] == i_key)
+	cmods.press(Modifier::Type_Repeat, true);
+  }
 
   for (int i = Modifier::Type_Mod0; i <= Modifier::Type_Mod9; ++ i)
     cmods.press(static_cast<Modifier::Type>(i),
@@ -277,7 +295,7 @@ void Engine::generateKeyEvent(Key *i_key, bool i_doPress, bool i_isByAssign)
 #endif
     }
     
-    m_lastPressedKey = i_doPress ? i_key : NULL;
+    m_lastGeneratedKey = i_doPress ? i_key : NULL;
   }
   
   {
@@ -357,7 +375,7 @@ void Engine::generateModifierEvents(const Modifier &i_mod)
       if (i == Modifier::Type_Alt || i == Modifier::Type_Windows)
       {
 	for (Keyboard::Mods::iterator j = mods.begin(); j != mods.end(); ++ j)
-	  if ((*j) == m_lastPressedKey)
+	  if ((*j) == m_lastGeneratedKey)
 	  {
 	    Keyboard::Mods *mods =
 	      &m_setting->m_keyboard.getModifiers(Modifier::Type_Shift);
@@ -506,7 +524,7 @@ void Engine::generateKeyboardEvents(const Current &i_c)
 	  << std::endl;
     return;
   }
-  
+
   const Keymap::KeyAssignment *keyAssign
     = i_c.m_keymap->searchAssignment(i_c.m_mkey);
   if (!keyAssign)
@@ -670,6 +688,7 @@ void Engine::keyboardHandler()
 #  error
 #endif
       }
+      updateLastPressedKey(NULL);
       continue;
     }
     
@@ -692,6 +711,7 @@ void Engine::keyboardHandler()
       if (!m_currentKeymap)
 	m_log << _T("internal error: m_currentKeymap == NULL")
 	      << std::endl;
+      updateLastPressedKey(NULL);
       continue;
     }
     
@@ -722,7 +742,8 @@ void Engine::keyboardHandler()
     }
     
     // create modifiers
-    c.m_mkey.m_modifier = getCurrentModifiers(isPhysicallyPressed);
+    c.m_mkey.m_modifier = getCurrentModifiers(c.m_mkey.m_key,
+					      isPhysicallyPressed);
     Keymap::AssignMode am;
     bool isModifier = fixModifierKey(&c.m_mkey, &am);
     if (m_isPrefix)
@@ -752,38 +773,46 @@ void Engine::keyboardHandler()
     {
       {
 	Acquire a(&m_log, 1);
-	m_log << _T("* one shot modifier") << std::endl;
+	if (am == Keymap::AM_oneShot)
+	  m_log << _T("* one shot modifier") << std::endl;
+	else
+	  m_log << _T("* one shot repeatable modifier") << std::endl;
       }
       // oneShot modifier doesn't generate scan code
       outputToLog(&key, c.m_mkey, 1);
       if (isPhysicallyPressed)
       {
-	if (am == Keymap::AM_oneShotRepeatable
-	    && m_oneShotKey == c.m_mkey.m_key)
+	if (am == Keymap::AM_oneShotRepeatable	// the key is repeating
+	    && m_oneShotKey.m_key == c.m_mkey.m_key)
 	{
 	  Current cnew = c;
+#if 0
 	  cnew.m_mkey.m_modifier.off(Modifier::Type_Up);
 	  cnew.m_mkey.m_modifier.on(Modifier::Type_Down);
-	  beginGeneratingKeyboardEvents(cnew, true);
+	  outputToLog(&key, cnew.m_mkey, 1);
+#endif
+	  beginGeneratingKeyboardEvents(cnew, false);
 	}
 	else
-	  m_oneShotKey = c.m_mkey.m_key;
+	  m_oneShotKey = c.m_mkey;
       }
       else
       {
-	if (m_oneShotKey)
+	if (m_oneShotKey.m_key)
 	{
 	  Current cnew = c;
+	  cnew.m_mkey.m_modifier = m_oneShotKey.m_modifier;
 	  cnew.m_mkey.m_modifier.off(Modifier::Type_Up);
 	  cnew.m_mkey.m_modifier.on(Modifier::Type_Down);
-	  beginGeneratingKeyboardEvents(cnew, true);
+	  beginGeneratingKeyboardEvents(cnew, false);
 	  
 	  cnew = c;
+	  cnew.m_mkey.m_modifier = m_oneShotKey.m_modifier;
 	  cnew.m_mkey.m_modifier.on(Modifier::Type_Up);
 	  cnew.m_mkey.m_modifier.off(Modifier::Type_Down);
-	  beginGeneratingKeyboardEvents(cnew, true);
+	  beginGeneratingKeyboardEvents(cnew, false);
 	}
-	m_oneShotKey = NULL;
+	m_oneShotKey.m_key = NULL;
       }
     }
     else if (c.m_mkey.m_key)
@@ -791,7 +820,7 @@ void Engine::keyboardHandler()
     {
       outputToLog(&key, c.m_mkey, 1);
       if (isPhysicallyPressed)
-	m_oneShotKey = NULL;
+	m_oneShotKey.m_key = NULL;
       beginGeneratingKeyboardEvents(c, isModifier);
     }
     
@@ -807,10 +836,11 @@ void Engine::keyboardHandler()
 	keyboardResetOnWin32();
       m_currentKeyPressCount = 0;
       m_currentKeyPressCountOnWin32 = 0;
-      m_oneShotKey = NULL;
+      m_oneShotKey.m_key = NULL;
     }
     
     key.initialize();
+    updateLastPressedKey(isPhysicallyPressed ? c.m_mkey.m_key : NULL);
   }
   CHECK_TRUE( SetEvent(m_eEvent) );
 }
@@ -830,8 +860,7 @@ Engine::Engine(tomsgstream &i_log)
     m_generateKeyboardEventsRecursionGuard(0),
     m_currentKeyPressCount(0),
     m_currentKeyPressCountOnWin32(0),
-    m_lastPressedKey(NULL),
-    m_oneShotKey(NULL),
+    m_lastGeneratedKey(NULL),
     m_isPrefix(false),
     m_currentKeymap(NULL),
     m_currentFocusOfThread(NULL),
@@ -840,11 +869,13 @@ Engine::Engine(tomsgstream &i_log)
     m_variable(0),
     m_log(i_log)
 {
-  int i;
+  for (size_t i = 0; i < NUMBER_OF(m_lastPressedKey); ++ i)
+    m_lastPressedKey[i] = NULL;
+    
   // set default lock state
-  for (i = 0; i < Modifier::Type_end; ++ i)
+  for (int i = 0; i < Modifier::Type_end; ++ i)
     m_currentLock.dontcare(static_cast<Modifier::Type>(i));
-  for (i = Modifier::Type_Lock0; i <= Modifier::Type_Lock9; ++ i)
+  for (int i = Modifier::Type_Lock0; i <= Modifier::Type_Lock9; ++ i)
     m_currentLock.release(static_cast<Modifier::Type>(i));
   
   // open mayu m_device
@@ -958,6 +989,7 @@ bool Engine::setSetting(Setting *i_setting)
     return false;
 
   if (m_setting)
+  {
     for (Keyboard::KeyIterator i = m_setting->m_keyboard.getKeyIterator();
 	 *i; ++ i)
     {
@@ -969,6 +1001,14 @@ bool Engine::setSetting(Setting *i_setting)
 	key->m_isPressedByAssign = (*i)->m_isPressedByAssign;
       }
     }
+    if (m_lastGeneratedKey)
+      m_lastGeneratedKey =
+	i_setting->m_keyboard.searchKey(*m_lastGeneratedKey);
+    for (size_t i = 0; i < NUMBER_OF(m_lastPressedKey); ++ i)
+      if (m_lastPressedKey[i])
+	m_lastPressedKey[i] =
+	  i_setting->m_keyboard.searchKey(*m_lastPressedKey[i]);
+  }
   
   m_setting = i_setting;
   if (m_currentFocusOfThread)

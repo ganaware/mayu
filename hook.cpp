@@ -29,7 +29,7 @@ struct Globals
   HWND m_hwndFocus;				/// 
   HINSTANCE m_hInstDLL;				///
   bool m_isInMenu;				///
-  UINT m_WM_MAYU_TARGETTED;			///
+  UINT m_WM_MAYU_MESSAGE;			///
   bool m_isImeLock;				///
   bool m_isImeCompositioning;			///
 };
@@ -62,7 +62,7 @@ BOOL WINAPI DllMain(HINSTANCE i_hInstDLL, DWORD i_fdwReason,
 	return FALSE;
       g.m_hInstDLL = i_hInstDLL;
       _tsetlocale(LC_ALL, _T(""));
-      g.m_WM_MAYU_TARGETTED = RegisterWindowMessage(WM_MAYU_TARGETTED_NAME);
+      g.m_WM_MAYU_MESSAGE = RegisterWindowMessage(WM_MAYU_MESSAGE_NAME);
       break;
     }
     case DLL_THREAD_ATTACH:
@@ -212,7 +212,7 @@ static void notifySetFocus()
   if (hwnd != g.m_hwndFocus)
   {
     g.m_hwndFocus = hwnd;
-    notifyName(g.m_hwndFocus, Notify::Type_setFocus);
+    notifyName(hwnd, Notify::Type_setFocus);
   }
 }
 
@@ -311,8 +311,15 @@ LRESULT CALLBACK getMessageProc(int i_nCode, WPARAM i_wParam, LPARAM i_lParam)
       notifyLockState();
       break;
     default:
-      if (msg.message == g.m_WM_MAYU_TARGETTED)
-	notifyName(msg.hwnd);
+      if (msg.message == g.m_WM_MAYU_MESSAGE)
+      {
+	switch (msg.wParam)
+	{
+	  case MayuMessage_notifyName:
+	    notifyName(msg.hwnd);
+	    break;
+	}
+      }
       break;
   }
   return CallNextHookEx(g_hookData->m_hHookGetMessage,

@@ -25,6 +25,7 @@ enum EngineNotify
   EngineNotify_loadSetting,			///
   EngineNotify_showDlg,				///
   EngineNotify_helpMessage,			///
+  EngineNotify_setForegroundWindow,		///
 };
 
 
@@ -162,8 +163,9 @@ private:
                                                     phisically ? */
   int m_currentKeyPressCountOnWin32;		/** how many keys are pressed
                                                     on win32 ? */
-  Key *m_lastPressedKey;			/// last pressed key
-  Key *m_oneShotKey;				/// one shot key
+  Key *m_lastGeneratedKey;			/// last generated key
+  Key *m_lastPressedKey[2];			/// last pressed key
+  ModifiedKey m_oneShotKey;			/// one shot key
   bool m_isPrefix;				/// is prefix ?
   bool m_doesIgnoreModifierForPrefix;		/** does ignore modifier key
                                                     when prefixed ? */
@@ -245,10 +247,13 @@ private:
   void keyboardResetOnWin32();
   
   /// get current modifiers
-  Modifier getCurrentModifiers(bool i_isPressed);
+  Modifier getCurrentModifiers(Key *i_key, bool i_isPressed);
 
-  // describe bindings
+  /// describe bindings
   void describeBindings();
+
+  /// update m_lastPressedKey
+  void updateLastPressedKey(Key *i_key);
 
 private:
   // BEGINING OF FUNCTION DEFINITION
@@ -290,6 +295,13 @@ private:
 			const tstring &i_file, const tstring &i_parameters,
 			const tstring &i_directory,
 			ShowCommandType i_showCommand);
+  /// SetForegroundWindow
+  void funcSetForegroundWindow(FunctionParam *i_param,
+			       const tregex &i_windowClassName,
+			       LogicalOperatorType i_logicalOp
+			       = LogicalOperatorType_and,
+			       const tregex &i_windowTitleName
+			       = tregex(_T(".*")));
   /// load setting
   void funcLoadSetting(FunctionParam *i_param, const tstring &i_name = _T(""));
   /// virtual key
@@ -447,7 +459,7 @@ public:
 
   /// shell execute
   void shellExecute();
-
+  
   /// get help message
   void getHelpMessages(tstring *o_helpMessage, tstring *o_helpTitle);
 

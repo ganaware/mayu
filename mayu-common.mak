@@ -29,47 +29,49 @@ BOOST_DIR	= ../boost
 # mayu.exe	###############################################################
 
 TARGET_1	= $(OUT_DIR)\mayu.exe
-OBJS_1		=				\
-		$(OUT_DIR)\dlgeditsetting.obj	\
-		$(OUT_DIR)\dlginvestigate.obj	\
-		$(OUT_DIR)\dlglog.obj		\
-		$(OUT_DIR)\dlgsetting.obj	\
-		$(OUT_DIR)\dlgversion.obj	\
-		$(OUT_DIR)\engine.obj		\
-		$(OUT_DIR)\focus.obj		\
-		$(OUT_DIR)\function.obj		\
-		$(OUT_DIR)\keyboard.obj		\
-		$(OUT_DIR)\keymap.obj		\
-		$(OUT_DIR)\layoutmanager.obj	\
-		$(OUT_DIR)\mayu.obj		\
-		$(OUT_DIR)\parser.obj		\
-		$(OUT_DIR)\registry.obj		\
-		$(OUT_DIR)\setting.obj		\
-		$(OUT_DIR)\stringtool.obj	\
-		$(OUT_DIR)\target.obj		\
-		$(OUT_DIR)\vkeytable.obj	\
-		$(OUT_DIR)\windowstool.obj	\
+OBJS_1		=					\
+		$(OUT_DIR)\compiler_specific_func.obj	\
+		$(OUT_DIR)\dlgeditsetting.obj		\
+		$(OUT_DIR)\dlginvestigate.obj		\
+		$(OUT_DIR)\dlglog.obj			\
+		$(OUT_DIR)\dlgsetting.obj		\
+		$(OUT_DIR)\dlgversion.obj		\
+		$(OUT_DIR)\engine.obj			\
+		$(OUT_DIR)\focus.obj			\
+		$(OUT_DIR)\function.obj			\
+		$(OUT_DIR)\keyboard.obj			\
+		$(OUT_DIR)\keymap.obj			\
+		$(OUT_DIR)\layoutmanager.obj		\
+		$(OUT_DIR)\mayu.obj			\
+		$(OUT_DIR)\parser.obj			\
+		$(OUT_DIR)\registry.obj			\
+		$(OUT_DIR)\setting.obj			\
+		$(OUT_DIR)\stringtool.obj		\
+		$(OUT_DIR)\target.obj			\
+		$(OUT_DIR)\vkeytable.obj		\
+		$(OUT_DIR)\windowstool.obj		\
 
-SRCS_1		=			\
-		dlgeditsetting.cpp	\
-		dlginvestigate.cpp	\
-		dlglog.cpp		\
-		dlgsetting.cpp		\
-		dlgversion.cpp		\
-		engine.cpp		\
-		focus.cpp		\
-		function.cpp		\
-		keyboard.cpp		\
-		keymap.cpp		\
-		layoutmanager.cpp	\
-		mayu.cpp		\
-		parser.cpp		\
-		registry.cpp		\
-		setting.cpp		\
-		stringtool.cpp		\
-		target.cpp		\
-		vkeytable.cpp		\
-		windowstool.cpp		\
+SRCS_1		=				\
+		compiler_specific_func.cpp	\
+		dlgeditsetting.cpp		\
+		dlginvestigate.cpp		\
+		dlglog.cpp			\
+		dlgsetting.cpp			\
+		dlgversion.cpp			\
+		engine.cpp			\
+		focus.cpp			\
+		function.cpp			\
+		keyboard.cpp			\
+		keymap.cpp			\
+		layoutmanager.cpp		\
+		mayu.cpp			\
+		parser.cpp			\
+		registry.cpp			\
+		setting.cpp			\
+		stringtool.cpp			\
+		target.cpp			\
+		vkeytable.cpp			\
+		windowstool.cpp			\
 
 RES_1		= $(OUT_DIR)\mayu.res
 
@@ -233,6 +235,8 @@ srcdesc::
 
 # DO NOT DELETE
 
+$(OUT_DIR)\compiler_specific_func.obj: compiler_specific.h \
+ compiler_specific_func.h misc.h stringtool.h
 $(OUT_DIR)\dlgeditsetting.obj: compiler_specific.h dlgeditsetting.h \
  layoutmanager.h mayurc.h misc.h stringtool.h windowstool.h
 $(OUT_DIR)\dlginvestigate.obj: compiler_specific.h dlginvestigate.h \
@@ -253,31 +257,33 @@ $(OUT_DIR)\engine.obj: compiler_specific.h driver.h engine.h errormessage.h \
 $(OUT_DIR)\focus.obj: compiler_specific.h focus.h misc.h stringtool.h \
  windowstool.h
 $(OUT_DIR)\function.obj: compiler_specific.h driver.h engine.h function.h \
- functions.h hook.h keyboard.h keymap.h misc.h msgstream.h multithread.h \
- parser.h setting.h stringtool.h vkeytable.h windowstool.h
+ functions.h hook.h keyboard.h keymap.h mayu.h misc.h msgstream.h \
+ multithread.h parser.h registry.h setting.h stringtool.h vkeytable.h \
+ windowstool.h
 $(OUT_DIR)\keyboard.obj: compiler_specific.h driver.h keyboard.h misc.h \
  stringtool.h
 $(OUT_DIR)\keymap.obj: compiler_specific.h driver.h errormessage.h \
  function.h keyboard.h keymap.h misc.h stringtool.h
 $(OUT_DIR)\layoutmanager.obj: compiler_specific.h layoutmanager.h misc.h \
  stringtool.h windowstool.h
-$(OUT_DIR)\mayu.obj: compiler_specific.h dlginvestigate.h dlglog.h \
- dlgsetting.h dlgversion.h driver.h engine.h errormessage.h focus.h \
- function.h functions.h hook.h keyboard.h keymap.h mayu.h mayurc.h misc.h \
- msgstream.h multithread.h parser.h registry.h setting.h stringtool.h \
- target.h windowstool.h
+$(OUT_DIR)\mayu.obj: compiler_specific.h compiler_specific_func.h \
+ dlginvestigate.h dlglog.h dlgsetting.h dlgversion.h driver.h engine.h \
+ errormessage.h focus.h function.h functions.h hook.h keyboard.h keymap.h \
+ mayu.h mayurc.h misc.h msgstream.h multithread.h parser.h registry.h \
+ setting.h stringtool.h target.h windowstool.h
 $(OUT_DIR)\parser.obj: compiler_specific.h errormessage.h misc.h parser.h \
  stringtool.h
-$(OUT_DIR)\registry.obj: compiler_specific.h misc.h registry.h stringtool.h
-$(OUT_DIR)\setting.obj: compiler_specific.h dlgsetting.h driver.h \
+$(OUT_DIR)\registry.obj: array.h compiler_specific.h misc.h registry.h \
+ stringtool.h
+$(OUT_DIR)\setting.obj: array.h compiler_specific.h dlgsetting.h driver.h \
  errormessage.h function.h functions.h keyboard.h keymap.h mayu.h mayurc.h \
  misc.h multithread.h parser.h registry.h setting.h stringtool.h \
  vkeytable.h windowstool.h
-$(OUT_DIR)\stringtool.obj: compiler_specific.h misc.h stringtool.h
+$(OUT_DIR)\stringtool.obj: array.h compiler_specific.h misc.h stringtool.h
 $(OUT_DIR)\target.obj: compiler_specific.h mayurc.h misc.h stringtool.h \
  target.h windowstool.h
 $(OUT_DIR)\vkeytable.obj: compiler_specific.h misc.h vkeytable.h
-$(OUT_DIR)\windowstool.obj: compiler_specific.h misc.h stringtool.h \
+$(OUT_DIR)\windowstool.obj: array.h compiler_specific.h misc.h stringtool.h \
  windowstool.h
 $(OUT_DIR)\hook.obj: compiler_specific.h hook.h misc.h stringtool.h
-$(OUT_DIR)\stringtool.obj: compiler_specific.h misc.h stringtool.h
+$(OUT_DIR)\stringtool.obj: array.h compiler_specific.h misc.h stringtool.h

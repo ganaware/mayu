@@ -190,6 +190,7 @@
 	<ASSIGN_MODIFIED_KEY_NAME> : <ASSIGN_MODIFIER>* <ALIASED_KEY_NAME>
 	<ASSIGN_MODIFIER>
 		: <KEYSEQ_MODIFIER>
+		| "R-"		# auto repeated key
 		| "IL-"		# if IME on
 		| "IC-" | "I-"	# if IME on and compositioning
 		| "NL-"		# if Num Lock on
