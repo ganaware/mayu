@@ -218,7 +218,7 @@ distrib:
 		-@echo "we need cygwin tool"
 		-rm -f mayu-$(VERSION) 
 		-ln -s . mayu-$(VERSION)
-		-bash -c "tar cvzf mayu-$(VERSION)-src.tgz `$(GETCVSFILES) | sed 's/^./mayu-$(VERSION)/'`"
+		-bash -c "tar cvzf mayu-$(VERSION)-src.tar.bz2 `$(GETCVSFILES) | sed 's/^./mayu-$(VERSION)/'`"
 		-rm -f mayu-$(VERSION) 
 		-$(GENIEXPRESS) \
 			mayu-$(VERSION)-$(DISTRIB_OS).exe \
