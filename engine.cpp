@@ -772,9 +772,9 @@ void Engine::keyboardHandler()
     {
       WriteFile(device, &kid, sizeof(kid), &len, NULL);
       Acquire a(&log, 0);
-      if (currentFocusOfThread)
+      if (!currentFocusOfThread)
 	log << "internal error: currentFocusOfThread == NULL" << endl;
-      else
+      if (!currentKeymap)
 	log << "internal error: currentKeymap == NULL" << endl;
       continue;
     }

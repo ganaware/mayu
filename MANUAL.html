@@ -53,6 +53,7 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
 	<li>窓使いの憂鬱以外のキーボードカスタマイズソフトを利用している場合はアンインストールします。
 	    <ul>
 	      <li>たとえば、AltIME や RemapKey や「猫まねき」などです。
+	      <li>特に AltIME を使用していた場合は、<a href="#FAQ">f.a.q.</a> の最初の項目をよく読んでください。
 	    </ul>
 	<li>以前のバージョンの「窓使いの憂鬱」を利用している場合は、終了させます。
 	    <ul>
@@ -71,9 +72,6 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
       
   <dd class="d1">
       コントロールパネルから「窓使いの憂鬱」をアンインストールしてください。アンインストール後に再びインストールする場合は、再起動後にインストールして下さい。また、アンインストール後に <tt>mayu.dll</tt> が残る場合があるので、その場合は再起動後に手作業で消してください。
-      </p>
-      
-      というキーをレジストリエディタで削除してください。
       
   <dt class="h1"><a name="CUSTOMIZE" href="CUSTOMIZE.html">4. customize</a>
       
@@ -93,7 +91,34 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
       <br>
       また、<tt><i>FUNCTION</i></tt> <a href="CUSTOMIZE.html#function_WindowIdentify"><tt>&amp;WindowIdentify</tt></a> を利用することもできます。<br>
       
-  <dt class="h1"><a name="BUGS">7. bugs &amp; to do</a>
+  <dt class="h1"><a name="FAQ">7. frequently asked questions</a>
+
+  <dd class="d1">
+      <dl>
+	<dt class="h3">「窓使いの憂鬱」を使っていると勝手にキーリピートしてしまいます。
+	<dt class="h3">「窓使いの憂鬱」を終了後に Windows が異常終了します。
+	<dt class="h3">「窓使いの憂鬱」を使っているといろいろ変になります。
+	<dd class="d3">あなたは以前 AltIME を使用していたはずです。これらの症状は AltIME が正しくアンインストールされていない時に出ます。<br>
+	    AltIME 2.27 の README によれば以下のようにするそうですので、そのようにしてください。
+	    <ol>
+	      <li>AltIME の設定で常駐させているなら一旦常駐のオプションをはずしてください。<br>
+		  スタートアップで起動しているときはスタートアップから削除してください。<br>
+		  サウンドを使用している場合は設定を外し、設定を完全に削除してください。
+	      <li>タスクトレイ上のアイコンを左クリックして AltIME のオプションダイアログを表示させ、アンインストールボタンを押してください。
+	      <li>いったん再起動後、<tt>ALTIME*.*</tt> のファイルを削除してください。
+	    </ol>
+	    【注意】Windows2000ではアンインストールボタンを使用せずに <tt>\winnt\system32\drivers\altime.sys</tt> を削除すると Windows が起動できなくなることがあります。
+
+
+	<dt class="h3">「窓使いの憂鬱」では USB キーボードは使えないのですか。
+	<dd class="d3">現在のところ使えません。対応するつもりではありますが、いつになるかはわかりません。
+	<dt class="h3">「窓使いの憂鬱」は Windows95/98/ME では使えないのですか。
+	<dd class="d3">使えません。ただし、USB キーボードに対応した暁には、USB キーボードのみサポートするかもしれません。<br>
+	<dt class="h3">mayu は繭なのですか。
+	<dd class="d3">違います。
+      </dl>
+      
+  <dt class="h1"><a name="BUGS">8. bugs &amp; to do</a>
 
   <dd class="d1">
       <ul>
@@ -117,7 +142,7 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
 	<li>(誰かかわいい女の子なマスコットキャラとか描いてくれないかな(ぉ
       </ul>
 
-  <dt class="h1"><a name="RELATEDWORK">8. related work</a>
+  <dt class="h1"><a name="RELATEDWORK">9. related work</a>
       
   <dd class="d1">
       以下のソフトと同時には使わないようにしてください。そもそも使えないものもありますし、使えたとしてもきっとわけのわからないことになるでしょう。
@@ -140,7 +165,7 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
 	<dt class="h2"><a href="http://www.nn.iij4u.or.jp/~dorenp/software/keymap.html" target="_top">KeyMap</a>
       </dl>
       
-  <dt class="h1"><a name="COPYRIGHT">9. copyright</a>
+  <dt class="h1"><a name="COPYRIGHT">10. copyright</a>
 
   <dd class="d1">
       Copyright (C) 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayuta</a> &lt;<a href="mailto:nayuta@users.sourceforge.net">nayuta@users.sourceforge.net</a>&gt;<br>
@@ -211,7 +236,7 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
       *** THIS IS AN ALTERED VERSION.  It was altered by TAGA Nayuta<br>
       *** support perl-like regexp etc.<br>
 
-  <dt class="h1"><a name="SUPPORT">10. support</a>
+  <dt class="h1"><a name="SUPPORT">11. support</a>
       
   <dd class="d1">
       <dl>
@@ -219,15 +244,15 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
 	<dd class="d2"><a href="http://mayu.sourceforge.net" target="_top">http://mayu.sourceforge.net</a>
 	<dt class="h2">「窓使いの憂鬱」メーリングリスト
 	<dd class="d2">
-	    <a href="http://lists.sourceforge.net/mailman/listinfo/mayu-support">Mayu-support Info Page</a> の Subscribing to Mayu-support のフォームに、自分のメールアドレスと、Mayu-support メーリングリストの為のパスワードを入れて Subscribe してください。
+	    <a href="http://lists.sourceforge.net/mailman/listinfo/mayu-support" target="_top">Mayu-support Info Page</a> の Subscribing to Mayu-support のフォームに、自分のメールアドレスと、Mayu-support メーリングリストの為のパスワードを入れて Subscribe してください。
       </dl>
       <br>
       
-  <dt class="h1"><a name="ACKNOWLEDGEMENT">11. acknowledgements</a>
+  <dt class="h1"><a name="ACKNOWLEDGEMENT">12. acknowledgements</a>
 
   <dd class="d1">cmkey 使いの皆さんへ愛を込めて(ぉ
 
-  <dt class="h1"><a name="HISTORY">12. history</a>
+  <dt class="h1"><a name="HISTORY">13. history</a>
       
   <dd class="d1">
       <dl>
@@ -236,6 +261,7 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
 	      <li>メーリングリストを <a href="http://lists.sourceforge.net/mailman/listinfo/mayu-support">Source Forge</a> へ移動。
 	      <li><a href="#RELATEDWORK">related work</a> に Pastel Touch を追加。
 	      <li><a href="#RELATEDWORK">related work</a> に KeyMap を追加。
+	      <li><a href="#FAQ">f.a.q.</a> を追加。
 	    </ul>
 	<dt>2000/05/28 version 3.16
 	    <ul>
