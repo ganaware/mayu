@@ -58,9 +58,9 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
 	    <ul>
 	      <li>Windows2000 の場合は、メニューの終了を選んだ後に何かのキ−を押さないと実際に終了しません。(<a href="#BUGS">BUG</a> です)
 	      <li>終了させるだけでよく、アンインストールする必要はありません。
-	      <li>DLL が更新されたと <a href="#HISTORY">history</a> に書いてある場合は、いったんログアウトしてください。さもないとさまざまなアプリケーションが落ちる可能性があります。
 	    </ul>
 	<li>ダウンロードした実行ファイルを Administrator 権限で実行してください。すると「窓使いの憂鬱」がインストールされます。
+	<li>インストールが終わったらいったんログアウトしてください。さもないとさまざまなアプリケーションが落ちる可能性があります。
 	<li>お好みにより、スタートアップにショートカットを作るのもいいでしょう。
 	<li>標準の設定ファイルの内容は <a href="contrib/mayu-settings.txt">contrib/mayu-settings.txt</a> が参考になります。
 	<li><tt>mayu.exe</tt> を実行することで開始します。
@@ -144,6 +144,7 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
 	<li>各国語キーボード対応。各言語のディレクトリをホームディレクトリに加える。キー設定は settings/* に移動(?)
 	<li>どぼらっくの指定をもっとスマートにする。
 	<li><tt>window ASTEC-X ( /:ASTEC-X$/ && /[xk]term/ ) : Global</tt> がうまくはたらかない気がする。
+	<li>インストーラは、ログアウトを促す。
 	<li>1 C-u 6 0 C-u 0 とかができるようにする。
 	<li>iexpress を使う。
 	<li>USB キーボードでは動作しないのでなんとかする (めんどくさいな…)。
@@ -280,6 +281,11 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
       
   <dd class="d1">
       <dl>
+	<dt>2000/??/?? version 3.18 (next)
+	    <ul>
+	      <li>ヘルプが開けないバグの修正。
+	    </ul>
+	    
 	<dt>2000/12/03 version 3.17
 	    <ul>
 	      <li>メーリングリストを <a href="http://lists.sourceforge.net/mailman/listinfo/mayu-support">Source Forge</a> へ移動。
