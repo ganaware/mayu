@@ -78,7 +78,8 @@ Copyright &copy; 1999-2000, <a href="http://www.ganaware.org" target="_top">TAGA
       
   <dt class="h1"><a name="CUSTOMIZE" href="CUSTOMIZE.html">4. customize</a>
       
-  <dd class="d1"><a href="CUSTOMIZE.html">カスタマイズ</a>。
+  <dd class="d1">
+      <p><a href="CUSTOMIZE.html">カスタマイズ</a>。</p>
       
   <dt class="h1"><a name="KEYNAME">5. key investigation</a>
 
@@ -121,7 +122,7 @@ Copyright &copy; 1999-2000, <a href="http://www.ganaware.org" target="_top">TAGA
 	<dt class="h2">Q4. ウインドウのクラス名はどうやって調べるんですか？
 	<dd class="d2"><p>タスクトレイの「窓使いの憂鬱」のアイコンでマウスの右ボタンを押して「<a href="#CLASSNAME">調査(I)...</a>」を選びます。</p>
 	<dt class="h2">Q5. アクティブな時にしか見えない窓などの場合、上記の方法では調査できないですが？
-	<dd class="d2"><p><a href="CUSTOMIZE.html#function_WindowIdentify"><code>&amp;WindowIdentify</code></a> を使ってください。default.mayu では <kbd>[Ctrl]</kbd> +<kbd>[Shift]</kbd> + <kbd>[D]</kbd> に割り振ってあります。</p>
+	<dd class="d2"><p><a href="CUSTOMIZE.html#function_WindowIdentify"><code>&amp;WindowIdentify</code></a> を使ってください。<a href="default.mayu"><code>default.mayu</code></a> では <kbd>[Ctrl]</kbd> +<kbd>[Shift]</kbd> + <kbd>[D]</kbd> に割り振ってあります。</p>
 	<dt class="h2">Q6. インストール時には 109 キーボードだったのですが、今度 104 キーボードを購入しました。しかし、タスクトレイメニューの「選択」には 109 しか出てきません。どうすればいいですか。
 	<dd class="d2">
 	    <p>インストール時の選択により、以下の表の上 4 つまたは下 4 つが選ばれます。「設定」ダイアログボックスで適切に設定してください。(<code>%MAYU_DIR%</code> は mayu をインストールしたディレクトリです)</p>
@@ -170,8 +171,6 @@ Copyright &copy; 1999-2000, <a href="http://www.ganaware.org" target="_top">TAGA
 	<li>各国語キーボード対応。各言語のディレクトリをホームディレクトリに加える。キー設定は settings/* に移動(?)
 	<li>どぼらっくの指定をもっとスマートにする。
 	<li><code>window ASTEC-X ( /:ASTEC-X$/ &amp;&amp; /[xk]term/ ) : Global</code> がうまくはたらかない気がする。
-	<li>インストーラは、ログアウトを促す。
-	<li>1 C-u 6 0 C-u 0 とかができるようにする。
 	<li>iexpress を使う。
 	<li>USB キーボードでは動作しないのでなんとかする (めんどくさいな…)。
 	<li>インストーラは、AltIME が入っていたら警告を出す。
@@ -224,12 +223,14 @@ Copyright &copy; 1999-2000, <a href="http://www.ganaware.org" target="_top">TAGA
   <dt class="h1"><a name="COPYRIGHT">10. copyright</a>
 
   <dd class="d1">
+      <p class="noindent">
       Copyright (C) 1999-2000, <a href="http://www.ganaware.org" target="_top">TAGA Nayuta</a> &lt;nayuta&#64;users.sourceforge.net&gt;<br>
-      All rights reserved.<br>
-      <br>
-      Redistribution and use in source and binary forms, with or
-      without modification, are permitted provided that the
-      following conditions are met:<br>
+      All rights reserved.</p>
+      
+      <p class="noindent">Redistribution and use in source and binary
+      forms, with or without modification, are permitted provided that
+      the following conditions are met:</p>
+      
       <ol>
 	<li>Redistributions of source code must retain the above
 	    copyright notice, this list of conditions and the following
@@ -242,7 +243,8 @@ Copyright &copy; 1999-2000, <a href="http://www.ganaware.org" target="_top">TAGA
 	    promote products derived from this software without
 	    specific prior written permission.
       </ol>
-      <br>
+
+      <p class="noindent">
       THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY
       EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
       THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
@@ -254,21 +256,23 @@ Copyright &copy; 1999-2000, <a href="http://www.ganaware.org" target="_top">TAGA
       HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
       CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
       OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-      EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.<br>
-      <br>
-      転載したらメールをもらえるとうれしいです(^^;<br>
-      <br>
-      正規表現ライブラリは、以下のものを利用しました。<br>
-      <br>
-      regcomp and regexec -- regsub and regerror are elsewhere<br>
-      @(#)regexp.c 1.3 of 18 April 87<br>
-      <br>
-      Copyright (c) 1986 by University of Toronto.<br>
-      Written by Henry Spencer.  Not derived from licensed software.<br>
-      <br>
-      Permission is granted to anyone to use this software for any
-      purpose on any computer system, and to redistribute it freely,
-      subject to the following restrictions:<br>
+      EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
+      
+      <p>転載したらメールをもらえるとうれしいです(^^;</p>
+      
+      <p>正規表現ライブラリは、以下のものを利用しました。</p>
+      
+      <p class="noindent">regcomp and regexec -- regsub and regerror
+      are elsewhere<br>
+      @(#)regexp.c 1.3 of 18 April 87</p>
+      
+      <p class="noindent">Copyright (c) 1986 by University of Toronto.<br>
+      Written by Henry Spencer.  Not derived from licensed software.</p>
+      
+      <p class="noindent">Permission is granted to anyone to use this
+      software for any purpose on any computer system, and to
+      redistribute it freely, subject to the following restrictions:</p>
+      
       <ol>
 	<li>The author is not responsible for the consequences of use of
 	    this software, no matter how awful, even if they arise
@@ -278,6 +282,8 @@ Copyright &copy; 1999-2000, <a href="http://www.ganaware.org" target="_top">TAGA
 	<li>Altered versions must be plainly marked as such, and must not
 	    be misrepresented as being the original software.
       </ol>
+
+      <p class="noindent">
       *** THIS IS AN ALTERED VERSION.  It was altered by John Gilmore,<br>
       *** hoptoad!gnu, on 27 Dec 1986, to add \&lt; and \&gt; for word-matching<br>
       *** as in BSD grep and ex.<br>
@@ -291,6 +297,7 @@ Copyright &copy; 1999-2000, <a href="http://www.ganaware.org" target="_top">TAGA
       *** it to be the engine for the Regexp class<br>
       *** THIS IS AN ALTERED VERSION.  It was altered by TAGA Nayuta<br>
       *** support perl-like regexp etc.<br>
+      </p>
 
   <dt class="h1"><a name="SUPPORT">11. support</a>
       
@@ -317,11 +324,21 @@ Copyright &copy; 1999-2000, <a href="http://www.ganaware.org" target="_top">TAGA
   <dd class="d1">
       <div>
       <dl class="history">
-	<dt>2000/??/?? version 3.18 (next)
+	<dt>2000/12/17 version 3.18
 	<dd>
 	    <ul>
 	      <li>ヘルプが開けないバグの修正。
 	      <li><a href="mayu-mode.el" target="MANUAL"><code>mayu-mode.el</code></a> が展開されていなかったのを直した。ついでに少しだけ修正。
+	      <li><code>IC-</code> が時々無視されるバグが直ったはず。
+	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_HelpMessage"><code>&amp;HelpMessage</code></a> を追加。<a href="default.mayu"><code>default.mayu</code></a> を使っている場合はメモ帳で <kbd>[Control]</kbd> + <kbd>[X]</kbd> を押してみよう (ただし IE5.0 以上を使っている場合のみ)。
+	      <li><a href="CUSTOMIZE.html#event"><code>event</code></a> を追加。
+	      <li>これらの追加により、プレフィックスキーが押された時にメッセージを表示することが可能になった。
+	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_KeymapWindow"><code>&amp;KeymapWindow</code></a> を追加。
+	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_Variable"><code>&amp;Variable</code></a> を追加。
+	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_Repeat"><code>&amp;Repeat</code></a> を追加。
+	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_HelpVariable"><code>&amp;HelpVariable</code></a> を追加。
+	      <li>これらの追加により Emacs の <kbd>[Control]</kbd> + <kbd>[U]</kbd> が可能になった。私にメールを送るために 1000000000000000000000000000000000000000000000000000000000000@tsg.ne.jp と入力するのもらくらくです。
+	      <li>チュートリアル・FAQ の充実は次回に延期。
 	    </ul>
 	<dt>2000/12/03 version 3.17
 	<dd>

@@ -53,12 +53,15 @@ public:
     SPECIAL = 0x10000,
     Default,			/// default key
     KeymapParent,		/// parent keymap's key
+    KeymapWindow,		/// keymap's key of current window
     OtherWindowClass,	/// search other window class for the key or default
     Prefix,			/// prefix key
     Keymap,			/// other keymap's key
     Sync,			/// sync
     Toggle,			/// toggle lock
     EditNextModifier,		/// edit next user input key's modifier
+    Variable,			/// &amp;Variable(mag, inc)
+    Repeat,			/// repeat N times
     
     /// other
     OTHER = 0x20000,
@@ -72,6 +75,8 @@ public:
     InvestigateCommand,		/// investigate WM_COMMAND, WM_SYSCOMMAND
     MayuDialog,			/// show mayu dialog box
     DescribeBindings,		/// describe bindings
+    HelpMessage,		/// show help message
+    HelpVariable,		/// show variable
     //input,			/// input string
     
     /// IME

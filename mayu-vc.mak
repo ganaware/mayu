@@ -13,8 +13,8 @@
 
 DEFINES		= $(COMMON_DEFINES) -DVERSION=""""$(VERSION)""""
 
-LDFLAGS_1	= $(guilflags)
-LDFLAGS_2	= $(dlllflags)
+LDFLAGS_1	= $(guilflags) /PDB:$(TARGET_1).pdb
+LDFLAGS_2	= $(dlllflags) /PDB:$(TARGET_2).pdb
 
 $(TARGET_1):	$(OBJS_1) $(RES_1) $(EXTRADEP_1)
 	$(link) -out:$@ $(ldebug) $(LDFLAGS_1) $(OBJS_1) $(LIBS_1) $(RES_1)

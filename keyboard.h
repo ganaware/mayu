@@ -83,6 +83,17 @@ public:
       lengthof_scanCodes(0)
   { }
 
+  /// for Event::* only
+  Key(const istring &name)
+    : isPressed(false),
+      isPressedOnWin32(false),
+      isPressedByAssign(false),
+      lengthof_scanCodes(0)
+  {
+    addName(name);
+    addScanCode(ScanCode());
+  }
+
   /// get key name (first name)
   const istring &getName() const { return names.at(0); }
 
@@ -188,6 +199,8 @@ public:
   Modifier &care    (Type t) {dontcares&=~((MODIFIERS(1))<<t); return *this;}
   ///
   Modifier &dontcare(Type t) {dontcares|= ((MODIFIERS(1))<<t); return *this;}
+  /// set all modifiers to dontcare
+  Modifier &dontcare() { dontcares = ~MODIFIERS(0); return *this; }
 
   ///
   Modifier &on      (Type t, bool isOn_) { return press(t, isOn_); }
@@ -216,7 +229,7 @@ public:
   bool isPressed(Type t) const { return !!(modifiers & ((MODIFIERS(1))<<t)); }
   ///
   bool isDontcare(Type t) const { return !!(dontcares & ((MODIFIERS(1))<<t)); }
-  
+
   /// stream output
   friend std::ostream &
   operator<<(std::ostream &i_ost, const Modifier &i_m);

@@ -7,7 +7,7 @@
 
 VERSION		= 3.18
 
-COMMON_DEFINES	= -DSTRICT -D_WIN32_IE=0x0400
+COMMON_DEFINES	= -DSTRICT -D_WIN32_IE=0x0500
 
 
 # mayu.exe	###############################################################
@@ -98,8 +98,10 @@ DISTRIB_MANUAL	=			\
 		CONTENTS.html		\
 		CUSTOMIZE.html		\
 		MANUAL.html		\
+		mayu-banner.png		\
 		README.css		\
 		syntax.txt		\
+		mayu-mode.el		\
 
 DISTRIB_CONTRIBS =				\
 		contrib\mayu-settings.txt	\
@@ -125,7 +127,6 @@ DISTRIBSRC	=			\
 		regexp.html		\
 		doc++-header.html	\
 		doc++.conf		\
-		mayu-mode.el		\
 					\
 		s\Makefile		\
 		s\*.mak			\
@@ -167,7 +168,7 @@ clean:
 		-$(RM) *.obj
 		-$(RM) $(TARGET_1) $(TARGET_2) $(TARGET_3)
 		-$(RM) *.res *.exp
-		-$(RM) mayu.aps mayu.opt vc60.pdb
+		-$(RM) mayu.aps mayu.opt *.pdb
 		-$(RM) *~ $(CLEAN)
 
 depend::

@@ -30,43 +30,43 @@ using namespace Installer;
 // Globals
 
 
-class SF : public SetupFile
-{
-};
+typedef SetupFile SF;
 
 const SetupFile setupFiles[] =
 {
   // executables
-  SetupFile(SF::Dll , SF::NT , "mayu.dll"      , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "mayu.exe"      , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "setup.exe"     , SF::ToDest),
+  SetupFile(SF::Dll , SF::NT , "mayu.dll"       , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "mayu.exe"       , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "setup.exe"      , SF::ToDest),
 
   // drivers
-  SetupFile(SF::File, SF::NT , "mayud.sys"     , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "mayudnt4.sys"  , SF::ToDest),
-  SetupFile(SF::File, SF::W2k, "mayud.sys"     , SF::ToDriver, "mayud.sys"),
-  SetupFile(SF::File, SF::NT4, "mayudnt4.sys"  , SF::ToDriver, "mayud.sys"),
+  SetupFile(SF::File, SF::NT , "mayud.sys"      , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "mayudnt4.sys"   , SF::ToDest),
+  SetupFile(SF::File, SF::W2k, "mayud.sys"      , SF::ToDriver, "mayud.sys"),
+  SetupFile(SF::File, SF::NT4, "mayudnt4.sys"   , SF::ToDriver, "mayud.sys"),
 
   // setting files
-  SetupFile(SF::File, SF::NT , "104.mayu"      , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "104on109.mayu" , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "109.mayu"      , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "109on104.mayu" , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "default.mayu"  , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "dot.mayu"      , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "emacsedit.mayu", SF::ToDest),
+  SetupFile(SF::File, SF::NT , "104.mayu"       , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "104on109.mayu"  , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "109.mayu"       , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "109on104.mayu"  , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "default.mayu"   , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "dot.mayu"       , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "emacsedit.mayu" , SF::ToDest),
 
   // documents
-  SetupFile(SF::File, SF::NT , "CONTENTS.html" , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "CUSTOMIZE.html", SF::ToDest),
-  SetupFile(SF::File, SF::NT , "MANUAL.html"   , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "README.css"    , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "README.html"   , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "syntax.txt"    , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "CONTENTS.html"  , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "CUSTOMIZE.html" , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "MANUAL.html"    , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "README.css"     , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "README.html"    , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "mayu-banner.png", SF::ToDest),
+  SetupFile(SF::File, SF::NT , "syntax.txt"     , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "mayu-mode.el"   , SF::ToDest),
 
-  SetupFile(SF::File, SF::NT , "source.cab"    , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "source.cab"     , SF::ToDest),
 
-  SetupFile(SF::Dir , SF::NT , "contrib"       , SF::ToDest),	// mkdir
+  SetupFile(SF::Dir , SF::NT , "contrib"        , SF::ToDest),	// mkdir
   SetupFile(SF::File, SF::NT , "contrib\\mayu-settings.txt", SF::ToDest),
   SetupFile(SF::File, SF::NT , "contrib\\dvorak.mayu"      , SF::ToDest),
   SetupFile(SF::File, SF::NT , "contrib\\keitai.mayu"      , SF::ToDest),
@@ -192,7 +192,9 @@ private:
     createUninstallInformation("mayu", resource->loadString(IDS_mayu),
 			       destDir + "\\setup.exe -u");
 
-    message(IDS_copyFinish, MB_OK | MB_ICONINFORMATION, hwnd); // success
+    if (message(IDS_copyFinish, MB_YESNO | MB_ICONQUESTION, hwnd)
+	== IDYES)
+      ExitWindows(0, 0);			// logoff
     return 0;
   }
   

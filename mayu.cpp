@@ -52,6 +52,7 @@ class Mayu
   
   UINT WM_TaskbarRestart;	/// window message sent when taskber restarts
   NOTIFYICONDATA ni;		/// taskbar icon data
+  bool m_canUseTasktrayBaloon;	/// 
 
   omsgstream log;		/// log stream (output to log dialog's edit)
 
@@ -386,6 +387,11 @@ private:
 	    case engineNotify_loadSetting:
 	      This->load();
 	      break;
+	    case engineNotify_helpMessage:
+	      This->showHelpMessage(false);
+	      if (lParam)
+		This->showHelpMessage(true);
+	      break;
 	    case engineNotify_showDlg:
 	    {
 	      // show investigate/log window
@@ -422,7 +428,7 @@ private:
 	default:
 	  if (message == This->WM_TaskbarRestart)
 	  {
-	    _true( Shell_NotifyIcon(NIM_ADD, &This->ni) );
+	    This->showHelpMessage(false, true);
 	    return 0;
 	  }
       }
@@ -456,6 +462,28 @@ private:
     setting = newSetting;
   }
 
+  // メッセージを表示
+  void showHelpMessage(bool i_doesShow = true, bool i_doesAdd = false)
+  {
+    if (m_canUseTasktrayBaloon)
+    {
+      ni.uFlags |= NIF_INFO;
+      if (i_doesShow)
+      {
+	std::string helpMessage, helpTitle;
+	engine.getHelpMessages(&helpMessage, &helpTitle);
+	StringTool::mbsfill(ni.szInfo, helpMessage.c_str(),
+			    lengthof(ni.szInfo));
+	StringTool::mbsfill(ni.szInfoTitle, helpTitle.c_str(),
+			    lengthof(ni.szInfoTitle));
+	ni.dwInfoFlags = NIIF_INFO;
+      }
+      else
+	ni.szInfo[0] = ni.szInfoTitle[0] = '\0';
+      _true( Shell_NotifyIcon(i_doesAdd ? NIM_ADD : NIM_MODIFY, &ni) );
+    }
+  }
+
 public:
   ///
   Mayu()
@@ -465,7 +493,9 @@ public:
       log(WM_MSGSTREAMNOTIFY),
       setting(NULL),
       isSettingDialogOpened(false),
-      engine(log)
+      engine(log),
+      m_canUseTasktrayBaloon(
+	PACKVERSION(5, 0) <= getDllVersion(TEXT("shlwapi.dll")))
   {
     _true( Register_focus() );
     _true( Register_target() );
@@ -515,6 +545,7 @@ public:
     engine.start();
     
     // show tasktray icon
+    memset(&ni, 0, sizeof(ni));
     ni.uID    = ID_TaskTrayIcon;
     ni.hWnd   = hwndTaskTray;
     ni.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
@@ -523,8 +554,11 @@ public:
     string tip = loadString(IDS_mayu);
     strncpy(ni.szTip, tip.c_str(), sizeof(ni.szTip));
     ni.szTip[lengthof(ni.szTip) - 1] = '\0';
-    ni.cbSize = sizeof(ni);
-    _true( Shell_NotifyIcon(NIM_ADD, &ni) );
+    if (m_canUseTasktrayBaloon)
+      ni.cbSize = sizeof(ni);
+    else
+      ni.cbSize = NOTIFYICONDATA_V1_SIZE;
+    showHelpMessage(false, true);
 
     // create menu
     hMenuTaskTray = LoadMenu(hInst, MAKEINTRESOURCE(IDR_MENU_tasktray));

@@ -302,6 +302,14 @@ LRESULT CALLBACK getMessageProc(int nCode, WPARAM wParam_, LPARAM lParam_)
 	notifySync();
       break;
     }
+    case WM_IME_STARTCOMPOSITION:
+      isImeCompositioning = true;
+      notifyLockState();
+      break;
+    case WM_IME_ENDCOMPOSITION:
+      isImeCompositioning = false;
+      notifyLockState();
+      break;
     default:
       if (msg.message == WM_Targetted)
 	notifyName(msg.hwnd);

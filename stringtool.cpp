@@ -7,6 +7,23 @@
 #include <malloc.h>
 
 
+/// copy 
+char *StringTool::mbsfill(char *o_dest,  const char *i_src, size_t i_destSize)
+{
+  const char *next;
+  const char *i;
+  for (i = i_src; *i; i = next)
+  {
+    next = mbsinc_(i);
+    if (i_destSize <= next - i_src)
+      break;
+  }
+  memcpy(o_dest, i_src, i - i_src);
+  o_dest[i - i_src] = '\0';
+  return o_dest;
+}
+
+
 std::string StringTool::interpretMetaCharacters(const char *str, size_t len,
 						const char *quote)
 {

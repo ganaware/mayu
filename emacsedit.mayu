@@ -60,11 +60,28 @@ keymap	EmacsMove : Global
 
 
 keymap	EmacsEdit : EmacsMove
-keymap2	EmacsMark : EmacsEdit => $EmacsMark/cancel &KeymapParent
+keymap2	EmacsMark : EmacsEdit => $EmacsMark/cancel &KeymapWindow
 
 
 keymap2	EmacsC-X : EmacsEdit
  key *U			=> C-Z					# UNDO
+
+keymap2 EmacsC-UC-U \
+		=> &Repeat((&KeymapWindow), 100) &HelpMessage &Variable(0, 0)
+ key C-G	=> &HelpMessage &Variable(0, 0) &Ignore
+ 
+keymap2 EmacsC-U : EmacsC-UC-U
+ key _0 Num0	=> &Variable(10, 0) &HelpVariable("ŒJ‚è•Ô‚µ") &Prefix(EmacsC-U)
+ key _1 Num1	=> &Variable(10, 1) &HelpVariable("ŒJ‚è•Ô‚µ") &Prefix(EmacsC-U)
+ key _2 Num2	=> &Variable(10, 2) &HelpVariable("ŒJ‚è•Ô‚µ") &Prefix(EmacsC-U)
+ key _3 Num3	=> &Variable(10, 3) &HelpVariable("ŒJ‚è•Ô‚µ") &Prefix(EmacsC-U)
+ key _4 Num4	=> &Variable(10, 4) &HelpVariable("ŒJ‚è•Ô‚µ") &Prefix(EmacsC-U)
+ key _5 Num5	=> &Variable(10, 5) &HelpVariable("ŒJ‚è•Ô‚µ") &Prefix(EmacsC-U)
+ key _6 Num6	=> &Variable(10, 6) &HelpVariable("ŒJ‚è•Ô‚µ") &Prefix(EmacsC-U)
+ key _7 Num7	=> &Variable(10, 7) &HelpVariable("ŒJ‚è•Ô‚µ") &Prefix(EmacsC-U)
+ key _8 Num8	=> &Variable(10, 8) &HelpVariable("ŒJ‚è•Ô‚µ") &Prefix(EmacsC-U)
+ key _9 Num9	=> &Variable(10, 9) &HelpVariable("ŒJ‚è•Ô‚µ") &Prefix(EmacsC-U)
+ key C-U	=> &Prefix(EmacsC-UC-U)
 
 keymap	EmacsEdit
  key C-Space		=> &Prefix(EmacsMark)			# Mark
@@ -79,6 +96,7 @@ keymap	EmacsEdit
  if ( !GANA ) key C-T	=> $EmacsEdit/transpose-chars		# •¶Žš“ü‚ê‘Ö‚¦
  key C-W		=> C-X					# CUT
  key M-W		=> C-C					# COPY
+ key C-U		=> &Variable(0, 0) &Prefix(EmacsC-U)
  key C-X		=> &Prefix(EmacsC-X)
  key C-Y		=> C-V					# PASTE
  key C-Slash		=> C-Z					# UNDO

@@ -9,6 +9,7 @@
 #include <string>
 
 #include <windows.h>
+#include <shlwapi.h>
 
 
 /// instance handle of this application
@@ -61,6 +62,9 @@ extern void asyncMoveWindow(HWND hwnd, int x, int y, int w, int h);
 /// resize asynchronously
 extern void asyncResize(HWND hwnd, int w, int h);
 
+/// get dll version
+extern DWORD getDllVersion(const char *i_dllname);
+#define PACKVERSION(major,minor) MAKELONG(minor,major)
 
 // ////////////////////////////////////////////////////////////////////////////
 // dialog

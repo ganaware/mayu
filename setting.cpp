@@ -20,6 +20,21 @@
 #include <shlwapi.h>
 
 
+namespace Event
+{
+  Key prefixed("prefixed");
+  Key before_key_down("before-key-down");
+  Key after_key_up("before-key-down");
+  Key *events[] =
+  {
+    &prefixed,
+    &before_key_down,
+    &after_key_up,
+    NULL,
+  };
+}
+
+
 // get mayu filename
 static bool getFilenameFromRegistry(
   istring *o_name, istring *o_filename, std::list<istring> *o_symbols)
@@ -850,6 +865,34 @@ void SettingLoader::load_KEY_ASSIGN()
 }
 
 
+// <EVENT_ASSIGN>
+void SettingLoader::load_EVENT_ASSIGN()
+{
+  list<ModifiedKey> assignedKeys;
+
+  ModifiedKey mkey;
+  mkey.modifier.dontcare();			//set all modifiers to dontcare
+  
+  Token *t = getToken();
+  Key **e;
+  for (e = Event::events; *e; e ++)
+    if (*t == (*e)->getName())
+    {
+      mkey.key = *e;
+      break;
+    }
+  if (!*e)
+    throw ErrorMessage() << "`" << *t << "': invalid event name.";
+
+  if (*getToken() != "=>")
+    throw ErrorMessage() << "`=>' is expected.";
+
+  assert(currentKeymap);
+  KeySeq *keySeq = load_KEY_SEQUENCE();
+  currentKeymap->addAssignment(mkey, keySeq);
+}
+
+
 // <MODIFIER_ASSIGNMENT>
 void SettingLoader::load_MODIFIER_ASSIGNMENT()
 {
@@ -1051,6 +1094,8 @@ void SettingLoader::load_LINE()
 	   *t == "window") load_KEYMAP_DEFINITION(t);
   // <KEY_ASSIGN>
   else if (*t == "key") load_KEY_ASSIGN();
+  // <EVENT_ASSIGN>
+  else if (*t == "event") load_EVENT_ASSIGN();
   // <MODIFIER_ASSIGNMENT>
   else if (*t == "mod") load_MODIFIER_ASSIGNMENT();
   // <KEYSEQ_DEFINITION>

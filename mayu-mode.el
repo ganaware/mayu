@@ -6,8 +6,8 @@
 ;; Maintainer: TAGA Nayuta <nayuta@ganaware.org>
 ;; Keywords: languages, faces
 
-(setq ;defvar
-      mayu-font-lock-keywords
+(defvar
+  mayu-font-lock-keywords
   `((,(concat
        "\\<\\("
        "[AMCWS]-"
@@ -23,9 +23,11 @@
        ) . font-lock-keyword-face)
     ("#.*$" . font-lock-comment-face)
     ("/[^/\n]*/" . font-lock-string-face)
+    ("\\\\$" . font-lock-warning-face)
     (,(concat
        "^\\s *\\<\\("
        "key"
+       "\\|event\\s +\\(prefixed\\|after-key-up\\|before-key-down\\)"
        "\\|keyseq"
        "\\|def\\s +\\(key\\|alias\\|mod\\|sync\\)"
        "\\|mod"
@@ -39,6 +41,59 @@
        "\\|elseif"
        "\\|elsif"
        "\\|endif"
+       "\\)\\>"
+       ) . font-lock-builtin-face)
+    (,(concat
+       "&\\("
+       "Default"
+       "\\|KeymapParent"
+       "\\|KeymapWindow"
+       "\\|OtherWindowClass"
+       "\\|Prefix"
+       "\\|Keymap"
+       "\\|Sync"
+       "\\|Toggle"
+       "\\|EditNextModifier"
+       "\\|Variable"
+       "\\|Repeat"
+       "\\|Undefined"
+       "\\|Ignore"
+       "\\|PostMessage"
+       "\\|ShellExecute"
+       "\\|LoadSetting"
+       "\\|VK"
+       "\\|Wait"
+       "\\|InvestigateCommand"
+       "\\|MayuDialog"
+       "\\|DescribeBindings"
+       "\\|HelpMessage"
+       "\\|HelpVariable"
+       "\\|WindowRaise"
+       "\\|WindowLower"
+       "\\|WindowMinimize"
+       "\\|WindowMaximize"
+       "\\|WindowHMaximize"
+       "\\|WindowVMaximize"
+       "\\|WindowMove"
+       "\\|WindowMoveVisibly"
+       "\\|WindowMoveTo"
+       "\\|WindowClingToLeft"
+       "\\|WindowClingToRight"
+       "\\|WindowClingToTop"
+       "\\|WindowClingToBottom"
+       "\\|WindowClose"
+       "\\|WindowToggleTopMost"
+       "\\|WindowIdentify"
+       "\\|WindowSetAlpha"
+       "\\|WindowRedraw"
+       "\\|WindowResizeTo"
+       "\\|MouseMove"
+       "\\|MouseWheel"
+       "\\|ClipboardUpcaseWord"
+       "\\|ClipboardDowncaseWord"
+       "\\|ClipboardCopy"
+       "\\|EmacsEditKillLinePred"
+       "\\|EmacsEditKillLineFunc"
        "\\)\\>"
        ) . font-lock-builtin-face)
     "Default font-lock-keywords for mayu mode."))

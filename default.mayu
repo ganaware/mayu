@@ -59,7 +59,8 @@ keymap Global
  key C-A-V		=> &WindowMoveVisibly	# ウィンドウを見える位置へ移動
  key C-S-K     C-A-K	=> $WindowClose		# ウィンドウを閉じる
  key C-S-T		=> &WindowToggleTopMost	# 最前面トグル
- key C-S-D		=> &WindowIdentify	# ウィンドウの素性を調べる
+ key C-S-D		=> &WindowIdentify \
+			&MayuDialog(Log, SHOW)	# ウィンドウの素性を調べる
  key C-S-H		=> &WindowSetAlpha(70)	# ウィンドウの半透明化
  key C-S-A-H		=> &WindowSetAlpha(-1)	# 半透明化全て解除
  key C-S-U		=> &WindowRedraw	# ウィンドウの再描画
@@ -108,7 +109,6 @@ keymap Global
  if ( MAP-ESCAPE-TO-META )
    key ESC		=> &EditNextModifier(M-)
  endif
-
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -255,6 +255,8 @@ window	Emacs	/:Emacs$/ : Global
  keyseq $Notepad/save-as	= &PostMessage(ToParentWindow, 273, 15, 0)
 
 keymap2	NotepadC-X : GeneralC-X
+ event prefixed		=> &HelpMessage("メモ帳 C-x-", "C-x C-s\t上書き保存\r\nC-x C-f\t開く\t\r\nC-x k\t\t新規作成\r\nC-x C-c\t終了")
+ event before-key-down	=> &HelpMessage
  key C-S		=> $Notepad/save-as	# 上書き保存(S)
  key C-F		=> $Notepad/open	# 開く(O)...
  key K			=> $Notepad/new		# 新規作成(N)
@@ -447,27 +449,27 @@ window WindowsMediaPlayer /mplayer2.*:(Media Player 2|VideoRenderer)/ : Global
 ## Windows Mine Sweeper .......................................................
 
 window WindowsMineSweeper /winmine.exe:マインスイーパ$/ : Global
- key	D-Z	=> &VK(RButton)
- key	U-Z	=> &Ignore
- key	D-X	=> &VK(MButton)
- key	U-X	=> &Ignore
- key	D-C	=> &VK(LButton)
- key	U-C	=> &Ignore
- key	Q	=> F2
- key	Num1	=> &MouseMove(-16,  16)
- key	Num2	=> &MouseMove(  0,  16)
- key	Num3	=> &MouseMove( 16,  16)
- key	Num4	=> &MouseMove(-16,   0)
- key	Num6	=> &MouseMove( 16,   0)
- key	Num7	=> &MouseMove(-16, -16)
- key	Num8	=> &MouseMove(  0, -16)
- key	Num9	=> &MouseMove( 16, -16)
+ key D-Z	=> &VK(RButton)
+ key U-Z	=> &Ignore
+ key D-X	=> &VK(MButton)
+ key U-X	=> &Ignore
+ key D-C	=> &VK(LButton)
+ key U-C	=> &Ignore
+ key Q		=> F2
+ key Num1	=> &MouseMove(-16,  16)
+ key Num2	=> &MouseMove(  0,  16)
+ key Num3	=> &MouseMove( 16,  16)
+ key Num4	=> &MouseMove(-16,   0)
+ key Num6	=> &MouseMove( 16,   0)
+ key Num7	=> &MouseMove(-16, -16)
+ key Num8	=> &MouseMove(  0, -16)
+ key Num9	=> &MouseMove( 16, -16)
 
 
 ## ICQ2000 ....................................................................
 
 if ( GANA )
   window ICQMessageSession \
-	( /ICQ.exe:#32770:Edit$/ && /Message Session/ ) : EmacsEdit
+	( /ICQ\.exe:#32770:Edit$/ && /Message Session/ ) : EmacsEdit
    key Enter  => M-S
 endif

@@ -165,6 +165,36 @@ void asyncResize(HWND hwnd, int w, int h)
 }
 
 
+/// get dll version
+DWORD getDllVersion(const char *i_dllname)
+{
+  DWORD dwVersion = 0;
+  
+  if (HINSTANCE hinstDll = LoadLibrary(i_dllname))
+  {
+    DLLGETVERSIONPROC pDllGetVersion
+      = (DLLGETVERSIONPROC)GetProcAddress(hinstDll, "DllGetVersion");
+    /* Because some DLLs may not implement this function, you
+     * must test for it explicitly. Depending on the particular 
+     * DLL, the lack of a DllGetVersion function may
+     * be a useful indicator of the version.
+     */
+    if (pDllGetVersion)
+    {
+      DLLVERSIONINFO dvi;
+      ZeroMemory(&dvi, sizeof(dvi));
+      dvi.cbSize = sizeof(dvi);
+
+      HRESULT hr = (*pDllGetVersion)(&dvi);
+      if (SUCCEEDED(hr))
+	dwVersion = PACKVERSION(dvi.dwMajorVersion, dvi.dwMinorVersion);
+    }
+        
+    FreeLibrary(hinstDll);
+  }
+  return dwVersion;
+}
+
 // ////////////////////////////////////////////////////////////////////////////
 // edit control
 

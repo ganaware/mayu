@@ -142,6 +142,9 @@ namespace StringTool
   /// converter
   string cast_string(const std::wstring &w_text);
 
+  /// copy 
+  char *mbsfill(char *o_dest,  const char *i_src, size_t i_destSize);
+  
   /// case insensitive string
   class istring : public string
   {

@@ -27,6 +27,9 @@ kbd {
 	font-family:Courier New,monospace;
 	color:#55a;
 }
+p.noindent {
+	text-indent:0em;
+}
 
 
 /* contents */

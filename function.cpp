@@ -116,6 +116,39 @@ static void mayuDialog(const Function::FuncData &fd)
 }
 
 
+/// help message
+static void helpMessage(const Function::FuncData &fd)
+{
+  if (!fd.isPressed)
+    return;
+
+  bool doesShow = false;
+  if (fd.args.size() == 2)
+  {
+    doesShow = true;
+    fd.engine.m_helpMessage = fd.args[1].getString();
+    fd.engine.m_helpTitle = fd.args[0].getString();
+  }
+  PostMessage(fd.engine.getAssociatedWndow(), WM_engineNotify,
+	      engineNotify_helpMessage, doesShow);
+}
+
+/// help variable
+static void helpVariable(const Function::FuncData &fd)
+{
+  if (!fd.isPressed)
+    return;
+
+  char buf[20];
+  snprintf(buf, lengthof(buf), "%d", fd.engine.m_variable);
+
+  fd.engine.m_helpTitle = fd.args[0].getString();
+  fd.engine.m_helpMessage = buf;
+  PostMessage(fd.engine.getAssociatedWndow(), WM_engineNotify,
+	      engineNotify_helpMessage, true);
+}
+
+
 // input string
 //  static void INPUT(const Function::FuncData &fd)
 //  {
@@ -709,12 +742,15 @@ const Function Function::functions[] =
   // special
   { FUNC(Default),			NULL, NULL, },
   { FUNC(KeymapParent),			NULL, NULL, },
+  { FUNC(KeymapWindow),			NULL, NULL, },
   { FUNC(OtherWindowClass),		NULL, NULL, },
   { FUNC(Prefix),			"K&b", NULL, },
   { FUNC(Keymap),			"K" , NULL, },
   { FUNC(Sync),				NULL, NULL, },
   { FUNC(Toggle),			"l", NULL, },
   { FUNC(EditNextModifier),		"M", NULL, },
+  { FUNC(Variable),			"dd", NULL, },
+  { FUNC(Repeat),			"S&d", NULL, },
   
   // other
   { FUNC(Undefined),			NULL, undefined, },
@@ -727,6 +763,8 @@ const Function Function::functions[] =
   { FUNC(InvestigateCommand),		NULL, investigateCommand, },
   { FUNC(MayuDialog),			"DW", mayuDialog, },
   { FUNC(DescribeBindings),		NULL, NULL, },
+  { FUNC(HelpMessage),			"&ss", helpMessage, },
+  { FUNC(HelpVariable),			"s", helpVariable, },
   //{ FUNC(Input),			1, INPUT, },
   
   // IME

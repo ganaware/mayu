@@ -112,7 +112,7 @@ BEGIN
     IDS_invalidDirectory    "不正なディレクトリです。"
     IDS_removeOk            "窓使いの憂鬱をアンインストールしてよろしいですか？"
     IDS_removeFinish        "窓使いの憂鬱はアンインストールされました。"
-    IDS_copyFinish          "インストールが終了しました。"
+    IDS_copyFinish          "インストールが終了しました。\n一度ログオフする必要があります。\n今すぐログオフしますか?"
     IDS_error               "インストール中にエラーが起こりました。"
     IDS_alreadyUninstalled  "窓使いの憂鬱のアンインストールが既に実行されています。\n再起動してからインストールしなおしてください。"
     IDS_notAdministrator    "Administrator で実行してください。"

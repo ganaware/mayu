@@ -19,6 +19,7 @@ enum {
   engineNotify_shellExecute,			///
   engineNotify_loadSetting,			///
   engineNotify_showDlg,				///
+  engineNotify_helpMessage,			///
 };
 
 
@@ -137,6 +138,11 @@ public:
   
   typedef std::list<HWND> WindowsWithAlpha; /// windows for &amp;WindowSetAlpha
   WindowsWithAlpha windowsWithAlpha; ///
+  
+  std::string m_helpMessage;			/// for &amp;HelpMessage
+  std::string m_helpTitle;			/// for &amp;HelpMessage
+  int m_variable;				/// for &amp;Variable,
+						///  &amp;Repeat
 
 private:
   /// keyboard handler thread
@@ -156,6 +162,9 @@ private:
 
   /// genete modifier events
   void generateModifierEvents(const Modifier &mod);
+  
+  /// genete event
+  void generateEvents(Current i_c, Keymap *i_keymap, Key *i_event);
   
   /// generate keyboard event
   void generateKeyEvent(Key *key, bool doPress, bool isByAssign);
@@ -232,6 +241,9 @@ public:
 
   /// shell execute
   void shellExecute();
+
+  /// get help message
+  void getHelpMessages(std::string *o_helpMessage, std::string *o_helpTitle);
 
   /// command notify
   void commandNotify(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);

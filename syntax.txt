@@ -38,6 +38,7 @@
 		| <KEYBOARD_DEFINITION>
 		| <KEYMAP_DEFINITION>
 		| <KEY_ASSIGN>
+		| <EVENT_ASSIGN>
 		| <KEYSEQ_DEFINITION>
 		| <MODIFIER_ASSIGNMENT>
 		| <LOCK_ASSIGNMENT>
@@ -193,6 +194,17 @@
 		| "SL-"		# if Scroll Lock on
 		| /M[0-9]/	# user defined modifier
 		| /L[0-9]/	# user defined lock
+
+#
+# EVENT TO KEY SEQUENCE ASSIGNMENT
+#
+
+	<EVENT_ASSIGN> :
+		| "event" <EVENT_NAME> "=>" <KEY_SEQUENCE>
+	<EVENT_NAME> :
+		| "prefixed"
+		| "before-key-down"
+		| "after-key-up"
 
 #
 # MODIFIER ASSIGNMENT

@@ -22,8 +22,21 @@ public:
   KeySeqs keySeqs;		///
   std::set<StringTool::istring> symbols;	///
   std::list<Modifier> modifiers;		///
+
 };
 
+///
+namespace Event
+{
+  ///
+  extern Key prefixed;
+  ///
+  extern Key before_key_down;
+  ///
+  extern Key after_key_up;
+  ///
+  extern Key *events[];
+}
 
 ///
 class SettingLoader
@@ -74,6 +87,7 @@ private:
   KeySeq *load_KEY_SEQUENCE(const istring &name = "",
 			    bool isInParen = false); /// &lt;KEY_SEQUENCE&gt;
   void load_KEY_ASSIGN();			/// &lt;KEY_ASSIGN&gt;
+  void load_EVENT_ASSIGN();			/// &lt;EVENT_ASSIGN&gt;
   void load_MODIFIER_ASSIGNMENT();		/// &lt;MODIFIER_ASSIGN&gt;
   void load_LOCK_ASSIGNMENT();			/// &lt;LOCK_ASSIGN&gt;
   void load_KEYSEQ_DEFINITION();		/// &lt;KEYSEQ_DEFINITION&gt;
