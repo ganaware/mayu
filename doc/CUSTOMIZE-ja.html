@@ -371,6 +371,23 @@
 				  <li><code>/:Edit$/</code> に該当したので、<code>/:Edit$/</code> の <kbd>[B]</kbd> が採用されます。したがって、「b edit」と表示されることとなります。
 				</ol>
 			      </div>
+
+			  <dt class="h3"><a name="perKeymapDefinition">キーマップが影響する定義</a>
+			      
+			  <dd class="d3">
+			      <div>
+				以下の単語で始まる定義は、キーマップ毎に定義できます。
+				<ul>
+				  <li><code>key ...</code> <a href="#key">キー割り当ての変更</a>
+				  <li><code>event ...</code> <a href="#event">イベント定義</a>
+				  <li><code>mod ...</code> <a href="#mod">モディファイヤキー割り当ての変更</a>
+				</ul>
+				以下の単語で始まる定義は、キーマップ毎に定義することはできません。
+				<ul>
+				  <li><code>def ...</code> <a href="#keyboard">キーボード定義</a>
+				  <li><code>keyseq ...</code> <a href="#keyseq">キーシーケンス定義</a>
+				</ul>
+			      </div>
 			</dl>
 		      </div>
 
@@ -704,7 +721,7 @@
 
 			<p class="continue"><code>SwapAB</code> というシンボルが <code>define</code> されている場合に、<kbd>[A]</kbd> と <kbd>[B]</kbd> を入れ替えます。</p>
 			
-			<p>「窓使いの憂鬱の設定」ダイアログボックスで <code>-Dシンボル名</code> を書くことでシンボルを定義することができます。</p>
+			<p>「<a href="MANUAL-ja.html#menu-s">設定(<u>S</u>)...</a>」で <code>-Dシンボル名</code> を書くことでシンボルを定義することができます。</p>
 		      </div>
 
 		  <dt class="h2"><a name="function">ix. <code><em>FUNCTION</em></code> リファレンス</a>
