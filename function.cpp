@@ -2248,11 +2248,11 @@ void Engine::funcPlugIn(FunctionParam *i_param,
 class StrExpr
 {
 private:
-  tstringq symbol;
+  tstringq m_symbol;
 protected:
-  static const Engine *engine;
+  static const Engine *s_engine;
 public:
-  StrExpr(const tstringq &i_symbol) : symbol(i_symbol) {};
+  StrExpr(const tstringq &i_symbol) : m_symbol(i_symbol) {};
 
   virtual ~StrExpr() {};
 
@@ -2263,13 +2263,13 @@ public:
 
   virtual tstringq eval() const
   {
-    return symbol;
+    return m_symbol;
   }
 
-  static void setEngine(const Engine *i_engine) { engine = i_engine; }
+  static void setEngine(const Engine *i_engine) { s_engine = i_engine; }
 };
 
-const Engine *StrExpr::engine = NULL;
+const Engine *StrExpr::s_engine = NULL;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // StrExprClipboard
@@ -2312,7 +2312,7 @@ public:
 
   tstringq eval() const
   {
-    return engine->getCurrentWindowClassName();
+    return s_engine->getCurrentWindowClassName();
   }
 };
 
@@ -2333,7 +2333,7 @@ public:
 
   tstringq eval() const
   {
-    return engine->getCurrentWindowTitleName();
+    return s_engine->getCurrentWindowTitleName();
   }
 };
 
@@ -2345,24 +2345,24 @@ public:
 // default constructor
 StrExprArg::StrExprArg()
 {
-  expr = new StrExpr(_T(""));
+  m_expr = new StrExpr(_T(""));
 }
 
 
 // copy contructor
 StrExprArg::StrExprArg(const StrExprArg &i_data)
 {
-  expr = i_data.expr->clone();
+  m_expr = i_data.m_expr->clone();
 }
 
 
 StrExprArg &StrExprArg::operator=(const StrExprArg &i_data)
 {
-  if (i_data.expr == expr)
+  if (i_data.m_expr == m_expr)
     return *this;
 
-  delete expr;
-  expr = i_data.expr->clone();
+  delete m_expr;
+  m_expr = i_data.m_expr->clone();
 
   return *this;
 }
@@ -2374,15 +2374,15 @@ StrExprArg::StrExprArg(const tstringq &i_symbol, Type i_type)
   switch (i_type)
   {
     case Literal:
-      expr = new StrExpr(i_symbol);
+      m_expr = new StrExpr(i_symbol);
       break;
     case Builtin:
       if (i_symbol == _T("Clipboard"))
-	expr = new StrExprClipboard(i_symbol);
+	m_expr = new StrExprClipboard(i_symbol);
       else if (i_symbol == _T("WindowClassName"))
-	expr = new StrExprWindowClassName(i_symbol);
+	m_expr = new StrExprWindowClassName(i_symbol);
       else if (i_symbol == _T("WindowTitleName"))
-	expr = new StrExprWindowTitleName(i_symbol);
+	m_expr = new StrExprWindowTitleName(i_symbol);
       break;
     default:
       break;
@@ -2392,13 +2392,13 @@ StrExprArg::StrExprArg(const tstringq &i_symbol, Type i_type)
 
 StrExprArg::~StrExprArg()
 {
-  delete expr;
+  delete m_expr;
 }
 
 
 tstringq StrExprArg::eval() const
 {
-  return expr->eval();
+  return m_expr->eval();
 }
 
 void StrExprArg::setEngine(const Engine *i_engine)

@@ -230,7 +230,7 @@ class StrExpr;
 class StrExprArg
 {
 private:
-  StrExpr *expr;
+  StrExpr *m_expr;
 public:
   enum Type
   {
