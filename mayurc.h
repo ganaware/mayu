@@ -6,6 +6,7 @@
 #define IDS_mayuAlreadyExists           2
 #define IDS_cannotOpenDevice            3
 #define IDS_driverNotInstalled          4
+#define IDS_executedInRemoteDesktop     5
 #define IDS_openMayu                    10
 #define IDS_openMayuFilter              11
 #define IDS_helpFilename                12
