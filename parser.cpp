@@ -209,11 +209,11 @@ bool Parser::getLine(std::vector<Token> *o_tokens)
   m_lineNumber = m_internalLineNumber;
 
   tstringi line;
+  bool isTokenExist = false;
   continue_getLineLoop:
   while (getLine(&line))
   {
     const _TCHAR *t = line.c_str();
-    bool isTokenExist = false;
 
     continue_getTokenLoop:
     while (true)
@@ -363,6 +363,7 @@ bool Parser::getLine(std::vector<Token> *o_tokens)
     if (0 < o_tokens->size())
       break;
     m_lineNumber = m_internalLineNumber;
+    isTokenExist = false;
   }
   
   return 0 < o_tokens->size();
