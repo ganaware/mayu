@@ -115,6 +115,14 @@ PDRIVER_DISPATCH _IopInvalidDeviceRequest; // Default dispatch function
 #define IOCTL_MAYU_DETOUR_CANCEL					 \
 CTL_CODE(FILE_DEVICE_KEYBOARD, 0x801, METHOD_BUFFERED, FILE_ANY_ACCESS)
 
+#define IOCTL_MAYU_GET_VERSION					 \
+CTL_CODE(FILE_DEVICE_KEYBOARD, 0x802, METHOD_BUFFERED, FILE_ANY_ACCESS)
+
+
+#define MAYUD_MODE L""
+static UNICODE_STRING MayuDriverVersion =
+UnicodeString(L"$Revision$" MAYUD_MODE);
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Entry / Unload
@@ -821,6 +829,20 @@ NTSTATUS detourDeviceControl(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
       
       if (irpCancel)
 	IoCancelIrp(irpCancel);// at this point, the irpCancel may be completed
+      status = STATUS_SUCCESS;
+      break;
+    }
+    case IOCTL_MAYU_GET_VERSION:
+    {
+      if (irpSp->Parameters.DeviceIoControl.OutputBufferLength <
+	  MayuDriverVersion.Length)
+      {
+	  status = STATUS_INVALID_PARAMETER;
+	  break;
+      }
+      RtlCopyMemory(irp->AssociatedIrp.SystemBuffer,
+		    MayuDriverVersion.Buffer, MayuDriverVersion.Length);
+      irp->IoStatus.Information = MayuDriverVersion.Length;
       status = STATUS_SUCCESS;
       break;
     }
