@@ -1162,6 +1162,16 @@ void Engine::funcVK(FunctionParam *i_param, VKey i_vkey)
     mouse_event(MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, 0);
   else if (vkey == VK_RBUTTON && isUp)
     mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, 0);
+#if(_WIN32_WINNT >= 0x0500)
+  else if (vkey == VK_XBUTTON1 && isDown)
+    mouse_event(MOUSEEVENTF_XDOWN, 0, 0, XBUTTON1, 0);
+  else if (vkey == VK_XBUTTON1 && isUp)
+    mouse_event(MOUSEEVENTF_XUP, 0, 0, XBUTTON1, 0);
+  else if (vkey == VK_XBUTTON2 && isDown)
+    mouse_event(MOUSEEVENTF_XDOWN, 0, 0, XBUTTON2, 0);
+  else if (vkey == VK_XBUTTON2 && isUp)
+    mouse_event(MOUSEEVENTF_XUP, 0, 0, XBUTTON2, 0);
+#endif /* _WIN32_WINNT >= 0x0500 */
   else if (isUp || isDown)
     keybd_event(vkey,
 		static_cast<BYTE>(MapVirtualKey(vkey, 0)),
