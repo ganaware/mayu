@@ -168,21 +168,24 @@ Copyright &copy; 1999-2000, <a href="http://www.ganaware.org" target="_top">TAGA
       <ul>
 	<li><span class="bug">[仕様]</span> コマンドプロンプトではロックキーとIMEの状態を区別することができません。また、コマンドプロンプトのプロパティに対しては無力です。
 	<li><span class="bug">[仕様]</span> Windows2000 では、「窓使いの憂鬱」を終了させたあとに何かのキーを押さないと終了しません。
+	    
 	<li><code>window ASTEC-X ( /:ASTEC-X$/ &amp;&amp; /[xk]term/ ) : Global</code> がうまくはたらかない気がする
+	<li>正規表現ルーチンの詳しい説明
+	<li>FUNCTION へのモディファイヤがきかない
 	<li>WindowsRaiseLower, WindowNextFocusや, WindowPreviousFocus を作る。
 	<li>cmkey のようなマウスイベントの置き換え機能をつける。
+	<li>セットアップの UNICODE 化。
+	<li>レイアウトの分離。
+	<li>FUNCTION の分離・型自動。
+	<li>どぼらっくの指定をもっとスマートにする。
+	<li><a href="http://www.microsoft.com/japan/support/kb/articles/J054/8/50.htm" target="_top">USB キーボードデバイス接続後に英語 101 キーボード配列になる</a>
 	    
 	<li>各国語キーボード対応。各言語のディレクトリをホームディレクトリに加える。キー設定は settings/* に移動(?)
-	<li>どぼらっくの指定をもっとスマートにする。
 	<li>iexpress を使う。
-	<li>USB キーボードでは動作しないのでなんとかする (めんどくさいな…)。
+	<li>USB キーボードでは動作しないので WDM ドライバを作る (めんどくさいな…)。
 	<li>インストーラは、AltIME が入っていたら警告を出す。
 	<li>インストーラは、ロジテックマウスが入っていたら警告を出す。
 	<li>Logiteck のキーボードドライバを使っているときにも動くようにする。
-	<li>WDM ドライバにして Windows98/ME でも動くようにする。
-	    <ul>
-	      <li>作者は必要性を感じていませんが、やる気のある方がドライバを書いて送っていただければ対応します。
-	    </ul>
 	<li>マルチプロセッサマシンでごくたまにおちるようだ。
 	<li>ドライバのセキュリティに関しての調査・実装。
 	<li>(誰か hack してくれないかな…(まぢ
@@ -214,7 +217,7 @@ Copyright &copy; 1999-2000, <a href="http://www.ganaware.org" target="_top">TAGA
 	    <a href="http://www.tcct.zaq.ne.jp/kaname/software/pt.htm" target="_top">Pastel Touch</a> / 
 	    <a href="http://www.nn.iij4u.or.jp/~dorenp/software/keymap.html" target="_top">KeyMap</a> / 
 	    <a href="http://hp.vector.co.jp/authors/VA009883/" target="_top">dvorak kr, swap2k</a> / 
-	    <a href="http://www2.airnet.ne.jp/pak04955/download.htm#nicolatter">Q's Nicolatter</a> (<a href="http://www.forest.impress.co.jp/article/2000/08/28/qsnicolatter.html">紹介記事</a>)
+	    <a href="http://www2.airnet.ne.jp/pak04955/download.htm#nicolatter" target="_top">Q's Nicolatter</a> (<a href="http://www.forest.impress.co.jp/article/2000/08/28/qsnicolatter.html" target="_top">紹介記事</a>)
 	<dd class="d2">キーボードによる操作を改善しようとさまざまなソフトが開発されています。
       </dl>
       </div>
@@ -222,82 +225,60 @@ Copyright &copy; 1999-2000, <a href="http://www.ganaware.org" target="_top">TAGA
   <dt class="h1"><a name="COPYRIGHT">10. copyright</a>
 
   <dd class="d1">
-      <p class="noindent">
-      Copyright (C) 1999-2000, <a href="http://www.ganaware.org" target="_top">TAGA Nayuta</a> &lt;nayuta&#64;users.sourceforge.net&gt;<br>
-      All rights reserved.</p>
-      
-      <p class="noindent">Redistribution and use in source and binary
-      forms, with or without modification, are permitted provided that
-      the following conditions are met:</p>
-      
-      <ol>
-	<li>Redistributions of source code must retain the above
-	    copyright notice, this list of conditions and the following
-	    disclaimer.
-	<li>Redistributions in binary form must reproduce the above
-	    copyright notice, this list of conditions and the following
-	    disclaimer in the documentation and/or other materials
-	    provided with the distribution.
-	<li>The name of the author may not be used to endorse or
-	    promote products derived from this software without
-	    specific prior written permission.
-      </ol>
+      <dl>
+	<dt class="h2">窓使いの憂鬱
+	<dd class="d2">
+	    <p class="noindent">
+	    Copyright (C) 1999-2000, <a href="http://www.ganaware.org" target="_top">TAGA Nayuta</a> &lt;nayuta&#64;users.sourceforge.net&gt;<br>
+	    All rights reserved.</p>
+	    
+	    <p class="noindent">Redistribution and use in source and binary
+	    forms, with or without modification, are permitted provided that
+	    the following conditions are met:</p>
+	    
+	    <ol>
+	      <li>Redistributions of source code must retain the above
+		  copyright notice, this list of conditions and the following
+		  disclaimer.
+	      <li>Redistributions in binary form must reproduce the
+		  above copyright notice, this list of conditions and
+		  the following disclaimer in the documentation and/or
+		  other materials provided with the distribution.
+	      <li>The name of the author may not be used to endorse or
+		  promote products derived from this software without
+		  specific prior written permission.
+	    </ol>
 
-      <p class="noindent">
-      THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY
-      EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-      THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-      PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE
-      AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-      SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-      NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-      LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-      HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-      CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-      OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-      EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
+	    <p class="noindent">
+	    THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY
+	    EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+	    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+	    FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT
+	    SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+	    INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+	    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+	    GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+	    BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+	    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+	    OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	    POSSIBILITY OF SUCH DAMAGE.</p>
+	    
+	<dt class="h2">Regex ++
+	<dd class="d2">
+	    <p class="noindent">Copyright (c) 1998-2000 Dr John Maddock</p>
+	    
+	    <p class="noindent">Permission to use, copy, modify,
+	    distribute and sell this software and its documentation
+	    for any purpose is hereby granted without fee, provided
+	    that the above copyright notice appear in all copies and
+	    that both that copyright notice and this permission notice
+	    appear in supporting documentation.  Dr John Maddock makes
+	    no representations about the suitability of this software
+	    for any purpose.  It is provided "as is" without express
+	    or implied warranty.</p>
+      </dl>
       
-      <p>転載したらメールをもらえるとうれしいです(^^;</p>
-      
-      <p>正規表現ライブラリは、以下のものを利用しました。</p>
-      
-      <p class="noindent">regcomp and regexec -- regsub and regerror
-      are elsewhere<br>
-      @(#)regexp.c 1.3 of 18 April 87</p>
-      
-      <p class="noindent">Copyright (c) 1986 by University of Toronto.<br>
-      Written by Henry Spencer.  Not derived from licensed software.</p>
-      
-      <p class="noindent">Permission is granted to anyone to use this
-      software for any purpose on any computer system, and to
-      redistribute it freely, subject to the following restrictions:</p>
-      
-      <ol>
-	<li>The author is not responsible for the consequences of use of
-	    this software, no matter how awful, even if they arise
-	    from defects in it.
-	<li>The origin of this software must not be misrepresented, either
-	    by explicit claim or by omission.
-	<li>Altered versions must be plainly marked as such, and must not
-	    be misrepresented as being the original software.
-      </ol>
-
-      <p class="noindent">
-      *** THIS IS AN ALTERED VERSION.  It was altered by John Gilmore,<br>
-      *** hoptoad!gnu, on 27 Dec 1986, to add \&lt; and \&gt; for word-matching<br>
-      *** as in BSD grep and ex.<br>
-      *** THIS IS AN ALTERED VERSION.  It was altered by John Gilmore,<br>
-      *** hoptoad!gnu, on 28 Dec 1986, to optimize characters quoted with \.<br>
-      *** THIS IS AN ALTERED VERSION.  It was altered by James A. Woods,<br>
-      *** ames!jaw, on 19 June 1987, to quash a regcomp() redundancy.<br>
-      *** THIS IS AN ALTERED VERSION.  It was altered by Geoffrey Noer,<br>
-      *** THIS IS AN ALTERED VERSION.  It was altered by Guy Gascoigne - Piggford<br>
-      *** guy@wyrdrune.com, on 15 March 1998, porting it to C++ and converting<br>
-      *** it to be the engine for the Regexp class<br>
-      *** THIS IS AN ALTERED VERSION.  It was altered by TAGA Nayuta<br>
-      *** support perl-like regexp etc.<br>
-      </p>
-
   <dt class="h1"><a name="SUPPORT">11. support</a>
       
   <dd class="d1">
@@ -329,6 +310,10 @@ Copyright &copy; 1999-2000, <a href="http://www.ganaware.org" target="_top">TAGA
 	      <li><kbd>[Control]</kbd> + <kbd>[U]</kbd> 操作の改良。
 	      <li><a href="default.mayu"><code>default.mayu</code></a> を使っている場合は、<code>Global</code> キーマップで <kbd>[英数]</kbd> を <kbd>[Control]</kbd> にしているが、<code>Global</code> キーマップを親キーマップとして持たない <a href="CUSTOMIZE.html#keymap2"><code>keymap2</code></a> の中では (当然ながら) <kbd>[英数]</kbd> を <kbd>[Control]</kbd> として使用できないので、ちゃんと <code>Global</code> キーマップを親キーマップとして持つように設定ファイルを修正。
 	      <li><a href="default.mayu"><code>default.mayu</code></a> で、<code>-DMAP-ESCAPE-TO-META</code> とすると <kbd>[Alt]</kbd> + <kbd>[X]</kbd> などを <kbd>[ESCAPE] [X]</kbd> で代用するようにした。
+	      <li>プログラム内部では全て UNICODE で処理するようにした。
+	      <li>設定ファイルの文字コードに、shift_jis だけでなく UTF-16LE/BE や UTF-8 を使用できるようになった。「メモ帳」で、「Unicode」や「Unicode big endien」や「UTF-8」を選んでセーブすれば、日本語だけでなくハングルなどの UNICODE で扱える文字が全て設定ファイルに書けるようになる。現在は文字コードは自動判別され、自動判別に失敗した場合の救済措置はない。自動判別に失敗するようなら自動判別できそうな文字をコメントにでも書いておくこと。
+	      <li>正規表現ライブラリを <a href="http://ourworld.compuserve.com/homepages/John_Maddock/regexpp.htm" target="_top">Regex++</a> に変更した。
+	      <li>いろいろ変えた結果多分 bcc32 ではコンパイルできなくなった。少し修正するだけだと思うが。
 	      <li><a href="contrib/ax.mayu"><code>contrib/ax.mayu</code></a> を追加。(Thanks to KAWABE Nobukazu)
 	    </ul>
 	<dt>2000/12/17 version 3.18
@@ -350,7 +335,7 @@ Copyright &copy; 1999-2000, <a href="http://www.ganaware.org" target="_top">TAGA
 	<dt>2000/12/03 version 3.17
 	<dd>
 	    <ul>
-	      <li>メーリングリストを <a href="http://lists.sourceforge.net/mailman/listinfo/mayu-support">Source Forge</a> へ移動。
+	      <li>メーリングリストを <a href="http://lists.sourceforge.net/mailman/listinfo/mayu-support" target="_top">Source Forge</a> へ移動。
 	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_WindowMoveTo"><code>&amp;WindowMoveTo</code></a> を追加。
 	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_WindowResizeTo"><code>&amp;WindowResizeTo</code></a> を追加。
 	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_MayuDialog"><code>&amp;MayuDialog</code></a> を追加。
@@ -361,7 +346,7 @@ Copyright &copy; 1999-2000, <a href="http://www.ganaware.org" target="_top">TAGA
 	      <li><a href="#RELATEDWORK">related work</a> に Q's Nicolatter を追加。
 	      <li><a href="#FAQ">FAQ</a> を追加。
 	      <li><code>mailto:</code> をドキュメントから削除。
-	      <li><a href="http://www.linuxsupportline.com/~doc++/">DOC++</a> で表示できるようにソースのコメントを書き換えた。
+	      <li><a href="http://www.linuxsupportline.com/~doc++/" target="_top">DOC++</a> で表示できるようにソースのコメントを書き換えた。
 	      <li>Emacs で設定ファイルを編集する人のために <a href="mayu-mode.el"><code>mayu-mode.el</code></a> を追加。ただし、色がつくだけです。
 	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_WindowIdentify"><code>&amp;WindowIdentify</code></a> で、ウィンドウの位置と大きさも表示するようにした。
 	      <li><a href="contrib/keitai.mayu"><code>contrib/keitai.mayu</code></a> を追加。テンキーで携帯電話式ひらがな入力をしようという画期的設定ファイル (注:Joke)。(Thanks to HANAWA Yoshio)
@@ -431,7 +416,7 @@ Copyright &copy; 1999-2000, <a href="http://www.ganaware.org" target="_top">TAGA
 	<dt>2000/05/05 version 3.10
 	<dd>
 	    <ul>
-	      <li><a href="http://www.inprise.com/bcppbuilder/freecompiler">Borland C++ Compiler 5.5</a> で<a href="CUSTOMIZE.html#compile">ビルド</a>できるようにした。(Thanks to HANAWA Yoshio)
+	      <li><a href="http://www.inprise.com/bcppbuilder/freecompiler" target="_top">Borland C++ Compiler 5.5</a> で<a href="CUSTOMIZE.html#compile">ビルド</a>できるようにした。(Thanks to HANAWA Yoshio)
 	      <li><a href="CUSTOMIZE.html#inputModifier">入力されたキーと同じモディファイヤの指定</a> ができるようにした。
 	      <li>複数のキー設定をメニューで切り替え可能にした。
 	      <li>設定ファイルを更新。

@@ -201,6 +201,9 @@
 	      <dd class="d3">
 		  <div>
 		  <p><code><em>ウィンドウクラス名</em></code>と<code><em>ウィンドウタイトル名</em></code>には正規表現が使用できます。正規表現は <code>/.../</code> で囲むか、<code>\m@...@</code>で囲みます (ただし<code>@</code>はどんな文字でもよし)。</p>
+		  
+		  <p>正規表現エンジンには <a href="http://ourworld.compuserve.com/homepages/John_Maddock/regexpp.htm" target="_top">Regex++</a> を使用しています。このエンジンでは <a href="http://www.kt.rim.or.jp/~kbk/perl5.005/perlre.html" target="_top">Perl で使用できる正規表現</a>がほぼカバーされています。よく使いそうなものを挙げておきます。</p>
+		  
 		  <ul>
 		    <li>"<code>|</code>" Alternation
 		    <li>"<code>*</code>" Match 0 or more times
@@ -1073,10 +1076,12 @@
 		    <dt class="h4">コンパイラ
 		    <dd class="d4"><div><p>現在対応しているコンパイラは Visual C++ 6.0 SP3 又は Borland C++ 5.5 です。</p></div>
 		    <dt class="h4">Platform SDK
-		    <dd class="d4"><div><p>Windows 2000 に対応したものが必要です。MSDN で配布されていますし、マイクロソフトの<a href="http://www.microsoft.com/msdownload/platformsdk/setuplauncher.htm">サイト</a>でも配布されています。</p></div>
+		    <dd class="d4"><div><p>Windows 2000 に対応したものが必要です。MSDN で配布されていますし、マイクロソフトの<a href="http://www.microsoft.com/msdownload/platformsdk/setuplauncher.htm" target="_top">サイト</a>でも配布されています。</p></div>
 		    <dt class="h4">DDK
-		    <dd class="d4"><div><p>デバイスドライバをビルドする場合のみ必要になります。MSDN で配布されていますし、マイクロソフトの<a href="http://www.microsoft.com/ddk/">サイト</a>でも配布されています。</p></div>
-		  </ul>
+		    <dd class="d4"><div><p>デバイスドライバをビルドする場合のみ必要になります。MSDN で配布されていますし、マイクロソフトの<a href="http://www.microsoft.com/ddk/" target="_top">サイト</a>でも配布されています。</p></div>
+		    <dt class="h4"><a href="http://ourworld.compuserve.com/homepages/John_Maddock/regexpp.htm" target="_top">Regex++</a>
+		    <dd class="d4"><div><p><a href="http://ourworld.compuserve.com/homepages/John_Maddock/regexpp3.zip" target="_top"><code>regexpp3.zip</code></a> 又は <a href="http://ourworld.compuserve.com/homepages/John_Maddock/regexpp3.tar.gz" target="_top"><code>regexpp3.tar.gz</code></a> が必要です。</p>
+		  </dl>
 		  </div>
 	      <dt class="h3"><a name="compile_source">ソースの展開</a>
 	      <dd class="d3">
@@ -1085,7 +1090,7 @@
 		    <dt class="h4"><code>source.cab</code> の展開
 		    <dd class="d4">
 			<div>
-			<p><code>source.cab</code> はインストールした「窓使いの憂鬱」を作成した時のソースが格納されています。「窓使いの憂鬱」をインストールしたディレクトリへディレクトリ付きで展開してください。Windows 付属のもので展開するとディレクトリが無視されるかもしれないので、<a href="http://www.csdinc.co.jp/archiver/">統合アーカイバプロジェクト</a>あたりにあるアーカイバを使用するといいでしょう。</p>
+			<p><code>source.cab</code> はインストールした「窓使いの憂鬱」を作成した時のソースが格納されています。「窓使いの憂鬱」をインストールしたディレクトリへディレクトリ付きで展開してください。Windows 付属のもので展開するとディレクトリが無視されるかもしれないので、<a href="http://www.csdinc.co.jp/archiver/" target="_top">統合アーカイバプロジェクト</a>あたりにあるアーカイバを使用するといいでしょう。</p>
 			</div>
 		    <dt class="h4">cvs による取り寄せ
 		    <dd class="d4">
@@ -1093,6 +1098,34 @@
 			<p>SourfeForge から cvs を使用して取り寄せることにより現在開発中で次のバージョンとなるはずのソースを入手することが出来ます。</p>
 			<p class="sample">
 			cvs -z 3 -d :pserver:anonymous@cvs1.sourceforge.net:/cvsroot/mayu checkout mayu
+			</p>
+			</div>
+		    <dt class="h4">ディレクトリ構成
+		    <dd class="d4">
+			<div>
+			<p>上記のどちらかの方法で「窓使いの憂鬱」本体のソースコードを展開後、Regex++ を展開します。最終的なディレクトリ構成が以下のようになるように展開してください。</p>
+			<p class="tree">
+			./<br>
+			<code>&nbsp;&nbsp;&nbsp;|</code><br>
+			<code>&nbsp;&nbsp;&nbsp;+---</code>boost/ ... <span>このディレクトリは手動で作成する</span><br>
+			<code>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;|</code><br>
+			<code>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;+---</code>boost/ ... <span>Regex++ の展開により作成される</span><br>
+			<code>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;|</code><br>
+			<code>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;+---</code>detail/ ...<br>
+			<code>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;+---</code>re_detail/ ...<br>
+			<code>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;|</code><br>
+			<code>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;+---</code>libs/ ... <span>Regex++ の展開により作成される</span><br>
+			<code>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|</code><br>
+			<code>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---</code>regex/ ...<br>
+			<code>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---</code>timer/ ...<br>
+			<code>&nbsp;&nbsp;&nbsp;|</code><br>
+			<code>&nbsp;&nbsp;&nbsp;+---</code>mayu/ ... <span>「窓使いの憂鬱｣本体ソース</span><br>
+			<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|</code><br>
+			<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---</code>contrib/ ...<br>
+			<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---</code>d/ ...<br>
+			<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---</code>r/ ...<br>
+			<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---</code>s/ ...<br>
+			<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---</code>tools/ ...<br>
 			</p>
 			</div>
 		  </dl>
@@ -1122,7 +1155,31 @@
 			<p><code>s</code> ディレクトリ以下のインストーラをコンパイルすることはできますが、<code>d</code> ディレクトリ以下にのドライバをコンパイルする方法は不明です。</p>
 			</div>
 		    <dt class="h4">デバッグ情報
-		    <dd class="d4"><div><p>どちらのコンパイラを使う場合でも、<code>nodebug=1</code> を削除すれば、デバッグ情報を生成します。何かパッチを作ったらぜひ作者までお知らせください。</p></div>
+		    <dd class="d4"><div><p>どちらのコンパイラを使う場合でも、<code>nodebug=1</code> を削除すれば、デバッグ情報を生成します。何かパッチを作ったらぜひ作者までお知らせください。</p>
+			<p>原因不明ですが、デバッグバージョンでビルドする場合のみ次のパッチを宛てる必要があります。さもないとリンクに失敗します。</p>
+
+<pre class="sample">*** boost/libs/regex/src/c_regex_traits.cpp~	Thu Nov 16 20:55:18 2000
+--- boost/libs/regex/src/c_regex_traits.cpp	Sat Jan 13 19:35:36 2001
+***************
+*** 863,868 ****
+--- 863,869 ----
+     BOOST_RE_GUARD_STACK
+     if(c &lt; 256)
+        return BOOST_RE_MAKE_BOOL(re_detail::wide_unicode_classes[c] &amp; f);
++ #ifdef BOOST_RE_DEBUG
+     if((f &amp; char_class_alpha) &amp;&amp; std::iswalpha(c))
+        return true;
+     if((f &amp; char_class_cntrl) &amp;&amp; std::iswcntrl(c))
+***************
+*** 881,886 ****
+--- 882,888 ----
+        return true;
+     if(f &amp; char_class_unicode)
+        return true;
++ #endif
+     return false;
+  }</pre>
+			</div>
 	    </div>
       </dl>
       </div>

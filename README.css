@@ -6,6 +6,15 @@ body {
   background-image:url(bg.png);
   margin:0pt;
   padding:0pt;
+
+  scrollbar-3dlight-color:#000;
+  scrollbar-highlight-color:#fff;
+  scrollbar-face-color:#ccc;
+  scrollbar-shadow-color:#555;
+  scrollbar-darkshadow-color:#000;
+  scrollbar-arrow-color:#555;
+  scrollbar-base-color:#fff;
+  scrollbar-track-color:#555;
 }
 
 a {
@@ -225,7 +234,7 @@ p.noindent {
   margin-left:0pt;
 }
 
-.manual p.sample {
+.manual .sample {
   white-space:nowrap;
   text-indent:0em;
   padding-left:8pt; padding-right:8pt;
@@ -284,4 +293,14 @@ table.default-settings .name-english td {
   border-width:2pt;
   border-color:#000;
   border-style: double none none none;
+}
+
+p.tree {
+  white-space:nowrap;
+  text-indent:0em;
+  line-height:10pt;
+}
+
+p.tree span {
+  color:#55a;
 }
