@@ -38,6 +38,10 @@ typedef struct _FilterDeviceExtension
   KSPIN_LOCK lock; // lock below datum
   PIRP irpq;
   KeyQue readQue; // when IRP_MJ_READ, the contents of readQue are returned
+  KDPC dpc;
+  KTIMER timer;
+  LARGE_INTEGER tickCount;
+  ULONG isTouched;
 } FilterDeviceExtension;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -71,6 +75,10 @@ NTSTATUS filterPower         (IN PDEVICE_OBJECT, IN PIRP);
 VOID CancelKeyboardClassRead(IN PIRP, IN PDEVICE_OBJECT);
 NTSTATUS readq(KeyQue*, PIRP);
 
+NTSTATUS filterTouchpadCompletion (IN PDEVICE_OBJECT, IN PIRP, IN PVOID);
+VOID pollTouchpad(IN PKDPC, IN PVOID, IN PVOID, IN PVOID);
+NTSTATUS filterTouchpad      (IN PDEVICE_OBJECT, IN PIRP);
+
 #ifdef ALLOC_PRAGMA
 #pragma alloc_text( init, DriverEntry )
 #endif // ALLOC_PRAGMA
@@ -96,6 +104,12 @@ UnicodeString(L"\\DosDevices\\MayuDetour1");
 
 static UNICODE_STRING KeyboardClassDeviceName =
 UnicodeString(DD_KEYBOARD_DEVICE_NAME_U L"0");
+
+static UNICODE_STRING UsbHubDriverName =
+UnicodeString(L"\\Driver\\usbhub");
+
+#define TICKCOUNT_FOR_TOUCHPAD_TIMEOUT 2
+#define TOUCHPAD_SCANCODE 0x7d
 
 // Global Variables
 PDRIVER_DISPATCH _IopInvalidDeviceRequest; // Default dispatch function
@@ -286,6 +300,10 @@ NTSTATUS mayuAddDevice(IN PDRIVER_OBJECT driverObject,
   filterDevExt->irpq = NULL;
   status = KqInitialize(&filterDevExt->readQue);
   if (!NT_SUCCESS(status)) goto error;
+  KeInitializeDpc(&filterDevExt->dpc, pollTouchpad, (PVOID)filterDevObj);
+  KeInitializeTimer(&filterDevExt->timer);
+  filterDevExt->tickCount = RtlConvertLongToLargeInteger(0);
+  filterDevExt->isTouched = 0;
 
   devObj = filterDevObj->NextDevice;
   while (devObj->NextDevice) {
@@ -307,7 +325,14 @@ NTSTATUS mayuAddDevice(IN PDRIVER_OBJECT driverObject,
        == _IopInvalidDeviceRequest) ?
       _IopInvalidDeviceRequest : filterPassThrough;
   }
-  filterDevExt->MajorFunction[IRP_MJ_READ] = filterRead;
+  if (RtlCompareUnicodeString(&UsbHubDriverName, &kbdClassDevObj->DriverObject->DriverName, TRUE) == 0)
+  {
+    filterDevExt->MajorFunction[IRP_MJ_INTERNAL_DEVICE_CONTROL] = filterTouchpad;
+  }
+  else
+  {
+    filterDevExt->MajorFunction[IRP_MJ_READ] = filterRead;
+  }
 #ifndef MAYUD_NT4
   filterDevExt->MajorFunction[IRP_MJ_POWER] = filterPower;
 #endif // !MAYUD_NT4
@@ -936,6 +961,115 @@ NTSTATUS filterPnP(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
     break;
   }
   return status;
+}
+
+
+// 
+NTSTATUS filterTouchpadCompletion(IN PDEVICE_OBJECT deviceObject,
+				 IN PIRP irp, IN PVOID context)
+{
+  FilterDeviceExtension *filterDevExt =
+    (FilterDeviceExtension*)deviceObject->DeviceExtension;
+
+  UNREFERENCED_PARAMETER(context);
+  
+  if (irp->PendingReturned)
+    IoMarkIrpPending(irp);
+
+  KeQueryTickCount(&filterDevExt->tickCount);
+  if (filterDevExt->isTouched == 0)
+  {
+    KIRQL currentIrql, cancelIrql;
+    PDEVICE_OBJECT detourDevObj = filterDevExt->detourDevObj;
+    DetourDeviceExtension *detourDevExt =
+      (DetourDeviceExtension*)detourDevObj->DeviceExtension;
+    if (detourDevExt->isOpen)
+    {
+      KEYBOARD_INPUT_DATA PadKey = {0, TOUCHPAD_SCANCODE, 0, 0, 0};
+      KeAcquireSpinLock(&detourDevExt->lock, &currentIrql);
+      // if detour is opened, key datum are forwarded to detour
+      KqEnque(&detourDevExt->readQue, &PadKey, 1);
+      detourDevExt->filterDevObj = deviceObject;
+
+      if (detourDevExt->irpq) {
+	if (readq(&detourDevExt->readQue, detourDevExt->irpq) ==
+	    STATUS_SUCCESS) {
+	  IoAcquireCancelSpinLock(&cancelIrql);
+	  IoSetCancelRoutine(detourDevExt->irpq, NULL);
+	  IoReleaseCancelSpinLock(cancelIrql);
+	  IoCompleteRequest(detourDevExt->irpq, IO_KEYBOARD_INCREMENT);
+	  detourDevExt->irpq = NULL;
+	}
+      }
+      KeReleaseSpinLock(&detourDevExt->lock, currentIrql);
+    }
+    filterDevExt->isTouched = 1;
+    KeSetTimer(&filterDevExt->timer, RtlConvertLongToLargeInteger(-100), &filterDevExt->dpc);
+  }
+  return STATUS_SUCCESS;
+}
+
+
+// filter touchpad input
+NTSTATUS filterTouchpad(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
+{
+  FilterDeviceExtension *filterDevExt =
+    (FilterDeviceExtension*)deviceObject->DeviceExtension;
+
+  *IoGetNextIrpStackLocation(irp) = *IoGetCurrentIrpStackLocation(irp);
+  IoSetCompletionRoutine(irp, filterTouchpadCompletion,
+			 NULL, TRUE, TRUE, TRUE);
+  return IoCallDriver(filterDevExt->kbdClassDevObj, irp);
+}
+
+
+VOID pollTouchpad(IN PKDPC Dpc,
+		  IN PVOID DeferredContext,
+		  IN PVOID SystemArgument1,
+		  IN PVOID SystemArgument2)
+{
+  LARGE_INTEGER tickCount = RtlConvertLongToLargeInteger(0);
+  PDEVICE_OBJECT filterDevObj = (PDEVICE_OBJECT)DeferredContext;
+  FilterDeviceExtension *filterDevExt =
+    (FilterDeviceExtension*)filterDevObj->DeviceExtension;
+  UNREFERENCED_PARAMETER(Dpc);
+  UNREFERENCED_PARAMETER(SystemArgument1);
+  UNREFERENCED_PARAMETER(SystemArgument2);
+
+  KeQueryTickCount(&tickCount);
+  if (tickCount.QuadPart - filterDevExt->tickCount.QuadPart
+      > TICKCOUNT_FOR_TOUCHPAD_TIMEOUT)
+  {
+    KIRQL currentIrql, cancelIrql;
+    PDEVICE_OBJECT detourDevObj = filterDevExt->detourDevObj;
+    DetourDeviceExtension *detourDevExt =
+      (DetourDeviceExtension*)detourDevObj->DeviceExtension;
+    if (detourDevExt->isOpen)
+    {
+      KEYBOARD_INPUT_DATA PadKey = {0, TOUCHPAD_SCANCODE, 1, 0, 0};
+      KeAcquireSpinLock(&detourDevExt->lock, &currentIrql);
+      // if detour is opened, key datum are forwarded to detour
+      KqEnque(&detourDevExt->readQue, &PadKey, 1);
+      detourDevExt->filterDevObj = filterDevObj;
+
+      if (detourDevExt->irpq) {
+	if (readq(&detourDevExt->readQue, detourDevExt->irpq) ==
+	    STATUS_SUCCESS) {
+	  IoAcquireCancelSpinLock(&cancelIrql);
+	  IoSetCancelRoutine(detourDevExt->irpq, NULL);
+	  IoReleaseCancelSpinLock(cancelIrql);
+	  IoCompleteRequest(detourDevExt->irpq, IO_KEYBOARD_INCREMENT);
+	  detourDevExt->irpq = NULL;
+	}
+      }
+      KeReleaseSpinLock(&detourDevExt->lock, currentIrql);
+    }
+    filterDevExt->isTouched = 0;
+  }
+  else
+  {
+    KeSetTimer(&filterDevExt->timer, RtlConvertLongToLargeInteger(-1000), &filterDevExt->dpc);
+  }
 }
 
 NTSTATUS detourPnP(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
