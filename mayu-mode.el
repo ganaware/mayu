@@ -6,99 +6,113 @@
 ;; Maintainer: TAGA Nayuta <nayuta@ganaware.org>
 ;; Keywords: languages, faces
 
+(require 'font-lock)
+
 (defvar
   mayu-font-lock-keywords
-  `((,(concat
-       "\\<\\("
-       "[AMCWS]-"
-       "\\|IC-"
-       ;;"\\|I-"
-       "\\|[INCS]L-"
-       "\\|M[0-9]-"
-       "\\|L[0-9]-"
-       "\\|U-"
-       "\\|D-"
-       "\\|R-"
-       "\\|E[01]-"
-       "\\)"
-       ) . font-lock-keyword-face)
-    ("#.*$" . font-lock-comment-face)
-    ("/[^/\n]*/" . font-lock-string-face)
-    ("\\\\$" . font-lock-warning-face)
-    (,(concat
-       "^\\s *\\<\\("
-       "key"
-       "\\|event\\s +\\(prefixed\\|after-key-up\\|before-key-down\\)"
-       "\\|keyseq"
-       "\\|def\\s +\\(key\\|alias\\|mod\\|sync\\|subst\\)"
-       "\\|mod"
-       "\\|keymap"
-       "\\|keymap2"
-       "\\|window"
-       "\\|include"
-       "\\|if"
-       "\\|define"
-       "\\|else"
-       "\\|elseif"
-       "\\|elsif"
-       "\\|endif"
-       "\\)\\>"
-       ) . font-lock-builtin-face)
-    (,(concat
-       "&\\("
-       "Default"
-       "\\|KeymapParent"
-       "\\|KeymapWindow"
-       "\\|OtherWindowClass"
-       "\\|Prefix"
-       "\\|Keymap"
-       "\\|Sync"
-       "\\|Toggle"
-       "\\|EditNextModifier"
-       "\\|Variable"
-       "\\|Repeat"
-       "\\|Undefined"
-       "\\|Ignore"
-       "\\|PostMessage"
-       "\\|ShellExecute"
-       "\\|LoadSetting"
-       "\\|VK"
-       "\\|Wait"
-       "\\|InvestigateCommand"
-       "\\|MayuDialog"
-       "\\|DescribeBindings"
-       "\\|HelpMessage"
-       "\\|HelpVariable"
-       "\\|WindowRaise"
-       "\\|WindowLower"
-       "\\|WindowMinimize"
-       "\\|WindowMaximize"
-       "\\|WindowHMaximize"
-       "\\|WindowVMaximize"
-       "\\|WindowMove"
-       "\\|WindowMoveVisibly"
-       "\\|WindowMoveTo"
-       "\\|WindowClingToLeft"
-       "\\|WindowClingToRight"
-       "\\|WindowClingToTop"
-       "\\|WindowClingToBottom"
-       "\\|WindowClose"
-       "\\|WindowToggleTopMost"
-       "\\|WindowIdentify"
-       "\\|WindowSetAlpha"
-       "\\|WindowRedraw"
-       "\\|WindowResizeTo"
-       "\\|MouseMove"
-       "\\|MouseWheel"
-       "\\|ClipboardUpcaseWord"
-       "\\|ClipboardDowncaseWord"
-       "\\|ClipboardCopy"
-       "\\|EmacsEditKillLinePred"
-       "\\|EmacsEditKillLineFunc"
-       "\\|LogClear"
-       "\\)\\>"
-       ) . font-lock-builtin-face)
-    "Default font-lock-keywords for mayu mode."))
+  (let* ((warning-face 
+	  (if (boundp 'font-lock-warning-face)
+	      font-lock-warning-face
+	    font-lock-function-name-face))
+	 (preprocessor-face 
+	  (if (boundp 'font-lock-builtin-face)
+	      font-lock-builtin-face
+	    font-lock-preprocessor-face))
+	 (function-name-face 
+	  (if (boundp 'font-lock-builtin-face)
+	      font-lock-builtin-face
+	    font-lock-function-name-face)))
+    `((,(concat
+	 "\\<\\("
+	 "[AMCWS]-"
+	 "\\|IC-"
+	 ;;"\\|I-"
+	 "\\|[INCS]L-"
+	 "\\|M[0-9]-"
+	 "\\|L[0-9]-"
+	 "\\|U-"
+	 "\\|D-"
+	 "\\|R-"
+	 "\\|E[01]-"
+	 "\\)"
+	 ) . font-lock-keyword-face)
+      ("#.*$" . font-lock-comment-face)
+      ("/[^/\n]*/" . font-lock-string-face)
+      ("\\\\$" . ,warning-face)
+      (,(concat
+	 "^\\s *\\<\\("
+	 "key"
+	 "\\|event\\s +\\(prefixed\\|after-key-up\\|before-key-down\\)"
+	 "\\|keyseq"
+	 "\\|def\\s +\\(key\\|alias\\|mod\\|sync\\|subst\\)"
+	 "\\|mod"
+	 "\\|keymap"
+	 "\\|keymap2"
+	 "\\|window"
+	 "\\|include"
+	 "\\|if"
+	 "\\|define"
+	 "\\|else"
+	 "\\|elseif"
+	 "\\|elsif"
+	 "\\|endif"
+	 "\\)\\>"
+	 ) . ,preprocessor-face)
+      (,(concat
+	 "&\\("
+	 "Default"
+	 "\\|KeymapParent"
+	 "\\|KeymapWindow"
+	 "\\|OtherWindowClass"
+	 "\\|Prefix"
+	 "\\|Keymap"
+	 "\\|Sync"
+	 "\\|Toggle"
+	 "\\|EditNextModifier"
+	 "\\|Variable"
+	 "\\|Repeat"
+	 "\\|Undefined"
+	 "\\|Ignore"
+	 "\\|PostMessage"
+	 "\\|ShellExecute"
+	 "\\|LoadSetting"
+	 "\\|VK"
+	 "\\|Wait"
+	 "\\|InvestigateCommand"
+	 "\\|MayuDialog"
+	 "\\|DescribeBindings"
+	 "\\|HelpMessage"
+	 "\\|HelpVariable"
+	 "\\|WindowRaise"
+	 "\\|WindowLower"
+	 "\\|WindowMinimize"
+	 "\\|WindowMaximize"
+	 "\\|WindowHMaximize"
+	 "\\|WindowVMaximize"
+	 "\\|WindowMove"
+	 "\\|WindowMoveVisibly"
+	 "\\|WindowMoveTo"
+	 "\\|WindowClingToLeft"
+	 "\\|WindowClingToRight"
+	 "\\|WindowClingToTop"
+	 "\\|WindowClingToBottom"
+	 "\\|WindowClose"
+	 "\\|WindowToggleTopMost"
+	 "\\|WindowIdentify"
+	 "\\|WindowSetAlpha"
+	 "\\|WindowRedraw"
+	 "\\|WindowResizeTo"
+	 "\\|MouseMove"
+	 "\\|MouseWheel"
+	 "\\|ClipboardUpcaseWord"
+	 "\\|ClipboardDowncaseWord"
+	 "\\|ClipboardCopy"
+	 "\\|EmacsEditKillLinePred"
+	 "\\|EmacsEditKillLineFunc"
+	 "\\|LogClear"
+	 "\\)\\>"
+	 ) . ,function-name-face)
+      "Default font-lock-keywords for mayu mode.")))
 
 (defvar mayu-mode-syntax-table nil
   "syntax table used in mayu mode")
