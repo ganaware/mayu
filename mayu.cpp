@@ -685,16 +685,19 @@ void convertRegistry()
   Registry reg(MAYU_REGISTRY_ROOT);
   tstringi dot_mayu;
   bool doesAdd = false;
+  DWORD index;
   if (reg.read(_T(".mayu"), &dot_mayu))
   {
     reg.write(_T(".mayu0"), _T(";") + dot_mayu + _T(";"));
     reg.remove(_T(".mayu"));
     doesAdd = true;
+    index = 0;
   }
   else if (!reg.read(_T(".mayu0"), &dot_mayu))
   {
     reg.write(_T(".mayu0"), loadString(IDS_readFromHomeDirectory) + _T(";;"));
     doesAdd = true;
+    index = 1;
   }
   if (doesAdd)
   {
@@ -726,6 +729,7 @@ void convertRegistry()
 	reg.write(_T(".mayu4"), loadString(IDS_109on104) + tmp
 		  + _T(";-DUSE104") _T(";-DUSE109on104"));
       }
+      reg.write(_T(".mayuIndex"), index);
     }
   }
 }

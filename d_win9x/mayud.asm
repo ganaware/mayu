@@ -102,7 +102,7 @@ DevCtrl_Success:
 	ret
 BufferUnderRun:
 	mov		BlockingID, edx
-	VMMCall _BlockOnID, <edx, BLOCK_SVC_INTS+BLOCK_ENABLE_INTS>
+	VMMCall _BlockOnID, <edx, BLOCK_SVC_INTS+BLOCK_ENABLE_INTS+Block_Thread_Idle>
 	mov		BlockingID, 0h
 	jmp		ReadFromBuffer
 DevCtrl_Fail:

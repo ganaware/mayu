@@ -15,7 +15,7 @@ TARGETOS	= WINNT
 !endif	# TARGETOS
 
 !if "$(TARGETOS)" == "WINNT"
-APPVER		= 5.0
+APPVER		= 4.0
 !ifdef nodebug
 OUT_DIR		= out_winnt
 !else	# nodebug
@@ -38,6 +38,7 @@ OUT_DIR		= out_win9x_debug
 
 _WIN32_IE	= 0x0500
 !include <win32.mak>
+NMAKE_WINVER	= 0x0500	# trick for WS_EX_LAYERED
 
 !ifdef nodebug
 DEBUG_FLAG	= -DNDEBUG
