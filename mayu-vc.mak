@@ -55,6 +55,15 @@ batch:
 		-$(MAKE) -k -f setup-vc.mak batch
 		cd ..
 
+batch_clean:
+		-$(MAKE) -k -f mayu-vc.mak TARGETOS=WINNT nodebug=1 clean
+		-$(MAKE) -k -f mayu-vc.mak TARGETOS=WINNT clean
+		-$(MAKE) -k -f mayu-vc.mak TARGETOS=WIN95 nodebug=1 clean
+		-$(MAKE) -k -f mayu-vc.mak TARGETOS=WIN95 clean
+		cd s
+		-$(MAKE) -k -f setup-vc.mak batch_clean
+		cd ..
+
 batch_distrib: batch
 		-$(MAKE) -k -f mayu-vc.mak TARGETOS=WINNT distrib
 		-$(MAKE) -k -f mayu-vc.mak TARGETOS=WIN95 distrib

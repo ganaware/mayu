@@ -212,10 +212,11 @@ depend::
 		-- $(DEPENDFLAGS) -- $(SRCS_1) $(SRCS_2)
 
 distrib:
-		-$(RM) mayu-$(VERSION) 
+		-@echo "we need cygwin tool"
+		-rm -f mayu-$(VERSION) 
 		-ln -s . mayu-$(VERSION)
 		-bash -c "tar cvzf mayu-$(VERSION)-src.tgz `$(GETCVSFILES) | sed 's/^./mayu-$(VERSION)/'`"
-		-$(RM) mayu-$(VERSION) 
+		-rm -f mayu-$(VERSION) 
 		-$(GENIEXPRESS) \
 			mayu-$(VERSION)-$(DISTRIB_OS).exe \
 			"MADO TSUKAI NO YUUTSU $(VERSION) $(TARGETOS)" \

@@ -34,3 +34,9 @@ batch:
 		-$(MAKE) -k -f setup-vc.mak TARGETOS=WINNT
 		-$(MAKE) -k -f setup-vc.mak TARGETOS=WIN95 nodebug=1
 		-$(MAKE) -k -f setup-vc.mak TARGETOS=WIN95
+
+batch_clean:
+		-$(MAKE) -k -f setup-vc.mak TARGETOS=WINNT nodebug=1 clean
+		-$(MAKE) -k -f setup-vc.mak TARGETOS=WINNT clean
+		-$(MAKE) -k -f setup-vc.mak TARGETOS=WIN95 nodebug=1 clean
+		-$(MAKE) -k -f setup-vc.mak TARGETOS=WIN95 clean
