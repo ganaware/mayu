@@ -229,6 +229,7 @@ tstring interpretMetaCharacters(const _TCHAR *i_str, size_t i_len,
 	    //case _T('\\'): *d++ = _T('\\'); i_str ++; break;
 	  case _T('\''): *d++ = _T('\''); i_str ++; break;
 	  case _T('"'): *d++ = _T('"'); i_str ++; break;
+	  case _T('\\'): *d++ = _T('\\'); i_str ++; break;
 	  case _T('c'): // control code, for example '\c[' is escape: '\x1b'
 	    i_str ++;
 	    if (i_str < end && *i_str)
@@ -371,4 +372,49 @@ tstring toLower(const tstring &i_str)
       str[i] = tolower(str[i]);
   }
   return str;
+}
+
+
+// convert wstring to UTF-8
+std::string to_UTF_8(const std::wstring &i_str)
+{
+  // 0xxxxxxx: 00-7F
+  // 110xxxxx 10xxxxxx: 0080-07FF
+  // 1110xxxx 10xxxxxx 10xxxxxx: 0800 - FFFF
+
+  int size = 0;
+  
+  // count needed buffer size
+  for (std::wstring::const_iterator i = i_str.begin(); i != i_str.end(); ++ i)
+  {
+    if (0x0000 <= *i && *i <= 0x007f)
+      size += 1;
+    else if (0x0080 <= *i && *i <= 0x07ff)
+      size += 2;
+    else if (0x0800 <= *i && *i <= 0xffff)
+      size += 3;
+  }
+
+  Array<char> result(size);
+  int ri = 0;
+  
+  // make UTF-8
+  for (std::wstring::const_iterator i = i_str.begin(); i != i_str.end(); ++ i)
+  {
+    if (0x0000 <= *i && *i <= 0x007f)
+      result[ri ++] = static_cast<char>(*i);
+    else if (0x0080 <= *i && *i <= 0x07ff)
+    {
+      result[ri ++] = static_cast<char>(((*i & 0x0fc0) >>  6) | 0xc0);
+      result[ri ++] = static_cast<char>(( *i & 0x003f       ) | 0x80);
+    }
+    else if (0x0800 <= *i && *i <= 0xffff)
+    {
+      result[ri ++] = static_cast<char>(((*i & 0xf000) >> 12) | 0xe0);
+      result[ri ++] = static_cast<char>(((*i & 0x0fc0) >>  6) | 0x80);
+      result[ri ++] = static_cast<char>(( *i & 0x003f       ) | 0x80);
+    }
+  }
+
+  return std::string(result.begin(), result.end());
 }

@@ -77,6 +77,8 @@ std::string guardRegexpFromMbcs(const char *i_str);
 std::wstring to_wstring(const std::string &i_str);
 /// converter
 std::string to_string(const std::wstring &i_str);
+// convert wstring to UTF-8
+std::string to_UTF_8(const std::wstring &i_str);
 
   
 /// case insensitive string
