@@ -139,7 +139,8 @@ NTSTATUS mayuLogDeque(PIRP irp)
     IoSetCancelRoutine(irp, mayuLogCancel);
     IoReleaseCancelSpinLock(cancelIrql);
     KeReleaseSpinLock(&s_logListLock, currentIrql);
-    return STATUS_PENDING;
+    irp->IoStatus.Information = 0;
+    irp->IoStatus.Status = STATUS_PENDING;
   }
   else
   {
@@ -153,10 +154,11 @@ NTSTATUS mayuLogDeque(PIRP irp)
     RtlCopyMemory(irp->AssociatedIrp.SystemBuffer,
                   pEntry->log.Buffer, pEntry->log.Length);
     irp->IoStatus.Information = pEntry->log.Length;
+    irp->IoStatus.Status = STATUS_SUCCESS;
     ExFreePool(pEntry->log.Buffer);
     ExFreePool(pEntry);
-    return STATUS_SUCCESS;
   }
+  return irp->IoStatus.Status;
 }
 
 #endif // DBG
