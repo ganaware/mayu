@@ -3,8 +3,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=iso-2022-jp">
 <link rel="stylesheet" type="text/css" href="README.css">
-<link rel="prev" href="MANUAL.html">
-<link rel="next" href="CONTENTS.html">
+<link rel="prev" href="MANUAL-ja.html">
+<link rel="next" href="CONTENTS-ja.html">
 <title>mayu - MANUAL - CUSTOMIZE</title>
 </head>
 
@@ -12,17 +12,17 @@
 
 <div class="main">
   <dl>
-    <dt class="h1"><a name="CUSTOMIZE" href="MANUAL.html#CUSTOMIZE">5. customize</a>
+    <dt class="h1"><a name="CUSTOMIZE" href="MANUAL-ja.html#CUSTOMIZE">5. customize</a>
 	
     <dd class="d1">
 	<div>
-	  <p>付属の <code>.mayu</code> (<a href="dot.mayu"><code>dot.mayu</code></a>) を利用すれば、エディットコントロールで Emacs 風の操作ができるようになりますが、<code>.mayu</code> をカスタマイズすることによって、Windows を自分の好きなキーバインディングで利用することができるようになります。</p>
+	  <p>付属の <code>.mayu</code> (<a href="../dot.mayu"><code>dot.mayu</code></a>) を利用すれば、エディットコントロールで Emacs 風の操作ができるようになりますが、<code>.mayu</code> をカスタマイズすることによって、Windows を自分の好きなキーバインディングで利用することができるようになります。</p>
 	  
 	  <p><code>.mayu</code> は<a href="#HOME">ホームディレクトリ</a>から検索されます。</p>
 
 	  <p><code>.mayu</code> は上から下へ読まれていき、重複する記述があれば、より下に書かれているものが有効になります。コメントは <code>#</code> ではじめます。アルファベットの大文字と小文字は区別されません。詳しい文法は <a href="syntax.txt"><code>syntax.txt</code></a> を参照してください。</p>
 
-	  <p>この章を読む前に、<a href="contrib/mayu-settings.txt"><code>contrib/mayu-settings.txt</code></a> を読んで付属の設定ファイルについて理解を深めておくことをお勧めします。</p>
+	  <p>この章を読む前に、<a href="../contrib/mayu-settings.txt"><code>contrib/mayu-settings.txt</code></a> を読んで付属の設定ファイルについて理解を深めておくことをお勧めします。</p>
 	  
 	  <dl>
 	    <dt class="h2"><a name="key">i. キー割り当ての変更</a>
@@ -37,7 +37,7 @@
 		  
 		  <p><code>=&gt;</code> より左の <code><em>KEY</em></code> をキーボードで押すと、Windows へは <code>=&gt;</code> より右の <code><em>KEY</em></code> が順番に入力されます。また、右に <code><em>FUNCTION</em></code> が書かれている場合はウィンドウの最大化や移動などの機能が実行されます。</p>
 		  
-		  <p><code><em>KEY</em></code> は<a href="#keyboard">キーボード定義</a>で定義されるもので、デフォルトでは <a href="109.mayu"><code>109.mayu</code></a> 又は <a href="104.mayu"><code>104.mayu</code></a> で定義されている <code><em>KEY</em></code> が使用できます。</p>
+		  <p><code><em>KEY</em></code> は<a href="#keyboard">キーボード定義</a>で定義されるもので、デフォルトでは <a href="../109.mayu"><code>109.mayu</code></a> 又は <a href="../104.mayu"><code>104.mayu</code></a> で定義されている <code><em>KEY</em></code> が使用できます。</p>
 		  
 		  <dl>
 		    <dt class="h3"><a name="modifier">モディファイヤの指定</a>
@@ -223,7 +223,7 @@
 				
 				<p>例えば、<code>/:Edit$/</code> は全てのエディットコントロールの<code><em>ウィンドウクラス名</em></code>を表しますし、<code>/:#32770.*:Edit$/</code> ならば、ダイアログボックス上にある全てのエディットコントロールの<code><em>ウィンドウクラス名</em></code>を表します (<code>#32770</code> はダイアログボックスのウィンドウクラス名)。</p>
 				
-				<p>個々のウィンドウの<code><em>ウィンドウクラス名</em></code>と<code><em>ウィンドウタイトル名</em></code>を調べるには、後述の <a href="MANUAL.html#CLASSNAME">window class investigation</a> を参照してください。</p>
+				<p>個々のウィンドウの<code><em>ウィンドウクラス名</em></code>と<code><em>ウィンドウタイトル名</em></code>を調べるには、後述の <a href="MANUAL-ja.html#CLASSNAME">window class investigation</a> を参照してください。</p>
 				
 				<p><code><em>ウィンドウクラス名</em></code>と<code><em>ウィンドウタイトル名</em></code>の両方を記述する場合は、括弧で囲みその間を <code>&amp;&amp;</code> か <code>||</code> で区切ります。<code>&amp;&amp;</code> の場合は、両方にマッチするようなウィンドウを表し、<code>||</code> の場合はどちらか一方にマッチするようなウィンドウを表します。</p>
 			      </div>
@@ -539,7 +539,7 @@
 		      
 		  <dd class="d2">
 		      <div>
-			<p>デフォルトのキーボード定義は <a href="109.mayu"><code>109.mayu</code></a> 又は <a href="104.mayu"><code>104.mayu</code></a> に書かれています。</p>
+			<p>デフォルトのキーボード定義は <a href="../109.mayu"><code>109.mayu</code></a> 又は <a href="../104.mayu"><code>104.mayu</code></a> に書かれています。</p>
 
 			<dl>
 			  <dt class="h3"><a name="def_key">キー定義</a>
@@ -802,7 +802,7 @@
 				
 				<p><strong>(C-k-2)</strong> カーソルが行末以外の場合、行末までをクリップボードに追加して行末までのテキストを削除。</p>
 				
-				<p>です。「窓使いの憂鬱」での定義は、<a href="emacsedit.mayu"><code>emacsedit.mayu</code></a> では、</p>
+				<p>です。「窓使いの憂鬱」での定義は、<a href="../emacsedit.mayu"><code>emacsedit.mayu</code></a> では、</p>
 
 				<p class="sample">
 				keyseq $EmacsEdit/kill-line = \<br>
@@ -1125,7 +1125,7 @@
 			      
 			  <dd class="d3">
 			      <div>
-				<p>仮想キーを Windows へ入力します。仮想キーには、物理的なキーボードから入力できないキーも存在しますのでそのようなキーの入力に使用します。仮想キーを調べるには、<a href="MANUAL.html#KEYNAME">key investigation</a> を参照してください。例えば、</p>
+				<p>仮想キーを Windows へ入力します。仮想キーには、物理的なキーボードから入力できないキーも存在しますのでそのようなキーの入力に使用します。仮想キーを調べるには、<a href="MANUAL-ja.html#KEYNAME">key investigation</a> を参照してください。例えば、</p>
 				
 				<p class="sample">
 				key 変換 =&gt; &amp;VK(F13)
@@ -1142,7 +1142,7 @@
 			      
 			  <dd class="d3">
 			      <div>
-				<p>内部変数を <code><em>mag</em></code> 倍してから <code><em>inc</em></code> を加えます。この変数は、<a href="CUSTOMIZE.html#function_Repeat"><code>&amp;Repeat</code></a> と <a href="CUSTOMIZE.html#function_HelpVariable"><code>&amp;HelpVariable</code></a> で使用されます。</p>
+				<p>内部変数を <code><em>mag</em></code> 倍してから <code><em>inc</em></code> を加えます。この変数は、<a href="#function_Repeat"><code>&amp;Repeat</code></a> と <a href="#function_HelpVariable"><code>&amp;HelpVariable</code></a> で使用されます。</p>
 			      </div>
 			      
 			  <dt class="h3"><a name="function_Wait"><code>&amp;Wait(<em>milli_second</em>)</code></a>
