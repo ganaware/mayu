@@ -26,6 +26,7 @@ enum EngineNotify
   EngineNotify_showDlg,				///
   EngineNotify_helpMessage,			///
   EngineNotify_setForegroundWindow,		///
+  EngineNotify_clearLog,			///
 };
 
 
@@ -412,6 +413,8 @@ private:
 				 const KeySeq *i_keySeq2);
   ///
   void funcEmacsEditKillLineFunc(FunctionParam *i_param);
+  /// clear log
+  void funcLogClear(FunctionParam *i_param);
   // END OF FUNCTION DEFINITION
 #  define FUNCTION_FRIEND
 #  include "functions.h"

@@ -206,11 +206,10 @@ void Engine::describeBindings()
 {
   Acquire a(&m_log, 0);
 
-  Keymap::DescribedKeys dk;
-  
+  Keymap::DescribeParam dp;
   for (KeymapPtrList::iterator i = m_currentFocusOfThread->m_keymaps.begin();
-       i != m_currentFocusOfThread->m_keymaps.end(); i ++)
-    (*i)->describe(m_log, &dk);
+       i != m_currentFocusOfThread->m_keymaps.end(); ++ i)
+    (*i)->describe(m_log, &dp);
   m_log << std::endl;
 }
 

@@ -1659,3 +1659,12 @@ void Engine::funcEmacsEditKillLineFunc(FunctionParam *i_param)
   m_emacsEditKillLine.func();
   m_emacsEditKillLine.m_doForceReset = false;
 }
+
+// clear log
+void Engine::funcLogClear(FunctionParam *i_param)
+{
+  if (!i_param->m_isPressed)
+    return;
+  PostMessage(getAssociatedWndow(), WM_APP_engineNotify,
+	      EngineNotify_clearLog, 0);
+}
