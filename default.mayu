@@ -501,6 +501,7 @@ endif
 
 
 ## Acrobat Reader .............................................................
+## http://www.adobe.co.jp/support/custsupport/library/acrwin.html
 
 window AcrobatReader /AcroRd32.exe:.*:MDIClient:/ : EmacsMove
  key Space		=> PageDown
