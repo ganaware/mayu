@@ -98,9 +98,11 @@ const SetupFile::Data g_setupFiles[] =
   SN(Dir , ALL, "contrib"	     , ToDest), // mkdir
   DN(File, ALL, "mayu-settings.txt"  , ToDest, "contrib\\mayu-settings.txt"),
   DN(File, ALL, "dvorak.mayu"	     , ToDest, "contrib\\dvorak.mayu"      ),
+  DN(File, ALL, "dvorak109.mayu"     , ToDest, "contrib\\dvorak109.mayu"   ),
   DN(File, ALL, "keitai.mayu"	     , ToDest, "contrib\\keitai.mayu"      ),
   DN(File, ALL, "ax.mayu"	     , ToDest, "contrib\\ax.mayu"          ),
   DN(File, ALL, "98x1.mayu"	     , ToDest, "contrib\\98x1.mayu"        ),
+  DN(File, ALL, "109onAX.mayu"	     , ToDest, "contrib\\109onAX.mayu"     ),
 };
 
 
