@@ -7,6 +7,7 @@
 #include "mayu.h"
 #include "mayurc.h"
 #include "windowstool.h"
+#include "compiler_specific_func.h"
 
 #include <cstdio>
 #include <windowsx.h>
@@ -30,11 +31,29 @@ public:
     setSmallIcon(m_hwnd, IDI_ICON_mayu);
     setBigIcon(m_hwnd, IDI_ICON_mayu);
     
-    _TCHAR buf[1024], buf2[1024];
-    Edit_GetText(GetDlgItem(m_hwnd, IDC_STATIC_version), buf,
-		 NUMBER_OF(buf));
-    _sntprintf(buf2, NUMBER_OF(buf2), buf, _T(VERSION));
-    Edit_SetText(GetDlgItem(m_hwnd, IDC_STATIC_version), buf2);
+    _TCHAR modulebuf[1024];
+    CHECK_TRUE( GetModuleFileName(g_hInst, modulebuf,
+				  NUMBER_OF(modulebuf)) );
+    
+    _TCHAR buf[1024];
+    _sntprintf(buf, NUMBER_OF(buf), loadString(IDS_version).c_str(),
+	       _T(VERSION)
+#ifndef NDEBUG
+	       _T(" (DEBUG)")
+#endif // !NDEBUG
+#ifdef _UNICODE
+	       _T(" (UNICODE)")
+#endif // !_UNICODE
+	       ,
+	       loadString(IDS_homepage).c_str(),
+	       (_T(LOGNAME) _T("@") + toLower(_T(COMPUTERNAME))).c_str(),
+	       _T(__DATE__) _T(" ") _T(__TIME__),
+	       getCompilerVersionString().c_str(),
+	       modulebuf);
+    
+    
+    Edit_SetText(GetDlgItem(m_hwnd, IDC_EDIT_builtBy), buf);
+    
     return TRUE;
   }
   
@@ -57,9 +76,8 @@ public:
       }
       case IDC_BUTTON_download:
       {
-	_TCHAR buf[1024];
-	Edit_GetText(GetDlgItem(m_hwnd, IDC_STATIC_url), buf, NUMBER_OF(buf));
-	ShellExecute(NULL, _T("open"), buf, NULL, NULL, SW_SHOWNORMAL);
+	ShellExecute(NULL, _T("open"), loadString(IDS_homepage).c_str(),
+		     NULL, NULL, SW_SHOWNORMAL);
 	CHECK_TRUE( EndDialog(m_hwnd, 0) );
 	return TRUE;
       }
