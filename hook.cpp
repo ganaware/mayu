@@ -438,6 +438,15 @@ LRESULT CALLBACK getMessageProc(int i_nCode, WPARAM i_wParam, LPARAM i_lParam)
     case WM_SYSKEYDOWN:
     case WM_SYSKEYUP:
     {
+      if (HIMC hIMC = ImmGetContext(msg.hwnd))
+      {
+	bool prev = g.m_isImeLock;
+	g.m_isImeLock = !!ImmGetOpenStatus(hIMC);
+	ImmReleaseContext(msg.hwnd, hIMC);
+	if (prev != g.m_isImeLock) {
+	  notifyLockState();
+	}
+      }
       int nVirtKey = (int)msg.wParam;
       // int repeatCount = (msg.lParam & 0xffff);
       BYTE scanCode   = (BYTE)((msg.lParam >> 16) & 0xff);
