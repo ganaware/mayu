@@ -15,6 +15,7 @@ default.mayu    （作者好みの）便利な設定の入ったファイル
 dot.mayu        デフォルトの設定ファイル
 emacsedit.mayu  emacsに似せたキーマップの定義
 
+contrib/98x1.mayu          NEC PC-98x1用の設定
 contrib/ax.mayu            AXキーボード用の設定
 contrib/dvorak.mayu        普通のキーボードでdvorak風に使う設定
 contrib/keitai.mayu        IME入力時にテンキーで携帯電話風に使う設定
@@ -95,7 +96,7 @@ mayuをインストールして104on109で使う方がお薦めです。
 default.mayu
 作者の趣味に従って作られた、偏ったデフォルト設定ファイルです。
 これを$HOME/.mayuで読み込めば、UN*X使いは幸せになれるはずです。
-おおまかに言うと、UNIXやemacsを常用している人向けの設定です。
+おおまかに言うと、UN*Xやemacsを常用している人向けの設定です。
 バージョンアップのたびに無軌道に増えていくので、
 全てを説明するのは不可能だと思いますが、
 可能な範囲で列挙していきます。
@@ -175,9 +176,11 @@ emacsに似た動作を実現させるための設定ファイルです。
 default.mayuで読みこまれています。
 
 
+contrib/98x1.mayu
 contrib/ax.mayu
 contrib/dvorak.mayu
 これらのファイルは、mayuのユーザーから提供されたファイルです。
+PC-98x1用の設定ファイルと、
 AXキーボード用の設定ファイルと、
 普通のキーボードでdvorak風に使う設定のようです。
 残念ながら筆者は使ったことがありませんが、
