@@ -58,11 +58,12 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
 	    <ul>
 	      <li>Windows2000 の場合は、メニューの終了を選んだ後に何かのキ−を押さないと実際に終了しません。(<a href="#BUGS">BUG</a> です)
 	      <li>終了させるだけでよく、アンインストールする必要はありません。
-	      <li>DLL が更新された場合は、いったんログアウトしてください。さもないとさまざまなアプリケーションが落ちる可能性があります。
+	      <li>DLL が更新されたと <a href="HISTORY">history</a> に書いてある場合は、いったんログアウトしてください。さもないとさまざまなアプリケーションが落ちる可能性があります。
 	    </ul>
 	<li>ダウンロードした実行ファイルを Administrator 権限で実行してください。すると「窓使いの憂鬱」がインストールされます。
 	<li>お好みにより、スタートアップにショートカットを作るのもいいでしょう。
 	<li>標準の設定ファイルの内容は <a href="contrib/mayu-settings.txt">contrib/mayu-settings.txt</a> が参考になります。
+	<li><tt>mayu.exe</tt> を実行することで開始します。
       </ol>
       <br>
       
@@ -70,12 +71,6 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
       
   <dd class="d1">
       コントロールパネルから「窓使いの憂鬱」をアンインストールしてください。アンインストール後に再びインストールする場合は、再起動後にインストールして下さい。また、アンインストール後に <tt>mayu.dll</tt> が残る場合があるので、その場合は再起動後に手作業で消してください。
-      <br>
-      レジストリも削除する場合は、
-      
-      <p class="sample">
-      HKEY_CURRENT_USER\Software\GANAware\mayu<br>
-      HKEY_LOCAL_MACHINE\Software\GANAware\mayu<br>
       </p>
       
       というキーをレジストリエディタで削除してください。
@@ -109,7 +104,7 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
 	<li>インストーラは、AltIME が入っていたら警告を出す。
 	<li>インストーラは、ロジテックマウスが入っていたら警告を出す。
 	<li>Logiteck のキーボードドライバを使っているときにも動くようにする。
-	<li>WDM ドライバにして Windows95/98/ME でも動くようにする。
+	<li>WDM ドライバにして Windows98/ME でも動くようにする。
 	    <ul>
 	      <li>作者は必要性を感じていませんが、やる気のある方がドライバを書いて送っていただければ対応します。
 	    </ul>
@@ -117,6 +112,7 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
 	    <ul>
 	      <li>マウスフィルタドライバを書けば対応できます。(以下同上)
 	    </ul>
+	<li>ドライバのセキュリティに関しての調査・実装。
 	<li>(誰か hack してくれないかな…(まぢ
 	<li>(誰かかわいい女の子なマスコットキャラとか描いてくれないかな(ぉ
       </ul>
@@ -240,6 +236,12 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
       
   <dd class="d1">
       <dl>
+	<dt>2000/05/28 version 3.16
+	    <ul>
+	      <li>インストーラがテンポラリフォルダに作った contrib を削除しないバグを直した。
+	      <li>アンインストーラが「窓使いの憂鬱」関連のレジストリを全て消すように変更。
+	      <li>バージョンダイアログの「最新バージョンのダウンロード」ボタンが利かなくなっていたバグを直した。
+	    </ul>
 	<dt>2000/05/23 version 3.15
 	    <ul>
 	      <li>ドライバを起動時にスタートさせることにした。ので、Administrator じゃなくても窓使いの憂鬱を起動できるようになったはず。ただしこれを有効にするには、窓使いの憂鬱を一旦アンインストールして、コンピュータをリセットしてから再びインストールすること。

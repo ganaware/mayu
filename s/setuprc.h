@@ -18,8 +18,8 @@
 #define IDS_mayu                        15
 #define IDS_mayud                       16
 #define IDS_shortcutName                17
-#define IDS_keyboard1                   18
-#define IDS_keyboard2                   19
+#define IDS_keyboard109                 18
+#define IDS_keyboard104                 19
 #define IDS_readFromHomeDirectory       22
 #define IDS_note01                      32
 #define IDS_note02                      33

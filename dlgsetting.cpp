@@ -206,7 +206,7 @@ public:
 	  getItem(index, &data);
 	if (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_DIALOG_editSetting),
 			   NULL, dlgEditSetting_dlgProc, (LPARAM)&data))
-	  if (!data.filename.empty())
+	  if (!data.name.empty())
 	  {
 	    insertItem(0, data);
 	    setSelectedItem(0);

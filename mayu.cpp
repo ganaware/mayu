@@ -554,13 +554,13 @@ void convertRegistry()
   bool doesAdd = false;
   if (reg.read(".mayu", &dot_mayu))
   {
-    reg.write(".mayu0", ";" + dot_mayu);
+    reg.write(".mayu0", ";" + dot_mayu + ";");
     reg.remove(".mayu");
     doesAdd = true;
   }
   else if (!reg.read(".mayu0", &dot_mayu))
   {
-    reg.write(".mayu0", loadString(IDS_readFromHomeDirectory) + ";");
+    reg.write(".mayu0", loadString(IDS_readFromHomeDirectory) + ";;");
     doesAdd = true;
   }
   if (doesAdd)

@@ -13,13 +13,15 @@ DEFINES		= -DSTRICT $(DEBUGDEFINES) -D_WIN32_IE=0x0400
 TARGET_1	= setup.exe
 OBJS_1		=			\
 		setup.obj		\
+		installer.obj		\
+		..\regexp.obj		\
 		..\registry.obj		\
 		..\stringtool.obj	\
 		..\windowstool.obj	\
 
 RES_1		= setup.res
 
-LIBS_1		= $(guixlibsmt) shell32.lib shlwapi.lib ole32.lib uuid.lib
+LIBS_1		= $(guixlibsmt) shell32.lib ole32.lib uuid.lib
 
 
 # cab32.exe	###############################################################
