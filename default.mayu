@@ -291,7 +291,7 @@ window	Emacs	/:Emacs$/ : Emacsen
 
  keyseq $Notepad/new		= &PostMessage(ToParentWindow, 273, 9, 0)
  keyseq $Notepad/open		= &PostMessage(ToParentWindow, 273, 10, 0)
- keyseq $Notepad/save-as	= &PostMessage(ToParentWindow, 273, 15, 0)
+ keyseq $Notepad/save-as	= &PostMessage(ToParentWindow, 273, 1, 0)
 
 keymap2	NotepadC-X : GeneralC-X
  event prefixed		=> &HelpMessage("ƒƒ‚’  C-x-", "C-x C-s\tã‘‚«•Û‘¶\r\nC-x C-f\tŠJ‚­\t\r\nC-x k\t\tV‹Kì¬\r\nC-x C-c\tI—¹")
