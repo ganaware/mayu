@@ -128,18 +128,33 @@
 	      <p>あなたはおそらく <a href="default.mayu"><code>default.mayu</code></a> を使っています。これを利用するとかなり色々な操作を Emacs 風にされてしまいますので、あなたの Windows 汚染度が高かったり、Emacs 汚染度が低かったりすると戸惑うことでしょう。<a href="contrib/mayu-settings.txt"><code>contrib/mayu-settings.txt</code></a> を参考に、自分好みにカスタマイズしてください。</p>
 
 	      <p>ちなみに、Windows なんだし <code>C-z</code>, <code>C-x</code>, <code>C-c</code>, <code>C-v</code> だけは使わせろ、という人のために、<code>ZXCV</code> というシンボルが定義されています。<code>-DZXCV</code> するなり <code>define ZXCV</code> すれば、それだけは Windows っぽく動きます。</p>
-	  <dt class="h2">Q6. 右 <kbd>[Windows]</kbd> キーを押すと IME のオンオフができるようにしたい。
+	  <dt class="h2">Q6.ノートパソコンの<kbd>[Fn]</kbd>キーに何か機能を割り当てることはできますか？ 
+	  <dd class="d2"><p>
+<kbd>[Fn]</kbd>キーを単体で押してもWindowsにキーイベントは来ないはずです
+（スキャンコードの調査で調べられます）。
+当然ながら、このようなキーに機能を割り当てることはできません。
+</p>
+	  <dt class="h2">Q7. スキャンコードの調査で、
+例えば<kbd>[Shift]</kbd>+<kbd>[↑]</kbd>を押したときなど、
+たまに出るはずのないE0-0x2aというキーイベントが出るようですが、
+これは何ですか？
+	  <dd class="d2"><p>このキーイベントがどういうタイミングで発生するのか、
+作者にもわかりません。
+なにか情報をお持ちの方は教えてください。
+</p>
+
+	  <dt class="h2">Q8. 右 <kbd>[Windows]</kbd> キーを押すと IME のオンオフができるようにしたい。
 	  <dd class="d2">
 	      <p class="sample">mod windows -= RightWindows # ... (1)<br>
 	      key RightWindows =&gt; $ToggleIME<br>
 	      </p>
 	      
 	      <p>右 <kbd>[Windows]</kbd> キーはモディファイヤキーなので特別扱いされます。したがって普通のキーのように動作するようにするには、<code>(1)</code> のようにしてモディファイヤキーとして動作しないようにします。これは <kbd>[Alt]</kbd> や <kbd>[Shift]</kbd> や <kbd>[Control]</kbd> でも同様です。</p>
-	  <dt class="h2">Q7. ウインドウのクラス名はどうやって調べるんですか？
+	  <dt class="h2">Q9. ウインドウのクラス名はどうやって調べるんですか？
 	  <dd class="d2"><p>タスクトレイの「窓使いの憂鬱」のアイコンでマウスの右ボタンを押して「<a href="#CLASSNAME">調査(I)...</a>」を選びます。</p>
-	  <dt class="h2">Q8. アクティブな時にしか見えない窓などの場合、上記の方法では調査できないですが？
+	  <dt class="h2">Q10. アクティブな時にしか見えない窓などの場合、上記の方法では調査できないですが？
 	  <dd class="d2"><p><a href="CUSTOMIZE.html#function_WindowIdentify"><code>&amp;WindowIdentify</code></a> を使ってください。<a href="default.mayu"><code>default.mayu</code></a> では <kbd>[Ctrl]</kbd> +<kbd>[Shift]</kbd> + <kbd>[D]</kbd> に割り振ってあります。</p>
-	  <dt class="h2">Q9. インストール時には 109 キーボードだったのですが、今度 104 キーボードを購入しました。しかし、タスクトレイメニューの「選択」には 109 しか出てきません。どうすればいいですか。
+	  <dt class="h2">Q11. インストール時には 109 キーボードだったのですが、今度 104 キーボードを購入しました。しかし、タスクトレイメニューの「選択」には 109 しか出てきません。どうすればいいですか。
 	  <dd class="d2">
 	      <p>インストール時の選択により、以下の表の上 4 つまたは下 4 つが選ばれます。「設定」ダイアログボックスで適切に設定してください。(<code>%MAYU_DIR%</code> は mayu をインストールしたディレクトリです)</p>
 	      
@@ -169,16 +184,16 @@
 		<tr class="filename"><th>設定ファイル名</th><td><code>%MAYU_DIR%\dot.mayu</code></td></tr>
 		<tr class="symbol"><th>シンボル</th><td><code>-DUSE104;-DUSE109on104</code></td></tr>
 	      </table>
-	  <dt class="h2">Q10. 「窓使いの憂鬱」では USB キーボードは使えないのですか。
+	  <dt class="h2">Q12. 「窓使いの憂鬱」では USB キーボードは使えないのですか。
 	  <dd class="d2"><p>小林義明さんが Windows2000 用のドライバを書いてくださったので、USB 用の mayu ドライバを利用すれば使用することができます。現在はまだテスト中なので <a href="#SUPPORT">メーリングリスト</a> で問い合わせてください。又 Win9x では普通に使用できます。</p>
-	  <dt class="h2">Q11. 「窓使いの憂鬱」は Windows95/98/ME では使えないのですか。
+	  <dt class="h2">Q13. 「窓使いの憂鬱」は Windows95/98/ME では使えないのですか。
 	  <dd class="d2"><p>小林義明さんがドライバを書いてくださったので、バージョン 3.19 から使用できるようになりました。</p>
-	  <dt class="h2">Q12. このマニュアルをNetscape4で見るとぐちゃぐちゃなんですけど、そういうもんですか。
+	  <dt class="h2">Q14. このマニュアルをNetscape4で見るとぐちゃぐちゃなんですけど、そういうもんですか。
 	  <dd class="d2">
 	      <p>そういうもんです。Netscape4 の css サポートが腐っているせいです。css をオフにすればまだましになりますけど、やっぱり見にくいです。</p>
 	      <p>ちなみに作者は IE5.5 と Mozilla 0.92 でしか確認していません。IE5.0 では細かい見栄えが少しだけ違ったりします。</p>
 
-	  <dt class="h2">Q13. mayu は<a href="http://www.tactics.co.jp/qtactics/one.htm" target="_top">椎名繭</a>なのですか。
+	  <dt class="h2">Q15. mayu は<a href="http://www.tactics.co.jp/qtactics/one.htm" target="_top">椎名繭</a>なのですか。
 	  <dd class="d2"><p>違います。ぜんぜん違います。GTO の繭君でもないです。</p>
 	</dl>
       </div>
