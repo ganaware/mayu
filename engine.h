@@ -152,6 +152,7 @@ private:
                                                     mayu-device ? */
   HANDLE m_threadEvent;				/** 1. thread has been started
 						    2. thread is about to end*/
+  tstring m_mayudVersion;			/// version of mayud.sys
 #if defined(_WINNT)
   HANDLE m_readEvent;				/** reading from mayu device
                                                     has been completed */
@@ -524,6 +525,8 @@ public:
   /// get current window title name
   const tstringi &getCurrentWindowTitleName() const { return m_currentFocusOfThread->m_titleName; }
 
+  /// get mayud version
+  const tstring &getMayudVersion() const { return m_mayudVersion; }
 };
 
 

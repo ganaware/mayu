@@ -86,14 +86,14 @@ BEGIN
                     WS_TABSTOP,149,47,39,10
 END
 
-IDD_DIALOG_version DIALOG DISCARDABLE  0, 0, 202, 131
+IDD_DIALOG_version DIALOG DISCARDABLE  0, 0, 204, 140
 STYLE DS_CENTERMOUSE | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "バージョン情報 - 窓使いの憂鬱"
 FONT 9, "MS UI Gothic"
 BEGIN
-    DEFPUSHBUTTON   "閉じる",IDOK,136,112,50,14
+    DEFPUSHBUTTON   "閉じる",IDOK,136,120,50,14
     PUSHBUTTON      "最新バージョンのダウンロード(&D)",IDC_BUTTON_download,
-                    32,112,100,14
+                    32,120,100,14
     ICON            IDI_ICON_mayu,IDC_STATIC_mayuIcon,8,20,20,20
     EDITTEXT        IDC_EDIT_builtBy,32,8,164,104,ES_MULTILINE | 
                     ES_AUTOVSCROLL | ES_READONLY | NOT WS_BORDER
@@ -257,7 +257,7 @@ BEGIN
     IDS_mayuPathName        "名前"
     IDS_mayuPath            "設定ファイル名"
     IDS_mayuSymbols         "シンボル"
-    IDS_version             "窓使いの憂鬱 %s\r\n  %s\r\n\r\nCopyright (C) 1999-2003,\r\n  TAGA Nayuta <nayuta@users.sourceforge.net>\r\n\r\nbuilt by %s\r\n  %s\r\n  %s\r\n\r\n  %s\r\n"
+    IDS_version             "窓使いの憂鬱 %s\r\n(mayud: %s)\r\n  %s\r\n\r\nCopyright (C) 1999-2003,\r\n  TAGA Nayuta <nayuta@users.sourceforge.net>\r\n\r\nbuilt by %s\r\n  %s\r\n  %s\r\n\r\n  %s\r\n"
     IDS_homepage            "http://mayu.sourceforge.net"
 END
 
@@ -336,14 +336,14 @@ BEGIN
                     WS_TABSTOP,149,147,39,10
 END
 
-IDD_DIALOG_version DIALOG DISCARDABLE  0, 0, 204, 132
+IDD_DIALOG_version DIALOG DISCARDABLE  0, 0, 204, 140
 STYLE DS_CENTERMOUSE | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "Version - MADO TSUKAI NO YUUTSU"
 FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "&Close",IDOK,136,112,50,14
+    DEFPUSHBUTTON   "&Close",IDOK,136,120,50,14
     PUSHBUTTON      "&Download The Latest Version",IDC_BUTTON_download,32,
-                    112,100,14
+                    120,100,14
     ICON            IDI_ICON_mayu,IDC_STATIC_mayuIcon,8,20,20,20
     EDITTEXT        IDC_EDIT_builtBy,32,8,164,104,ES_MULTILINE | 
                     ES_AUTOVSCROLL | ES_READONLY | NOT WS_BORDER
@@ -498,7 +498,7 @@ BEGIN
     IDS_mayuPathName        "Name"
     IDS_mayuPath            "Setting Filename"
     IDS_mayuSymbols         "Symbols"
-    IDS_version             "MADO TSUKAI NO YUUTSU %s\r\n  %s\r\n\r\nCopyright (C) 1999-2003,\r\n  TAGA Nayuta <nayuta@users.sourceforge.net>\r\n\r\nbuilt by %s\r\n  %s\r\n  %s\r\n\r\n  %s\r\n"
+    IDS_version             "MADO TSUKAI NO YUUTSU %s\r\n(mayud: %s)\r\n  %s\r\n\r\nCopyright (C) 1999-2003,\r\n  TAGA Nayuta <nayuta@users.sourceforge.net>\r\n\r\nbuilt by %s\r\n  %s\r\n  %s\r\n\r\n  %s\r\n"
     IDS_homepage            "http://mayu.sourceforge.net"
 END
 

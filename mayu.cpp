@@ -570,8 +570,9 @@ public:
     CHECK_TRUE( m_hwndInvestigate );
 
     m_hwndVersion =
-      CreateDialog(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_version), NULL,
-		   dlgVersion_dlgProc);
+      CreateDialogParam(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_version),
+			NULL, dlgVersion_dlgProc,
+			(LPARAM)m_engine.getMayudVersion().c_str());
     CHECK_TRUE( m_hwndVersion );
 
     // attach log

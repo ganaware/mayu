@@ -909,6 +909,7 @@ Engine::Engine(tomsgstream &i_log)
     m_device(NULL),
     m_didMayuStartDevice(false),
     m_threadEvent(NULL),
+    m_mayudVersion(_T("unknown")),
 #if defined(_WINNT)
     m_readEvent(NULL),
     m_terminateThreadEvent(NULL),
@@ -977,6 +978,15 @@ Engine::Engine(tomsgstream &i_log)
       throw ErrorMessage() << loadString(IDS_driverNotInstalled);
   }
 
+  {
+    TCHAR versionBuf[256];
+    DWORD length = 0;
+
+    if (DeviceIoControl(m_device, IOCTL_MAYU_GET_VERSION, NULL, 0,
+			versionBuf, sizeof(versionBuf), &length, NULL)
+	&& length)
+      m_mayudVersion = tstring(versionBuf, length / 2);
+  }
   // create event for sync
   CHECK_TRUE( m_eSync = CreateEvent(NULL, FALSE, FALSE, NULL) );
 #if defined(_WINNT)

@@ -28,8 +28,9 @@ public:
   }
   
   /// WM_INITDIALOG
-  BOOL wmInitDialog(HWND /* i_focus */, LPARAM /* i_lParam */)
+  BOOL wmInitDialog(HWND /* i_focus */, LPARAM i_lParam)
   {
+    TCHAR *mayudVersion = (TCHAR*)i_lParam;
     setSmallIcon(m_hwnd, IDI_ICON_mayu);
     setBigIcon(m_hwnd, IDI_ICON_mayu);
     
@@ -47,6 +48,7 @@ public:
 	       _T(" (UNICODE)")
 #endif // !_UNICODE
 	       ,
+	       mayudVersion,
 	       loadString(IDS_homepage).c_str(),
 	       (_T(LOGNAME) _T("@") + toLower(_T(COMPUTERNAME))).c_str(),
 	       _T(__DATE__) _T(" ") _T(__TIME__),
