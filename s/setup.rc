@@ -126,10 +126,8 @@ STRINGTABLE DISCARDABLE
 BEGIN
     IDS_mayud               "窓使いの憂鬱ドライバ"
     IDS_shortcutName        "窓使いの憂鬱"
-    IDS_keyboard109         "日本語 109 (106) キーボード"
-    IDS_keyboard104         "英語 104 (101) キーボード"
-    IDS_keyboard109usb      "日本語 109 (106) USB キーボード"
-    IDS_keyboard104usb      "英語 104 (101) USB キーボード"
+    IDS_keyboard109usb      "日本語 109 (106) キーボード"
+    IDS_keyboard104usb      "英語 104 (101) キーボード"
 END
 
 STRINGTABLE DISCARDABLE 
@@ -242,10 +240,8 @@ STRINGTABLE DISCARDABLE
 BEGIN
     IDS_mayud               "MADO TSUKAI NO YUUTSU driver"
     IDS_shortcutName        "MADO TSUKAI NO YUUTSU"
-    IDS_keyboard109         "Japanese 109 (106) Keyboard"
-    IDS_keyboard104         "Standard 104 (101) Keyboard"
-    IDS_keyboard109usb      "Japanese 109 (106) USB Keybaord"
-    IDS_keyboard104usb      "Standard 104 (101) USB Keyboard"
+    IDS_keyboard109usb      "Japanese 109 (106) Keybaord"
+    IDS_keyboard104usb      "Standard 104 (101) Keyboard"
 END
 
 STRINGTABLE DISCARDABLE 

@@ -19,8 +19,6 @@
 #define IDS_mayu                        15
 #define IDS_mayud                       16
 #define IDS_shortcutName                17
-#define IDS_keyboard109                 18
-#define IDS_keyboard104                 19
 #define IDS_keyboard109usb              20
 #define IDS_keyboard104usb              21
 #define IDS_readFromHomeDirectory       22

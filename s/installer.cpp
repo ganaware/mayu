@@ -264,15 +264,44 @@ namespace Installer
 		    SERVICE_ERROR_IGNORE,
 		    i_driverPath.c_str(), NULL, NULL,
 		    i_preloadedGroups, NULL, NULL);
+    DWORD err = GetLastError();
     if (hs == NULL)
     {
-      DWORD err = GetLastError();
       switch (err)
       {
 	case ERROR_SERVICE_EXISTS:
+	{
+#if 0
+	  hs = OpenService(hscm, i_serviceName.c_str(), SERVICE_CHANGE_CONFIG);
+	  if (hs == NULL) {
+	    CloseServiceHandle(hscm);
+	    return GetLastError();
+	  }
+	  if (!ChangeServiceConfig(
+		hscm, SERVICE_KERNEL_DRIVER,
+		forUsb == true ? SERVICE_DEMAND_START : SERVICE_AUTO_START,
+		SERVICE_ERROR_IGNORE,
+		i_driverPath.c_str(), NULL, NULL,
+		i_preloadedGroups, NULL, NULL,
+		i_serviceDescription.c_str())) {
+	    CloseServiceHandle(hs);
+	    CloseServiceHandle(hscm);
+	    return GetLastError();		// ERROR_IO_PENDING!
+	    // this code always reaches here. why?
+	  }
+#else
+	  Registry reg(HKEY_LOCAL_MACHINE,
+		       _T("SYSTEM\\CurrentControlSet\\Services\\mayud"));
+	  reg.write(_T("Start"),
+		    forUsb ? SERVICE_DEMAND_START : SERVICE_AUTO_START);
+#endif
 	  break;
+	}
 	default:
+	{
+	  CloseServiceHandle(hscm);
 	  return err;
+	}
       }
     }
     CloseServiceHandle(hs);

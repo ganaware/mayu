@@ -150,8 +150,27 @@ void driverServiceError(DWORD i_err)
       message(IDS_alreadyUninstalled, MB_OK | MB_ICONSTOP);
       break;
     default:
-      message(IDS_error, MB_OK | MB_ICONSTOP);
+    {
+      TCHAR *errmsg;
+      int err = int(i_err);
+      if (err < 0) {
+	i_err = -err;
+      }
+      if (FormatMessage(
+	    FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+	    NULL, i_err, 0, (LPTSTR)&errmsg, 0, NULL)) {
+	TCHAR buf[1024];
+	_sntprintf(buf, NUMBER_OF(buf), _T("%s: %d: %s\n"),
+		   g_resource->loadString(IDS_error),
+		   err, errmsg);
+	LocalFree(errmsg);
+	MessageBox(NULL, buf, g_resource->loadString(IDS_mayuSetup),
+		   MB_OK | MB_ICONSTOP);
+      } else {
+	message(IDS_error, MB_OK | MB_ICONSTOP);
+      }
       break;
+    }
   }
 }
 
@@ -289,15 +308,19 @@ private:
     setBigIcon(m_hwnd, IDI_ICON_mayu);
     Edit_SetText(GetDlgItem(m_hwnd, IDC_EDIT_path), g_destDir.c_str());
     HWND hwndCombo = GetDlgItem(m_hwnd, IDC_COMBO_keyboard);
+#if 0
     if (checkOs(SetupFile::W2k))
+#endif
     {
       ComboBox_AddString(hwndCombo,
 			 g_resource->loadString(IDS_keyboard109usb));
       ComboBox_AddString(hwndCombo,
 			 g_resource->loadString(IDS_keyboard104usb));
     }
+#if 0
     ComboBox_AddString(hwndCombo, g_resource->loadString(IDS_keyboard109));
     ComboBox_AddString(hwndCombo, g_resource->loadString(IDS_keyboard104));
+#endif
     ComboBox_SetCurSel(hwndCombo,
 		       (g_keyboardKind == KEYBOARD_KIND_109) ? 0 : 1);
     tstring note = g_resource->loadString(IDS_note01);
@@ -362,7 +385,9 @@ private:
 	  int curSel =
 	    ComboBox_GetCurSel(GetDlgItem(m_hwnd, IDC_COMBO_keyboard));
 	  g_flags = SetupFile::Normal;
+#if 0
 	  if (checkOs(SetupFile::W2k))
+#endif
 	  {
 	    switch (curSel)
 	    {
@@ -374,10 +399,13 @@ private:
 		g_keyboardKind = KEYBOARD_KIND_104;
 		g_flags = Flag_Usb;
 		break;
+#if 0
 	      case 2: g_keyboardKind = KEYBOARD_KIND_109; break;
 	      case 3: g_keyboardKind = KEYBOARD_KIND_104; break;
+#endif
 	    };
 	  }
+#if 0
 	  else
 	  {
 	    switch (curSel)
@@ -386,6 +414,7 @@ private:
 	      case 1: g_keyboardKind = KEYBOARD_KIND_104; break;
 	    };
 	  }
+#endif
 
 #if 0
 	  if (g_flags == Flag_Usb)
@@ -526,27 +555,32 @@ int WINAPI _tWinMain(HINSTANCE i_hInstance, HINSTANCE /* hPrevInstance */,
     retval = uninstallStep1(_T("-u"));
   else
   {
-    // is mayu running ?
-    HANDLE mutex = CreateMutex(
+    HANDLE mutexPrevVer = CreateMutex(
       (SECURITY_ATTRIBUTES *)NULL, TRUE,
-      addSessionId(MUTEX_MAYU_EXCLUSIVE_RUNNING).c_str());
-    if (GetLastError() == ERROR_ALREADY_EXISTS) // mayu is running
+      MUTEX_MAYU_EXCLUSIVE_RUNNING);
+    if (GetLastError() == ERROR_ALREADY_EXISTS) { // mayu is running
       message(IDS_mayuRunning, MB_OK | MB_ICONSTOP);
-    else if (__argc == 3 && _tcsicmp(__targv[1], _T("-u")) == 0)
-    {
-      uninstallStep2(__targv[2]);
-      retval = uninstall();
+    } else {
+      // is mayu running ?
+      HANDLE mutex = CreateMutex(
+	(SECURITY_ATTRIBUTES *)NULL, TRUE,
+	addSessionId(MUTEX_MAYU_EXCLUSIVE_RUNNING).c_str());
+      if (GetLastError() == ERROR_ALREADY_EXISTS) { // mayu is running
+	message(IDS_mayuRunning, MB_OK | MB_ICONSTOP);
+      } else if (__argc == 3 && _tcsicmp(__targv[1], _T("-u")) == 0) {
+	uninstallStep2(__targv[2]);
+	retval = uninstall();
+      } else if (__argc == 2 && _tcsicmp(__targv[1], _T("-s")) == 0) {
+	g_wasExecutedBySFX = true;
+	retval = DialogBox(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_main), NULL,
+			   DlgMain::dlgProc);
+      } else if (__argc == 1) {
+	retval = DialogBox(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_main), NULL,
+			   DlgMain::dlgProc);
+      }
+      CloseHandle(mutex);
     }
-    else if (__argc == 2 && _tcsicmp(__targv[1], _T("-s")) == 0)
-    {
-      g_wasExecutedBySFX = true;
-      retval = DialogBox(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_main), NULL,
-			 DlgMain::dlgProc);
-    }
-    else if (__argc == 1)
-      retval = DialogBox(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_main), NULL,
-			 DlgMain::dlgProc);
-    CloseHandle(mutex);
+    CloseHandle(mutexPrevVer);
   }
   
   return retval;
