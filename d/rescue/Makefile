@@ -3,6 +3,7 @@
 clean:
 	-del buildfre.log
 	-del i386\mayudrsc.sys
+	-del i386\mayudrsc.pdb
 	-del obj\_objects.mac
 	-del objfre\i386\\mayudrsc.obj
 	-del *~
