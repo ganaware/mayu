@@ -56,8 +56,10 @@ const SetupFile::Data g_setupFiles[] =
 #if defined(_WINNT)
   SN(File, NT , "mayud.sys"	     , ToDest),
   SN(File, NT , "mayudnt4.sys"	     , ToDest),
+  SN(File, W2k, "mayudrsc.sys"    , ToDest),
   SN(File, W2k, "mayud.sys"	     , ToDriver),
   DN(File, NT4, "mayudnt4.sys"	     , ToDriver, "mayud.sys"),
+  SN(File, W2k, "mayudrsc.sys"    , ToDriver),
 #elif defined(_WIN95)
   SN(File, W9x, "mayud.vxd"	     , ToDest),
 #else
