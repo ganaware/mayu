@@ -1205,6 +1205,10 @@ bool readFile(tstring *o_data, const tstringi &i_filename)
   struct stati64_t sbuf;
   if (_tstati64(i_filename.c_str(), &sbuf) < 0 || sbuf.st_size == 0)
     return false;
+  // following check is needed to cast sbuf.st_size to size_t safely
+  // this cast occurs because of above workaround for bcc
+  if (sbuf.st_size > UINT_MAX)
+    return false;
 #endif
   
   // open
@@ -1213,8 +1217,8 @@ bool readFile(tstring *o_data, const tstringi &i_filename)
     return false;
   
   // read file
-  Array<BYTE> buf(sbuf.st_size + 1);
-  if (fread(buf.get(), sbuf.st_size, 1, fp) != 1)
+  Array<BYTE> buf(static_cast<size_t>(sbuf.st_size) + 1);
+  if (fread(buf.get(), static_cast<size_t>(sbuf.st_size), 1, fp) != 1)
   {
     fclose(fp);
     return false;
@@ -1228,7 +1232,7 @@ bool readFile(tstring *o_data, const tstringi &i_filename)
       sbuf.st_size % 2 == 0)
     // UTF-16 Little Endien
   {
-    size_t size = sbuf.st_size / 2;
+    size_t size = static_cast<size_t>(sbuf.st_size) / 2;
     o_data->resize(size);
     BYTE *p = buf.get();
     for (size_t i = 0; i < size; ++ i)
@@ -1246,7 +1250,7 @@ bool readFile(tstring *o_data, const tstringi &i_filename)
       sbuf.st_size % 2 == 0)
     // UTF-16 Big Endien
   {
-    size_t size = sbuf.st_size / 2;
+    size_t size = static_cast<size_t>(sbuf.st_size) / 2;
     o_data->resize(size);
     BYTE *p = buf.get();
     for (size_t i = 0; i < size; ++ i)
@@ -1272,7 +1276,7 @@ bool readFile(tstring *o_data, const tstringi &i_filename)
   
   // try UTF-8
   {
-    Array<wchar_t> wbuf(sbuf.st_size);
+    Array<wchar_t> wbuf(static_cast<size_t>(sbuf.st_size));
     BYTE *f = buf.get();
     BYTE *end = buf.get() + sbuf.st_size;
     wchar_t *d = wbuf.get();
@@ -1325,7 +1329,7 @@ bool readFile(tstring *o_data, const tstringi &i_filename)
 #endif // _UNICODE
 
   // assume ascii
-  o_data->resize(sbuf.st_size);
+  o_data->resize(static_cast<size_t>(sbuf.st_size));
   for (off_t i = 0; i < sbuf.st_size; ++ i)
     (*o_data)[i] = buf.get()[i];
   fclose(fp);
