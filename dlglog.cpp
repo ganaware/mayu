@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////
 // dlglog.cpp
 
 
@@ -13,16 +13,18 @@
 #include <windowsx.h>
 
 
+///
 class DlgLog
 {
-  HWND hwnd;
-  HWND hwndEdit;
-  LOGFONT lf;
-  HFONT hfontOriginal;
-  HFONT hfont;
-  omsgstream *log;
+  HWND hwnd;		///
+  HWND hwndEdit;	///
+  LOGFONT lf;		///
+  HFONT hfontOriginal;	///
+  HFONT hfont;		///
+  omsgstream *log;	///
   
 public:
+  ///
   DlgLog(HWND hwnd_)
     : hwnd(hwnd_),
       hwndEdit(GetDlgItem(hwnd, IDC_EDIT_log)),
@@ -31,7 +33,7 @@ public:
   {
   }
   
-  // WM_INITDIALOG
+  /// WM_INITDIALOG
   BOOL wmInitDialog(HWND /* focus */, LPARAM lParam)
   {
     log = (omsgstream *)lParam;
@@ -59,7 +61,7 @@ public:
     return TRUE;
   }
 
-  // WM_DESTROY
+  /// WM_DESTROY
   BOOL wmDestroy()
   {
     // unset font
@@ -72,7 +74,7 @@ public:
     return TRUE;
   }
   
-  // WM_SIZE
+  /// WM_SIZE
   BOOL wmSize(DWORD /* fwSizeType */, short nWidth, short nHeight)
   {
     RECT rcLog, rcCl, rcCf, rcD, rcOK;
@@ -99,14 +101,14 @@ public:
     return TRUE;
   }
   
-  // WM_CLOSE
+  /// WM_CLOSE
   BOOL wmClose()
   {
     ShowWindow(hwnd, SW_HIDE);
     return TRUE;
   }
 
-  // WM_COMMAND
+  /// WM_COMMAND
   BOOL wmCommand(int /* notify_code */, int id, HWND /* hwnd_control */)
   {
     switch (id)
@@ -156,6 +158,7 @@ public:
 };
 
 
+///
 BOOL CALLBACK dlgLog_dlgProc(HWND hwnd, UINT message,
 			     WPARAM wParam, LPARAM lParam)
 {

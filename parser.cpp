@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////
 // parser.cpp
 
 
@@ -12,7 +12,7 @@
 using namespace std;
 
 
-///////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////
 // Token
 
 
@@ -42,7 +42,6 @@ Token::Token(const istring &value, bool isValueQuoted_, bool isRegexp)
     data(NULL)
 {
 }
-
 
 Token::Token(Type type_)
   : type(type_),
@@ -112,7 +111,7 @@ ostream &operator<<(ostream &ost, const Token &t)
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////
 // Parser
 
 
@@ -124,7 +123,7 @@ Parser::Parser(istream &ist_)
 {
 }
 
-// set string that may be prefix of a token
+// set string that may be prefix of a token.
 // prefix_ is not copied, so it must be preserved after setPrefix()
 void Parser::setPrefix(const vector<istring> *prefix_)
 {
@@ -159,7 +158,7 @@ bool Parser::getLine(istring *line_r)
 }
 
 
-// get a parsed line
+// get a parsed line.
 // if no more lines exist, returns false
 bool Parser::getLine(vector<Token> *tokens_r)
 {

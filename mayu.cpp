@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////
 // mayu.cpp
 
 
@@ -33,42 +33,45 @@
 using namespace std;
 
 
+///
 #define ID_MENUITEM_reloadBegin _APS_NEXT_COMMAND_VALUE
 
 
-///////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////
 // Mayu
 
 
+///
 class Mayu
 {
-  HWND hwndTaskTray;		// tasktray window
-  HWND hwndLog;			// log dialog
-  HWND hwndInvestigate;		// investigate dialog
-  HWND hwndVersion;		// version dialog
+  HWND hwndTaskTray;		/// tasktray window
+  HWND hwndLog;			/// log dialog
+  HWND hwndInvestigate;		/// investigate dialog
+  HWND hwndVersion;		/// version dialog
   
-  UINT WM_TaskbarRestart;	// window message sent when taskber restarts
-  NOTIFYICONDATA ni;		// taskbar icon data
+  UINT WM_TaskbarRestart;	/// window message sent when taskber restarts
+  NOTIFYICONDATA ni;		/// taskbar icon data
 
-  omsgstream log;		// log stream (output to log dialog's edit)
+  omsgstream log;		/// log stream (output to log dialog's edit)
 
-  HANDLE mhEvent;		// event for message handler thread
+  HANDLE mhEvent;		/// event for message handler thread
 
-  HMENU hMenuTaskTray;		// tasktray menu
+  HMENU hMenuTaskTray;		/// tasktray menu
   
-  Setting *setting;		// current setting
+  Setting *setting;		/// current setting
   
-  Engine engine;		// engine
-  
+  Engine engine;		/// engine
+
+  /** @name ANONYMOUS */
   enum
   { 
-    WM_TASKTRAYNOTIFY = WM_APP + 101,
-    WM_MSGSTREAMNOTIFY = WM_APP + 102,
-    ID_TaskTrayIcon = 1,
+    WM_TASKTRAYNOTIFY = WM_APP + 101,	///
+    WM_MSGSTREAMNOTIFY = WM_APP + 102,	///
+    ID_TaskTrayIcon = 1,		///
   };
 
 private:
-  // register class for tasktray
+  /// register class for tasktray
   ATOM Register_tasktray()
   {
     WNDCLASS wc;
@@ -85,11 +88,12 @@ private:
     return RegisterClass(&wc);
   }
 
-  // notify handler thread
+  /// notify handler thread
   static void notifyHandler(void *This)
   {
     ((Mayu *)This)->notifyHandler();
   }
+  ///
   void notifyHandler()
   {
     HANDLE hMailslot =
@@ -176,7 +180,7 @@ private:
     }
   }
   
-  // window procedure for tasktray
+  /// window procedure for tasktray
   static LRESULT CALLBACK
   tasktray_wndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
   {
@@ -365,7 +369,7 @@ private:
     return DefWindowProc(hwnd, message, wParam, lParam);
   }
 
-  // load setting
+  /// load setting
   void load()
   {
     Setting *newSetting = new Setting;
@@ -393,6 +397,7 @@ private:
   }
 
 public:
+  ///
   Mayu()
     : hwndTaskTray(NULL),
       hwndLog(NULL),
@@ -468,6 +473,7 @@ public:
     notifyLockState();
   }
 
+  ///
   ~Mayu()
   {
     // first, detach log from edit control to avoid deadlock
@@ -499,7 +505,7 @@ public:
     delete setting;
   }
   
-  // message loop
+  /// message loop
   WPARAM messageLoop()
   {
     // banner
@@ -542,11 +548,11 @@ public:
 };
 
 
-///////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////
 // Functions
 
 
-// convert registry
+/// convert registry
 void convertRegistry()
 {
   Registry reg(MAYU_REGISTRY_ROOT);
@@ -597,7 +603,7 @@ void convertRegistry()
 }
 
 
-// main
+/// main
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
 		   LPSTR /* lpszCmdLine */, int /* nCmdShow */)
 {

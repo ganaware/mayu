@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////
 // errormessage.h
 
 
@@ -10,15 +10,18 @@
 #include <string>
 
 
+///
 class ErrorMessage
 {
-  std::ostrstream ost;
+  std::ostrstream ost;		///
   
 public:
+  ///
   ErrorMessage() { }
+  ///
   ErrorMessage(const ErrorMessage &em) { ost << em.getMessage(); }
 
-  // get error message
+  /// get error message
   std::string getMessage() const
   {
     ErrorMessage &em = *const_cast<ErrorMessage *>(this);
@@ -27,23 +30,26 @@ public:
     return msg;
   }
   
-  // add message
+  /// add message
   template<class T> ErrorMessage &operator<<(const T &t)
   { ost << t; return *this; }
   
-  // stream output
+
+  /// stream output
   friend std::ostream &operator<<(std::ostream &ost, const ErrorMessage &em);
 };
 
 
+/// stream output
 inline std::ostream &operator<<(std::ostream &ost, const ErrorMessage &em)
 { return ost << em.getMessage(); }
 
 
+///
 class WarningMessage : public ErrorMessage
 {
 public:
-  // add message
+  /// add message
   template<class T> WarningMessage &operator<<(const T &t)
   { ErrorMessage::operator<<(t); return *this; }
 };

@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////
 // windowstool.cpp
 
 
@@ -10,7 +10,7 @@
 #include <malloc.h>
 
 
-///////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////
 // Global variables
 
 
@@ -18,7 +18,7 @@
 HINSTANCE hInst = NULL;
 
 
-///////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////
 // Functions
 
 
@@ -47,8 +47,8 @@ HICON loadBigIcon(UINT id)
 }
 
 
-// set small icon to the specified window
-// returns handle of previous icon or NULL
+// set small icon to the specified window.
+//  @return handle of previous icon or NULL
 HICON setSmallIcon(HWND hwnd, UINT id)
 {
   HICON hicon = (id == (UINT)-1) ? NULL : loadSmallIcon(id);
@@ -56,8 +56,8 @@ HICON setSmallIcon(HWND hwnd, UINT id)
 }
 
 
-// set big icon to the specified window
-// returns handle of previous icon or NULL
+// set big icon to the specified window.
+// @return handle of previous icon or NULL
 HICON setBigIcon(HWND hwnd, UINT id)
 {
   HICON hicon = (id == (UINT)-1) ? NULL : loadBigIcon(id);
@@ -93,7 +93,8 @@ bool resizeWindow(HWND hwnd, int w, int h, bool doRepaint)
 }
 
 
-// return rect of the window in client coordinates
+// get rect of the window in client coordinates
+// @return rect of the window in client coordinates
 bool getChildWindowRect(HWND hwnd, RECT *rc)
 {
   if (!GetWindowRect(hwnd, rc))
@@ -115,11 +116,12 @@ bool getChildWindowRect(HWND hwnd, RECT *rc)
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////
 // edit control
 
 
-// returns bytes of text
+// get edit control's text size
+// @return bytes of text
 size_t editGetTextBytes(HWND hwnd)
 {
   return Edit_GetTextLength(hwnd);

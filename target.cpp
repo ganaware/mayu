@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////
 // target.cpp
 
 
@@ -9,12 +9,14 @@
 #include "windowstool.h"
 
 
+///
 class Target
 {
-  HWND hwnd;
-  HWND preHwnd;
-  HICON hCursor;
+  HWND hwnd;		///
+  HWND preHwnd;		///
+  HICON hCursor;	///
 
+  ///
   static void invertFrame(HWND hwnd)
   {
     HDC hdc = GetWindowDC(hwnd);
@@ -40,6 +42,7 @@ class Target
     _true( ReleaseDC(hwnd, hdc) );
   }
   
+  ///
   Target(HWND hwnd_)
     : hwnd(hwnd_),
       preHwnd(NULL),
@@ -47,14 +50,14 @@ class Target
   {
   }
 
-  // WM_CREATE
+  /// WM_CREATE
   int wmCreate(CREATESTRUCT * /* cs */)
   {
     _true( hCursor = LoadCursor(hInst, MAKEINTRESOURCE(IDC_CURSOR_target)) );
     return 0;
   }
 
-  // WM_PAINT
+  /// WM_PAINT
   int wmPaint()
   {
     PAINTSTRUCT ps;
@@ -74,13 +77,15 @@ class Target
     return 0;
   }
 
+  ///
   struct PointWindow
   {
-    POINT p;
-    HWND hwnd;
-    RECT rc;
+    POINT p;		///
+    HWND hwnd;		///
+    RECT rc;		///
   };
   
+  ///
   static BOOL CALLBACK childWindowFromPoint(HWND hwnd, LPARAM lParam)
   {
     if (IsWindowVisible(hwnd))
@@ -98,6 +103,7 @@ class Target
     return TRUE;
   }
   
+  ///
   static BOOL CALLBACK windowFromPoint(HWND hwnd, LPARAM lParam)
   {
     if (IsWindowVisible(hwnd))
@@ -115,7 +121,7 @@ class Target
     return TRUE;
   }
 
-  // WM_MOUSEMOVE
+  /// WM_MOUSEMOVE
   int wmMouseMove(WORD /* keys */, int /* x */, int /* y */)
   {
     if (GetCapture() == hwnd)
@@ -146,7 +152,7 @@ class Target
     return 0;
   }
 
-  // WM_LBUTTONDOWN
+  /// WM_LBUTTONDOWN
   int wmLButtonDown(WORD /* keys */, int /* x */, int /* y */)
   {
     SetCapture(hwnd);
@@ -156,7 +162,7 @@ class Target
     return 0;
   }
 
-  // WM_LBUTTONUP
+  /// WM_LBUTTONUP
   int wmLButtonUp(WORD /* keys */, int /* x */, int /* y */)
   {
     if (preHwnd)
@@ -169,6 +175,7 @@ class Target
   }
 
 public:
+  ///
   static LRESULT CALLBACK WndProc(HWND hwnd, UINT message,
 				  WPARAM wParam, LPARAM lParam)
   {

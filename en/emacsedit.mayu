@@ -1,50 +1,50 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 窓使いの憂鬱 - emacsedit.mayu
+# MADO TSUKAI NO YUUTSU - emacsedit.mayu
 # Copyright (C) 1999-2000, TAGA Nayuta <nayuta@users.sourceforge.net>
 #
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Emacs 風移動コマンド
+# Emacs like commands for cursor movement
 #
 
 keymap	EmacsMove : Global
- key Home		=> C-Home		# 文頭
- key End		=> C-End		# 文末
- key C-Space		=> &Undefined		# Mark
- key C-A		=> Home			# 行頭
- key C-B		=> Left			# ←
- key M-B		=> C-Left		# ←(単語)
- key C-E		=> End			# 行末
- key C-F		=> Right		# →
- key M-F		=> C-Right		# →(単語)
- key C-G		=> Escape		# CANCEL
- key C-L		=> &WindowRedraw	# 再描画
- key C-N		=> Down			# ↓
- key C-P		=> Up			# ↑
- key C-Q		=> &Prefix(KeymapDefault) # mayu に左右されないキー入力
- key C-S		=> C-F			# 検索
- key C-V		=> Next			# 次頁
- key M-V		=> Prior		# 前頁
- key S-Home		=> S-C-Home		# 文頭(選択)
- key S-End		=> S-C-End		# 文末(選択)
- key S-M-Comma		=> C-Home		# 文頭
- key S-M-Period		=> C-End		# 文末
+ key Home		=> C-Home		# beginning-of-buffer
+ key End		=> C-End		# end-of-buffer
+ key C-Space		=> &Undefined		# set-mark-command
+ key C-A		=> Home			# beginning-of-line
+ key C-B		=> Left			# backward-char
+ key M-B		=> C-Left		# backward-word
+ key C-E		=> End			# end-of-line
+ key C-F		=> Right		# forward-char
+ key M-F		=> C-Right		# forward-word
+ key C-G		=> Escape		# Cancel
+ key C-L		=> &WindowRedraw	# Redraw
+ key C-N		=> Down			# next-line
+ key C-P		=> Up			# previous-line
+ key C-Q		=> &Prefix(KeymapDefault) # quoted-insert
+ key C-S		=> C-F			# Search
+ key C-V		=> Next			# scroll-up
+ key M-V		=> Prior		# scroll-down
+ key S-Home		=> S-C-Home		# beginning-of-line (select)
+ key S-End		=> S-C-End		# end-of-line (select)
+ key S-M-Comma		=> C-Home		# beginning-of-buffer
+ key S-M-Period		=> C-End		# end-of-buffer
 
  if ( EmacsMove/ShiftSelection )
-   key S-C-A		=> S-Home		# 行頭(選択)
-   key S-C-B		=> S-Left		# ←(選択)
-   key S-C-E		=> S-End		# 行末(選択)
-   key S-C-F		=> S-Right		# →(選択)
-   key S-C-N		=> S-Down		# ↓(選択)
-   key S-C-P		=> S-Up			# ↑(選択)
-   key S-C-V		=> S-Next		# 次頁(選択)
-   key S-M-V		=> S-Prior		# 前頁(選択)
+   key S-C-A		=> S-Home		# beginning-of-line (select)
+   key S-C-B		=> S-Left		# backward-char (select)
+   key S-C-E		=> S-End		# end-of-buffer (select)
+   key S-C-F		=> S-Right		# forward-char (select)
+   key S-C-N		=> S-Down		# next-line (select)
+   key S-C-P		=> S-Up			# previous-line (select)
+   key S-C-V		=> S-Next		# scroll-up (select)
+   key S-M-V		=> S-Prior		# scroll-down (select)
  endif
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Emacs 風編集コマンド
+# Emacs like edit commands
 #
 
  keyseq	$EmacsEdit/kill-word		= S-C-Right C-X
@@ -64,46 +64,46 @@ keymap2	EmacsMark : EmacsEdit => $EmacsMark/cancel &KeymapParent
 
 
 keymap2	EmacsC-X : EmacsEdit
- key *U			=> C-Z					# UNDO
+ key *U			=> C-Z				 # undo
 
 keymap	EmacsEdit
- key C-Space		=> &Prefix(EmacsMark)			# Mark
- key M-BackSpace	=> $EmacsEdit/backward-kill-word	# BS(単語)
- key C-D		=> Delete				# 削除
- key M-D		=> $EmacsEdit/kill-word			# 削除(単語)
- key C-H		=> BackSpace				# BS
- key C-J		=> Return				# RETURN
- key C-K		=> $EmacsEdit/kill-line			# 行末まで削除
- key C-M		=> Return				# RETURN
- key C-O		=> Return Left				# 一行増やす
- if ( !GANA ) key C-T	=> $EmacsEdit/transpose-chars		# 文字入れ替え
- key C-W		=> C-X					# CUT
- key M-W		=> C-C					# COPY
- key C-X		=> &Prefix(EmacsC-X)
- key C-Y		=> C-V					# PASTE
- key C-Slash		=> C-Z					# UNDO
- key M-U		=> $EmacsEdit/upcase-word		# 大文字
- key M-L		=> $EmacsEdit/downcase-word		# 小文字
+ key C-Space		=> &Prefix(EmacsMark)		 # set-mark-command
+ key M-BackSpace	=> $EmacsEdit/backward-kill-word # backward-kill-word
+ key C-D		=> Delete			 # delete-char
+ key M-D		=> $EmacsEdit/kill-word		 # kill-word
+ key C-H		=> BackSpace			 # delete-backward-char
+ key C-J		=> Return			 # newline
+ key C-K		=> $EmacsEdit/kill-line		 # kill-line
+ key C-M		=> Return			 # newline
+ key C-O		=> Return Left			 # open-line
+ if ( !GANA ) key C-T	=> $EmacsEdit/transpose-chars	 # transpose-chars
+ key C-W		=> C-X				 # kill-region
+ key M-W		=> C-C				 # copy-region-as-kill
+ key C-X		=> &Prefix(EmacsC-X)		 # Prefix Command
+ key C-Y		=> C-V				 # yank
+ key C-Slash		=> C-Z				 # undo
+ key M-U		=> $EmacsEdit/upcase-word	 # upcase-word
+ key M-L		=> $EmacsEdit/downcase-word	 # downcase-word
 
 keymap2	EmacsMark
- key Home		=> S-C-Home	&Prefix(EmacsMark)	# 文頭
- key End		=> S-C-End	&Prefix(EmacsMark)	# 文末
- key C-A		=> S-Home	&Prefix(EmacsMark)	# 行頭
- key C-B		=> S-Left	&Prefix(EmacsMark)	# ←
- key M-B		=> S-C-Left	&Prefix(EmacsMark)	# ←(単語)
- key C-E		=> S-End	&Prefix(EmacsMark)	# 行末
- key C-F		=> S-Right	&Prefix(EmacsMark)	# →
- key M-F		=> S-C-Right	&Prefix(EmacsMark)	# →(単語)
- key C-G		=> $EmacsMark/cancel &Undefined		# キャンセル
- key C-N		=> S-Down	&Prefix(EmacsMark)	# ↓
- key C-P		=> S-Up		&Prefix(EmacsMark)	# ↑
- key C-V		=> S-Next	&Prefix(EmacsMark)	# 次頁
- key M-V		=> S-Prior	&Prefix(EmacsMark)	# 前頁
- key C-W		=> C-X Left Right			# CUT
- key M-W		=> C-C Left Right			# COPY
- key S-M-Comma		=> S-C-Home	&Prefix(EmacsMark)	# 文頭
- key S-M-Period		=> S-C-End	&Prefix(EmacsMark)	# 文末
- key Left		=> S-Left	&Prefix(EmacsMark)	# ←
- key Up			=> S-Up		&Prefix(EmacsMark)	# ↑
- key Right		=> S-Right	&Prefix(EmacsMark)	# →
- key Down		=> S-Down	&Prefix(EmacsMark)	# ↓
+ key Home		=> S-C-Home   &Prefix(EmacsMark) # beginning-of-buffer
+ key End		=> S-C-End    &Prefix(EmacsMark) # end-of-buffer
+ key C-A		=> S-Home     &Prefix(EmacsMark) # beginning-of-line
+ key C-B		=> S-Left     &Prefix(EmacsMark) # backward-char
+ key M-B		=> S-C-Left   &Prefix(EmacsMark) # backward-word
+ key C-E		=> S-End      &Prefix(EmacsMark) # end-of-line
+ key C-F		=> S-Right    &Prefix(EmacsMark) # forward-char
+ key M-F		=> S-C-Right  &Prefix(EmacsMark) # forward-word
+ key C-G		=> $EmacsMark/cancel &Undefined	 # Cancel
+ key C-N		=> S-Down     &Prefix(EmacsMark) # next-line
+ key C-P		=> S-Up	      &Prefix(EmacsMark) # previous-line
+ key C-V		=> S-Next     &Prefix(EmacsMark) # scroll-up
+ key M-V		=> S-Prior    &Prefix(EmacsMark) # scroll-down
+ key C-W		=> C-X Left Right		 # kill-region
+ key M-W		=> C-C Left Right		 # copy-region-as-kill
+ key S-M-Comma		=> S-C-Home   &Prefix(EmacsMark) # beginning-of-buffer
+ key S-M-Period		=> S-C-End    &Prefix(EmacsMark) # end-of-buffer
+ key Left		=> S-Left     &Prefix(EmacsMark) # backward-char
+ key Up			=> S-Up	      &Prefix(EmacsMark) # previous-line
+ key Right		=> S-Right    &Prefix(EmacsMark) # forward-char
+ key Down		=> S-Down     &Prefix(EmacsMark) # next-line

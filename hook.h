@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////
 // hook.h
 
 
@@ -8,86 +8,99 @@
 
 #include "misc.h"
 
-
-#define mailslotNotify						\
+///
+#define mailslotNotify							  \
 "\\\\.\\mailslot\\GANAware\\mayu\\{330F7914-EB5B-49be-ACCE-D2B8DF585B32}" \
 VERSION
-
+///
 #define WM_Targetted_name "GANAware\\mayu\\WM_Targetted"
 
 
+///
 class Notify
 {
 public:
+  ///
   enum Type
   {
-    TypeMayuExit,	// Notify
-    TypeSetFocus,	// NotifySetFocus
-    TypeName,		// NotifySetFocus
-    TypeLockState,	// NotifyLockState
-    TypeSync,		// Notify
-    TypeThreadDetach,	// NotifyThreadDetach
-    TypeCommand,	// NotifyThreadDetach
+    TypeMayuExit,	/// Notify
+    TypeSetFocus,	/// NotifySetFocus
+    TypeName,		/// NotifySetFocus
+    TypeLockState,	/// NotifyLockState
+    TypeSync,		/// Notify
+    TypeThreadDetach,	/// NotifyThreadDetach
+    TypeCommand,	/// NotifyThreadDetach
   };
-  Type type;
+  Type type;		///
 };
 
 
+///
 class NotifySetFocus
 {
 public:
-  Notify::Type type;
-  DWORD threadId;
-  HWND hwnd;
-  char className[GANA_MAX_PATH];
-  char titleName[GANA_MAX_PATH];
+  Notify::Type type;			///
+  DWORD threadId;			///
+  HWND hwnd;				///
+  char className[GANA_MAX_PATH];	///
+  char titleName[GANA_MAX_PATH];	///
 };
 
 
+///
 class NotifyLockState
 {
 public:
-  Notify::Type type;
-  bool isNumLockToggled;
-  bool isCapsLockToggled;
-  bool isScrollLockToggled;
-  bool isImeLockToggled;
-  bool isImeCompToggled;
+  Notify::Type type;		///
+  bool isNumLockToggled;	///
+  bool isCapsLockToggled;	///
+  bool isScrollLockToggled;	///
+  bool isImeLockToggled;	///
+  bool isImeCompToggled;	///
 };
 
 
+///
 class NotifyThreadDetach
 {
 public:
-  Notify::Type type;
-  DWORD threadId;
+  Notify::Type type;		///
+  DWORD threadId;		///
 };
 
 
+///
 class NotifyCommand
 {
 public:
-  Notify::Type type;
-  HWND hwnd;
-  UINT message;
-  WPARAM wParam;
-  LPARAM lParam;
+  Notify::Type type;	///
+  HWND hwnd;		///
+  UINT message;		///
+  WPARAM wParam;	///
+  LPARAM lParam;	///
 };
 
 
-enum { notifyMessageSize = sizeof(NotifySetFocus), };
+/** @name ANONYMOUS */
+enum {
+  notifyMessageSize = sizeof(NotifySetFocus),	///
+};
 
 
-struct HookData
+///
+class HookData
 {
-  HHOOK hhook[2];
-  BYTE syncKey;
-  bool syncKeyIsExtended;
-  bool doesNotifyCommand;
+public:
+  HHOOK hhook[2];		///
+  BYTE syncKey;			///
+  bool syncKeyIsExtended;	///
+  bool doesNotifyCommand;	///
 };
 
 
+///
 #define DllExport __declspec(dllexport)
+///
 #define DllImport __declspec(dllimport)
 
 

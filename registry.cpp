@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////
 // registry.cpp
 
 
@@ -165,6 +165,7 @@ bool Registry::write(HKEY root, const string &path, const string &name,
 }
 
 
+///
 static bool string2logfont(LOGFONT *lf, const string &strlf)
 {
   char *p = (char *)_alloca(strlf.size() + 1);

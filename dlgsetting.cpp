@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////
 // dlgsetting.cpp
 
 
@@ -19,15 +19,22 @@
 using namespace std;
 
 
+///
 class DlgSetting
 {
-  HWND hwnd;
-  HWND hwndMayuPaths;
+  HWND hwnd;		///
+  HWND hwndMayuPaths;	///
+  ///
   Registry reg;
-  enum { maxMayuPaths = 256 };
+  /** @name ANONYMOUS */
+  enum
+  {
+    maxMayuPaths = 256,		///
+  };
 
-  typedef DlgEditSettingData Data;
+  typedef DlgEditSettingData Data;		///
 
+  ///
   void insertItem(int index, const Data &data)
   {
     LVITEM item;
@@ -42,6 +49,7 @@ class DlgSetting
     ListView_SetItemText(hwndMayuPaths, index,2,(char *)data.symbols.c_str());
   }
   
+  ///
   void setItem(int index, const Data &data)
   {
     ListView_SetItemText(hwndMayuPaths, index,0,(char *)data.name.c_str());
@@ -49,6 +57,7 @@ class DlgSetting
     ListView_SetItemText(hwndMayuPaths, index,2,(char *)data.symbols.c_str());
   }
 
+  ///
   void getItem(int index, Data *data_r)
   {
     char buf[GANA_MAX_PATH];
@@ -71,11 +80,13 @@ class DlgSetting
     data_r->symbols = item.pszText;
   }
 
+  ///
   void setSelectedItem(int index)
   {
     ListView_SetItemState(hwndMayuPaths, index, LVIS_SELECTED, LVIS_SELECTED);
   }
 
+  ///
   int getSelectedItem()
   {
     if (ListView_GetSelectedCount(hwndMayuPaths) == 0)
@@ -88,6 +99,7 @@ class DlgSetting
   }
 
 public:
+  ///
   DlgSetting(HWND hwnd_)
     : hwnd(hwnd_),
       hwndMayuPaths(NULL),
@@ -95,7 +107,7 @@ public:
   {
   }
   
-  // WM_INITDIALOG
+  /// WM_INITDIALOG
   BOOL wmInitDialog(HWND /* focus */, LPARAM /* lParam */)
   {
     setSmallIcon(hwnd, IDI_ICON_mayu);
@@ -161,14 +173,14 @@ public:
     return TRUE;
   }
   
-  // WM_CLOSE
+  /// WM_CLOSE
   BOOL wmClose()
   {
     EndDialog(hwnd, 0);
     return TRUE;
   }
   
-  // WM_COMMAND
+  /// WM_COMMAND
   BOOL wmCommand(int /* notify_code */, int id, HWND /* hwnd_control */)
   {
     char buf[GANA_MAX_PATH];

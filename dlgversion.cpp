@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////
 // dlgversion.cpp
 
 
@@ -14,17 +14,19 @@
 
 using namespace std;
 
+///
 class DlgVersion
 {
-  HWND hwnd;
+  HWND hwnd;		///
   
 public:
+  ///
   DlgVersion(HWND hwnd_)
     : hwnd(hwnd_)
   {
   }
   
-  // WM_INITDIALOG
+  /// WM_INITDIALOG
   BOOL wmInitDialog(HWND /* focus */, LPARAM /* lParam */)
   {
     setSmallIcon(hwnd, IDI_ICON_mayu);
@@ -38,14 +40,14 @@ public:
     return TRUE;
   }
   
-  // WM_CLOSE
+  /// WM_CLOSE
   BOOL wmClose()
   {
     _true( EndDialog(hwnd, 0) );
     return TRUE;
   }
 
-  // WM_COMMAND
+  /// WM_COMMAND
   BOOL wmCommand(int /* notify_code */, int id, HWND /* hwnd_control */)
   {
     switch (id)
@@ -69,6 +71,7 @@ public:
 };
 
 
+///
 BOOL CALLBACK dlgVersion_dlgProc(HWND hwnd, UINT message,
 				 WPARAM wParam, LPARAM lParam)
 {

@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////
 // function.cpp
 
 
@@ -13,7 +13,7 @@
 using namespace std;
 
 
-// get toplevel (non-child) window
+/// get toplevel (non-child) window
 static HWND getToplevelWindow(HWND hwnd, bool *isMDI)
 {
   while (hwnd)
@@ -35,13 +35,14 @@ static HWND getToplevelWindow(HWND hwnd, bool *isMDI)
 }
 
 
-// move window asynchronously
+/// move window asynchronously
 static void asyncMoveWindow(HWND hwnd, int x, int y)
 {
   SetWindowPos(hwnd, NULL, x, y, 0, 0,
 	       SWP_ASYNCWINDOWPOS | SWP_NOACTIVATE | SWP_NOOWNERZORDER |
 	       SWP_NOSIZE | SWP_NOZORDER);
 }
+/// move window asynchronously
 static void asyncMoveWindow(HWND hwnd, int x, int y, int w, int h)
 {
   SetWindowPos(hwnd, NULL, x, y, w, h,
@@ -50,7 +51,7 @@ static void asyncMoveWindow(HWND hwnd, int x, int y, int w, int h)
 }
 
 
-// undefined key
+/// undefined key
 static void undefined(const Function::FuncData &fd)
 {
   if (!fd.isPressed)
@@ -59,7 +60,7 @@ static void undefined(const Function::FuncData &fd)
 }
 
 
-// PostMessage
+/// PostMessage
 static void postMessage(const Function::FuncData &fd)
 {
   if (!fd.isPressed)
@@ -100,7 +101,7 @@ static void postMessage(const Function::FuncData &fd)
 }
 
 
-// virtual key
+/// virtual key
 static void vk(const Function::FuncData &fd)
 {
   long key = fd.args[0].getData();
@@ -128,7 +129,7 @@ static void vk(const Function::FuncData &fd)
 }
 
 
-// investigate WM_COMMAND, WM_SYSCOMMAND
+/// investigate WM_COMMAND, WM_SYSCOMMAND
 static void investigateCommand(const Function::FuncData &fd)
 {
   if (!fd.isPressed)
@@ -153,6 +154,7 @@ static void investigateCommand(const Function::FuncData &fd)
 //  }
 
 
+///
 #define WINDOW_ROUTINE				\
   if (!fd.isPressed)				\
     return;					\
@@ -160,6 +162,7 @@ static void investigateCommand(const Function::FuncData &fd)
   if (!hwnd)					\
     return;
 
+///
 #define MDI_WINDOW_ROUTINE(i)						\
   if (!fd.isPressed)							\
     return;								\
@@ -169,7 +172,7 @@ static void investigateCommand(const Function::FuncData &fd)
     return;
 
 
-// window cling to ...
+/// window cling to ...
 static void windowClingTo(const Function::FuncData &fd)
 {
   MDI_WINDOW_ROUTINE(0);
@@ -197,7 +200,7 @@ static void windowClingTo(const Function::FuncData &fd)
 }
 
 
-// rise window
+/// rise window
 static void windowRaise(const Function::FuncData &fd)
 {
   MDI_WINDOW_ROUTINE(0);
@@ -206,7 +209,7 @@ static void windowRaise(const Function::FuncData &fd)
 }
 
 
-// lower window
+/// lower window
 static void windowLower(const Function::FuncData &fd)
 {
   MDI_WINDOW_ROUTINE(0);
@@ -215,7 +218,7 @@ static void windowLower(const Function::FuncData &fd)
 }
 
 
-// minimize window
+/// minimize window
 static void windowMinimize(const Function::FuncData &fd)
 {
   MDI_WINDOW_ROUTINE(0);
@@ -224,7 +227,7 @@ static void windowMinimize(const Function::FuncData &fd)
 }
 
 
-// maximize window
+/// maximize window
 static void windowMaximize(const Function::FuncData &fd)
 {
   MDI_WINDOW_ROUTINE(0);
@@ -241,7 +244,7 @@ static void windowMaximize(const Function::FuncData &fd)
 //  }
 
 
-// close window
+/// close window
 static void windowClose(const Function::FuncData &fd)
 {
   MDI_WINDOW_ROUTINE(0);
@@ -249,7 +252,7 @@ static void windowClose(const Function::FuncData &fd)
 }
 
 
-// toggle top most
+/// toggle top most
 static void windowToggleTopMost(const Function::FuncData &fd)
 {
   WINDOW_ROUTINE;
@@ -261,7 +264,7 @@ static void windowToggleTopMost(const Function::FuncData &fd)
 }
 
 
-// identify
+/// identify
 static void windowIdentify(const Function::FuncData &fd)
 {
   if (!fd.isPressed)
@@ -294,7 +297,7 @@ static void windowIdentify(const Function::FuncData &fd)
 }
 
 
-// maximize horizontally or virtically
+/// maximize horizontally or virtically
 static void windowHVMaximize(const Function::FuncData &fd)
 {
   MDI_WINDOW_ROUTINE(0);
@@ -375,7 +378,7 @@ static void windowHVMaximize(const Function::FuncData &fd)
 }
 
 
-// move window
+/// move window
 static void windowMove(const Function::FuncData &fd)
 {
   MDI_WINDOW_ROUTINE(2);
@@ -390,7 +393,7 @@ static void windowMove(const Function::FuncData &fd)
 }
 
 
-// move window visibly
+/// move window visibly
 static void windowMoveVisibly(const Function::FuncData &fd)
 {
   MDI_WINDOW_ROUTINE(0);
@@ -419,11 +422,11 @@ static void windowMoveVisibly(const Function::FuncData &fd)
 }
 
 
-// initialize layerd window
+/// initialize layerd window
 static BOOL WINAPI
 initalizeLayerdWindow(HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags);
 
-// SetLayeredWindowAttributes API
+/// SetLayeredWindowAttributes API
 static BOOL (WINAPI *SetLayeredWindowAttributes_)
   (HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags)
   = initalizeLayerdWindow;
@@ -444,11 +447,11 @@ static BOOL WINAPI initalizeLayerdWindow(
     return FALSE;
 }
 
-static const LONG LWA_ALPHA_ = 0x00000002;
-static const DWORD WS_EX_LAYERED_ = 0x00080000;
+static const LONG LWA_ALPHA_ = 0x00000002;		///
+static const DWORD WS_EX_LAYERED_ = 0x00080000;		///
 
 
-// set window alpha
+/// set window alpha
 static void windowSetAlpha(const Function::FuncData &fd)
 {
   WINDOW_ROUTINE;
@@ -503,7 +506,7 @@ static void windowSetAlpha(const Function::FuncData &fd)
 }
 
 
-// redraw
+/// redraw
 static void windowRedraw(const Function::FuncData &fd)
 {
   WINDOW_ROUTINE;
@@ -512,7 +515,7 @@ static void windowRedraw(const Function::FuncData &fd)
 }
 
 
-// move mouse
+/// move mouse
 static void mouseMove(const Function::FuncData &fd)
 {
   if (!fd.isPressed)
@@ -523,7 +526,7 @@ static void mouseMove(const Function::FuncData &fd)
 }
 
 
-// move wheel
+/// move wheel
 static void mouseWheel(const Function::FuncData &fd)
 {
   if (!fd.isPressed)
@@ -532,7 +535,7 @@ static void mouseWheel(const Function::FuncData &fd)
 }
 
 
-// get clipboard text (you must call closeClopboard())
+/// get clipboard text (you must call closeClopboard())
 static char *getTextFromClipboard(HGLOBAL *hdata)
 {
   *hdata = NULL;
@@ -551,7 +554,7 @@ static char *getTextFromClipboard(HGLOBAL *hdata)
 }
 
 
-// close clipboard that opend by getTextFromClipboard()
+/// close clipboard that opend by getTextFromClipboard()
 static void closeClipboard(HGLOBAL hdata, HGLOBAL hdataNew = NULL)
 {
   if (hdata)
@@ -565,7 +568,7 @@ static void closeClipboard(HGLOBAL hdata, HGLOBAL hdataNew = NULL)
 }
 
 
-// chenge case of the text in the clipboard
+/// chenge case of the text in the clipboard
 static void clipboardChangeCase(const Function::FuncData &fd)
 {
   if (!fd.isPressed)
@@ -601,7 +604,7 @@ static void clipboardChangeCase(const Function::FuncData &fd)
 }
 
 
-// copy string to clipboard
+/// copy string to clipboard
 static void clipboardCopy(const Function::FuncData &fd)
 {
   if (!fd.isPressed)
@@ -619,7 +622,7 @@ static void clipboardCopy(const Function::FuncData &fd)
 }
 
 
-// EmacsEditKillLineFunc
+// EmacsEditKillLineFunc.
 // clear the contents of the clopboard
 // at that time, confirm if it is the result of the previous kill-line
 void EmacsEditKillLine::func()
@@ -640,12 +643,16 @@ void EmacsEditKillLine::func()
 }
 
 
-// if the text of the clipboard is ...
-// 1: EDIT Control (at EOL C-K): ""            => buf + "\r\n", Delete
-// 0: EDIT Control (other  C-K): "(.+)"        => buf + "\1"
-// 0: IE FORM TEXTAREA (at EOL C-K): "\r\n"    => buf + "\r\n"
-// 2: IE FORM TEXTAREA (other C-K): "(.+)\r\n" => buf + "\1", Return Left
-// ^retval
+/** if the text of the clipboard is
+@doc
+\begin{verbatim}
+1: EDIT Control (at EOL C-K): ""            => buf + "\r\n", Delete   
+0: EDIT Control (other  C-K): "(.+)"        => buf + "\1"             
+0: IE FORM TEXTAREA (at EOL C-K): "\r\n"    => buf + "\r\n"           
+2: IE FORM TEXTAREA (other C-K): "(.+)\r\n" => buf + "\1", Return Left
+^retval
+\end{verbatim}
+*/
 HGLOBAL EmacsEditKillLine::makeNewKillLineBuf(const char *data, int *retval)
 {
   int len = buf.size();
@@ -698,7 +705,9 @@ int EmacsEditKillLine::pred()
 }
 
 
+///
 #define FUNC(id) id, #id
+///
 const Function Function::functions[] =
 {
   // special

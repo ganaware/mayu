@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////
 // dlginvestigate.cpp
 
 
@@ -19,13 +19,15 @@
 using namespace std;
 
 
+///
 class DlgInvestigate
 {
-  HWND hwnd;
-  UINT WM_Targetted;
-  Engine *engine;
+  HWND hwnd;		///
+  UINT WM_Targetted;	///
+  Engine *engine;	///
   
 public:
+  ///
   DlgInvestigate(HWND hwnd_)
     : hwnd(hwnd_),
       WM_Targetted(RegisterWindowMessage(WM_Targetted_name)),
@@ -33,7 +35,7 @@ public:
   {
   }
   
-  // WM_INITDIALOG
+  /// WM_INITDIALOG
   BOOL wmInitDialog(HWND /* focus */, LPARAM lParam)
   {
     engine = (Engine *)lParam;
@@ -42,7 +44,7 @@ public:
     return TRUE;
   }
   
-  // WM_DESTROY
+  /// WM_DESTROY
   BOOL wmDestroy()
   {
     unsetSmallIcon(hwnd);
@@ -50,14 +52,14 @@ public:
     return TRUE;
   }
   
-  // WM_CLOSE
+  /// WM_CLOSE
   BOOL wmClose()
   {
     ShowWindow(hwnd, SW_HIDE);
     return TRUE;
   }
 
-  // WM_COMMAND
+  /// WM_COMMAND
   BOOL wmCommand(int /* notify_code */, int id, HWND /* hwnd_control */)
   {
     switch (id)
@@ -71,7 +73,7 @@ public:
     return FALSE;
   }
 
-  // WM_focusNotify
+  /// WM_focusNotify
   BOOL wmFocusNotify(bool isFocused, HWND hwndFocus)
   {
     if (engine && hwndFocus == GetDlgItem(hwnd, IDC_CUSTOM_scancode))
@@ -79,7 +81,7 @@ public:
     return TRUE;
   }
   
-  // WM_targetNotify
+  /// WM_targetNotify
   BOOL wmTargetNotify(HWND hwndTarget)
   {
     char className[GANA_MAX_ATOM_LENGTH];
@@ -106,7 +108,7 @@ public:
     return TRUE;
   }
   
-  // WM_vkeyNotify
+  /// WM_vkeyNotify
   BOOL wmVkeyNotify(int nVirtKey, int /* repeatCount*/, BYTE /*scanCode*/,
 		    bool isExtended, bool /*isAltDown*/, bool isKeyup)
   {
@@ -132,6 +134,7 @@ public:
 };
 
 
+///
 BOOL CALLBACK dlgInvestigate_dlgProc(HWND hwnd, UINT message,
 				     WPARAM wParam, LPARAM lParam)
 {

@@ -5,7 +5,7 @@
 ###############################################################################
 
 
-VERSION		= 3.16
+VERSION		= 3.17
 
 COMMON_DEFINES	= -DSTRICT -D_WIN32_IE=0x0400
 
@@ -92,33 +92,39 @@ DISTRIB		=			\
 		$(DISTRIB_MANUAL)	\
 		$(DISTRIB_CONTRIBS)	\
 
-DISTRIBSRC	=		\
-		Makefile	\
-		*.mak		\
-		*.cpp		\
-		*.h		\
-		*.rc		\
-		regexp.html	\
-				\
-		s\Makefile	\
-		s\*.mak		\
-		s\*.cpp		\
-		s\*.h		\
-		s\*.rc		\
-		s\*.lib 	\
-				\
-		r\*		\
-				\
-		d\Makefile	\
-		d\SOURCES	\
-		d\*.c		\
-		d\README.txt	\
-		d\test.reg 	\
-		d\nt4\Makefile	\
-		d\nt4\SOURCES	\
-		d\nt4\*.c	\
+DISTRIBSRC	=			\
+		Makefile		\
+		*.mak			\
+		*.cpp			\
+		*.h			\
+		*.rc			\
+		regexp.html		\
+		doc++-header.html	\
+		doc++.conf		\
+					\
+		s\Makefile		\
+		s\*.mak			\
+		s\*.cpp			\
+		s\*.h			\
+		s\*.rc			\
+		s\*.lib 		\
+					\
+		r\*			\
+					\
+		d\Makefile		\
+		d\SOURCES		\
+		d\*.c			\
+		d\README.txt		\
+		d\test.reg 		\
+		d\nt4\Makefile		\
+		d\nt4\SOURCES		\
+		d\nt4\*.c		\
+
+
+# tools		###############################################################
 
 CAB		= s\cab32.exe
+DOCXX		= doc++.exe
 
 
 # rules		###############################################################
@@ -158,3 +164,7 @@ distrib:
 		-@$(RM) source.cab mayud.sys mayudnt4.sys setup.exe
 		$(CAB) -f mayu-$(VERSION).cab
 		-@$(RM) mayu-$(VERSION).cab
+
+srcdesc::
+		@$(ECHO) USE DOC++ 3.4.4-pre5 OR HIGHER
+		$(DOCXX) *.h *.cpp

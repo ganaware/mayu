@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////
 // hook.cpp
 
 
@@ -13,28 +13,29 @@
 #include <imm.h>
 
 
+///
 #define HOOK_DATA_NAME "{08D6E55C-5103-4e00-8209-A1C4AB13BBEF}" VERSION
 
 
 using namespace std;
 
 
-///////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////
 // Global Variables
 
 
-DllExport HookData *hookData;
+DllExport HookData *hookData;		///
 
-static HANDLE hHookData;
-static HWND hwndFocus = NULL;
-static HINSTANCE hInstDLL;
-static bool isInMenu;
-static UINT WM_Targetted;
-static bool isImeLock;
-static bool isImeCompositioning;
+static HANDLE hHookData;		///
+static HWND hwndFocus = NULL;		///
+static HINSTANCE hInstDLL;		///
+static bool isInMenu;			///
+static UINT WM_Targetted;		///
+static bool isImeLock;			///
+static bool isImeCompositioning;	///
 
 
-///////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////
 // Prototypes
 
 
@@ -43,11 +44,11 @@ static bool mapHookData();
 static void unmapHookData();
 
 
-///////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////
 // Functions
 
 
-// EntryPoint
+/// EntryPoint
 BOOL WINAPI DllMain(HINSTANCE hInstDLL_, DWORD fdwReason,
 		    LPVOID /* lpvReserved */)
 {
@@ -78,7 +79,7 @@ BOOL WINAPI DllMain(HINSTANCE hInstDLL_, DWORD fdwReason,
 }
 
 
-// map hook data
+/// map hook data
 static bool mapHookData()
 {
   hHookData = CreateFileMapping((HANDLE)0xffffffff, NULL, PAGE_READWRITE,
@@ -98,7 +99,7 @@ static bool mapHookData()
 }
 
 
-// unmap hook data
+/// unmap hook data
 static void unmapHookData()
 {
   if (hookData)
@@ -111,7 +112,7 @@ static void unmapHookData()
 }
 
 
-// notify
+/// notify
 DllExport bool notify(void *data, size_t sizeof_data)
 {
   HANDLE hMailslot =
@@ -128,7 +129,7 @@ DllExport bool notify(void *data, size_t sizeof_data)
 }
 
 
-// get class name and title name
+/// get class name and title name
 static void getClassNameTitleName(HWND hwnd, bool isInMenu, 
 				  StringTool::istring *className_r,
 				  string *titleName_r)
@@ -184,7 +185,7 @@ static void getClassNameTitleName(HWND hwnd, bool isInMenu,
 }
 
 
-// notify WM_Targetted
+/// notify WM_Targetted
 static void notifyName(HWND hwnd, Notify::Type type = Notify::TypeName)
 {
   StringTool::istring className;
@@ -204,7 +205,7 @@ static void notifyName(HWND hwnd, Notify::Type type = Notify::TypeName)
 }
 
 
-// notify WM_SETFOCUS
+/// notify WM_SETFOCUS
 static void notifySetFocus()
 {
   HWND hwnd = GetFocus();
@@ -216,7 +217,7 @@ static void notifySetFocus()
 }
 
 
-// notify sync
+/// notify sync
 static void notifySync()
 {
   Notify n;
@@ -225,7 +226,7 @@ static void notifySync()
 }
 
 
-// notify DLL_THREAD_DETACH
+/// notify DLL_THREAD_DETACH
 static void notifyThreadDetach()
 {
   NotifyThreadDetach ntd;
@@ -235,7 +236,7 @@ static void notifyThreadDetach()
 }
 
 
-// notify WM_COMMAND, WM_SYSCOMMAND
+/// notify WM_COMMAND, WM_SYSCOMMAND
 static void notifyCommand(
   HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -252,7 +253,7 @@ static void notifyCommand(
 }
 
 
-// notify lock state
+/// notify lock state
 DllExport void notifyLockState()
 {
   NotifyLockState n;
@@ -266,7 +267,7 @@ DllExport void notifyLockState()
 }
 
 
-// hook of GetMessage
+/// hook of GetMessage
 LRESULT CALLBACK getMessageProc(int nCode, WPARAM wParam_, LPARAM lParam_)
 {
   if (!hookData)
@@ -310,7 +311,7 @@ LRESULT CALLBACK getMessageProc(int nCode, WPARAM wParam_, LPARAM lParam_)
 }
 
 
-// hook of SendMessage
+/// hook of SendMessage
 LRESULT CALLBACK callWndProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
   if (!hookData)
@@ -374,7 +375,7 @@ LRESULT CALLBACK callWndProc(int nCode, WPARAM wParam, LPARAM lParam)
 }
 
 
-// install hooks
+/// install hooks
 DllExport int installHooks()
 {
   hookData->hhook[0] =
@@ -385,7 +386,7 @@ DllExport int installHooks()
 }
 
 
-// uninstall hooks
+/// uninstall hooks
 DllExport int uninstallHooks()
 {
   if (hookData->hhook[0])

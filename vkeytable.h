@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////
 // vkeytable.h
 
 
@@ -6,15 +6,16 @@
 #define __vkeytable_h__
 
 
+///
 class VKeyTable
 {
 public:
-  unsigned char code;
-  const char *name;
+  unsigned char code;		///
+  const char *name;		///
 };
 
 
-extern const VKeyTable vkeyTable[];
+extern const VKeyTable vkeyTable[];	///
 
 
 #endif // __vkeytable_h__
