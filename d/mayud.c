@@ -53,6 +53,12 @@ NTSTATUS mayuAddDevice       (IN PDRIVER_OBJECT, IN PDEVICE_OBJECT);
 struct _MayuDeviceExtension;
 
 #define MAX_KBD 4
+
+#define KD_SET(x, y) ((x) |= (1 << (y)))
+#define KD_CLR(x, y) ((x) &= ~(1 << (y)))
+#define KD_ISSET(x, y) ((x) & (1 << (y)))
+#define KD_ZERO(x) ((x) = 0)
+
 typedef struct CommonData
 {
   // Device Objects
@@ -62,7 +68,7 @@ typedef struct CommonData
   // Device Extensions
   struct _MayuDeviceExtension *detourDevExt;
   struct _MayuDeviceExtension *filterDevExt[MAX_KBD];
-  ULONG nkbd;
+  ULONG kbd_desc;
   ULONG curkbd;
   
   LONG isDetourOpened; // is detour opened ?
@@ -167,8 +173,8 @@ NTSTATUS DriverEntry(IN PDRIVER_OBJECT driverObject,
     cd->detourDevExt = (MayuDeviceExtension*)cd->detourDevObj->DeviceExtension;
     RtlZeroMemory(cd->detourDevExt, sizeof(MayuDeviceExtension));
     cd->detourDevExt->cd = cd;
-	cd->nkbd = 0;
-	cd->curkbd = 0;
+    KD_ZERO(cd->kbd_desc);
+    cd->curkbd = 0;
     KeInitializeSpinLock(&cd->detourDevExt->lock);
     status = KqInitialize(&cd->detourDevExt->readQue);
     if (!NT_SUCCESS(status)) goto error;
@@ -219,44 +225,49 @@ NTSTATUS mayuAddDevice(IN PDRIVER_OBJECT driverObject, IN PDEVICE_OBJECT PDO)
     NTSTATUS status;
 	ULONG i;
 	CommonData *cd = getCd(driverObject->DeviceObject);
+	int free_kbd;
 
-	if (cd->nkbd >= MAX_KBD) 
+	for (free_kbd = 0; free_kbd < MAX_KBD; free_kbd++)
+	  if (!KD_ISSET(cd->kbd_desc, free_kbd))
+	    break;
+
+	if (free_kbd == MAX_KBD) 
 		return (STATUS_NO_SUCH_DEVICE);
     // create filter device
     status = IoCreateDevice(driverObject, sizeof(MayuDeviceExtension),
 			    NULL, FILE_DEVICE_KEYBOARD,
-			    0, FALSE, &cd->filterDevObj[cd->nkbd]);
+			    0, FALSE, &cd->filterDevObj[free_kbd]);
     if (!NT_SUCCESS(status)) goto error;
     
     // initialize filter device extension
-    cd->filterDevExt[cd->nkbd] = (MayuDeviceExtension*)cd->filterDevObj[cd->nkbd]->DeviceExtension;
-    RtlZeroMemory(cd->filterDevExt[cd->nkbd], sizeof(MayuDeviceExtension));
-    cd->filterDevExt[cd->nkbd]->cd = cd;
-	cd->filterDevExt[cd->nkbd]->kbdnum = cd->nkbd;
-    KeInitializeSpinLock(&cd->filterDevExt[cd->nkbd]->lock);
-    status = KqInitialize(&cd->filterDevExt[cd->nkbd]->readQue);
+    cd->filterDevExt[free_kbd] = (MayuDeviceExtension*)cd->filterDevObj[free_kbd]->DeviceExtension;
+    RtlZeroMemory(cd->filterDevExt[free_kbd], sizeof(MayuDeviceExtension));
+    cd->filterDevExt[free_kbd]->cd = cd;
+    cd->filterDevExt[free_kbd]->kbdnum = free_kbd;
+    KeInitializeSpinLock(&cd->filterDevExt[free_kbd]->lock);
+    status = KqInitialize(&cd->filterDevExt[free_kbd]->readQue);
     if (!NT_SUCCESS(status)) goto error;
 
     // attach filter device to keyboard class device
-    cd->filterDevExt[cd->nkbd]->kbdClassDevObj = IoAttachDeviceToDeviceStack(cd->filterDevObj[cd->nkbd], PDO);
-	cd->filterDevObj[cd->nkbd]->Flags |= (DO_BUFFERED_IO | DO_POWER_PAGABLE);
-	cd->filterDevObj[cd->nkbd]->Flags &= ~DO_DEVICE_INITIALIZING;
+    cd->filterDevExt[free_kbd]->kbdClassDevObj = IoAttachDeviceToDeviceStack(cd->filterDevObj[free_kbd], PDO);
+	cd->filterDevObj[free_kbd]->Flags |= (DO_BUFFERED_IO | DO_POWER_PAGABLE);
+	cd->filterDevObj[free_kbd]->Flags &= ~DO_DEVICE_INITIALIZING;
     for (i = 0; i < IRP_MJ_MAXIMUM_FUNCTION; i++)
-      cd->filterDevExt[cd->nkbd]->MajorFunction[i] =
-		(cd->filterDevExt[cd->nkbd]->kbdClassDevObj->DriverObject->MajorFunction[i] == _IopInvalidDeviceRequest) ?
+      cd->filterDevExt[free_kbd]->MajorFunction[i] =
+		(cd->filterDevExt[free_kbd]->kbdClassDevObj->DriverObject->MajorFunction[i] == _IopInvalidDeviceRequest) ?
 		_IopInvalidDeviceRequest : filterPassThrough;
 
-    cd->filterDevExt[cd->nkbd]->MajorFunction[IRP_MJ_READ] = filterRead;
-    cd->filterDevExt[cd->nkbd]->MajorFunction[IRP_MJ_POWER] = filterPower;
-	cd->filterDevExt[cd->nkbd]->MajorFunction[IRP_MJ_PNP] = filterPnP;
-	++cd->nkbd;
+    cd->filterDevExt[free_kbd]->MajorFunction[IRP_MJ_READ] = filterRead;
+    cd->filterDevExt[free_kbd]->MajorFunction[IRP_MJ_POWER] = filterPower;
+	cd->filterDevExt[free_kbd]->MajorFunction[IRP_MJ_PNP] = filterPnP;
+	KD_SET(cd->kbd_desc, free_kbd);
 	return (STATUS_SUCCESS);
 
 error:
     if (cd->filterDevObj)
     {
-      KqFinalize(&cd->filterDevExt[cd->nkbd]->readQue);
-      IoDeleteDevice(cd->filterDevObj[cd->nkbd]);
+      KqFinalize(&cd->filterDevExt[free_kbd]->readQue);
+      IoDeleteDevice(cd->filterDevObj[free_kbd]);
     }
 	return status;
 }
@@ -272,8 +283,9 @@ VOID mayuUnloadDriver(IN PDRIVER_OBJECT driverObject)
   IoDeleteSymbolicLink(&MayuDetourWin32DeviceName);
   
   // cancel filter IRP_MJ_READ
-  for (i = 0; i < cd->nkbd; ++i) {
+  for (i = 0; i < MAX_KBD; ++i) {
     // detach
+    if (KD_ISSET(cd->kbd_desc, i)) {
 	IoDetachDevice(cd->filterDevExt[i]->kbdClassDevObj);
   
 	irp = cd->filterDevExt[i]->kbdClassDevObj->CurrentIrp;
@@ -282,6 +294,7 @@ VOID mayuUnloadDriver(IN PDRIVER_OBJECT driverObject)
 		IoCancelIrp(irp);
 	KqFinalize(&cd->filterDevExt[i]->readQue);
 	IoDeleteDevice(cd->filterDevObj[i]);
+    }
   }
   
   // finalize read que
@@ -480,10 +493,12 @@ NTSTATUS detourCreate(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
     KIRQL currentIrql;
     
     cd->detourDevExt->wasCleanupInitiated = FALSE;
-	for (i = 0; i < cd->nkbd; ++i) {
+	for (i = 0; i < MAX_KBD; ++i) {
+	  if (KD_ISSET(cd->kbd_desc, i)) {
 		irpCancel = cd->filterDevExt[i]->kbdClassDevObj->CurrentIrp;
 		if (irpCancel) // cancel filter's read irp
 			IoCancelIrp(irpCancel);
+	  }
 	}
     
     KeAcquireSpinLock(&cd->detourDevExt->lock, &currentIrql);
@@ -594,13 +609,15 @@ NTSTATUS detourCleanup(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
   ULONG i;
 
   // cancel io
-  for (i = 0; i < cd->nkbd; ++i) {
+  for (i = 0; i < MAX_KBD; ++i) {
+    if (KD_ISSET(cd->kbd_desc, i)) {
 	  irpCancel = cd->filterDevExt[i]->kbdClassDevObj->CurrentIrp;
 	  if (irpCancel)
 		  IoCancelIrp(irpCancel);
 	  irpCancel = cd->filterDevObj[i]->CurrentIrp;
 	  if (irpCancel)
 		  IoCancelIrp(irpCancel);
+    }
   }
 
   KeAcquireSpinLock(&devExt->lock, &currentIrql);
