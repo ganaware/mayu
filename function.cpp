@@ -14,15 +14,23 @@ using namespace std;
 
 
 // get toplevel (non-child) window
-static HWND getToplevelWindow(HWND hwnd)
+static HWND getToplevelWindow(HWND hwnd, bool *isMDI)
 {
   while (hwnd)
   {
     LONG style = GetWindowLong(hwnd, GWL_STYLE);
     if ((style & WS_CHILD) == 0)
       break;
+    if (isMDI && *isMDI)
+    {
+      LONG exStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+      if (exStyle & WS_EX_MDICHILD)
+	return hwnd;
+    }
     hwnd = GetParent(hwnd);
   }
+  if (isMDI)
+    *isMDI = false;
   return hwnd;
 }
 
@@ -148,18 +156,34 @@ static void investigateCommand(const Function::FuncData &fd)
 #define WINDOW_ROUTINE				\
   if (!fd.isPressed)				\
     return;					\
-  HWND hwnd = getToplevelWindow(fd.hwnd);	\
+  HWND hwnd = getToplevelWindow(fd.hwnd, NULL);	\
   if (!hwnd)					\
-    return;					\
+    return;
+
+#define MDI_WINDOW_ROUTINE(i)						\
+  if (!fd.isPressed)							\
+    return;								\
+  bool isMDI = (fd.args.size() == i + 1 && fd.args[i].getData());	\
+  HWND hwnd = getToplevelWindow(fd.hwnd, &isMDI);			\
+  if (!hwnd)								\
+    return;
 
 
 // window cling to ...
 static void windowClingTo(const Function::FuncData &fd)
 {
-  WINDOW_ROUTINE;
+  MDI_WINDOW_ROUTINE(0);
   RECT rc, rcd;
-  GetWindowRect(hwnd, &rc);
-  SystemParametersInfo(SPI_GETWORKAREA, 0, (void *)&rcd, FALSE);
+  if (isMDI)
+  {
+    getChildWindowRect(hwnd, &rc);
+    GetClientRect(GetParent(hwnd), &rcd);
+  }
+  else
+  {
+    GetWindowRect(hwnd, &rc);
+    SystemParametersInfo(SPI_GETWORKAREA, 0, (void *)&rcd, FALSE);
+  }
   int x = rc.left, y = rc.top;
   if (fd.id == Function::WindowClingToLeft)
     x = rcd.left;
@@ -176,7 +200,7 @@ static void windowClingTo(const Function::FuncData &fd)
 // rise window
 static void windowRaise(const Function::FuncData &fd)
 {
-  WINDOW_ROUTINE;
+  MDI_WINDOW_ROUTINE(0);
   SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0,
 	       SWP_ASYNCWINDOWPOS | SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOSIZE);
 }
@@ -185,7 +209,7 @@ static void windowRaise(const Function::FuncData &fd)
 // lower window
 static void windowLower(const Function::FuncData &fd)
 {
-  WINDOW_ROUTINE;
+  MDI_WINDOW_ROUTINE(0);
   SetWindowPos(hwnd, HWND_BOTTOM, 0, 0, 0, 0,
 	       SWP_ASYNCWINDOWPOS | SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOSIZE);
 }
@@ -194,7 +218,7 @@ static void windowLower(const Function::FuncData &fd)
 // minimize window
 static void windowMinimize(const Function::FuncData &fd)
 {
-  WINDOW_ROUTINE;
+  MDI_WINDOW_ROUTINE(0);
   PostMessage(hwnd, WM_SYSCOMMAND,
 	      IsIconic(hwnd) ? SC_RESTORE : SC_MINIMIZE, 0);
 }
@@ -203,7 +227,7 @@ static void windowMinimize(const Function::FuncData &fd)
 // maximize window
 static void windowMaximize(const Function::FuncData &fd)
 {
-  WINDOW_ROUTINE;
+  MDI_WINDOW_ROUTINE(0);
   PostMessage(hwnd, WM_SYSCOMMAND,
 	      IsZoomed(hwnd) ? SC_RESTORE : SC_MAXIMIZE, 0);
 }
@@ -220,7 +244,7 @@ static void windowMaximize(const Function::FuncData &fd)
 // close window
 static void windowClose(const Function::FuncData &fd)
 {
-  WINDOW_ROUTINE;
+  MDI_WINDOW_ROUTINE(0);
   PostMessage(hwnd, WM_SYSCOMMAND, SC_CLOSE, 0);
 }
 
@@ -273,7 +297,7 @@ static void windowIdentify(const Function::FuncData &fd)
 // maximize horizontally or virtically
 static void windowHVMaximize(const Function::FuncData &fd)
 {
-  WINDOW_ROUTINE;
+  MDI_WINDOW_ROUTINE(0);
 
   bool isHorizontal = fd.id == Function::WindowHMaximize;
   typedef std::list<Engine::WindowPosition>::iterator WPiter;
@@ -307,7 +331,10 @@ static void windowHVMaximize(const Function::FuncData &fd)
   else
   {
     RECT rc;
-    GetWindowRect(hwnd, &rc);
+    if (isMDI)
+      getChildWindowRect(hwnd, &rc);
+    else
+      GetWindowRect(hwnd, &rc);
     
     Engine::WindowPosition::Mode mode = Engine::WindowPosition::ModeNormal;
     
@@ -333,7 +360,10 @@ static void windowHVMaximize(const Function::FuncData &fd)
     }
     
     RECT rc_max;
-    SystemParametersInfo(SPI_GETWORKAREA, 0, (void *)&rc_max, FALSE);
+    if (isMDI)
+      GetClientRect(GetParent(hwnd), &rc_max);
+    else
+      SystemParametersInfo(SPI_GETWORKAREA, 0, (void *)&rc_max, FALSE);
     
     if ((int)mode & (int)Engine::WindowPosition::ModeH)
       rc.left = rc_max.left, rc.right = rc_max.right;
@@ -348,10 +378,13 @@ static void windowHVMaximize(const Function::FuncData &fd)
 // move window
 static void windowMove(const Function::FuncData &fd)
 {
-  WINDOW_ROUTINE;
+  MDI_WINDOW_ROUTINE(2);
   
   RECT rc;
-  GetWindowRect(hwnd, &rc);
+  if (isMDI)
+    getChildWindowRect(hwnd, &rc);
+  else
+    GetWindowRect(hwnd, &rc);
   asyncMoveWindow(hwnd, rc.left + fd.args[0].getNumber(),
 		  rc.top  + fd.args[1].getNumber());
 }
@@ -360,12 +393,19 @@ static void windowMove(const Function::FuncData &fd)
 // move window visibly
 static void windowMoveVisibly(const Function::FuncData &fd)
 {
-  WINDOW_ROUTINE;
+  MDI_WINDOW_ROUTINE(0);
   
-  RECT rc;
-  GetWindowRect(hwnd, &rc);
-  RECT rcd;
-  SystemParametersInfo(SPI_GETWORKAREA, 0, (void *)&rcd, FALSE);
+  RECT rc, rcd;
+  if (isMDI)
+  {
+    getChildWindowRect(hwnd, &rc);
+    GetClientRect(GetParent(hwnd), &rcd);
+  }
+  else
+  {
+    GetWindowRect(hwnd, &rc);
+    SystemParametersInfo(SPI_GETWORKAREA, 0, (void *)&rcd, FALSE);
+  }
   int x = rc.left, y = rc.top;
   if (rc.left < rcd.left)
     x = rcd.left;
@@ -689,19 +729,19 @@ const Function Function::functions[] =
   //{ FUNC(ToggleKatakanaHiragana),	0, NULL, },
   
   // window
-  { FUNC(WindowRaise),			NULL, windowRaise, },
-  { FUNC(WindowLower),			NULL, windowLower, },
-  { FUNC(WindowMinimize),		NULL, windowMinimize, },
-  { FUNC(WindowMaximize),		NULL, windowMaximize, },
-  { FUNC(WindowHMaximize),		NULL, windowHVMaximize, },
-  { FUNC(WindowVMaximize),		NULL, windowHVMaximize, },
-  { FUNC(WindowMove),			"dd", windowMove, },
-  { FUNC(WindowMoveVisibly),		NULL, windowMoveVisibly, },
-  { FUNC(WindowClingToLeft),		NULL, windowClingTo, },
-  { FUNC(WindowClingToRight),		NULL, windowClingTo, },
-  { FUNC(WindowClingToTop),		NULL, windowClingTo, },
-  { FUNC(WindowClingToBottom),		NULL, windowClingTo, },
-  { FUNC(WindowClose),			NULL, windowClose, },
+  { FUNC(WindowRaise),			"&b", windowRaise, },
+  { FUNC(WindowLower),			"&b", windowLower, },
+  { FUNC(WindowMinimize),		"&b", windowMinimize, },
+  { FUNC(WindowMaximize),		"&b", windowMaximize, },
+  { FUNC(WindowHMaximize),		"&b", windowHVMaximize, },
+  { FUNC(WindowVMaximize),		"&b", windowHVMaximize, },
+  { FUNC(WindowMove),			"dd&b", windowMove, },
+  { FUNC(WindowMoveVisibly),		"&b", windowMoveVisibly, },
+  { FUNC(WindowClingToLeft),		"&b", windowClingTo, },
+  { FUNC(WindowClingToRight),		"&b", windowClingTo, },
+  { FUNC(WindowClingToTop),		"&b", windowClingTo, },
+  { FUNC(WindowClingToBottom),		"&b", windowClingTo, },
+  { FUNC(WindowClose),			"&b", windowClose, },
   { FUNC(WindowToggleTopMost),		NULL, windowToggleTopMost, },
   { FUNC(WindowIdentify),		NULL, windowIdentify, },
   { FUNC(WindowSetAlpha),		"d",  windowSetAlpha, },

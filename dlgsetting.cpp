@@ -10,9 +10,10 @@
 #include "stringtool.h"
 #include "windowstool.h"
 #include "setting.h"
+#include "dlgeditsetting.h"
+#include "regexp.h"
 
-#include <malloc.h>
-#include <windowsx.h>
+#include <commctrl.h>
 
 
 using namespace std;
@@ -21,25 +22,74 @@ using namespace std;
 class DlgSetting
 {
   HWND hwnd;
-  HWND hwndMayuPath;
-  HWND hwndMayuPathName;
   HWND hwndMayuPaths;
   Registry reg;
   enum { maxMayuPaths = 256 };
 
-  StringTool::istring ListBox_GetString(int index)
+  typedef DlgEditSettingData Data;
+
+  void insertItem(int index, const Data &data)
   {
-    int len = ListBox_GetTextLen(hwndMayuPaths, index);
-    char *text = (char *)_alloca(len + 1);
-    ListBox_GetText(hwndMayuPaths, index, text);
-    return StringTool::istring(text);
+    LVITEM item;
+    item.mask = LVIF_TEXT;
+    item.iItem = index;
+    
+    item.iSubItem = 0;
+    item.pszText = (char *)data.name.c_str();
+    _true( ListView_InsertItem(hwndMayuPaths, &item) );
+
+    ListView_SetItemText(hwndMayuPaths, index,1,(char *)data.filename.c_str());
+    ListView_SetItemText(hwndMayuPaths, index,2,(char *)data.symbols.c_str());
   }
   
+  void setItem(int index, const Data &data)
+  {
+    ListView_SetItemText(hwndMayuPaths, index,0,(char *)data.name.c_str());
+    ListView_SetItemText(hwndMayuPaths, index,1,(char *)data.filename.c_str());
+    ListView_SetItemText(hwndMayuPaths, index,2,(char *)data.symbols.c_str());
+  }
+
+  void getItem(int index, Data *data_r)
+  {
+    char buf[GANA_MAX_PATH];
+    LVITEM item;
+    item.mask = LVIF_TEXT;
+    item.iItem = index;
+    item.pszText = buf;
+    item.cchTextMax = sizeof(buf);
+    
+    item.iSubItem = 0;
+    _true( ListView_GetItem(hwndMayuPaths, &item) );
+    data_r->name = item.pszText;
+    
+    item.iSubItem = 1;
+    _true( ListView_GetItem(hwndMayuPaths, &item) );
+    data_r->filename = item.pszText;
+
+    item.iSubItem = 2;
+    _true( ListView_GetItem(hwndMayuPaths, &item) );
+    data_r->symbols = item.pszText;
+  }
+
+  void setSelectedItem(int index)
+  {
+    ListView_SetItemState(hwndMayuPaths, index, LVIS_SELECTED, LVIS_SELECTED);
+  }
+
+  int getSelectedItem()
+  {
+    if (ListView_GetSelectedCount(hwndMayuPaths) == 0)
+      return -1;
+    for (int i = 0; ; i ++)
+    {
+      if (ListView_GetItemState(hwndMayuPaths, i, LVIS_SELECTED))
+	return i;
+    }
+  }
+
 public:
   DlgSetting(HWND hwnd_)
     : hwnd(hwnd_),
-      hwndMayuPath(NULL),
-      hwndMayuPathName(NULL),
       hwndMayuPaths(NULL),
       reg(MAYU_REGISTRY_ROOT)
   {
@@ -51,24 +101,63 @@ public:
     setSmallIcon(hwnd, IDI_ICON_mayu);
     setBigIcon(hwnd, IDI_ICON_mayu);
     
-    _true( hwndMayuPath = GetDlgItem(hwnd, IDC_EDIT_mayuPath) );
-    _true( hwndMayuPathName = GetDlgItem(hwnd, IDC_EDIT_mayuPathName) );
     _true( hwndMayuPaths = GetDlgItem(hwnd, IDC_LIST_mayuPaths) );
+
+    // create list view colmn
+    RECT rc;
+    GetClientRect(hwndMayuPaths, &rc);
     
+    LVCOLUMN lvc; 
+    lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT; 
+    lvc.fmt = LVCFMT_LEFT; 
+    lvc.cx = (rc.right - rc.left) / 3;
+
+    istring str = loadString(IDS_mayuPathName);
+    lvc.pszText = (char *)str.c_str();
+    _must_be( ListView_InsertColumn(hwndMayuPaths, 0, &lvc), ==, 0 );
+    str = loadString(IDS_mayuPath);
+    lvc.pszText = (char *)str.c_str();
+    _must_be( ListView_InsertColumn(hwndMayuPaths, 1, &lvc), ==, 1 );
+    str = loadString(IDS_mayuSymbols);
+    lvc.pszText = (char *)str.c_str();
+    _must_be( ListView_InsertColumn(hwndMayuPaths, 2, &lvc), ==, 2 );
+
+    Data data;
+    insertItem(0, data);				// TODO: why ?
+    
+    // set list view
+    Regexp split("^([^;]*);([^;]*);(.*)$");
     StringTool::istring dot_mayu;
-    for (int i = 0; i < maxMayuPaths; i ++)
+    int i;
+    for (i = 0; i < maxMayuPaths; i ++)
     {
       char buf[100];
       snprintf(buf, sizeof(buf), ".mayu%d", i);
       if (!reg.read(buf, &dot_mayu))
 	break;
-      ListBox_AddString(hwndMayuPaths, dot_mayu.c_str());
+      if (split.doesMatch(dot_mayu))
+      {
+	data.name = split[1];
+	data.filename = split[2];
+	data.symbols = split[3];
+	insertItem(i, data);
+      }
     }
-    
+
+    _true( ListView_DeleteItem(hwndMayuPaths, i) );	// TODO: why ?
+
+    // arrange list view size
+    ListView_SetColumnWidth(hwndMayuPaths, 0, LVSCW_AUTOSIZE);
+    ListView_SetColumnWidth(hwndMayuPaths, 1, LVSCW_AUTOSIZE);
+    ListView_SetColumnWidth(hwndMayuPaths, 2, LVSCW_AUTOSIZE);
+
+    ListView_SetExtendedListViewStyle(hwndMayuPaths, LVS_EX_FULLROWSELECT);
+
+    // set selection
     int index;
     reg.read(".mayuIndex", &index, 0);
-    ListBox_SetCurSel(hwndMayuPaths, index);
-    
+    setSelectedItem(index);
+
     return TRUE;
   }
   
@@ -88,111 +177,87 @@ public:
       case IDC_BUTTON_up:
       case IDC_BUTTON_down:
       {
-	int count = ListBox_GetCount(hwndMayuPaths);
+	int count = ListView_GetItemCount(hwndMayuPaths);
 	if (count < 2)
 	  return TRUE;
-	int index = ListBox_GetCurSel(hwndMayuPaths);
-	if (index == LB_ERR ||
+	int index = getSelectedItem();
+	if (index < 0 ||
 	    (id == IDC_BUTTON_up && index == 0) ||
 	    (id == IDC_BUTTON_down && index == count - 1))
 	  return TRUE;
 
 	int target = (id == IDC_BUTTON_up) ? index - 1 : index + 1;
 
-	StringTool::istring indexText(ListBox_GetString(index));
-	StringTool::istring targetText(ListBox_GetString(target));
+	Data dataIndex, dataTarget;
+	getItem(index, &dataIndex);
+	getItem(target, &dataTarget);
+	setItem(index, dataTarget);
+	setItem(target, dataIndex);
 	
-	ListBox_DeleteString(hwndMayuPaths, index);
-	ListBox_InsertString(hwndMayuPaths, index, targetText.c_str());
-	ListBox_DeleteString(hwndMayuPaths, target);
-	ListBox_InsertString(hwndMayuPaths, target, indexText.c_str());
-	ListBox_SetCurSel(hwndMayuPaths, target);
+	setSelectedItem(target);
 	return TRUE;
       }
       
       case IDC_BUTTON_add:
       {
-	Edit_GetText(hwndMayuPathName, buf, lengthof(buf));
-	for (char *p = buf; *p; p ++)
-	{
-	  if (*p == ';')
-	    *p = ' ';
-	  if (StringTool::ismbblead_(*p) && p[1])
-	    p ++;
-	}
-	
-	StringTool::istring name(buf);
-	name += ';';
-	
-	Edit_GetText(hwndMayuPath, buf, lengthof(buf));
-	name += buf;
-	
-	int index = ListBox_GetCurSel(hwndMayuPaths);
-	if (index == LB_ERR)
-	  index = 0;
-	ListBox_InsertString(hwndMayuPaths, index, name.c_str());
-	ListBox_SetCurSel(hwndMayuPaths, index);
+	Data data;
+	int index = getSelectedItem();
+	if (0 <= index)
+	  getItem(index, &data);
+	if (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_DIALOG_editSetting),
+			   NULL, dlgEditSetting_dlgProc, (LPARAM)&data))
+	  if (!data.filename.empty())
+	  {
+	    insertItem(0, data);
+	    setSelectedItem(0);
+	  }
 	return TRUE;
       }
       
       case IDC_BUTTON_delete:
-      case IDC_BUTTON_edit:
       {
-	int index = ListBox_GetCurSel(hwndMayuPaths);
-	if (index == LB_ERR)
-	  return TRUE;
-
-	StringTool::istring text(ListBox_GetString(index));
-	if (id == IDC_BUTTON_delete)
-	  ListBox_DeleteString(hwndMayuPaths, index);
-	int count = ListBox_GetCount(hwndMayuPaths);
-	if (0 < count)
+	int index = getSelectedItem();
+	if (0 <= index)
 	{
-	  if (index == count)
-	    index --;
-	  ListBox_SetCurSel(hwndMayuPaths, index);
+	  _true( ListView_DeleteItem(hwndMayuPaths, index) );
+	  int count = ListView_GetItemCount(hwndMayuPaths);
+	  if (count == 0)
+	    ;
+	  else if (count == index)
+	    setSelectedItem(index - 1);
+	  else
+	    setSelectedItem(index);
 	}
-
-	StringTool::istring name, filename;
-	parseDotMayuFilename(text, &name, &filename);
-	Edit_SetText(hwndMayuPathName, name.c_str());
-	Edit_SetText(hwndMayuPath, filename.c_str());
 	return TRUE;
       }
       
-      case IDC_BUTTON_browse:
+      case IDC_BUTTON_edit:
       {
-	string title = loadString(IDS_openMayu);
-	string filter = loadString(IDS_openMayuFilter);
-	for (size_t i = 0; i < filter.size(); i++)
-	  if (filter[i] == '|')
-	    filter[i] = '\0';
-
-	strcpy(buf, ".mayu");
-	OPENFILENAME of;
-	memset(&of, 0, sizeof(of));
-	of.lStructSize = sizeof(of);
-	of.hwndOwner = hwnd;
-	of.lpstrFilter = filter.c_str();
-	of.nFilterIndex = 1;
-	of.lpstrFile = buf;
-	of.nMaxFile = lengthof(buf);
-	of.lpstrTitle = title.c_str();
-	of.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST |
-	  OFN_HIDEREADONLY | OFN_PATHMUSTEXIST;
-	if (GetOpenFileName(&of))
-	  Edit_SetText(hwndMayuPath, buf);
+	Data data;
+	int index = getSelectedItem();
+	if (index < 0)
+	  return TRUE;
+	getItem(index, &data);
+	if (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_DIALOG_editSetting),
+			   NULL, dlgEditSetting_dlgProc, (LPARAM)&data))
+	  if (!data.filename.empty())
+	  {
+	    setItem(index, data);
+	    setSelectedItem(index);
+	  }
 	return TRUE;
       }
       
       case IDOK:
       {
-	int count = ListBox_GetCount(hwndMayuPaths);
+	int count = ListView_GetItemCount(hwndMayuPaths);
 	int index;
 	for (index = 0; index < count; index ++)
 	{
 	  snprintf(buf, sizeof(buf), ".mayu%d", index);
-	  reg.write(buf, ListBox_GetString(index).c_str());
+	  Data data;
+	  getItem(index, &data);
+	  reg.write(buf, data.name + ";" + data.filename + ";" + data.symbols);
 	}
 	for (; ; index ++)
 	{
@@ -200,8 +265,8 @@ public:
 	  if (!reg.remove(buf))
 	    break;
 	}
-	index = ListBox_GetCurSel(hwndMayuPaths);
-	if (index == LB_ERR)
+	index = getSelectedItem();
+	if (index < 0)
 	  index = 0;
 	reg.write(".mayuIndex", index);
 	EndDialog(hwnd, 1);

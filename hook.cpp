@@ -101,11 +101,6 @@ static bool mapHookData()
 // unmap hook data
 static void unmapHookData()
 {
-  // Windows sometimes seems to call callWndProc() even after
-  // DLL_PROCESS_DETACH, so we cannot unmap the data.  But this mapped
-  // data will released at the end of the process, so it will not
-  // cause any memory leak.
-#if 0
   if (hookData)
     if (!UnmapViewOfFile(hookData))
       return;
@@ -113,7 +108,6 @@ static void unmapHookData()
   if (hHookData)
     CloseHandle(hHookData);
   hHookData = NULL;
-#endif
 }
 
 
@@ -275,6 +269,9 @@ DllExport void notifyLockState()
 // hook of GetMessage
 LRESULT CALLBACK getMessageProc(int nCode, WPARAM wParam_, LPARAM lParam_)
 {
+  if (!hookData)
+    return 0;
+  
   MSG &msg = (*(MSG *)lParam_);
 
   switch (msg.message)
@@ -316,6 +313,9 @@ LRESULT CALLBACK getMessageProc(int nCode, WPARAM wParam_, LPARAM lParam_)
 // hook of SendMessage
 LRESULT CALLBACK callWndProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
+  if (!hookData)
+    return 0;
+  
   CWPSTRUCT &cwps = *(CWPSTRUCT *)lParam;
   
   if (0 <= nCode)

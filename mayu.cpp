@@ -27,6 +27,7 @@
 #include <shlwapi.h>
 #include <process.h>
 #include <time.h>
+#include <commctrl.h>
 
 
 using namespace std;
@@ -229,6 +230,7 @@ private:
 		reg.read(".mayuIndex", &mayuIndex, 0);
 		while (DeleteMenu(hMenuSubSub, 0, MF_BYPOSITION))
 		  ;
+		Regexp getName("^([^;]*);");
 		for (int index = 0; ; index ++)
 		{
 		  char buf[100];
@@ -236,22 +238,22 @@ private:
 		  StringTool::istring dot_mayu;
 		  if (!reg.read(buf, &dot_mayu))
 		    break;
-		  StringTool::istring name, filename;
-		  parseDotMayuFilename(dot_mayu, &name, &filename);
-		  dot_mayu = name;
-		  
-		  MENUITEMINFO mii;
-		  memset(&mii, 0, sizeof(mii));
-		  mii.cbSize = sizeof(mii);
-		  mii.fMask = MIIM_ID | MIIM_STATE | MIIM_TYPE;
-		  mii.fType = MFT_STRING;
-		  mii.fState =
-		    MFS_ENABLED | ((mayuIndex == index) ? MFS_CHECKED : 0);
-		  mii.wID = ID_MENUITEM_reloadBegin + index;
-		  mii.dwTypeData = (char *)dot_mayu.c_str();
-		  mii.cch = dot_mayu.size();
-		  
-		  InsertMenuItem(hMenuSubSub, index, TRUE, &mii);
+		  if (getName.doesMatch(dot_mayu))
+		  {
+		    MENUITEMINFO mii;
+		    memset(&mii, 0, sizeof(mii));
+		    mii.cbSize = sizeof(mii);
+		    mii.fMask = MIIM_ID | MIIM_STATE | MIIM_TYPE;
+		    mii.fType = MFT_STRING;
+		    mii.fState =
+		      MFS_ENABLED | ((mayuIndex == index) ? MFS_CHECKED : 0);
+		    mii.wID = ID_MENUITEM_reloadBegin + index;
+		    StringTool::istring name = getName[1];
+		    mii.dwTypeData = (char *)name.c_str();
+		    mii.cch = name.size();
+		    
+		    InsertMenuItem(hMenuSubSub, index, TRUE, &mii);
+		  }
 		}
 
 		// show popup menu
@@ -603,6 +605,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
 
   // set locale
   _true( setlocale(LC_ALL, "") );
+
+  // common controls
+  INITCOMMONCONTROLSEX icc;
+  icc.dwSize = sizeof(icc);
+  icc.dwICC = ICC_LISTVIEW_CLASSES;
+  _true( InitCommonControlsEx(&icc) );
 
   // convert old registry to new registry
   convertRegistry();

@@ -117,6 +117,8 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
 	    <ul>
 	      <li>マウスフィルタドライバを書けば対応できます。(以下同上)
 	    </ul>
+	<li>ちゃんと ~/.mayu/.mayu の時 ~/.mayu/default.mayu を読んでくれる？
+	<li>いきなり User で起動すると動かん。
 	<li>(誰か hack してくれないかな…(まぢ
 	<li>(誰かかわいい女の子なマスコットキャラとか描いてくれないかな(ぉ
       </ul>
@@ -240,9 +242,26 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
       
   <dd class="d1">
       <dl>
-	<dt>2000/05/20 version 3.15
+	<dt>2000/05/22 version 3.15
 	    <ul>
 	      <li>アプリケーション終了時に時々エラーが起きていたバグを退治。
+	      <li>「窓使いの憂鬱の設定」ダイアログの改良。
+	      <li>version 3.10 あたりから、<a href="CUSTOMIZE.html#HOME">ホームディレクトリ</a>のうち「設定(S)... で指定したファイルのあるディレクトリ」が検索されなくなっていたバグを修正。
+	      <li>以下の <tt><i>FUNCTION</i></tt> の最後の引数に <tt>MDI</tt> を指定すると、MDI 子ウィンドウを操作できるようにした。
+<a href="CUSTOMIZE.html#function_WindowCling"><tt>&amp;WindowClingToBottom</tt></a>,
+<a href="CUSTOMIZE.html#function_WindowCling"><tt>&amp;WindowClingToLeft</tt></a>,
+<a href="CUSTOMIZE.html#function_WindowCling"><tt>&amp;WindowClingToRight</tt></a>,
+<a href="CUSTOMIZE.html#function_WindowCling"><tt>&amp;WindowClingToTop</tt></a>,
+<a href="CUSTOMIZE.html#function_WindowClose"><tt>&amp;WindowClose</tt></a>,
+<a href="CUSTOMIZE.html#function_WindowMaxMinHVMax"><tt>&amp;WindowHMaximize</tt></a>,
+<a href="CUSTOMIZE.html#function_WindowRiseLower"><tt>&amp;WindowLower</tt></a>,
+<a href="CUSTOMIZE.html#function_WindowMaxMinHVMax"><tt>&amp;WindowMaximize</tt></a>,
+<a href="CUSTOMIZE.html#function_WindowMaxMinHVMax"><tt>&amp;WindowMinimize</tt></a>,
+<a href="CUSTOMIZE.html#function_WindowMove"><tt>&amp;WindowMove</tt></a>,
+<a href="CUSTOMIZE.html#function_WindowMoveVisibly"><tt>&amp;WindowMoveVisibly</tt></a>,
+<a href="CUSTOMIZE.html#function_WindowRiseLower"><tt>&amp;WindowRaise</tt></a>,
+<a href="CUSTOMIZE.html#function_WindowMaxMinHVMax"><tt>&amp;WindowVMaximize</tt></a>
+	      <li>設定ファイルを更新。
 	    </ul>
 	<dt>2000/05/19 version 3.14
 	    <ul>

@@ -7,11 +7,14 @@
 
 VERSION		= 3.15
 
+COMMON_DEFINES	= -DSTRICT -D_WIN32_IE=0x0400
+
 
 # mayu.exe	###############################################################
 
 TARGET_1	= mayu.exe
 OBJS_1		=			\
+		dlgeditsetting.obj	\
 		dlginvestigate.obj	\
 		dlglog.obj		\
 		dlgsetting.obj		\
@@ -29,12 +32,12 @@ OBJS_1		=			\
 		setting.obj		\
 		stringtool.obj		\
 		target.obj		\
-		windowstool.obj		\
 		vkeytable.obj		\
+		windowstool.obj		\
 
 RES_1		= mayu.res
 
-LIBS_1		= $(guixlibsmt) mayu.lib shell32.lib shlwapi.lib
+LIBS_1		= $(guixlibsmt) mayu.lib shell32.lib shlwapi.lib comctl32.lib
 
 EXTRADEP_1	= mayu.lib
 

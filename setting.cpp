@@ -66,27 +66,6 @@ extern bool getHomeDirectory(int index, istring *path_r)
 }
 
 
-// pase .mayu filename ("NAME;PATH;-DSYMBOL" -> "NAME", "PATH;-DSYMBOL")
-extern void parseDotMayuFilename(const istring &dot_mayu, 
-				 istring *name_r, istring *filename_r)
-{
-  size_t i;
-  for (i = 0; i < dot_mayu.size(); i ++)
-  {
-    if (dot_mayu[i] == ';')
-      break;
-    if (StringTool::ismbblead_(dot_mayu[i]) && i + 1 < dot_mayu.size())
-      i ++;
-  }
-  if (name_r)
-    *name_r = dot_mayu.substr(0, i);
-  if (i < dot_mayu.size() && filename_r)
-  {
-    i ++;
-    *filename_r = dot_mayu.substr(i);
-  }
-}
-
 using namespace std;
 
 
@@ -541,12 +520,21 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
 				 << "': too many arguments.";
 	}
       }
+      else if (isEOL() && *type == '&')
+	;
       else
 	// has some arguments
       {
-	if (!getToken()->isOpenParen())
+	if (!lookToken()->isOpenParen())
+	{
+	  if (*type == '&')
+	    goto ok;
 	  throw ErrorMessage() << "there must be `(' after `&"
 			       << af.function->name << "'.";
+	}
+	
+	getToken();
+	
 	for (; *type; type ++)
 	{
 	  t = lookToken();
@@ -722,12 +710,10 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
 	    case 'b': // bool
 	    {
 	      getToken();
-	      if (*t == "true")
-		t->setData(1);
-	      else if (*t == "false")
+	      if (*t == "false")
 		t->setData(0);
 	      else
-		throw ErrorMessage() << "`" << *t << "': is true or false ?";
+		t->setData(1);
 	      break;
 	    }
 
@@ -751,6 +737,7 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
 	if (!getToken()->isCloseParen())
 	  throw ErrorMessage() << "`&"  << af.function->name
 			       << "': too many arguments.";
+	ok: ;
       }
       keySeq.add(af);
     }
@@ -1149,32 +1136,26 @@ bool SettingLoader::getFilenameFromRegistry(istring *path_r) const
   if (!reg.read(buf, path_r))
     return false;
 
-  StringTool::istring dummy;
-  parseDotMayuFilename(*path_r, &dummy, path_r);
-  
-  // split off options
-  size_t s = path_r->find(';');
-  string d;
-  if (s != path_r->npos)
-  {
-    d = path_r->substr(s + 1);
-    *path_r = path_r->substr(0, s);
-  }
-  
-  if (0 < path_r->size() && !isReadable(*path_r))
+  Regexp getFilename("^[^;]*;([^;]*);(.*)$");
+  if (!getFilename.doesMatch(*path_r))
     return false;
   
+  istring path = getFilename[1];
+  istring options = getFilename[2];
+  
+  if (0 < path.size() && !isReadable(path))
+    return false;
+  *path_r = path;
+  
   // set symbols
-  for (s = d.find(';'); !d.empty(); s = d.find(';'))
+  Regexp symbol("-D([^;]*)");
+  while (symbol.doesMatch(options))
   {
-    string o = d.substr(0, s);
-    if (o[0] == '-' && o[1] == 'D')
-      setting->symbols.insert(o.substr(2));
-    if (s == d.npos)
-      break;
-    d = d.substr(s + 1);
+    setting->symbols.insert(symbol[1]);
+    options = options.substr(symbol.subBegin(1));
   }
-  return 0 < path_r->size();
+  
+  return true;
 }
 
 
@@ -1187,14 +1168,20 @@ bool SettingLoader::getFilename(const istring &name_, istring *path_r) const
     if (getFilenameFromRegistry(path_r))
       return true;
 
-  if (Registry::read(HKEY_CURRENT_USER, "Software\\GANAware\\mayu",
-		     ".mayu", path_r))
+  Registry reg(MAYU_REGISTRY_ROOT);
+  int index;
+  reg.read(".mayuIndex", &index, 0);
+  char buf[100];
+  snprintf(buf, sizeof(buf), ".mayu%d", index);
+  if (reg.read(buf, path_r))
   {
-    size_t b = path_r->rfind('\\');
-    path_r->resize(b + 1);
-    *path_r += name;
-    if (isReadable(*path_r))
-      return true;
+    Regexp getPath("^[^;]*;([^;]*[/\\\\])[^;/\\\\]*;");
+    if (getPath.doesMatch(*path_r))
+    {
+      *path_r = getPath[1] + name;
+      if (isReadable(*path_r))
+	return true;
+    }
   }
   
   for (int i = 0; getHomeDirectory(i, path_r); i++)

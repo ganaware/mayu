@@ -153,6 +153,43 @@ keymap2	GeneralC-X : EmacsC-X
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# MDI 上のウィンドウの設定
+#
+
+keymap2 MDI-WindowOperation
+ key C-S-L     C-A-L	=> &WindowLower(MDI)		# ウィンドウを一番下へ
+ key C-S-R     C-A-R	=> &WindowRaise(MDI)		# ウィンドウを一番上へ
+ key C-S-Z     C-A-Z	=> &WindowMaximize(MDI)		# ウィンドウの最大化
+ key C-S-I     C-A-I	=> &WindowMinimize(MDI)		# ウィンドウの最小化
+ key C-S-X     C-A-X	=> &WindowVMaximize(MDI)	# ウィンドウの縦最大化
+ key C-S-C     C-A-C	=> &WindowHMaximize(MDI)	# ウィンドウの横最大化
+ key C-S-Left  C-A-Left	=> &WindowMove(-16, 0, MDI)	# ウィンドウの移動
+ key C-S-Right C-A-Right=> &WindowMove(16, 0, MDI)	#	〃
+ key C-S-Up    C-A-Up	=> &WindowMove(0, -16, MDI)	#	〃
+ key C-S-Down  C-A-Down	=> &WindowMove(0, 16, MDI)	#	〃
+ key C-S-A-Left		=> &WindowMove(-1, 0, MDI)	#	〃
+ key C-S-A-Right	=> &WindowMove(1, 0, MDI)	#	〃
+ key C-S-A-Up		=> &WindowMove(0, -1, MDI)	#	〃
+ key C-S-A-Down		=> &WindowMove(0, 1, MDI)	#	〃
+ key C-S-A C-S-B C-A-A	=> &WindowClingToLeft(MDI)	# ウィンドウ左に寄せる
+ key C-S-F C-S-F C-A-E	=> &WindowClingToRight(MDI)	# ウィンドウ右に寄せる
+ key C-S-P     C-A-P	=> &WindowClingToTop(MDI)	# ウィンドウ上に寄せる
+ key C-S-N     C-A-N	=> &WindowClingToBottom(MDI)	# ウィンドウ下に寄せる
+ key C-S-V     C-A-V	=> &WindowMoveVisibly(MDI)	# ウィンドウ見える位置
+ key C-S-K     C-A-K	=> $WindowClose		# ウィンドウを閉じる
+ key C-S-T		=> &WindowToggleTopMost	# 最前面トグル
+ key C-S-D		=> &WindowIdentify	# ウィンドウの素性を調べる
+ key C-S-H		=> &WindowSetAlpha(70)	# ウィンドウの半透明化
+ key C-S-A-H		=> &WindowSetAlpha(-1)	# 半透明化全て解除
+ key C-S-U		=> &WindowRedraw	# ウィンドウの再描画
+ key C-S-S		=> &LoadSetting		# 設定ファイルの読み込み
+ key C-S-F1		=> &InvestigateCommand	# WM_COMMAND の調査
+
+window	MDI	/:MDIClient:/ : Global
+ key C-S-Q     C-A-Q	=> &Prefix(MDI-WindowOperation)
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 各アプリケーションの設定
 #
 
@@ -388,7 +425,8 @@ window Xyzzy /xyzzy\.exe:/ : Global
 
 ## Windows Media Player .......................................................
 
-window WindowsMediaPlayer /:Media Player 2/ : Global
+window WindowsMediaPlayer /mplayer2.*:(Media Player 2|VideoRenderer)/ : Global
+ key C-A		=> Space		# Play
  key C-R		=> Space		# Play
  key C-P		=> Space		# Pause
  key C-S		=> Period		# Stop

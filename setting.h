@@ -97,7 +97,5 @@ public:
 
 // get home directory path
 extern bool getHomeDirectory(int index, istring *path_r);
-extern void parseDotMayuFilename(const istring &dot_mayu, 
-				 istring *name_r, istring *filename_r);
 
 #endif // __setting_h__

@@ -21,7 +21,11 @@
 #define IDS_109on104Emacs               22
 #define IDS_104                         23
 #define IDS_109on104                    24
+#define IDS_mayuPathName                25
+#define IDS_mayuPath                    26
+#define IDS_mayuSymbols                 27
 #define IDI_ICON_mayu                   101
+#define IDD_DIALOG_editSetting          101
 #define IDD_DIALOG_log                  102
 #define IDC_CURSOR_target               103
 #define IDR_MENU_tasktray               105
@@ -45,10 +49,12 @@
 #define IDC_CUSTOM_vkey                 1007
 #define IDC_BUTTON_edit                 1007
 #define IDC_EDIT_keycode                1008
+#define IDC_EDIT_symbols                1008
 #define IDC_EDIT_class                  1009
 #define IDC_STATIC_version              1010
 #define IDC_STATIC_url                  1011
 #define IDC_CHECK_detail                1012
+#define IDC_STATIC_url2                 1012
 #define IDC_BUTTON_clearLog             1013
 #define IDC_LIST_mayuPaths              1014
 #define ID_MENUITEM_quit                40001
@@ -65,9 +71,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        101
+#define _APS_NEXT_RESOURCE_VALUE        102
 #define _APS_NEXT_COMMAND_VALUE         40012
-#define _APS_NEXT_CONTROL_VALUE         1016
+#define _APS_NEXT_CONTROL_VALUE         1024
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -11,7 +11,7 @@
 !include <vc.mak>
 !include <mayu-common.mak>
 
-DEFINES		= -DSTRICT -DVERSION=""""$(VERSION)""""
+DEFINES		= $(COMMON_DEFINES) -DVERSION=""""$(VERSION)""""
 
 LDFLAGS_1	= $(guilflags)
 LDFLAGS_2	= $(dlllflags)
