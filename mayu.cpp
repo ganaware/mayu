@@ -54,9 +54,6 @@ class Mayu
   tomsgstream m_log;				/** log stream (output to log
 						    dialog's edit) */
 
-  HANDLE m_mhEvent;				/** event for message handler
-						    thread */
-
   HMENU m_hMenuTaskTray;			/// tasktray menu
   
   Setting *m_setting;				/// current setting
@@ -94,11 +91,6 @@ private:
   {
       switch (cd->dwData)
       {
-	case Notify::Type_mayuExit:		// terminate thread
-	{
-	  setTaskTrayHwnd(NULL);
-	  break;
-	}
 	
 	case Notify::Type_setFocus:
 	case Notify::Type_name:
@@ -604,12 +596,6 @@ public:
     CHECK_TRUE( DestroyWindow(m_hwndLog) );
     CHECK_TRUE( DestroyWindow(m_hwndTaskTray) );
     
-    // wait for message handler thread terminate
-    Notify n = { Notify::Type_mayuExit };
-    notify(&n, sizeof(n));
-    CHECK( WAIT_OBJECT_0 ==, WaitForSingleObject(m_mhEvent, INFINITE) );
-    CHECK_TRUE( CloseHandle(m_mhEvent) );
-
     // destroy menu
     DestroyMenu(m_hMenuTaskTray);
     

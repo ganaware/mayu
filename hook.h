@@ -28,7 +28,6 @@ struct Notify
   ///
   enum Type
   {
-    Type_mayuExit,				/// Notify
     Type_setFocus,				/// NotifySetFocus
     Type_name,					/// NotifySetFocus
     Type_lockState,				/// NotifyLockState
