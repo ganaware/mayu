@@ -1,101 +1,279 @@
-body			{ color:#ffffff; background-color:#000000;
-			  font-size:medium; font-family:"ＭＳ Ｐゴシック";  }
+body {
+	color:#555;
+	font-size:10pt;
+	font-family:Arial,sans-serif;
+	background-color:#fff;
+	background-image:url(bg.png);
+	margin:0pt;
+	padding:0pt;
+}
+
+a	{ color:#000; }
+a:hover, a:active {
+	text-decoration:underline;
+	background-color:#ffa;
+}
+img	{ border-width:0pt; }
+code, code a {
+	font-size:10pt;
+	font-family:Courier New,monospace;
+	color:#a00;
+}
+em {
+	color:#000;
+}
+kbd {
+	font-weight:bold;
+	font-family:Courier New,monospace;
+	color:#55a;
+}
+
 
 /* contents */
 
-.contents A:link	{ color:#ffffff; text-decoration:none; }
-.contents A:visited	{ color:#ffffff; text-decoration:none; }
-.contents A:active	{ color:#ffffff; text-decoration:underline; }
-
-.contents		{ margin:0; }
-
-.section		{ color:#ffffff; background-color:#555555;
-			  text-indent:-2ex;
-			  padding:0.3ex; padding-left:3ex;
-			  margin-top:0.5ex; margin-bottom:0.5ex;
-			  font-family:"Arial"; font-weight:bold;
-			  font-size:small; 
-			}
-
-.subsection		{ font-size:x-small; text-indent:-2ex; 
-			  padding-left:4ex; background-color:#222222;
-			  margin-top:0.5ex; margin-bottom:0.5ex; }
-
-.subsection tt		{ color:#ffdddd; font-family:"ＭＳ ゴシック";
-			  font-size:x-small; }
-
-.subsubsection		{ font-size:x-small; margin-left:6ex;
-			  text-indent:-2ex; }
-.subsubsection tt	{ color:#ffdddd; font-family:"ＭＳ ゴシック";
-			  font-size:x-small; }
+.contents {
+	color:#000;
+	margin:0pt;
+	padding:0pt;
+	border-left-width:4pt; border-top-width:1pt;
+	border-style: solid none none solid;
+	border-color:#000;
+}
+.contents a {
+	text-decoration:none;
+}
+.contents div {
+	margin:0pt;
+	padding:0pt;
+}
+.contents .section, .contents .appendix {
+	background-color:#ccc;
+	font-weight:bold;
+}
+.contents .section ol, .contents .appendix ol {
+	margin:0pt;
+	padding:0pt; padding-left:28pt;
+}
+.contents .appendix ol {
+	list-style-type: upper-alpha;
+}
+.contents .subsection {
+	color:#555;
+	font-weight:normal;
+	background-color:#fff;
+	border-color:#000;
+	border-width:1pt;
+	border-style: solid none solid solid;
+	padding-top:1pt;
+	margin-left:-24pt;
+}
+.contents .subsection ol {
+	margin:0pt;
+	padding:0pt;
+	padding-left:24pt;
+	list-style-type: lower-roman;
+}
+.contents .subsubsection {
+	margin:1pt;
+	margin-left:-10pt;
+	background-color:#eee;
+	padding:1pt;
+	line-height:11pt;
+}
+.contents .subsubsection ul {
+	padding:0pt;
+	margin:0pt;
+	margin-left:16pt;
+	list-style-type: disc;
+}
 
 /* manual */
 
-.manual A:link		{ color:#ffffdd; text-decoration:underline; }
-.manual A:visited	{ color:#ffffdd; text-decoration:underline; }
-.manual A:active	{ color:#ffffdd; text-decoration:underline; }
+.manual a { text-decoration:underline; }
+.manual a code { text-decoration:underline; }
 
-.manual			{ margin:0; }
+.manual {
+	color:#333;
+	margin:0pt;
+	padding:0pt;
+	border-left-width:4pt;
+	border-top-width:1pt;
+	border-style: solid none none solid;
+	border-color:#000;
+	background-color:#ccc;
+	line-height:14pt;
+}
+.manual .banner {
+	font-family:"ＭＳ Ｐ明朝";
+	padding:4pt;
+	margin:0pt;
+}
+.manual .title {
+	font-family:"ＭＳ Ｐ明朝";
+	padding:0pt;
+	margin:0pt; margin-bottom:-2pt;
+	margin-left:2pt; /* .marnual .d1 の半分？ なぜ？*/
+}
+.manual .copyright {
+	text-align:right;
+	font-weight:bold;
+	font-size:8pt;
+	padding:4pt;
+	color:#555;
+}
+.manual .copyright a {
+	color:#555;
+}
+.manual .main {
+	margin-bottom:1000pt;
+}
 
-.title			{ font-family:"ＭＳ Ｐ明朝"; background-color:#222222;
-			  padding:0.5ex; font-size:xx-large; }
+.manual dl {
+	padding:0pt;
+	margin:0pt;
+}
 
-.copyright		{ font-family:"Arial"; padding:1ex;
-			  font-weight:bold; font-size:small; }
+.manual .h1 {
+	padding:4pt; padding-left:10pt;
+	margin:0pt;
+	font-weight:bold;
+}
+.manual .h1 a, .manual .h1 a code {
+	text-decoration:none;
+}
+.manual .d1 {
+	padding:8pt; padding-right:8pt; padding-left:16pt;
+	margin:0pt; margin-left:4pt;
+	background-color:#fff;
+	border-color:#000;
+	border-width:1pt;
+	border-style: solid none solid solid;
+}
+.manual .d1 p {
+	margin-top:3pt;
+	margin-bottom:3pt;
+	text-indent:1em;
+}
+.manual .d1 p.continue {
+	text-indent:0em;
+}
+.manual .d1 ol, .manual .d1 ul {
+	margin-top:4pt;
+	margin-bottom:4pt;
+}
+.manual .d1 ol li, .manual .d1 ul li {
+	margin-left:-10pt;
+}
+.manual .h2 {
+	padding:4pt; padding-right:0pt;
+	font-weight:bold;
+}
+.manual .h2 a, .manual .h2 a code {
+	text-decoration:none;
+}
+.manual .d2 {
+	background-color:#eee;
+	margin:0pt; margin-left:20pt; margin-right:-8pt;
+	padding:8pt; padding-right:8pt; padding-left:16pt;
+}
+.manual .h3 {
+	padding:4pt; padding-right:0pt;
+	font-weight:bold;
+}
+.manual .h3 a, .manual .h3 a code {
+	text-decoration:none;
+}
+.manual .d3 {
+	margin-left:10pt;
+	padding:4pt; padding-left:8pt; padding-right:8pt;
+	border-color:#777;
+	border-width:3pt;
+	border-style: dotted;
+}
+.manual .function .h3 em {
+	font-weight:normal;
+}
+.manual .d1 ol li, .manual .d1 ul li{
+	line-height:12pt;
+	padding-top:1pt;
+	padding-bottom:1pt;
+}
+.manual .history dt {
+	font-weight:bold;
+}
+.manual .history ul li {
+	margin-left:-30pt;
+}
+.manual .history ul ul li {
+	margin-left:0pt;
+}
 
-ul			{ margin-top:1ex; margin-bottom:1ex; }
-ol			{ margin-top:1ex; margin-bottom:1ex; }
-tt			{ color:#ffdddd; font-family:"ＭＳ ゴシック";
-			  font-size:x-small; }
+.manual p.sample {
+	white-space:nowrap;
+	text-indent:0em;
+	padding-left:8pt; padding-right:8pt;
+	font-size:10pt;
+	font-family:Courier New,monospace;
+	color:#a00;
+	border-color:#a00;
+	border-width:1pt;
+	border-style: solid;
+	margin-left:4pt;
+	background-color:#fff;
+}
 
-.h1			{ color:#ffffff; background-color:#555555;
-			  text-indent:-2ex;
-			  padding:0.3ex; padding-left:3ex;
-			  margin-top:0.5ex; margin-bottom:0.5ex;
-			  font-family:"Arial"; font-weight:bold; }
-.h1 A:link		{ color:#ffffff; text-decoration:none; }
-.h1 A:visited		{ color:#ffffff; text-decoration:none; }
-.h1 A:active		{ color:#ffffff; text-decoration:underline; }
 
-.d1			{ margin-right:2ex; margin-top:2ex; margin-bottom:4ex;
-			  font-size:small; }
 
-.h2			{ font-size:small; text-indent:-2ex;
-			  padding:1ex; padding-left:4ex;
-			  background-color:#222222;
-			  margin-top:1ex; margin-bottom:1ex; }
-
-.d2			{ font-size:small; margin-right:2ex;
-			  margin-top:1ex; margin-bottom:3ex; }
-
-.h3			{ font-size:small; 
-			  padding-left:1ex; background-color:#222222;
-			  margin-top:1ex; margin-bottom:1ex; }
-
-.d3			{ font-size:small; margin-right:2ex;
-			  margin-top:1ex; margin-bottom:3ex; }
-
-kbd			{ font-family:"Arial"; font-weight:bold;
-			  color:#ddffdd; 
-			  font-size:x-small; }
-
-.sample			{ font-family:"ＭＳ ゴシック"; font-size:x-small;
+/*
+.sample			x2{ font-family:"ＭＳ ゴシック"; font-size:x-small;
 			  margin:0.5ex; margin-left:1.5ex; padding:0.5ex;
 			  color:#ffdddd;  border-color:#222222; border-width:2;
 			  border-style: solid solid solid solid; }
+*/
 
-.bug			{ font-family:"Arial"; font-weight:bold;
-			  color:#ff0000; }
+.manual .bug	{
+	font-weight:bold;
+	color:#f00;
+}
 
-table.DefaultSettings	{ 
-			  color:#ffdddd; font-family:"ＭＳ ゴシック";
-			  font-size:x-small; border-width:1px;
-			  border-style: solid; }
-
-table.DefaultSettings td
-			{ background-color:#222222;
-			  color:#ffdddd; font-family:"ＭＳ ゴシック";
-			  font-size:x-small; }
-table.DefaultSettings th
-			{ background-color:#555555;
-			  color:#ffffff; }
+table	{
+	color:#000;
+	border-width:1pt;
+	border-color:#000;
+	border-style: solid;
+	background-color:#ccc;
+	border-collapse:collapse;
+	border-spacing:0pt;
+}
+table.default-settings th {
+	font-family:Arial,sans-serif;
+	font-size:10pt;
+	padding-left:4pt; padding-right:4pt;
+}
+table.default-settings td {
+	font-family:Arial,sans-serif;
+	font-size:10pt;
+	background-color:#fff;
+	padding-left:4pt; padding-right:4pt;
+	margin:10pt;
+}
+table.default-settings .name th {
+	border-width:1pt;
+	border-color:#000;
+	border-style: solid none none none;
+}
+table.default-settings .name td {
+	border-width:1pt;
+	border-color:#000;
+	border-style: solid none none none;
+}
+table.default-settings .name-english th {
+	border-width:2pt;
+	border-color:#000;
+	border-style: double none none none;
+}
+table.default-settings .name-english td {
+	border-width:2pt;
+	border-color:#000;
+	border-style: double none none none;
+}
