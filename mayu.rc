@@ -101,10 +101,10 @@ BEGIN
     DEFPUSHBUTTON   "閉じる",IDOK,136,48,50,14
     ICON            IDI_ICON_mayu,IDC_STATIC,8,20,20,20
     LTEXT           "窓使いの憂鬱 %s",IDC_STATIC_version,32,8,164,8
-    CONTROL         "Copyright (C) 1999-2000, TAGA Nayuta <nayuta@i.am>",
+    CONTROL         "Copyright (C) 1999-2000, TAGA Nayuta <nayuta@users.sourceforge.net>",
                     IDC_STATIC,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,32,20,
                     164,8
-    LTEXT           "http://i.am/nayuta",IDC_STATIC_url,32,32,164,8
+    LTEXT           "http://mayu.sourceforge.net",IDC_STATIC_url,32,32,164,8
     PUSHBUTTON      "最新バージョンのダウンロード(&D)",IDC_BUTTON_download,
                     32,48,100,14
 END
@@ -265,10 +265,10 @@ BEGIN
     DEFPUSHBUTTON   "&Close",IDOK,136,48,50,14
     ICON            IDI_ICON_mayu,IDC_STATIC,8,20,20,20
     LTEXT           "MADO TSUKAI NO YUUTSU %s",IDC_STATIC_version,32,8,164,8
-    CONTROL         "Copyright (C) 1999-2000, TAGA Nayuta <nayuta@i.am>",
+    CONTROL         "Copyright (C) 1999-2000, TAGA Nayuta <nayuta@users.sourceforge.net>",
                     IDC_STATIC,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,32,20,
                     178,8
-    LTEXT           "http://i.am/nayuta",IDC_STATIC_url,32,32,164,8
+    LTEXT           "http://mayu.sourceforge.net",IDC_STATIC_url,32,32,164,8
     PUSHBUTTON      "&Download Latest Version",IDC_BUTTON_download,32,48,100,
                     14
 END
