@@ -4,7 +4,7 @@
 ###############################################################################
 #
 #
-#			Makedepend 0.04
+#			Makedepend 0.05
 #
 #
 #  1. What is different form the X11 makedepend ?
@@ -34,6 +34,11 @@
 #	   CUSTOMIZABLE2 section in this file.
 #
 #  3. History
+#
+#	2001/08/08 version 0.05
+#		* First, Makefile.new is created, then Makefile is
+#		  renamed to Makefile.bak, and Makefile.new is renamed
+#		  to Makefile.  (Thanks to Marvin Wolfthal)
 #
 #	2000/11/10 version 0.04
 #		* now dir/.. is eliminated.
@@ -191,13 +196,15 @@ __EOM__
 # system configuration
 
 # Is using Windows ?
-$isWindows = $^O eq "MSWin32";
+$isActivePerlWindows = $^O eq "MSWin32";
+$isCygwin = $^O eq "cygwin";
+$isWindows = $isActivePerlWindows || $isCygwin;
 
 # Does ignore case of filename ?
-$ignoreCase = $isWindows;
+$ignoreCase = $isActivePerlWindows;
 
 # null device filename
-if ( $isWindows ) {
+if ( $isActivePerlWindows ) {
   $nullDevice = "nul";
 } else {
   $nullDevice = "/dev/null";
@@ -232,7 +239,7 @@ $OPTION_CPP = "gcc";
 $OPTION_CPP_BIN = "";
 
 # newline code (--newline select this value)
-$OPTION_NEWLINE = $isWindows ? "\x0d\x0a" : "\x0a";
+$OPTION_NEWLINE = $isActivePerlWindows ? "\x0d\x0a" : "\x0a";
 
 # path delimiter (--path-delimiter select this value)
 $OPTION_PATH_DELIMITER = "/";
@@ -311,7 +318,7 @@ foreach $i ( @ARGV ) {
     if ( $1 eq "unix" ) {
       $OPTION_PATH_DELIMITER = "/";
     } elsif ( $1 eq "os" ) {
-      $OPTION_PATH_DELIMITER = $isWindows ? "\\" : "/";
+      $OPTION_PATH_DELIMITER = $isActivePerlWindows ? "\\" : "/";
     } elsif ( $1 eq "dos" ) {
       $OPTION_PATH_DELIMITER = "\\";
     } elsif ( $1 eq "dosq" ) {
@@ -445,11 +452,13 @@ if ( ! $ignoreSystemIncludeDirectories ) {
 
 # parse ignored directories for --option
 sub parseIgnore {
-  @OPTION_IGNORE = ( @OPTION_IGNORE , split( /;/ , $_[0]));
+  my ($ignore) = $_[0];
+  return unless ($ignore);
+  @OPTION_IGNORE = ( @OPTION_IGNORE , split( /;/ , $ignore));
   my($i);
   for ( $i = 0; $i < @OPTION_IGNORE; $i ++ ) {
     # DOS-style-path to UNIX path
-    $OPTION_IGNORE[$i] =~ s:\\:/:g if ( $isWindows );
+    $OPTION_IGNORE[$i] =~ s:\\:/:g if ( $isActivePerlWindows );
     $OPTION_IGNORE[$i] =~ s/^\s*(\S.*\S)\s*$/$1/;
   }
 }
@@ -469,7 +478,7 @@ if ( 2 <= $OPTION_VERBOSE && 0 < @OPTION_IGNORE) {
 
 foreach $i ( @OPTION_OPTIONS ) {
   # quote
-  if ( $isWindows ) {
+  if ( $isActivePerlWindows ) {
     $i =~ s/\"/\"\"\"\"/g;
   } else {
     $i =~ s/\"/\\\"/g;
@@ -489,14 +498,14 @@ if ( $OPTION_FILENAME eq "-" ) {
     print "$0: error: $OPTION_FILENAME is not present\n" ;
     exit 1;
   }
-  $bak = $OPTION_FILENAME . ".bak";
-  unlink $bak;
-  rename $OPTION_FILENAME, $bak;
-  open(MAKEFILEBAK, "<$bak") || die $!;
-  open(MAKEFILE, ">$OPTION_FILENAME") || die $!;
-  binmode MAKEFILE;
-  select MAKEFILE;
-  while (<MAKEFILEBAK>) {
+  $NEW_FILENAME = $OPTION_FILENAME . ".new";
+  $BACKUP_FILENAME = $OPTION_FILENAME . ".bak";
+  open(MAKEFILEORIG, "<$OPTION_FILENAME") || die $!;
+  unlink $NEW_FILENAME;
+  open(MAKEFILENEW, ">$NEW_FILENAME") || die $!;
+  binmode MAKEFILENEW;
+  select MAKEFILENEW;
+  while (<MAKEFILEORIG>) {
     chomp;
     if ( /^\Q$OPTION_STRING\E/ ) {
       if ( $OPTION_APPEND ) {
@@ -507,7 +516,7 @@ if ( $OPTION_FILENAME eq "-" ) {
     }
     print $_ . $OPTION_NEWLINE;
   }
-  close(MAKEFILEBAK);
+  close(MAKEFILEORIG);
 }
 
 if ( $OPTION_STRING ) {
@@ -558,7 +567,7 @@ sub getRelativeDirectory {
   my($path) = @_;
   $path = &reduceDirectory($path);
   my($cwd) = getcwd();
-  $cwd =~ s:\\:/:g if ( $isWindows );
+  $cwd =~ s:\\:/:g if ( $isActivePerlWindows );
   $cwd = &reduceDirectory($cwd);
   
   if ( ( $ignoreCase  && "$path\n$cwd" =~ m:^(.*)/(.*)\n\1/(.*)$:i ) ||
@@ -583,7 +592,6 @@ foreach $source ( @OPTION_SRCS ) {
   }
   
   open(CXX, "$commandline $source|") || next;
-
   my(%dependFiles);
 
   while (<CXX>) {
@@ -642,4 +650,12 @@ foreach $source ( @OPTION_SRCS ) {
     $len += length(" " . $i);
   }
   print $OPTION_NEWLINE;
+}
+
+if ( $OPTION_FILENAME ne "-" ) {
+  select STDIN;
+  close MAKEFILENEW;
+  
+  rename $OPTION_FILENAME, $BACKUP_FILENAME;
+  rename $NEW_FILENAME, $OPTION_FILENAME;
 }
