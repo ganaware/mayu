@@ -6,6 +6,7 @@
 
 sub getcvsfiles {
   my ($dir) = @_;
+  return if (! -d $dir);	# empty directory 
   open(CVS_Entries, "<$dir/CVS/Entries") || die;
   my (@lines) = <CVS_Entries>;
   close(CVS_Entries);
