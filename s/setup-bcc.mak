@@ -23,5 +23,5 @@ $(TARGET_2):	$(OBJS_2) $(RES_2) $(EXTRADEP_2)
 
 strres.h:	setup.rc
 	cmd /c grep -q- IDS setup.rc | \
-	sed "s/\(IDS[a-zA-Z0-9_]*\)[^""]*\("".*\)$$/\1, \2,/" | \
+	sed "s/\(IDS[a-zA-Z0-9_]*\)[^""]*\("".*\)$$/\1, _T(\2),/" | \
 	sed "s/^File.*$//" > strres.h

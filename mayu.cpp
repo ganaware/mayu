@@ -453,8 +453,8 @@ private:
     // set symbol
     for (int i = 1; i < __argc; ++ i)
     {
-      if (__wargv[i][0] == _T('-') && __wargv[i][1] == _T('D'))
-	newSetting->m_symbols.insert(__wargv[i] + 2);
+      if (__targv[i][0] == _T('-') && __targv[i][1] == _T('D'))
+	newSetting->m_symbols.insert(__targv[i] + 2);
     }
 
     if (!SettingLoader(&m_log, &m_log).load(newSetting))

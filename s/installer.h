@@ -2,50 +2,47 @@
 // installer.h
 
 
-#ifndef __installer_h__
-#define __installer_h__
+#ifndef _INSTALLER_H
+#  define _INSTALLER_H
 
 
 namespace Installer
 {
-  using namespace std;
-  using namespace StringTool;
-  
-  
   /////////////////////////////////////////////////////////////////////////////
   // SetupFile
   
   // files to copy
-  struct SetupFile
+  namespace SetupFile
   {
-  public:
-    enum Kind { File, Dir, Dll };
+    enum Kind
+    {
+      File,
+      Dir,
+      Dll,
+    };
+    
     enum OS
     {
       ALL,
       W9x, // W95, W98,
       NT,  NT4, W2k,
     };
-    enum Destination { ToDest, ToDriver };
-  
-  public:
-    const Kind kind;
-    const OS os;
-    const char *from;
-    const Destination destination;
-    const char *to;
-  
-  public:
-    SetupFile(Kind kind_, OS os_, const char *from_, Destination destination_,
-	      const char *to_ = NULL)
-      : kind(kind_),
-	os(os_),
-	from(from_),
-	destination(destination_),
-	to(to_ ? to_ : from_)
+    
+    enum Destination
     {
-    }
-  };
+      ToDest,
+      ToDriver,
+    };
+    
+    struct Data
+    {
+      Kind m_kind;
+      OS m_os;
+      const _TCHAR *m_from;
+      Destination m_destination;
+      const _TCHAR *m_to;
+    };
+  }
 
   
   /////////////////////////////////////////////////////////////////////////////
@@ -53,33 +50,33 @@ namespace Installer
   
   enum Locale
   {
-    Locale_Japanese_Japan_932 = 0,
-    Locale_C = 1,
+    LOCALE_Japanese_Japan_932 = 0,
+    LOCALE_C = 1,
   };
 
   struct StringResource
   {
-    UINT id;
-    char *str;
+    UINT m_id;
+    _TCHAR *m_str;
   };
 
   class Resource
   {
-    const StringResource *stringResources;
+    const StringResource *m_stringResources;
     
-    Locale locale;
+    Locale m_locale;
     
   public:
     // constructor
-    Resource(const StringResource *stringResources_);
-    Resource(const StringResource *stringResources_, Locale locale_)
-      : stringResources(stringResources_), locale(locale_) { }
+    Resource(const StringResource *i_stringResources);
+    Resource(const StringResource *i_stringResources, Locale i_locale)
+      : m_stringResources(i_stringResources), m_locale(i_locale) { }
     
     // get resource string
-    const char *loadString(UINT id);
+    const _TCHAR *loadString(UINT i_id);
 
     // locale
-    Locale getLocale() const { return locale; }
+    Locale getLocale() const { return m_locale; }
   };
 
   
@@ -88,73 +85,78 @@ namespace Installer
 
   // createLink - uses the shell's IShellLink and IPersistFile interfaces 
   //   to create and store a shortcut to the specified object. 
-  HRESULT createLink(LPCSTR lpszPathObj, LPCSTR lpszPathLink, LPCSTR lpszDesc);
+  HRESULT createLink(LPCTSTR i_pathObj, LPCTSTR i_pathLink, LPCTSTR i_desc);
   
   // create file extension information
-  void createFileExtension(const istring &ext, const string &contentType,
-			   const istring &fileType, const string &fileTypeName,
-			   const istring &iconPath, const string &command);
+  void createFileExtension(const tstringi &i_ext, const tstring &i_contentType,
+			   const tstringi &i_fileType,
+			   const tstring &i_fileTypeName,
+			   const tstringi &i_iconPath,
+			   const tstring &i_command);
   
   // remove file extension information
-  void removeFileExtension(const istring &ext, const istring &fileType);
+  void removeFileExtension(const tstringi &i_ext, const tstringi &i_fileType);
   
   // create uninstallation information
-  void createUninstallInformation(const istring &name,
-				  const string &displayName,
-				  const string &commandLine);
+  void createUninstallInformation(const tstringi &i_name,
+				  const tstring &i_displayName,
+				  const tstring &i_commandLine);
   
   // remove uninstallation information
-  void removeUninstallInformation(const istring &name);
+  void removeUninstallInformation(const tstringi &i_name);
 
   // normalize path
-  istring normalizePath(istring path);
+  tstringi normalizePath(tstringi i_path);
   
   // create deep directory
-  bool createDirectories(const char *folder);
+  bool createDirectories(const _TCHAR *i_folder);
 
   // get driver directory
-  istring getDriverDirectory();
+  tstringi getDriverDirectory();
 
   // get current directory
-  istring getModuleDirectory();
+  tstringi getModuleDirectory();
 
   // get start menu name
-  istring getStartMenuName(const istring &shortcutName);
+  tstringi getStartMenuName(const tstringi &i_shortcutName);
 
   // get start up name
-  istring getStartUpName(const istring &shortcutName);
+  tstringi getStartUpName(const tstringi &i_shortcutName);
 
   // create driver service
-  DWORD createDriverService(const istring &serviceName,
-			    const string &serviceDescription,
-			    const istring &driverPath,
-			    const char *preloadedGroups);
+  DWORD createDriverService(const tstringi &i_serviceName,
+			    const tstring &i_serviceDescription,
+			    const tstringi &i_driverPath,
+			    const _TCHAR *i_preloadedGroups);
 
   // remove driver service
-  DWORD removeDriverService(const istring &serviceName);
+  DWORD removeDriverService(const tstringi &i_serviceName);
 
   // check operating system
-  bool checkOs(SetupFile::OS os);
+  bool checkOs(SetupFile::OS i_os);
   
   // install files
-  bool installFiles(const SetupFile *setupFiles, size_t lengthof_setupFiles,
-		    const istring &srcDir, const istring &destDir);
+  bool installFiles(const SetupFile::Data *i_setupFiles,
+		    size_t i_setupFilesSize,
+		    const tstringi &i_srcDir, const tstringi &i_destDir);
   
   // remove files from src
-  bool removeSrcFiles(const SetupFile *setupFiles, size_t lengthof_setupFiles,
-		      const istring &srcDir);
+  bool removeSrcFiles(const SetupFile::Data *i_setupFiles,
+		      size_t i_setupFilesSize,
+		      const tstringi &i_srcDir);
   
   // remove files
-  void removeFiles(const SetupFile *setupFiles, size_t lengthof_setupFiles,
-		   const istring &destDir);
+  void removeFiles(const SetupFile::Data *i_setupFiles,
+		   size_t i_setupFilesSize,
+		   const tstringi &i_destDir);
   
   // uninstall step1
-  int uninstallStep1(const char *uninstallOption);
+  int uninstallStep1(const _TCHAR *i_uninstallOption);
   
   // uninstall step2
   // (after this function, we cannot use any resource)
-  void uninstallStep2(const char *argByStep1);
+  void uninstallStep2(const _TCHAR *i_argByStep1);
 }
 
 
-#endif // __installer_h__
+#endif // _INSTALLER_H

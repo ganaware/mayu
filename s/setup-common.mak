@@ -5,7 +5,9 @@
 ###############################################################################
 
 
-DEFINES		= -DSTRICT $(DEBUGDEFINES) -D_WIN32_IE=0x0400
+DEFINES		= -DSTRICT -D_WIN32_IE=0x0400 -DUNICODE -D_UNICODE \
+		  $(DEBUGDEFINES)
+BOOST_DIR	= ../../boost
 
 
 # setup.exe	###############################################################
@@ -14,7 +16,6 @@ TARGET_1	= setup.exe
 OBJS_1		=			\
 		setup.obj		\
 		installer.obj		\
-		..\regexp.obj		\
 		..\registry.obj		\
 		..\stringtool.obj	\
 		..\windowstool.obj	\

@@ -6,7 +6,6 @@
 #include "../registry.h"
 #include "../stringtool.h"
 #include "../windowstool.h"
-#include "../regexp.h"
 #include "installer.h"
 
 #include <shlobj.h>
@@ -17,33 +16,37 @@
 namespace Installer
 {
   using namespace std;
-  using namespace StringTool;
   
   
   /////////////////////////////////////////////////////////////////////////////
   // Utility Functions
 
-  // createLink - uses the shell's IShellLink and IPersistFile interfaces 
-  //   to create and store a shortcut to the specified object. 
-  // Returns the result of calling the member functions of the interfaces. 
-  // lpszPathObj - address of a buffer containing the path of the object. 
-  // lpszPathLink - address of a buffer containing the path where the 
-  //   shell link is to be stored. 
-  // lpszDesc - address of a buffer containing the description of the 
-  //   shell link. 
-  HRESULT createLink(LPCSTR lpszPathObj, LPCSTR lpszPathLink, LPCSTR lpszDesc)
+  /** createLink
+		uses the shell's IShellLink and IPersistFile interfaces to
+		create and store a shortcut to the specified object.
+      @return
+		the result of calling the member functions of the interfaces.
+      @param i_pathObj
+		address of a buffer containing the path of the object.
+      @param i_pathLink
+      		address of a buffer containing the path where the
+		shell link is to be stored.
+      @param i_desc
+		address of a buffer containing the description of the
+		shell link.
+  */
+  HRESULT createLink(LPCTSTR i_pathObj, LPCTSTR i_pathLink, LPCTSTR i_desc)
   { 
-    HRESULT hres;
-    IShellLink* psl;
-
     // Get a pointer to the IShellLink interface. 
-    hres = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER,
-			    IID_IShellLink, (void **)&psl);
+    IShellLink* psl;
+    HRESULT hres =
+      CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER,
+		       IID_IShellLink, (void **)&psl);
     if (SUCCEEDED(hres))
     { 
       // Set the path to the shortcut target and add the description. 
-      psl->SetPath(lpszPathObj);
-      psl->SetDescription(lpszDesc);
+      psl->SetPath(i_pathObj);
+      psl->SetDescription(i_desc);
  
       // Query IShellLink for the IPersistFile interface for saving the 
       // shortcut in persistent storage. 
@@ -52,15 +55,18 @@ namespace Installer
  
       if (SUCCEEDED(hres))
       {
-	wchar_t wsz[MAX_PATH]; 
-      
+#ifdef UNICODE
+	// Save the link by calling IPersistFile::Save. 
+	hres = ppf->Save(i_pathLink, TRUE); 
+#else
+	wchar_t wsz[MAX_PATH];
 	// Ensure that the string is ANSI. 
-	MultiByteToWideChar(CP_ACP, 0, lpszPathLink, -1, wsz, MAX_PATH); 
-      
+	MultiByteToWideChar(CP_ACP, 0, i_pathLink, -1, wsz, MAX_PATH);
 	// Save the link by calling IPersistFile::Save. 
 	hres = ppf->Save(wsz, TRUE); 
+#endif
 	ppf->Release();
-      } 
+      }
       psl->Release();
     } 
     return hres; 
@@ -68,165 +74,173 @@ namespace Installer
 
 
   // create file extension information
-  void createFileExtension(const istring &ext, const string &contentType,
-			   const istring &fileType, const string &fileTypeName,
-			   const istring &iconPath, const string &command)
+  void createFileExtension(const tstringi &i_ext, const tstring &i_contentType,
+			   const tstringi &i_fileType,
+			   const tstring &i_fileTypeName,
+			   const tstringi &i_iconPath,
+			   const tstring &i_command)
   {
-    string dummy;
+    tstring dummy;
 
-    Registry regExt(HKEY_CLASSES_ROOT, ext);
-    if (!    regExt.read ("", &dummy))
-      _true( regExt.write("", fileType) );
-    if (!    regExt.read ("Content Type", &dummy))
-      _true( regExt.write("Content Type", contentType) );
+    Registry regExt(HKEY_CLASSES_ROOT, i_ext);
+    if (!         regExt.read (_T(""), &dummy))
+      CHECK_TRUE( regExt.write(_T(""), i_fileType) );
+    if (!         regExt.read (_T("Content Type"), &dummy))
+      CHECK_TRUE( regExt.write(_T("Content Type"), i_contentType) );
 
-    Registry regFileType(HKEY_CLASSES_ROOT, fileType);
-    if (!    regFileType.read ("", &dummy))
-      _true( regFileType.write("", fileTypeName) );
+    Registry      regFileType(HKEY_CLASSES_ROOT, i_fileType);
+    if (!         regFileType.read (_T(""), &dummy))
+      CHECK_TRUE( regFileType.write(_T(""), i_fileTypeName) );
 
-    Registry regFileTypeIcon(HKEY_CLASSES_ROOT, fileType + "\\DefaultIcon");
-    if (!    regFileTypeIcon.read ("", &dummy))
-      _true( regFileTypeIcon.write("", iconPath) );
+    Registry      regFileTypeIcon(HKEY_CLASSES_ROOT,
+				  i_fileType + _T("\\DefaultIcon"));
+    if (!         regFileTypeIcon.read (_T(""), &dummy))
+      CHECK_TRUE( regFileTypeIcon.write(_T(""), i_iconPath) );
 
-    Registry regFileTypeComand(HKEY_CLASSES_ROOT,
-			       fileType + "\\shell\\open\\command");
-    if (!    regFileTypeComand.read ("", &dummy))
-      _true( regFileTypeComand.write("", command) );
+    Registry      regFileTypeComand(HKEY_CLASSES_ROOT,
+				    i_fileType + _T("\\shell\\open\\command"));
+    if (!         regFileTypeComand.read (_T(""), &dummy))
+      CHECK_TRUE( regFileTypeComand.write(_T(""), i_command) );
   }
 
 
   // remove file extension information
-  void removeFileExtension(const istring &ext, const istring &fileType)
+  void removeFileExtension(const tstringi &i_ext, const tstringi &i_fileType)
   {
-    Registry::remove(HKEY_CLASSES_ROOT, ext);
-    Registry::remove(HKEY_CLASSES_ROOT, fileType + "\\shell\\open\\command");
-    Registry::remove(HKEY_CLASSES_ROOT, fileType + "\\shell\\open");
-    Registry::remove(HKEY_CLASSES_ROOT, fileType + "\\shell");
-    Registry::remove(HKEY_CLASSES_ROOT, fileType);
+    Registry::remove(HKEY_CLASSES_ROOT, i_ext);
+    Registry::remove(HKEY_CLASSES_ROOT,
+		     i_fileType + _T("\\shell\\open\\command"));
+    Registry::remove(HKEY_CLASSES_ROOT, i_fileType + _T("\\shell\\open"));
+    Registry::remove(HKEY_CLASSES_ROOT, i_fileType + _T("\\shell"));
+    Registry::remove(HKEY_CLASSES_ROOT, i_fileType);
   }
 
   
   // create uninstallation information
-  void createUninstallInformation(const istring &name,
-				  const string &displayName,
-				  const string &commandLine)
+  void createUninstallInformation(const tstringi &i_name,
+				  const tstring &i_displayName,
+				  const tstring &i_commandLine)
   {
-    Registry reg(HKEY_LOCAL_MACHINE,
-		 "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\"
-		 + name);
+    Registry reg(
+      HKEY_LOCAL_MACHINE,
+      _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\")
+      + i_name);
 
-    _true( reg.write("DisplayName", displayName) );
-    _true( reg.write("UninstallString", commandLine) );
+    CHECK_TRUE( reg.write(_T("DisplayName"), i_displayName) );
+    CHECK_TRUE( reg.write(_T("UninstallString"), i_commandLine) );
   }
 
   
   // remove uninstallation information
-  void removeUninstallInformation(const istring &name)
+  void removeUninstallInformation(const tstringi &i_name)
   {
     Registry::
       remove(HKEY_LOCAL_MACHINE,
-	     "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\"
-	     + name);
+	     _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\")
+	     + i_name);
   }
   
   
   // normalize path
-  istring normalizePath(istring path)
+  tstringi normalizePath(tstringi i_path)
   {
-    Regexp regSlash("^(.*)/(.*)$");
-    while (regSlash.doesMatch(path))
-      path = regSlash[1] + "\\" + regSlash[2];
+    tregex regSlash(_T("^(.*)/(.*)$"));
+    tcmatch_results what;
+    while (boost::regex_search(i_path, what, regSlash))
+      i_path = what.str(1) + _T("\\") + what.str(2);
 
-    Regexp regTailBackSlash("^(.*)\\\\$");
-    if (regTailBackSlash.doesMatch(path))
-      path = regTailBackSlash[1];
-  
-    return path;
+    tregex regTailBackSlash(_T("^(.*)\\\\$"));
+    while (boost::regex_search(i_path, what, regTailBackSlash))
+      i_path = what.str(1);
+    
+    return i_path;
   }
-
+  
   
   // create deep directory
-  bool createDirectories(const char *folder)
+  bool createDirectories(const _TCHAR *i_folder)
   {
-    const char *s = strchr(folder, '\\'); // TODO: '/'
-    if (s && s - folder == 2 && folder[1] == ':')
-      s = strchr(s + 1, '\\');
+    const _TCHAR *s = _tcschr(i_folder, _T('\\')); // TODO: '/'
+    if (s && s - i_folder == 2 && i_folder[1] == _T(':'))
+      s = _tcschr(s + 1, _T('\\'));
     
-    struct stat sbuf;
+    struct _stat sbuf;
     while (s)
     {
-      istring f(folder, 0, s - folder);
-      if (stat(f.c_str(), &sbuf) < 0)
+      tstringi f(i_folder, 0, s - i_folder);
+      if (_tstat(f.c_str(), &sbuf) < 0)
 	if (!CreateDirectory(f.c_str(), NULL))
 	  return false;
-      s = strchr(s + 1, '\\');
+      s = _tcschr(s + 1, _T('\\'));
     }
-    if (stat(folder, &sbuf) < 0)
-      if (!CreateDirectory(folder, NULL))
+    if (_tstat(i_folder, &sbuf) < 0)
+      if (!CreateDirectory(i_folder, NULL))
 	return false;
     return true;
   }
 
 
   // get driver directory
-  istring getDriverDirectory()
+  tstringi getDriverDirectory()
   {
-    char buf[GANA_MAX_PATH];
-    _true( GetSystemDirectory(buf, sizeof(buf)) );
-    return istring(buf) + "\\drivers";
+    _TCHAR buf[GANA_MAX_PATH];
+    CHECK_TRUE( GetSystemDirectory(buf, NUMBER_OF(buf)) );
+    return tstringi(buf) + _T("\\drivers");
   }
 
   
   // get current directory
-  istring getModuleDirectory()
+  tstringi getModuleDirectory()
   {
-    char buf[GANA_MAX_PATH];
-    _true( GetModuleFileName(hInst, buf, sizeof(buf)) );
-    Regexp reg("^(.*)\\\\[^\\\\]*$");
-    if (reg.doesMatch(buf))
-      return reg[1];
+    _TCHAR buf[GANA_MAX_PATH];
+    CHECK_TRUE( GetModuleFileName(g_hInst, buf, NUMBER_OF(buf)) );
+    tregex reg(_T("^(.*)\\\\[^\\\\]*$"));
+    tcmatch_results what;
+    if (boost::regex_search(buf, what, reg))
+      return what.str(1);
     else
       return buf;
   }
 
 
   // get start menu name
-  istring getStartMenuName(const istring &shortcutName)
+  tstringi getStartMenuName(const tstringi &i_shortcutName)
   {
 #if 0
     char programDir[GANA_MAX_PATH];
     if (SUCCEEDED(SHGetSpecialFolderPath(NULL, programDir,
 					 CSIDL_COMMON_PROGRAMS, FALSE)))
-      return istring(programDir) + "\\" + shortcutName + ".lnk";
+      return tstringi(programDir) + "\\" + shortcutName + ".lnk";
 #else
-    istring programDir;
+    tstringi programDir;
     if (Registry::read(HKEY_LOCAL_MACHINE,
-		       "Software\\Microsoft\\Windows\\CurrentVersion\\"
-		       "Explorer\\Shell Folders", "Common Programs",
+		       _T("Software\\Microsoft\\Windows\\CurrentVersion\\")
+		       _T("Explorer\\Shell Folders"), _T("Common Programs"),
 		       &programDir))
-      return programDir + "\\" + shortcutName + ".lnk";
+      return programDir + _T("\\") + i_shortcutName + _T(".lnk");
 #endif
-    return "";
+    return _T("");
   }
 
 
   // get start up name
-  istring getStartUpName(const istring &shortcutName)
+  tstringi getStartUpName(const tstringi &i_shortcutName)
   {
-    istring startupDir;
+    tstringi startupDir;
     if (Registry::read(HKEY_CURRENT_USER,
-		       "Software\\Microsoft\\Windows\\CurrentVersion\\"
-		       "Explorer\\Shell Folders", "Startup", &startupDir))
-      return startupDir + "\\" + shortcutName + ".lnk";
-    return "";
+		       _T("Software\\Microsoft\\Windows\\CurrentVersion\\")
+		       _T("Explorer\\Shell Folders"), _T("Startup"),
+		       &startupDir))
+      return startupDir + _T("\\") + i_shortcutName + _T(".lnk");
+    return _T("");
   }
 
 
   // create driver service
-  DWORD createDriverService(const istring &serviceName,
-			    const string &serviceDescription,
-			    const istring &driverPath,
-			    const char *preloadedGroups)
+  DWORD createDriverService(const tstringi &i_serviceName,
+			    const tstring &i_serviceDescription,
+			    const tstringi &i_driverPath,
+			    const _TCHAR *i_preloadedGroups)
   {
     SC_HANDLE hscm =
       OpenSCManager(NULL, NULL,
@@ -235,11 +249,11 @@ namespace Installer
       return false;
 
     SC_HANDLE hs =
-      CreateService(hscm, serviceName.c_str(), serviceDescription.c_str(),
+      CreateService(hscm, i_serviceName.c_str(), i_serviceDescription.c_str(),
 		    SERVICE_START | SERVICE_STOP, SERVICE_KERNEL_DRIVER,
 		    SERVICE_AUTO_START, SERVICE_ERROR_IGNORE,
-		    driverPath.c_str(), NULL, NULL,
-		    preloadedGroups, NULL, NULL);
+		    i_driverPath.c_str(), NULL, NULL,
+		    i_preloadedGroups, NULL, NULL);
     if (hs == NULL)
     {
       DWORD err = GetLastError();
@@ -258,13 +272,13 @@ namespace Installer
 
 
   // remove driver service
-  DWORD removeDriverService(const istring &serviceName)
+  DWORD removeDriverService(const tstringi &i_serviceName)
   {
     DWORD err = ERROR_SUCCESS;
     
     SC_HANDLE hscm = OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT);
     SC_HANDLE hs =
-      OpenService(hscm, serviceName.c_str(),
+      OpenService(hscm, i_serviceName.c_str(),
 		  SERVICE_START | SERVICE_STOP | DELETE);
     if (!hs)
     {
@@ -316,36 +330,37 @@ namespace Installer
 
   
   // install files
-  bool installFiles(const SetupFile *setupFiles, size_t lengthof_setupFiles,
-		    const istring &srcDir, const istring &destDir)
+  bool installFiles(const SetupFile::Data *i_setupFiles,
+		    size_t i_setupFilesSize,
+		    const tstringi &i_srcDir, const tstringi &i_destDir)
   {
-    istring to, from;
-    istring destDriverDir = getDriverDirectory();
+    tstringi to, from;
+    tstringi destDriverDir = getDriverDirectory();
 
-    for (size_t i = 0; i < lengthof_setupFiles; i ++)
+    for (size_t i = 0; i < i_setupFilesSize; ++ i)
     {
-      const SetupFile &s = setupFiles[i];
-      const istring &fromDir = srcDir;
-      const istring &toDir =
-	(s.destination == SetupFile::ToDriver) ? destDriverDir : destDir;
+      const SetupFile::Data &s = i_setupFiles[i];
+      const tstringi &fromDir = i_srcDir;
+      const tstringi &toDir =
+	(s.m_destination == SetupFile::ToDriver) ? destDriverDir : i_destDir;
 
-      if (!s.from)
-	continue;	// remove only
+      if (!s.m_from)
+	continue;				// remove only
 
       if (fromDir == toDir)
-	continue;	// same directory
+	continue;				// same directory
 
-      if (!checkOs(s.os))	// check operating system
+      if (!checkOs(s.m_os))			// check operating system
 	continue;
 
       // type
-      switch (s.kind)
+      switch (s.m_kind)
       {
 	case SetupFile::Dll:
 	{
 	  // rename driver
-	  istring from_ = toDir + "\\" + s.to;
-	  istring to_ = toDir + "\\deleted." + s.to;
+	  tstringi from_ = toDir + _T("\\") + s.m_to;
+	  tstringi to_ = toDir + _T("\\deleted.") + s.m_to;
 	  DeleteFile(to_.c_str());
 	  MoveFile(from_.c_str(), to_.c_str());
 	  DeleteFile(to_.c_str());
@@ -354,20 +369,20 @@ namespace Installer
 	default:
 	case SetupFile::File:
 	{
-	  from += fromDir + '\\' + s.from + '\0';
-	  to   += toDir   + '\\' + s.to   + '\0';
+	  from += fromDir + _T('\\') + s.m_from + _T('\0');
+	  to   += toDir   + _T('\\') + s.m_to   + _T('\0');
 	  break;
 	}
 	case SetupFile::Dir:
 	{
-	  createDirectories((toDir + '\\' + s.to).c_str());
+	  createDirectories((toDir + _T('\\') + s.m_to).c_str());
 	  break;
 	}
       }
     }
 
     SHFILEOPSTRUCT fo;
-    ZeroMemory(&fo, sizeof(fo));
+    ::ZeroMemory(&fo, sizeof(fo));
     fo.wFunc = FO_COPY;
     fo.fFlags = FOF_MULTIDESTFILES;
     fo.pFrom = from.c_str();
@@ -376,84 +391,85 @@ namespace Installer
       return false;
     return true;
   }
+  
 
   // remove files from src
-  bool removeSrcFiles(const SetupFile *setupFiles, size_t lengthof_setupFiles,
-		      const istring &srcDir)
+  bool removeSrcFiles(const SetupFile::Data *i_setupFiles,
+		      size_t i_setupFilesSize, const tstringi &i_srcDir)
   {
-    istring destDriverDir = getDriverDirectory();
+    tstringi destDriverDir = getDriverDirectory();
 
-    for (size_t i = 0; i < lengthof_setupFiles; i ++)
+    for (size_t i = 0; i < i_setupFilesSize; ++ i)
     {
-      const SetupFile &s = setupFiles[lengthof_setupFiles - i - 1];
-      const istring &fromDir = srcDir;
+      const SetupFile::Data &s = i_setupFiles[i_setupFilesSize - i - 1];
+      const tstringi &fromDir = i_srcDir;
       
-      if (!s.from)
+      if (!s.m_from)
 	continue;	// remove only
 
-      if (!checkOs(s.os))	// check operating system
+      if (!checkOs(s.m_os))	// check operating system
 	continue;
 
       // type
-      switch (s.kind)
+      switch (s.m_kind)
       {
 	default:
 	case SetupFile::Dll:
 	case SetupFile::File:
-	  DeleteFile((fromDir + '\\' + s.from).c_str());
+	  DeleteFile((fromDir + _T('\\') + s.m_from).c_str());
 	  break;
 	case SetupFile::Dir:
-	  RemoveDirectory((fromDir + '\\' + s.from).c_str());
+	  RemoveDirectory((fromDir + _T('\\') + s.m_from).c_str());
 	  break;
       }
     }
-    RemoveDirectory(srcDir.c_str());
+    RemoveDirectory(i_srcDir.c_str());
     return true;
   }
 
   
   // remove files
-  void removeFiles(const SetupFile *setupFiles, size_t lengthof_setupFiles,
-		   const istring &destDir)
+  void removeFiles(const SetupFile::Data *i_setupFiles,
+		   size_t i_setupFilesSize, const tstringi &i_destDir)
   {
-    istring destDriverDir = getDriverDirectory();
+    tstringi destDriverDir = getDriverDirectory();
 
-    for (size_t i = 0; i < lengthof_setupFiles; i ++)
+    for (size_t i = 0; i < i_setupFilesSize; ++ i)
     {
-      const SetupFile &s = setupFiles[lengthof_setupFiles - i - 1];
-      const istring &toDir =
-	(s.destination == SetupFile::ToDriver) ? destDriverDir : destDir;
+      const SetupFile::Data &s = i_setupFiles[i_setupFilesSize - i - 1];
+      const tstringi &toDir =
+	(s.m_destination == SetupFile::ToDriver) ? destDriverDir : i_destDir;
 
-      if (!checkOs(s.os))	// check operating system
+      if (!checkOs(s.m_os))	// check operating system
 	continue;
 
       // type
-      switch (s.kind)
+      switch (s.m_kind)
       {
 	case SetupFile::Dll:
-	  DeleteFile((toDir + "\\deleted." + s.to).c_str());
+	  DeleteFile((toDir + _T("\\deleted.") + s.m_to).c_str());
 	  // fall through
 	default:
 	case SetupFile::File:
-	  DeleteFile((toDir + '\\' + s.to).c_str());
+	  DeleteFile((toDir + _T('\\') + s.m_to).c_str());
 	  break;
 	case SetupFile::Dir:
-	  RemoveDirectory((toDir + '\\' + s.to).c_str());
+	  RemoveDirectory((toDir + _T('\\') + s.m_to).c_str());
 	  break;
       }
     }
-    RemoveDirectory(destDir.c_str());
+    RemoveDirectory(i_destDir.c_str());
   }
   
   
   // uninstall step1
-  int uninstallStep1(const char *uninstallOption)
+  int uninstallStep1(const _TCHAR *i_uninstallOption)
   {
     // copy this EXEcutable image into the user's temp directory
-    char setup_exe[GANA_MAX_PATH], tmp_setup_exe[GANA_MAX_PATH];
-    GetModuleFileName(NULL, setup_exe, sizeof(setup_exe));
-    GetTempPath(sizeof(tmp_setup_exe), tmp_setup_exe);
-    GetTempFileName(tmp_setup_exe, "del", 0, tmp_setup_exe);
+    _TCHAR setup_exe[GANA_MAX_PATH], tmp_setup_exe[GANA_MAX_PATH];
+    GetModuleFileName(NULL, setup_exe, NUMBER_OF(setup_exe));
+    GetTempPath(NUMBER_OF(tmp_setup_exe), tmp_setup_exe);
+    GetTempFileName(tmp_setup_exe, _T("del"), 0, tmp_setup_exe);
     CopyFile(setup_exe, tmp_setup_exe, FALSE);
     
     // open the clone EXE using FILE_FLAG_DELETE_ON_CLOSE
@@ -462,13 +478,13 @@ namespace Installer
     
     // spawn the clone EXE passing it our EXE's process handle
     // and the full path name to the original EXE file.
-    char commandLine[512];
+    _TCHAR commandLine[512];
     HANDLE hProcessOrig =
       OpenProcess(SYNCHRONIZE, TRUE, GetCurrentProcessId());
-    _snprintf(commandLine, sizeof(commandLine), "%s %s %d",
-	      tmp_setup_exe, uninstallOption, hProcessOrig);
+    _sntprintf(commandLine, NUMBER_OF(commandLine), _T("%s %s %d"),
+	       tmp_setup_exe, i_uninstallOption, hProcessOrig);
     STARTUPINFO si;
-    ZeroMemory(&si, sizeof(si));
+    ::ZeroMemory(&si, sizeof(si));
     si.cb = sizeof(si);
     PROCESS_INFORMATION pi;
     CreateProcess(NULL, commandLine, NULL, NULL, TRUE, 0, NULL, NULL, &si,&pi);
@@ -481,10 +497,10 @@ namespace Installer
 
   // uninstall step2
   // (after this function, we cannot use any resource)
-  void uninstallStep2(const char *argByStep1)
+  void uninstallStep2(const _TCHAR *argByStep1)
   {
     // clone EXE: When original EXE terminates, delete it
-    HANDLE hProcessOrig = (HANDLE)atoi(argByStep1);
+    HANDLE hProcessOrig = (HANDLE)_ttoi(argByStep1);
     WaitForSingleObject(hProcessOrig, INFINITE);
     CloseHandle(hProcessOrig);
   }
@@ -495,49 +511,49 @@ namespace Installer
 
 
   // constructor
-  Resource::Resource(const StringResource *stringResources_)
-    : stringResources(stringResources_),
-      locale(Locale_C)
+  Resource::Resource(const StringResource *i_stringResources)
+    : m_stringResources(i_stringResources),
+      m_locale(LOCALE_C)
   {
     struct LocaleInformaton
     {
-      const char *localeString;
-      Locale locale;
+      const _TCHAR *m_localeString;
+      Locale m_locale;
     };
 
     // set locale information
-    const char *localeString = setlocale(LC_ALL, "");
+    const _TCHAR *localeString = _tsetlocale(LC_ALL, _T(""));
     
     static const LocaleInformaton locales[] =
     {
-      { "Japanese_Japan.932", Locale_Japanese_Japan_932 },
+      { _T("Japanese_Japan.932"), LOCALE_Japanese_Japan_932 },
     };
 
-    for (size_t i = 0; i < lengthof(locales); i ++)
-      if (mbsiequal_(localeString, locales[i].localeString))
+    for (size_t i = 0; i < NUMBER_OF(locales); ++ i)
+      if (_tcsicmp(localeString, locales[i].m_localeString) == 0)
       {
-	locale = locales[i].locale;
+	m_locale = locales[i].m_locale;
 	break;
       }
   }
   
   
   // get resource string
-  const char *Resource::loadString(UINT id)
+  const _TCHAR *Resource::loadString(UINT i_id)
   {
-    int n = (int)locale;
+    int n = static_cast<int>(m_locale);
     int index = -1;
-    for (int i = 0; stringResources[i].str; i ++)
-      if (stringResources[i].id == id)
+    for (int i = 0; m_stringResources[i].m_str; ++ i)
+      if (m_stringResources[i].m_id == i_id)
       {
 	if (n == 0)
-	  return stringResources[i].str;
+	  return m_stringResources[i].m_str;
 	index = i;
 	n --;
       }
     if (0 <= index)
-      return stringResources[index].str;
+      return m_stringResources[index].m_str;
     else
-      return "";
+      return _T("");
   }
 }
