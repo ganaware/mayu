@@ -19,9 +19,9 @@
       <br>
       <tt>.mayu</tt> は<a href="#HOME">ホームディレクトリ</a>から検索されます。<br>
       <br>
-      <tt>.mayu</tt> は上から下へ読まれていき、重複する記述があれば、より下に書かれているものが有効になります。コメントは <tt>#</tt> ではじめます。アルファベットの大文字と小文字は区別されません。詳しい文法は <a href="../en/syntax.txt">syntax.txt</a> を参照してください。<br>
+      <tt>.mayu</tt> は上から下へ読まれていき、重複する記述があれば、より下に書かれているものが有効になります。コメントは <tt>#</tt> ではじめます。アルファベットの大文字と小文字は区別されません。詳しい文法は <a href="syntax.txt">syntax.txt</a> を参照してください。<br>
       <br>
-      この章を読む前に、<a href="../contrib/mayu-settings.txt">contrib/mayu-settings.txt</a> を読んで付属の設定ファイルについて理解を深めておくことをお勧めします。
+      この章を読む前に、<a href="contrib/mayu-settings.txt">contrib/mayu-settings.txt</a> を読んで付属の設定ファイルについて理解を深めておくことをお勧めします。
       
       <dl>
 	<dt class="h3"><a name="HOME">&diams; ホームディレクトリ</a>
@@ -50,7 +50,7 @@
 	    
       <tt>=&gt;</tt> より左の <tt><i>KEY</i></tt> をキーボードで押すと、Windows へは <tt>=&gt;</tt> より右の <tt><i>KEY</i></tt> が順番に入力されます。また、右に <tt><i>FUNCTION</i></tt> が書かれている場合はウィンドウの最大化や移動などの機能が実行されます。<br>
       <br>
-      <tt><i>KEY</i></tt> は<a href="#keyboard">キーボード定義</a>で定義されるもので、デフォルトでは <a href="109.mayu">109.mayu</a> 又は <a href="../en/104.mayu">104.mayu</a> で定義されている <tt><i>KEY</i></tt> が使用できます。<br>
+      <tt><i>KEY</i></tt> は<a href="#keyboard">キーボード定義</a>で定義されるもので、デフォルトでは <a href="109.mayu">109.mayu</a> 又は <a href="104.mayu">104.mayu</a> で定義されている <tt><i>KEY</i></tt> が使用できます。<br>
       <br>
       <dl>
 	<dt class="h3"><a name="modifier">&diams; モディファイヤの指定</a>
@@ -442,7 +442,7 @@
   <dt class="h2"><a name="keyboard">v. キーボード定義</a>
       
   <dd class="d2">
-      デフォルトのキーボード定義は <a href="109.mayu">109.mayu</a> 又は <a href="../en/104.mayu">104.mayu</a> に書かれています。
+      デフォルトのキーボード定義は <a href="109.mayu">109.mayu</a> 又は <a href="104.mayu">104.mayu</a> に書かれています。
 
       <dl>
 	<dt class="h3"><a name="def_key">&diams; キー定義</a>
@@ -653,7 +653,7 @@
 	    key	C-X =&gt; &amp;Prefix(NotepadC-X)<br>
 	    </nobr></p>
 		  
-	    というように記述しておくと、メモ帳で <kbd>[Control]</kbd> + <kbd>[C]</kbd> <kbd>[Control]</kbd> + <kbd>[X]</kbd> と続けて入力するとメモ帳を終了することができます。<br>
+	    というように記述しておくと、メモ帳で <kbd>[Control]</kbd> + <kbd>[X]</kbd> <kbd>[Control]</kbd> + <kbd>[C]</kbd> と続けて入力するとメモ帳を終了することができます。<br>
 	    <br>
 	    <tt><i>モディファイヤの扱い</i></tt> は省略可能な引数で <tt>true</tt> か <tt>false</tt> を指定します。省略すると <tt>true</tt> が指定されたとみなされます。<tt>true</tt> が指定された場合、<tt><i>キーマップ名</i></tt> で指示されるキーマップは
 	    <p class="sample"><nobr>
@@ -752,6 +752,12 @@
 	    
 	<dd class="d3">
 	    ▼ これらの <tt><i>FUNCTION</i></tt> は、ウィンドウのそれぞれの辺が、画面のそれぞれの辺にくっつくように移動させます。引数に <tt>MDI</tt> を指定すると、MDI 子ウィンドウを操作します。
+	    <ul>
+	      <li><tt>&amp;WindowClingToTop</tt> は <a href="#function_WindowMoveTo"><tt>&amp;WindowMoveTo(N, 0, 0)</tt></a>と同じ。
+	      <li><tt>&amp;WindowClingToRight</tt> は <a href="#function_WindowMoveTo"><tt>&amp;WindowMoveTo(E, 0, 0)</tt></a> と同じ。
+	      <li><tt>&amp;WindowClingToLeft</tt> は <a href="#function_WindowMoveTo"><tt>&amp;WindowMoveTo(W, 0, 0)</tt></a> と同じ。
+	      <li><tt>&amp;WindowClingToBottom</tt> は <a href="#function_WindowMoveTo"><tt>&amp;WindowMoveTo(S, 0, 0)</tt></a> と同じ。
+	    </ul>
 	    
 	<dt class="h3"><a name="function_WindowClose">&diams; <tt><i>FUNCTION</i> &amp;WindowClose</tt></a>
 	    
@@ -761,7 +767,17 @@
 	<dt class="h3"><a name="function_WindowIdentify">&diams; <tt><i>FUNCTION</i> &amp;WindowIdentify</tt></a>
 	    
 	<dd class="d3">
-	    ▼ <tt>&amp;WindowIdentify</tt> は、ウィンドウのウィンドウクラス名とタイトルを調べログに出力します。
+	    ▼ <tt>&amp;WindowIdentify</tt> は、ウィンドウのウィンドウクラス名とタイトルを調べログに出力します。又、各種ウィンドウの位置と大きさも出力します。
+	    
+	<dt class="h3"><a name="function_MayuDialog">&diams; <tt><i>FUNCTION</i> &amp;MayuDialog</tt></a>
+	    
+	<dd class="d3">
+	    ▼ <tt>&amp;MayuDialog(<i>dialog</i>, <i>SHOWCOMMAND</i>)</tt> 「窓使いの憂鬱」のダイアログボックスを表示したり隠したりします。<tt><i>dialog</i></tt> には <tt>Investigate</tt> と <tt>Log</tt> が指定できます。それぞれ「調査」ダイアログと「ログ」ダイアログです。<tt><i>SHOWCOMMAND</i></tt> には、<tt>HIDE</tt>, <tt>SHOW</tt>, <tt>SHOWNA</tt> などが指定できます。
+	    
+	<dt class="h3"><a name="function_DescribeBindings">&diams; <tt><i>FUNCTION</i> &amp;DescribeBindings</tt></a>
+	    
+	<dd class="d3">
+	    ▼ <tt>&amp;DescribeBindings</tt> は、現在のキーマップでどのようなキー操作をするとどのような動作が起こるかを表示します。が、表示形式がいまいち分かりにくいのでどうしようか思案中。
 	    
 	<dt class="h3"><a name="function_WindowMaxMinHVMax">&diams; <tt><i>FUNCTION</i> &amp;WindowMinimize</tt>, <tt>&amp;WindowMaximize</tt>, <tt>&amp;WindowHMaximize</tt>, <tt>&amp;WindowVMaximize</tt></a>
 	    
@@ -771,12 +787,42 @@
 	<dt class="h3"><a name="function_WindowMove">&diams; <tt><i>FUNCTION</i> &amp;WindowMove</tt></a>
 	    
 	<dd class="d3">
-	    ▼ <tt>&amp;WindowMove(<i>dx</i>, <i>dy</i>)</tt> はウインドウを x 方向に <tt><i>dx</i></tt>、y 方向に <tt><i>dy</i></tt> 移動します。<tt>MDI</tt> を引数の最後に追加指定すると、MDI 子ウィンドウを操作します。
+	    ▼ <tt>&amp;WindowMove(<i>dx</i>, <i>dy</i>)</tt> はウインドウを x 方向に <tt><i>dx</i></tt>、y 方向に <tt><i>dy</i></tt> 移動します。<tt>MDI</tt> を引数の最後に追加指定すると、MDI 子ウィンドウを操作します。<tt>&amp;WindowMoveTo(C, <i>dx</i>, <i>dy</i>)</tt> と同じ動作をします。
+
+	    
+	<dt class="h3"><a name="function_WindowMoveTo">&diams; <tt><i>FUNCTION</i> &amp;WindowMoveTo</tt></a>
+	    
+	<dd class="d3">
+	    ▼ <tt>&amp;WindowMoveTo(<i>gravity</i>, <i>dx</i>, <i>dy</i>)</tt> は基準位置から相対的にウインドウを x 方向に <tt><i>dx</i></tt>、y 方向に <tt><i>dy</i></tt> 移動します。<tt>MDI</tt> を引数の最後に追加指定すると、MDI 子ウィンドウを操作します。<tt><i>gravity</i></tt> には、次のものが指定できます。
+	    <table>
+	      <tr><td><tt>C</tt></td><td>現在位置からの相対位置に移動します。</tr>
+	      <tr><td><tt>N</tt></td><td>上下方向はデスクトップの上からの相対位置、左右方向は現在位置からの相対位置に移動します。</td></tr>
+	      <tr><td><tt>E</tt></td><td>上下方向は現在位置からの相対位置、左右方向はデスクトップの右からの相対位置に移動します。</td></tr>
+	      <tr><td><tt>W</tt></td><td>上下方向は現在位置からの相対位置、左右方向はデスクトップの左からの相対位置に移動します。</td></tr>
+	      <tr><td><tt>S</tt></td><td>上下方向はデスクトップの下からの相対位置、左右方向は現在位置からの相対位置に移動します。</td></tr>
+	      <tr><td><tt>NE</tt></td><td>デスクトップ右上からの相対位置に移動。</td></tr>
+	      <tr><td><tt>NW</tt></td><td>デスクトップ左上からの相対位置に移動。</td></tr>
+	      <tr><td><tt>SE</tt></td><td>デスクトップ右下からの相対位置に移動。</td></tr>
+	      <tr><td><tt>SW</tt></td><td>デスクトップ左下からの相対位置に移動。</td></tr>
+	    </table>
+	    また、他の移動 <tt><i>FUNCTION</i></tt> とは以下のような関係があります。
+	    <ul>
+	      <li><tt>&amp;WindowMoveTo(C, <i>dx</i>, <i>dy</i>)</tt> は <a href="#function_WindowMove"><tt>&amp;WindowMoveTo(<i>dx</i>, <i>dy</i>)</tt></a> と同じ。
+	      <li><tt>&amp;WindowMoveTo(N, 0, 0)</tt> は <a href="#function_WindowCling"><tt>&amp;WindowClingToTop</tt></a> と同じ。
+	      <li><tt>&amp;WindowMoveTo(E, 0, 0)</tt> は <a href="#function_WindowCling"><tt>&amp;WindowClingToRight</tt></a> と同じ。
+	      <li><tt>&amp;WindowMoveTo(W, 0, 0)</tt> は <a href="#function_WindowCling"><tt>&amp;WindowClingToLeft</tt></a> と同じ。
+	      <li><tt>&amp;WindowMoveTo(S, 0, 0)</tt> は <a href="#function_WindowCling"><tt>&amp;WindowClingToBottom</tt></a> と同じ。
+	    </ul>
 	    
 	<dt class="h3"><a name="function_WindowMoveVisibly">&diams; <tt><i>FUNCTION</i> &amp;WindowMoveVisibly</tt></a>
 	    
 	<dd class="d3">
 	    ▼ <tt>&amp;WindowMoveVisibly</tt> はウィンドウ全体が画面に表示されるような位置までウィンドウを移動します。引数に <tt>MDI</tt> を指定すると、MDI 子ウィンドウを操作します。
+	    
+	<dt class="h3"><a name="function_WindowResizeTo">&diams; <tt><i>FUNCTION</i> &amp;WindowResizeTo</tt></a>
+	    
+	<dd class="d3">
+	    ▼ <tt>&amp;WindowResizeTo(<i>width</i>, <i>height</i>)</tt> はウインドウの大きさを幅 <tt><i>width</i></tt>、高さ <tt><i>height</i></tt> に変更します。<tt>0</tt> を指定すると現在の大きさに、負の値を指定するとデスクトップの大きさより指定したピクセル数だけ小さい大きさになります。<tt>MDI</tt> を引数の最後に追加指定すると、MDI 子ウィンドウを操作します。
 	    
 	<dt class="h3"><a name="function_WindowRiseLower">&diams; <tt><i>FUNCTION</i> &amp;WindowRaise</tt>, <tt>&amp;WindowLower</tt></a>
 	    

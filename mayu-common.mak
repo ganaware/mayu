@@ -35,6 +35,28 @@ OBJS_1		=			\
 		vkeytable.obj		\
 		windowstool.obj		\
 
+SRCS_1		=			\
+		dlgeditsetting.cpp	\
+		dlginvestigate.cpp	\
+		dlglog.cpp		\
+		dlgsetting.cpp		\
+		dlgversion.cpp		\
+		engine.cpp		\
+		focus.cpp		\
+		function.cpp		\
+		keyboard.cpp		\
+		keymap.cpp		\
+		mayu.cpp		\
+		msgstream.cpp		\
+		parser.cpp		\
+		regexp.cpp		\
+		registry.cpp		\
+		setting.cpp		\
+		stringtool.cpp		\
+		target.cpp		\
+		vkeytable.cpp		\
+		windowstool.cpp		\
+
 RES_1		= mayu.res
 
 LIBS_1		=		\
@@ -50,6 +72,7 @@ EXTRADEP_1	= mayu.lib
 
 TARGET_2	= mayu.dll
 OBJS_2		= hook.obj
+SRCS_2		= hook.cpp
 LIBS_2		= $(guixlibsmt) imm32.lib
 
 
@@ -61,26 +84,27 @@ DLL_3		= mayu.dll
 
 # distribution	###############################################################
 
-DISTRIB_SETTINGS =						\
-					en\104.mayu		\
-		ja\104on109.mayu	en\104on109.mayu	\
-		ja\109.mayu		en\109.mayu		\
-					en\109on104.mayu	\
-		ja\default.mayu		en\default.mayu		\
-		ja\emacsedit.mayu	en\emacsedit.mayu	\
-		ja\dot.mayu		en\dot.mayu		\
+DISTRIB_SETTINGS =			\
+		104.mayu		\
+		104on109.mayu		\
+		109.mayu		\
+		109on104.mayu		\
+		default.mayu		\
+		emacsedit.mayu		\
+		dot.mayu		\
 
-DISTRIB_MANUAL	=						\
-		ja\README.html		en\README.html		\
-		ja\CONTENTS.html	en\CONTENTS.html	\
-		ja\CUSTOMIZE.html	en\CUSTOMIZE.html	\
-		ja\MANUAL.html		en\MANUAL.html		\
-		ja\README.css		en\README.css		\
-					en\syntax.txt		\
+DISTRIB_MANUAL	=			\
+		README.html		\
+		CONTENTS.html		\
+		CUSTOMIZE.html		\
+		MANUAL.html		\
+		README.css		\
+		syntax.txt		\
 
 DISTRIB_CONTRIBS =				\
 		contrib\mayu-settings.txt	\
 		contrib\dvorak.mayu		\
+		contrib\keitai.mayu		\
 
 DISTRIB		=			\
 		$(TARGET_1)		\
@@ -101,6 +125,7 @@ DISTRIBSRC	=			\
 		regexp.html		\
 		doc++-header.html	\
 		doc++.conf		\
+		mayu-mode.el		\
 					\
 		s\Makefile		\
 		s\*.mak			\
@@ -119,12 +144,19 @@ DISTRIBSRC	=			\
 		d\nt4\Makefile		\
 		d\nt4\SOURCES		\
 		d\nt4\*.c		\
+					\
+		tools\makedepend	\
+		tools\dos2unix		\
+		tools\unix2dos		\
 
 
 # tools		###############################################################
 
 CAB		= s\cab32.exe
 DOCXX		= doc++.exe
+MAKEDEPEND	= perl tools/makedepend -o.obj
+DOS2UNIX	= perl tools/dos2unix
+UNIX2DOS	= perl tools/unix2dos
 
 
 # rules		###############################################################
@@ -135,7 +167,12 @@ clean:
 		-$(RM) *.obj
 		-$(RM) $(TARGET_1) $(TARGET_2) $(TARGET_3)
 		-$(RM) *.res *.exp
+		-$(RM) mayu.aps mayu.opt vc60.pdb
 		-$(RM) *~ $(CLEAN)
+
+depend::
+		$(MAKEDEPEND) -fmayu-common.mak \
+		-- $(DEPENDFLAGS) -- $(SRCS_1) $(SRCS_2)
 
 distrib:
 		@$(ECHO) "============================================================================="
@@ -160,7 +197,9 @@ distrib:
 		@$(ECHO) "   解凍後、実行または開くファイル名(C):   setup.exe -s                       "
 		@$(ECHO) "レ プログラム終了後、解凍されたファイルを削除する                            "
 		@$(ECHO) "============================================================================="
+		$(UNIX2DOS) $(DISTRIB_SETTINGS) $(DISTRIB_CONTRIBS)
 		$(CAB) -a mayu-$(VERSION).cab -ml:21 $(DISTRIB) source.cab
+		$(DOS2UNIX) $(DISTRIB_SETTINGS) $(DISTRIB_CONTRIBS)
 		-@$(RM) source.cab mayud.sys mayudnt4.sys setup.exe
 		$(CAB) -f mayu-$(VERSION).cab
 		-@$(RM) mayu-$(VERSION).cab
@@ -168,3 +207,48 @@ distrib:
 srcdesc::
 		@$(ECHO) USE DOC++ 3.4.4 OR HIGHER
 		$(DOCXX) *.h
+
+# DO NOT DELETE
+
+dlgeditsetting.obj: compiler_specific.h dlgeditsetting.h mayurc.h misc.h \
+ stringtool.h windowstool.h
+dlginvestigate.obj: compiler_specific.h dlginvestigate.h driver.h engine.h \
+ focus.h function.h hook.h keyboard.h keymap.h mayurc.h misc.h msgstream.h \
+ multithread.h parser.h regexp.h regexp_internal.h setting.h stringtool.h \
+ target.h vkeytable.h windowstool.h
+dlglog.obj: compiler_specific.h mayu.h mayurc.h misc.h msgstream.h \
+ multithread.h registry.h windowstool.h
+dlgsetting.obj: compiler_specific.h dlgeditsetting.h driver.h function.h \
+ keyboard.h keymap.h mayu.h mayurc.h misc.h multithread.h parser.h regexp.h \
+ regexp_internal.h registry.h setting.h stringtool.h windowstool.h
+dlgversion.obj: compiler_specific.h mayu.h mayurc.h misc.h windowstool.h
+engine.obj: compiler_specific.h driver.h engine.h errormessage.h function.h \
+ hook.h keyboard.h keymap.h mayurc.h misc.h msgstream.h multithread.h \
+ parser.h regexp.h regexp_internal.h setting.h stringtool.h windowstool.h
+focus.obj: focus.h windowstool.h
+function.obj: compiler_specific.h driver.h engine.h function.h hook.h \
+ keyboard.h keymap.h misc.h msgstream.h multithread.h parser.h regexp.h \
+ regexp_internal.h setting.h stringtool.h windowstool.h
+keyboard.obj: compiler_specific.h driver.h keyboard.h misc.h stringtool.h
+keymap.obj: compiler_specific.h driver.h errormessage.h function.h \
+ keyboard.h keymap.h misc.h parser.h regexp.h regexp_internal.h \
+ stringtool.h
+mayu.obj: compiler_specific.h dlginvestigate.h dlglog.h dlgsetting.h \
+ dlgversion.h driver.h engine.h errormessage.h focus.h function.h hook.h \
+ keyboard.h keymap.h mayu.h mayurc.h misc.h msgstream.h multithread.h \
+ parser.h regexp.h regexp_internal.h registry.h setting.h stringtool.h \
+ target.h windowstool.h
+msgstream.obj: compiler_specific.h misc.h msgstream.h multithread.h
+parser.obj: compiler_specific.h errormessage.h misc.h parser.h stringtool.h
+regexp.obj: compiler_specific.h misc.h regexp.h regexp_internal.h \
+ stringtool.h
+registry.obj: compiler_specific.h misc.h registry.h stringtool.h
+setting.obj: compiler_specific.h dlgsetting.h driver.h errormessage.h \
+ function.h keyboard.h keymap.h mayu.h mayurc.h misc.h multithread.h \
+ parser.h regexp.h regexp_internal.h registry.h setting.h stringtool.h \
+ vkeytable.h windowstool.h
+stringtool.obj: compiler_specific.h misc.h stringtool.h
+target.obj: compiler_specific.h mayurc.h misc.h target.h windowstool.h
+vkeytable.obj: vkeytable.h
+windowstool.obj: compiler_specific.h misc.h windowstool.h
+hook.obj: compiler_specific.h hook.h misc.h stringtool.h

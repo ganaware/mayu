@@ -62,7 +62,7 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
 	    </ul>
 	<li>ダウンロードした実行ファイルを Administrator 権限で実行してください。すると「窓使いの憂鬱」がインストールされます。
 	<li>お好みにより、スタートアップにショートカットを作るのもいいでしょう。
-	<li>標準の設定ファイルの内容は <a href="../contrib/mayu-settings.txt">contrib/mayu-settings.txt</a> が参考になります。
+	<li>標準の設定ファイルの内容は <a href="contrib/mayu-settings.txt">contrib/mayu-settings.txt</a> が参考になります。
 	<li><tt>mayu.exe</tt> を実行することで開始します。
       </ol>
       <br>
@@ -108,7 +108,24 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
 	    </ol>
 	    【注意】Windows2000ではアンインストールボタンを使用せずに <tt>\winnt\system32\drivers\altime.sys</tt> を削除すると Windows が起動できなくなることがあります。
 
-
+	<dt class="h3">ウインドウのクラス名はどうやって調べるんですか？
+	<dd class="d3">タスクトレイの「窓使いの憂鬱」のアイコンでマウスの右ボタンを押して「<a href="#CLASSNAME">調査(I)...</a>」を選びます。
+	<dt class="h3">アクティブな時にしか見えない窓などの場合、上記の方法では調査できないですが？
+	<dd class="d3"><a href="CUSTOMIZE.html#function_WindowIdentify"><tt>&amp;WindowIdentify</tt></a> を使ってください。default.mayu では <kbd>[Ctrl]</kbd> +<kbd>[Shift]</kbd> + <kbd>[D]</kbd> に割り振ってあります。
+	<dt class="h3">インストール時には 109 キーボードだったのですが、今度 104 キーボードを購入しました。しかし、タスクトレイメニューの「選択」には 109 しか出てきません。どうすればいいですか。
+	<dd class="d3">
+	    インストール時の選択により、以下の表の上 4 つまたは下 4 つが選ばれます。「設定」ダイアログボックスで適切に設定してください。(<tt>%MAYU_DIR%</tt> は mayu をインストールしたディレクトリです)
+	    <table class="DefaultSettings">
+	      <tr><th>名前</th><th>設定ファイル名</th><th>シンボル</th></tr>
+	      <tr><td>日本語 109 キーボード (Emacs 風)</td><td>%MAYU_DIR%\dot.mayu</td><td>-DUSE109;-DUSEdefault</td></tr>
+	      <tr><td>日本語 109 キーボード (104 風, Emacs 風)</td><td>%MAYU_DIR%\dot.mayu</td><td>-DUSE109;-DUSEdefault;-DUSE104on109</td></tr>
+	      <tr><td>日本語 109 キーボード</td><td>%MAYU_DIR%\dot.mayu</td><td>-DUSE109</td></tr>
+	      <tr><td>日本語 109 キーボード (104 風)</td><td>%MAYU_DIR%\dot.mayu</td><td>-DUSE109;-DUSE104on109</td></tr>
+	      <tr><td>英語 104 キーボード (Emacs 風)</td><td>%MAYU_DIR%\dot.mayu</td><td>-DUSE104;-DUSEdefault</td></tr>
+	      <tr><td>英語 104 キーボード (109 風, Emacs 風)</td><td>%MAYU_DIR%\dot.mayu</td><td>-DUSE104;-DUSEdefault;-DUSE109on104</td></tr>
+	      <tr><td>英語 104 キーボード</td><td>%MAYU_DIR%\dot.mayu</td><td>-DUSE104</td></tr>
+	      <tr><td>英語 104 キーボード (109 風)</td><td>%MAYU_DIR%\dot.mayu</td><td>-DUSE104;-DUSE109on104</td></tr>
+	    </table>
 	<dt class="h3">「窓使いの憂鬱」では USB キーボードは使えないのですか。
 	<dd class="d3">現在のところ使えません。対応するつもりではありますが、いつになるかはわかりません。
 	<dt class="h3">「窓使いの憂鬱」は Windows95/98/ME では使えないのですか。
@@ -124,15 +141,11 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
 	<li><span class="bug">[仕様]</span> コマンドプロンプトではロックキーとIMEの状態を区別することができません。また、コマンドプロンプトのプロパティに対しては無力です。
 	<li><span class="bug">[仕様]</span> Windows2000 では、「窓使いの憂鬱」を終了させたあとに何かのキーを押さないと終了しません。
 	    <br>
-	<li>キー設定は settings/* に移動(?)
+	<li>各国語キーボード対応。各言語のディレクトリをホームディレクトリに加える。キー設定は settings/* に移動(?)
 	<li>どぼらっくの指定をもっとスマートにする。
-	<li>ActWin32 用の WindowVMaximize をつくる。大きさの指定できる WindowMaximize
-	<li>ja/109.mayu は en/109.mayu からの差分のみにする
-	<li><tt>window ASTEC-X ( /:ASTEC-X$/ && /[xk]term/ ) : Global</tt> がうまくはたらかない
-	<li>各言語のディレクトリをホームディレクトリに加える
+	<li><tt>window ASTEC-X ( /:ASTEC-X$/ && /[xk]term/ ) : Global</tt> がうまくはたらかない気がする。
+	<li>1 C-u 6 0 C-u 0 とかができるようにする。
 	<li>iexpress を使う。
-	<li>setting file cannot be read from home dir
-	<li>cannot clear filename by Edit(E) in setting dialog
 	<li>USB キーボードでは動作しないのでなんとかする (めんどくさいな…)。
 	<li>インストーラは、AltIME が入っていたら警告を出す。
 	<li>インストーラは、ロジテックマウスが入っていたら警告を出す。
@@ -145,6 +158,7 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
 	    <ul>
 	      <li>マウスフィルタドライバを書けば対応できます。(以下同上)
 	    </ul>
+	<li>マルチプロセッサマシンでごくたまにおちるようだ。
 	<li>ドライバのセキュリティに関しての調査・実装。
 	<li>(誰か hack してくれないかな…(まぢ
 	<li>(誰かかわいい女の子なマスコットキャラとか描いてくれないかな(ぉ
@@ -172,6 +186,7 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
 	<dt class="h2"><a href="http://www.tcct.zaq.ne.jp/kaname/software/pt.htm" target="_top">Pastel Touch</a>
 	<dt class="h2"><a href="http://www.nn.iij4u.or.jp/~dorenp/software/keymap.html" target="_top">KeyMap</a>
 	<dt class="h2"><a href="http://hp.vector.co.jp/authors/VA009883/" target="_top">dvorak kr, swap2k</a>
+	<dt class="h2"><a href="http://www2.airnet.ne.jp/pak04955/download.htm#nicolatter">Q's Nicolatter</a> (<a href="http://www.forest.impress.co.jp/article/2000/08/28/qsnicolatter.html">紹介記事</a>)
       </dl>
       
   <dt class="h1"><a name="COPYRIGHT">10. copyright</a>
@@ -259,22 +274,39 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
       
   <dt class="h1"><a name="ACKNOWLEDGEMENT">12. acknowledgements</a>
 
-  <dd class="d1">cmkey 使いの皆さんへ愛を込めて(ぉ
+  <dd class="d1">窓使いの憂鬱を応援してくれるみなさんへ。
 
   <dt class="h1"><a name="HISTORY">13. history</a>
       
   <dd class="d1">
       <dl>
-	<dt>2000/??/?? version 3.17 (next release)
+	<dt>2000/12/03 version 3.17
 	    <ul>
 	      <li>メーリングリストを <a href="http://lists.sourceforge.net/mailman/listinfo/mayu-support">Source Forge</a> へ移動。
+	      <li><tt><i>FUNCTION</i></tt> <a href="CUSTOMIZE.html#function_WindowMoveTo"><tt>&amp;WindowMoveTo</tt></a> を追加。
+	      <li><tt><i>FUNCTION</i></tt> <a href="CUSTOMIZE.html#function_WindowResizeTo"><tt>&amp;WindowResizeTo</tt></a> を追加。
+	      <li><tt><i>FUNCTION</i></tt> <a href="CUSTOMIZE.html#function_MayuDialog"><tt>&amp;MayuDialog</tt></a> を追加。
+	      <li><tt><i>FUNCTION</i></tt> <a href="CUSTOMIZE.html#function_DescribeBindings"><tt>&amp;DescribeBindings</tt></a> を追加。表示形式がいまいち分かりにくいのでどうしようか思案中。
 	      <li><a href="#RELATEDWORK">related work</a> に Pastel Touch を追加。
 	      <li><a href="#RELATEDWORK">related work</a> に KeyMap を追加。
 	      <li><a href="#RELATEDWORK">related work</a> に dvorak kr, swap2k を追加。
+	      <li><a href="#RELATEDWORK">related work</a> に Q's Nicolatter を追加。
 	      <li><a href="#FAQ">f.a.q.</a> を追加。
-	      <li><a href="../en/README.html" target="_top">英語マニュアル</a>の追加準備。(Thanks to SUMII Eijiro)
 	      <li><tt>mailto:</tt> をドキュメントから削除。
 	      <li><a href="http://www.linuxsupportline.com/~doc++">DOC++</a> で表示できるようにソースのコメントを書き換えた。
+	      <li>Emacs で設定ファイルを編集する人のために <a href="mayu-mode.el">mayu-mode.el</a> を追加。ただし、色がつくだけです。
+	      <li><tt><i>FUNCTION</i></tt> <a href="CUSTOMIZE.html#function_WindowIdentify"><tt>&amp;WindowIdentify</tt></a> で、ウィンドウの位置と大きさも表示するようにした。
+	      <li><a href="contrib/keitai.mayu">contrib/keitai.mayu</a> を追加。テンキーで携帯電話式ひらがな入力をしようという画期的設定ファイル (注:Joke)。(Thanks to HANAWA Yoshio)
+	      <li>設定ファイルが見つからなかったときはエラーを出すようになった。
+	      <li>設定ファイルを更新。
+	      <li>調査ダイアログを動かすとログウィンドウも動くようにした。
+	      <li>設定ダイアログ
+		  <ul>
+		    <li>タスクトレイのメニューから沢山開けるバグを修正。
+		    <li>「編集」を押して編集ダイアログが出ている最中にもう一度「編集」を押せるバグの修正。
+		    <li>「編集」で、ファイル名を空にできないバグの修正。
+		    <li>サイズ変更できるようにした。
+		  </ul>
 	    </ul>
 	<dt>2000/05/28 version 3.16
 	    <ul>
@@ -319,8 +351,8 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
 	    </ul>
 	<dt>2000/05/06 version 3.11
 	    <ul>
-	      <li><a href="../contrib/dvorak.mayu">contrib/dvorak.mayu</a> を更新。(Thanks to KANAI Makoto)
-	      <li><a href="../contrib/mayu-settings.txt">contrib/mayu-settings.txt</a> を更新。(Thanks to HANAWA Yoshio)
+	      <li><a href="contrib/dvorak.mayu">contrib/dvorak.mayu</a> を更新。(Thanks to KANAI Makoto)
+	      <li><a href="contrib/mayu-settings.txt">contrib/mayu-settings.txt</a> を更新。(Thanks to HANAWA Yoshio)
 	    </ul>
 	<dt>2000/05/05 version 3.10
 	    <ul>
@@ -333,7 +365,7 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
 	    </ul>
 	<dt>2000/04/24 version 3.09
 	    <ul>
-	      <li><a href="../contrib/dvorak.mayu">contrib/dvorak.mayu</a> を追加。(Thanks to KANAI Makoto)
+	      <li><a href="contrib/dvorak.mayu">contrib/dvorak.mayu</a> を追加。(Thanks to KANAI Makoto)
 	      <li><tt><i>FUNCTION</i></tt> <a href="CUSTOMIZE.html#function_InvestigateCommand"><tt>&amp;InvestigateCommand</tt></a> を追加。<a href="CUSTOMIZE.html#function_PostMessage"><tt>&amp;PostMessage</tt></a> の為の調査用。
 	      <li><tt><i>FUNCTION</i></tt> <a href="CUSTOMIZE.html#function_EditNextModifier"><tt>&amp;EditNextModifier</tt></a> を追加。<kbd>[Alt]</kbd> + <kbd>[X]</kbd> などを <kbd>[ESCAPE][X]</kbd> などで代用することが可能に。
 	      <li><tt><i>FUNCTION</i></tt> <a href="CUSTOMIZE.html#function_Prefix"><tt>&amp;Prefix</tt></a> を変更。<a href="CUSTOMIZE.html#keymap2"><tt>keymap2</tt></a> を使うときのお約束 (<tt>mod !shift !alt !control !windows</tt>) が不要に。
@@ -344,7 +376,7 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
 	      <li><tt><i>FUNCTION</i></tt> <a href="CUSTOMIZE.html#function_WindowSetAlpha"><tt>&amp;WindowSetAlpha</tt></a> を追加。
 	      <li><tt><i>FUNCTION</i></tt> <a href="CUSTOMIZE.html#function_WindowRedraw"><tt>&amp;WindowRedraw</tt></a> を追加。
 	      <li><a href="#RELATEDWORK">related work</a> に KillGates を追加。
-	      <li><a href="../contrib/mayu-settings.txt">contrib/mayu-settings.txt</a> を更新。(Thanks to HANAWA Yoshio)
+	      <li><a href="contrib/mayu-settings.txt">contrib/mayu-settings.txt</a> を更新。(Thanks to HANAWA Yoshio)
 	      <li>設定ファイルを更新。
 	    </ul>
 	<dt>2000/04/01 version 3.07
@@ -385,7 +417,7 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
 	      <li><tt><i>FUNCTION</i></tt> <a href="CUSTOMIZE.html#function_WindowMaxMinHVMax"><tt>&amp;WindowHMaximize</tt></a> を追加。
 	      <li><tt><i>FUNCTION</i></tt> <a href="CUSTOMIZE.html#function_WindowIdentify"><tt>&amp;WindowIdentify</tt></a> を追加。
 	      <li>設定ファイルを大幅に更新した。
-	      <li><a href="../contrib/mayu-settings.txt">contrib/mayu-settings.txt</a> の追加。(Thanks to HANAWA Yoshio)
+	      <li><a href="contrib/mayu-settings.txt">contrib/mayu-settings.txt</a> の追加。(Thanks to HANAWA Yoshio)
 	      <li>Windows2000 用のドライバをパワーマネジメント対応にした。
 	      <li>コンソールのフォーカスの追跡に時々失敗していたのが直ったかもしれない。
 	      <li>PlayStation2 の発売日。
@@ -403,7 +435,7 @@ Copyright &copy; 1999-2000, <a href="http://i.am/nayuta" target="_top">TAGA Nayu
 	    </ul>
 	<dt>1999/10/30 version 3.01
 	    <ul>
-	      <li><a href="104on109.mayu">104on109.mayu</a> と <a href="../en/109on104.mayu">109on104.mayu</a> を作った。
+	      <li><a href="104on109.mayu">104on109.mayu</a> と <a href="109on104.mayu">109on104.mayu</a> を作った。
 	    </ul>
 	<dt>1999/10/29 version 3.00
 	<dt>1999/09/08 cmkey version 2.21

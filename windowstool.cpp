@@ -116,6 +116,55 @@ bool getChildWindowRect(HWND hwnd, RECT *rc)
 }
 
 
+/// get toplevel (non-child) window
+HWND getToplevelWindow(HWND hwnd, bool *isMDI)
+{
+  while (hwnd)
+  {
+    LONG style = GetWindowLong(hwnd, GWL_STYLE);
+    if ((style & WS_CHILD) == 0)
+      break;
+    if (isMDI && *isMDI)
+    {
+      LONG exStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+      if (exStyle & WS_EX_MDICHILD)
+	return hwnd;
+    }
+    hwnd = GetParent(hwnd);
+  }
+  if (isMDI)
+    *isMDI = false;
+  return hwnd;
+}
+
+
+/// move window asynchronously
+void asyncMoveWindow(HWND hwnd, int x, int y)
+{
+  SetWindowPos(hwnd, NULL, x, y, 0, 0,
+	       SWP_ASYNCWINDOWPOS | SWP_NOACTIVATE | SWP_NOOWNERZORDER |
+	       SWP_NOSIZE | SWP_NOZORDER);
+}
+
+
+/// move window asynchronously
+void asyncMoveWindow(HWND hwnd, int x, int y, int w, int h)
+{
+  SetWindowPos(hwnd, NULL, x, y, w, h,
+	       SWP_ASYNCWINDOWPOS | SWP_NOACTIVATE | SWP_NOOWNERZORDER |
+	       SWP_NOZORDER);
+}
+
+
+/// resize asynchronously
+void asyncResize(HWND hwnd, int w, int h)
+{
+  SetWindowPos(hwnd, NULL, 0, 0, w, h,
+	       SWP_ASYNCWINDOWPOS | SWP_NOACTIVATE | SWP_NOOWNERZORDER |
+	       SWP_NOMOVE | SWP_NOZORDER);
+}
+
+
 // ////////////////////////////////////////////////////////////////////////////
 // edit control
 

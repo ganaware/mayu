@@ -48,49 +48,28 @@ const SetupFile setupFiles[] =
   SetupFile(SF::File, SF::NT4, "mayudnt4.sys"  , SF::ToDriver, "mayud.sys"),
 
   // setting files
-  SetupFile(SF::Dir , SF::NT , "en"                , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "en\\104.mayu"      , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "en\\104on109.mayu" , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "en\\109.mayu"      , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "en\\109on104.mayu" , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "en\\default.mayu"  , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "en\\dot.mayu"      , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "en\\emacsedit.mayu", SF::ToDest),
-
-  SetupFile(SF::Dir , SF::NT , "ja"                , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "ja\\104on109.mayu" , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "ja\\109.mayu"      , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "ja\\default.mayu"  , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "ja\\dot.mayu"      , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "ja\\emacsedit.mayu", SF::ToDest),
-
-  SetupFile(SF::File, SF::NT , "en\\104.mayu"      , SF::ToDest, "104.mayu"      ),
-  SetupFile(SF::File, SF::NT , "ja\\104on109.mayu" , SF::ToDest, "104on109.mayu" ),
-  SetupFile(SF::File, SF::NT , "ja\\109.mayu"      , SF::ToDest, "109.mayu"      ),
-  SetupFile(SF::File, SF::NT , "en\\109on104.mayu" , SF::ToDest, "109on104.mayu" ),
-  SetupFile(SF::File, SF::NT , "ja\\default.mayu"  , SF::ToDest, "default.mayu"  ),
-  SetupFile(SF::File, SF::NT , "ja\\dot.mayu"      , SF::ToDest, "dot.mayu"      ),
-  SetupFile(SF::File, SF::NT , "ja\\emacsedit.mayu", SF::ToDest, "emacsedit.mayu"),
+  SetupFile(SF::File, SF::NT , "104.mayu"      , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "104on109.mayu" , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "109.mayu"      , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "109on104.mayu" , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "default.mayu"  , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "dot.mayu"      , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "emacsedit.mayu", SF::ToDest),
 
   // documents
-  SetupFile(SF::File, SF::NT , "en\\CONTENTS.html" , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "en\\CUSTOMIZE.html", SF::ToDest),
-  SetupFile(SF::File, SF::NT , "en\\MANUAL.html"   , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "en\\README.css"    , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "en\\README.html"   , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "en\\syntax.txt"    , SF::ToDest),
-
-  SetupFile(SF::File, SF::NT , "ja\\CONTENTS.html" , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "ja\\CUSTOMIZE.html", SF::ToDest),
-  SetupFile(SF::File, SF::NT , "ja\\MANUAL.html"   , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "ja\\README.css"    , SF::ToDest),
-  SetupFile(SF::File, SF::NT , "ja\\README.html"   , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "CONTENTS.html" , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "CUSTOMIZE.html", SF::ToDest),
+  SetupFile(SF::File, SF::NT , "MANUAL.html"   , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "README.css"    , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "README.html"   , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "syntax.txt"    , SF::ToDest),
 
   SetupFile(SF::File, SF::NT , "source.cab"    , SF::ToDest),
 
   SetupFile(SF::Dir , SF::NT , "contrib"       , SF::ToDest),	// mkdir
   SetupFile(SF::File, SF::NT , "contrib\\mayu-settings.txt", SF::ToDest),
   SetupFile(SF::File, SF::NT , "contrib\\dvorak.mayu"      , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "contrib\\keitai.mayu"      , SF::ToDest),
 };
 
 

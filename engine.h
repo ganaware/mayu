@@ -16,8 +16,9 @@
 #define WM_engineNotify (WM_APP + 110)
 /** @name ANONYMOUS */
 enum {
-  engineNotify_shellExecute,		///
-  engineNotify_loadSetting,		///
+  engineNotify_shellExecute,			///
+  engineNotify_loadSetting,			///
+  engineNotify_showDlg,				///
 };
 
 
@@ -172,6 +173,9 @@ private:
   
   /// get current modifiers
   Modifier getCurrentModifiers(bool isPressed_);
+
+  // describe bindings
+  void describeBindings();
   
 public:
   /// log stream (output to log dialog's edit)
@@ -202,6 +206,9 @@ public:
 
   /// associated window
   void setAssociatedWndow(HWND hwnd) { hwndAssocWindow = hwnd; }
+  
+  /// associated window
+  HWND getAssociatedWndow() const { return hwndAssocWindow; }
   
   /// setting
   bool setSetting(Setting *setting_);

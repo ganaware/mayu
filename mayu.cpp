@@ -14,6 +14,7 @@
 #include "engine.h"
 #include "errormessage.h"
 #include "focus.h"
+#include "function.h"
 #include "hook.h"
 #include "mayu.h"
 #include "mayurc.h"
@@ -59,6 +60,7 @@ class Mayu
   HMENU hMenuTaskTray;		/// tasktray menu
   
   Setting *setting;		/// current setting
+  bool isSettingDialogOpened;	/// is setting dialog opened ?
   
   Engine engine;		/// engine
 
@@ -142,7 +144,31 @@ private:
 	  }
 	  Acquire a(&log, (n->type == Notify::TypeName) ? 0 : 1);
 	  log << "CLASS:\t" << n->className << endl;
-	  log << "TITLE:\t" << n->titleName << endl << endl;
+	  log << "TITLE:\t" << n->titleName << endl;
+	  
+	  bool isMDI = true;
+	  HWND hwnd = getToplevelWindow(n->hwnd, &isMDI);
+	  RECT rc;
+	  if (isMDI)
+	  {
+	    getChildWindowRect(hwnd, &rc);
+	    log << "MDI Window Position/Size: ("
+		<< rc.left << ", "<< rc.top << ") / ("
+		<< rcWidth(&rc) << "x" << rcHeight(&rc) << ")" << endl;
+	    hwnd = getToplevelWindow(n->hwnd, NULL);
+	  }
+	  
+	  GetWindowRect(hwnd, &rc);
+	  log << "Toplevel Window Position/Size: ("
+	      << rc.left << ", "<< rc.top << ") / ("
+	      << rcWidth(&rc) << "x" << rcHeight(&rc) << ")" << endl;
+
+	  SystemParametersInfo(SPI_GETWORKAREA, 0, (void *)&rc, FALSE);
+	  log << "Desktop Window Position/Size: ("
+	      << rc.left << ", "<< rc.top << ") / ("
+	      << rcWidth(&rc) << "x" << rcHeight(&rc) << ")" << endl;
+	  
+	  log << endl;
 	  break;
 	}
 	
@@ -310,9 +336,14 @@ private:
 		break;
 	      }
 	      case ID_MENUITEM_setting:
-		if (DialogBox(hInst, MAKEINTRESOURCE(IDD_DIALOG_setting),
-			      NULL, dlgSetting_dlgProc))
-		  This->load();
+		if (!This->isSettingDialogOpened)
+		{
+		  This->isSettingDialogOpened = true;
+		  if (DialogBox(hInst, MAKEINTRESOURCE(IDD_DIALOG_setting),
+				NULL, dlgSetting_dlgProc))
+		    This->load();
+		  This->isSettingDialogOpened = false;
+		}
 		break;
 	      case ID_MENUITEM_log:
 		ShowWindow(This->hwndLog, SW_SHOW);
@@ -354,6 +385,35 @@ private:
 	      break;
 	    case engineNotify_loadSetting:
 	      This->load();
+	      break;
+	    case engineNotify_showDlg:
+	    {
+	      // show investigate/log window
+	      int sw = (lParam & ~Function::mayuDlgMask);
+	      HWND hwnd = NULL;
+	      if ((lParam & Function::mayuDlgMask)
+		  == Function::mayuDlgInvestigate)
+		hwnd = This->hwndInvestigate;
+	      else if ((lParam & Function::mayuDlgMask)
+		       == Function::mayuDlgLog)
+		hwnd = This->hwndLog;
+	      if (hwnd)
+	      {
+		ShowWindow(hwnd, sw);
+		switch (sw)
+		{
+		  case SW_SHOWNORMAL:
+		  case SW_SHOWMAXIMIZED:
+		  case SW_SHOW:
+		  case SW_RESTORE:
+		  case SW_SHOWDEFAULT:
+		    SetForegroundWindow(hwnd);
+		    break;
+		}
+	      }
+	      break;
+	    }
+	    default:
 	      break;
 	  }
 	  return 0;
@@ -404,6 +464,7 @@ public:
       WM_TaskbarRestart(RegisterWindowMessage(TEXT("TaskbarCreated"))),
       log(WM_MSGSTREAMNOTIFY),
       setting(NULL),
+      isSettingDialogOpened(false),
       engine(log)
   {
     _true( Register_focus() );
@@ -411,11 +472,13 @@ public:
     _true( Register_tasktray() );
 
     // change dir
-    istring path;
-    for (int i = 0; getHomeDirectory(i, &path); i ++)
-      if (SetCurrentDirectory(path.c_str()))
+    std::list<istring> pathes;
+    getHomeDirectories(&pathes);
+    for (std::list<istring>::iterator
+	   i = pathes.begin(); i != pathes.end(); i ++)
+      if (SetCurrentDirectory(i->c_str()))
 	break;
-      
+    
     // create windows, dialogs
     istring title = loadString(IDS_mayu);
     hwndTaskTray = CreateWindow("mayuTasktray", title.c_str(),
@@ -429,10 +492,13 @@ public:
       CreateDialogParam(hInst, MAKEINTRESOURCE(IDD_DIALOG_log), NULL,
 			dlgLog_dlgProc, (LPARAM)&log);
     _true( hwndLog );
-    
+
+    DlgInvestigateData did;
+    did.m_engine = &engine;
+    did.m_hwndLog = hwndLog;
     hwndInvestigate =
       CreateDialogParam(hInst, MAKEINTRESOURCE(IDD_DIALOG_investigate), NULL,
-			dlgInvestigate_dlgProc, (LPARAM)&engine);
+			dlgInvestigate_dlgProc, (LPARAM)&did);
     _true( hwndInvestigate );
 
     hwndVersion =

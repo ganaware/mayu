@@ -67,6 +67,13 @@ bool Key::isPrefixScanCode(const Key &key) const
 }
 
 
+/// stream output
+std::ostream &operator<<(std::ostream &i_ost, const Key &i_mk)
+{
+  return i_ost << i_mk.getName();
+}
+
+
 // ////////////////////////////////////////////////////////////////////////////
 // Modifier
 
@@ -100,6 +107,54 @@ Modifier &Modifier::operator+=(const Modifier &m)
 	  release((Modifier::Type)i);
   }
   return *this;
+}
+
+/// stream output
+std::ostream &operator<<(std::ostream &i_ost, const Modifier &i_m)
+{
+  const static
+    struct
+    {
+      Modifier::Type m_mt;
+      const char *m_symbol;
+    } mods[] =
+      {
+	{ Modifier::Up, "U-" }, { Modifier::Down, "  " },
+	{ Modifier::Shift, "S-" }, { Modifier::Alt, "A-" },
+	{ Modifier::Control, "C-" }, { Modifier::Windows, "W-" },
+	{ Modifier::ImeLock, "IL-" }, { Modifier::ImeComp, "IC-" },
+	{ Modifier::ImeComp, "I-" }, { Modifier::NumLock, "NL-" },
+	{ Modifier::CapsLock, "CL-" }, { Modifier::ScrollLock, "SL-" },
+	{ Modifier::Mod0, "M0-" }, { Modifier::Mod1, "M1-" },
+	{ Modifier::Mod2, "M2-" }, { Modifier::Mod3, "M3-" },
+	{ Modifier::Mod4, "M4-" }, { Modifier::Mod5, "M5-" },
+	{ Modifier::Mod6, "M6-" }, { Modifier::Mod7, "M7-" },
+	{ Modifier::Mod8, "M8-" }, { Modifier::Mod9, "M9-" },
+	{ Modifier::Lock0, "L0-" }, { Modifier::Lock1, "L1-" },
+	{ Modifier::Lock2, "L2-" }, { Modifier::Lock3, "L3-" },
+	{ Modifier::Lock4, "L4-" }, { Modifier::Lock5, "L5-" },
+	{ Modifier::Lock6, "L6-" }, { Modifier::Lock7, "L7-" },
+	{ Modifier::Lock8, "L8-" }, { Modifier::Lock9, "L9-" },
+      };
+
+  for (size_t i = 0; i < lengthof(mods); i++)
+    if (!i_m.isDontcare(mods[i].m_mt) && i_m.isPressed(mods[i].m_mt))
+      i_ost << mods[i].m_symbol;
+
+  return i_ost;
+}
+
+
+// ////////////////////////////////////////////////////////////////////////////
+// ModifiedKey
+
+
+/// stream output
+std::ostream &operator<<(std::ostream &i_ost, const ModifiedKey &i_mk)
+{
+  if (i_mk.key)
+    i_ost << i_mk.modifier << *i_mk.key;
+  return i_ost;
 }
 
 

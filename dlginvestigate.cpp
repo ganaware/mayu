@@ -12,6 +12,7 @@
 #include "target.h"
 #include "windowstool.h"
 #include "vkeytable.h"
+#include "dlginvestigate.h"
 
 #include <iomanip>
 
@@ -22,23 +23,24 @@ using namespace std;
 ///
 class DlgInvestigate
 {
-  HWND hwnd;		///
-  UINT WM_Targetted;	///
-  Engine *engine;	///
+  HWND hwnd;					///
+  UINT WM_Targetted;				///
+  DlgInvestigateData m_data;			/// 
   
 public:
   ///
   DlgInvestigate(HWND hwnd_)
     : hwnd(hwnd_),
-      WM_Targetted(RegisterWindowMessage(WM_Targetted_name)),
-      engine(NULL)
+      WM_Targetted(RegisterWindowMessage(WM_Targetted_name))
   {
+    m_data.m_engine = NULL;
+    m_data.m_hwndLog = NULL;
   }
   
   /// WM_INITDIALOG
   BOOL wmInitDialog(HWND /* focus */, LPARAM lParam)
   {
-    engine = (Engine *)lParam;
+    m_data = *(DlgInvestigateData *)lParam;
     setSmallIcon(hwnd, IDI_ICON_mayu);
     setBigIcon(hwnd, IDI_ICON_mayu);
     return TRUE;
@@ -76,8 +78,8 @@ public:
   /// WM_focusNotify
   BOOL wmFocusNotify(bool isFocused, HWND hwndFocus)
   {
-    if (engine && hwndFocus == GetDlgItem(hwnd, IDC_CUSTOM_scancode))
-      engine->enableLogMode(isFocused);
+    if (m_data.m_engine && hwndFocus == GetDlgItem(hwnd, IDC_CUSTOM_scancode))
+      m_data.m_engine->enableLogMode(isFocused);
     return TRUE;
   }
   
@@ -94,12 +96,13 @@ public:
 	if (GetWindowText(hwndTarget, titleName, sizeof(titleName)) == 0)
 	  titleName[0] = '\0';
 	{
-	  Acquire a(&engine->log, 1);
-	  engine->log << "HWND:\t" << hex << (int)hwndTarget << dec << endl;
+	  Acquire a(&m_data.m_engine->log, 1);
+	  m_data.m_engine->log << "HWND:\t" << hex
+			       << (int)hwndTarget << dec << endl;
 	}
-	Acquire a(&engine->log, 0);
-	engine->log << "CLASS:\t" << className << endl;
-	engine->log << "TITLE:\t" << titleName << endl;
+	Acquire a(&m_data.m_engine->log, 0);
+	m_data.m_engine->log << "CLASS:\t" << className << endl;
+	m_data.m_engine->log << "TITLE:\t" << titleName << endl;
 	ok = true;
       }
     }
@@ -112,8 +115,8 @@ public:
   BOOL wmVkeyNotify(int nVirtKey, int /* repeatCount*/, BYTE /*scanCode*/,
 		    bool isExtended, bool /*isAltDown*/, bool isKeyup)
   {
-    Acquire a(&engine->log, 0);
-    engine->log << (isExtended ? " E-" : "   ")
+    Acquire a(&m_data.m_engine->log, 0);
+    m_data.m_engine->log << (isExtended ? " E-" : "   ")
 		<< "0x" << hex << setw(2) << setfill('0') << nVirtKey << dec
 		<< "  &VK( "
 		<< (isExtended ? "E-" : "  ")
@@ -123,12 +126,25 @@ public:
     {
       if (vkt->code == nVirtKey)
       {
-	engine->log << vkt->name << " )" << endl;
+	m_data.m_engine->log << vkt->name << " )" << endl;
 	return TRUE;
       }
     }
-    engine->log << "0x" << hex << setw(2) << setfill('0') << nVirtKey << dec
-		<< " )" << endl;
+    m_data.m_engine->log << "0x" << hex << setw(2)
+			 << setfill('0') << nVirtKey << dec
+			 << " )" << endl;
+    return TRUE;
+  }
+
+  BOOL wmMove(int /* i_x */, int /* i_y */)
+  {
+    RECT rc1, rc2;
+    GetWindowRect(hwnd, &rc1);
+    GetWindowRect(m_data.m_hwndLog, &rc2);
+    
+    MoveWindow(m_data.m_hwndLog, rc1.left, rc1.bottom,
+	       rcWidth(&rc2), rcHeight(&rc2), TRUE);
+    
     return TRUE;
   }
 };
@@ -150,6 +166,8 @@ BOOL CALLBACK dlgInvestigate_dlgProc(HWND hwnd, UINT message,
   else
     switch (message)
     {
+      case WM_MOVE:
+	return wc->wmMove((short)LOWORD(lParam), (short)HIWORD(lParam));
       case WM_COMMAND:
 	return wc->wmCommand(HIWORD(wParam), LOWORD(wParam), (HWND)lParam);
       case WM_CLOSE:

@@ -19,17 +19,108 @@
 using namespace std;
 
 
+class LayoutManager
+{
+public:
+  enum Origin
+  {
+    ORIGIN_LEFT_EDGE,
+    ORIGIN_TOP_EDGE = ORIGIN_LEFT_EDGE,
+    ORIGIN_CENTER,
+    ORIGIN_RIGHT_EDGE,
+    ORIGIN_BOTTOM_EDGE = ORIGIN_RIGHT_EDGE,
+  };
+
+private:
+  class Item
+  {
+  public:
+    HWND m_hwnd;
+    HWND m_hwndParent;
+    RECT m_rc;
+    RECT m_rcParent;
+    Origin m_origin[4];
+  };
+
+  typedef std::list<Item> Items;
+  Items m_items;
+  
+public:
+  bool addItem(HWND i_hwnd, Origin i_originLeft, Origin i_originTop,
+	       Origin i_originBottom, Origin i_originRight)
+  {
+    Item item;
+    if (!i_hwnd)
+      return false;
+    item.m_hwnd = i_hwnd;
+    if (!(GetWindowLong(i_hwnd, GWL_STYLE) & WS_CHILD))
+      return false;
+    item.m_hwndParent = GetParent(i_hwnd);
+    if (!item.m_hwndParent)
+      return false;
+    getChildWindowRect(item.m_hwnd, &item.m_rc);
+    GetWindowRect(item.m_hwndParent, &item.m_rcParent);
+    item.m_origin[0] = i_originLeft;
+    item.m_origin[1] = i_originTop;
+    item.m_origin[2] = i_originBottom;
+    item.m_origin[3] = i_originRight;
+    
+    m_items.push_back(item);
+    return true;
+  }
+  
+  void adjust() const
+  {
+    for (Items::const_iterator i = m_items.begin(); i != m_items.end(); i ++)
+    {
+      RECT rc;
+      GetWindowRect(i->m_hwndParent, &rc);
+
+      struct { int m_width, m_pos; int m_curWidth; LONG *m_out; }
+      pos[4] =
+      {
+	{ rcWidth(&i->m_rcParent), i->m_rc.left, rcWidth(&rc), &rc.left },
+	{ rcHeight(&i->m_rcParent), i->m_rc.top, rcHeight(&rc), &rc.top },
+	{ rcWidth(&i->m_rcParent), i->m_rc.right, rcWidth(&rc), &rc.right },
+	{ rcHeight(&i->m_rcParent), i->m_rc.bottom, rcHeight(&rc), &rc.bottom }
+      };
+      for (int j = 0; j < 4; j ++)
+      {
+	switch (i->m_origin[j])
+	{
+	  case ORIGIN_LEFT_EDGE:
+	    *pos[j].m_out = pos[j].m_pos;
+	    break;
+	  case ORIGIN_CENTER:
+	    *pos[j].m_out = pos[j].m_curWidth / 2
+	      - (pos[j].m_width / 2 - pos[j].m_pos);
+	    break;
+	  case ORIGIN_RIGHT_EDGE:
+	    *pos[j].m_out = pos[j].m_curWidth
+	      - (pos[j].m_width - pos[j].m_pos);
+	    break;
+	}
+      }
+      MoveWindow(i->m_hwnd, rc.left, rc.top,
+		 rcWidth(&rc), rcHeight(&rc), FALSE);
+    }
+  }
+};
+
+
 ///
 class DlgSetting
 {
-  HWND hwnd;		///
-  HWND hwndMayuPaths;	///
+  HWND hwnd;					///
+  HWND hwndMayuPaths;				///
+  LayoutManager m_layoutManager;		/// 
+  
   ///
   Registry reg;
   /** @name ANONYMOUS */
   enum
   {
-    maxMayuPaths = 256,		///
+    maxMayuPaths = 256,				///
   };
 
   typedef DlgEditSettingData Data;		///
@@ -43,7 +134,7 @@ class DlgSetting
     
     item.iSubItem = 0;
     item.pszText = (char *)data.name.c_str();
-    _true( ListView_InsertItem(hwndMayuPaths, &item) );
+    _true( ListView_InsertItem(hwndMayuPaths, &item) != -1 );
 
     ListView_SetItemText(hwndMayuPaths, index,1,(char *)data.filename.c_str());
     ListView_SetItemText(hwndMayuPaths, index,2,(char *)data.symbols.c_str());
@@ -170,6 +261,61 @@ public:
     reg.read(".mayuIndex", &index, 0);
     setSelectedItem(index);
 
+    // set layout manager
+    m_layoutManager.addItem(GetDlgItem(hwnd, IDC_STATIC_mayuPaths),
+			    LayoutManager::ORIGIN_LEFT_EDGE,
+			    LayoutManager::ORIGIN_TOP_EDGE,
+			    LayoutManager::ORIGIN_RIGHT_EDGE,
+			    LayoutManager::ORIGIN_BOTTOM_EDGE);
+    m_layoutManager.addItem(GetDlgItem(hwnd, IDC_LIST_mayuPaths),
+			    LayoutManager::ORIGIN_LEFT_EDGE,
+			    LayoutManager::ORIGIN_TOP_EDGE,
+			    LayoutManager::ORIGIN_RIGHT_EDGE,
+			    LayoutManager::ORIGIN_BOTTOM_EDGE);
+    m_layoutManager.addItem(GetDlgItem(hwnd, IDC_BUTTON_up),
+			    LayoutManager::ORIGIN_RIGHT_EDGE,
+			    LayoutManager::ORIGIN_CENTER,
+			    LayoutManager::ORIGIN_RIGHT_EDGE,
+			    LayoutManager::ORIGIN_CENTER);
+    m_layoutManager.addItem(GetDlgItem(hwnd, IDC_BUTTON_down),
+			    LayoutManager::ORIGIN_RIGHT_EDGE,
+			    LayoutManager::ORIGIN_CENTER,
+			    LayoutManager::ORIGIN_RIGHT_EDGE,
+			    LayoutManager::ORIGIN_CENTER);
+    m_layoutManager.addItem(GetDlgItem(hwnd, IDC_BUTTON_add),
+			    LayoutManager::ORIGIN_CENTER,
+			    LayoutManager::ORIGIN_BOTTOM_EDGE,
+			    LayoutManager::ORIGIN_CENTER,
+			    LayoutManager::ORIGIN_BOTTOM_EDGE);
+    m_layoutManager.addItem(GetDlgItem(hwnd, IDC_BUTTON_edit),
+			    LayoutManager::ORIGIN_CENTER,
+			    LayoutManager::ORIGIN_BOTTOM_EDGE,
+			    LayoutManager::ORIGIN_CENTER,
+			    LayoutManager::ORIGIN_BOTTOM_EDGE);
+    m_layoutManager.addItem(GetDlgItem(hwnd, IDC_BUTTON_delete),
+			    LayoutManager::ORIGIN_CENTER,
+			    LayoutManager::ORIGIN_BOTTOM_EDGE,
+			    LayoutManager::ORIGIN_CENTER,
+			    LayoutManager::ORIGIN_BOTTOM_EDGE);
+    m_layoutManager.addItem(GetDlgItem(hwnd, IDCANCEL),
+			    LayoutManager::ORIGIN_CENTER,
+			    LayoutManager::ORIGIN_BOTTOM_EDGE,
+			    LayoutManager::ORIGIN_CENTER,
+			    LayoutManager::ORIGIN_BOTTOM_EDGE);
+    m_layoutManager.addItem(GetDlgItem(hwnd, IDOK),
+			    LayoutManager::ORIGIN_CENTER,
+			    LayoutManager::ORIGIN_BOTTOM_EDGE,
+			    LayoutManager::ORIGIN_CENTER,
+			    LayoutManager::ORIGIN_BOTTOM_EDGE);
+    return TRUE;
+  }
+
+  /// WM_SIZE
+  BOOL wmSize(DWORD /* fwSizeType */, short /* nWidth */, short /* nHeight */)
+  {
+    m_layoutManager.adjust();
+    RedrawWindow(hwnd, NULL, NULL,
+		 RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
     return TRUE;
   }
   
@@ -217,7 +363,7 @@ public:
 	if (0 <= index)
 	  getItem(index, &data);
 	if (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_DIALOG_editSetting),
-			   NULL, dlgEditSetting_dlgProc, (LPARAM)&data))
+			   hwnd, dlgEditSetting_dlgProc, (LPARAM)&data))
 	  if (!data.name.empty())
 	  {
 	    insertItem(0, data);
@@ -251,12 +397,11 @@ public:
 	  return TRUE;
 	getItem(index, &data);
 	if (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_DIALOG_editSetting),
-			   NULL, dlgEditSetting_dlgProc, (LPARAM)&data))
-	  if (!data.filename.empty())
-	  {
-	    setItem(index, data);
-	    setSelectedItem(index);
-	  }
+			   hwnd, dlgEditSetting_dlgProc, (LPARAM)&data))
+	{
+	  setItem(index, data);
+	  setSelectedItem(index);
+	}
 	return TRUE;
       }
       
@@ -311,6 +456,8 @@ BOOL CALLBACK dlgSetting_dlgProc(HWND hwnd, UINT message,
   else
     switch (message)
     {
+      case WM_SIZE:
+	return wc->wmSize(wParam, LOWORD(lParam), HIWORD(lParam));
       case WM_COMMAND:
 	return wc->wmCommand(HIWORD(wParam), LOWORD(wParam), (HWND)lParam);
       case WM_CLOSE:

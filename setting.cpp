@@ -20,49 +20,72 @@
 #include <shlwapi.h>
 
 
-// get home directory path
-extern bool getHomeDirectory(int index, istring *path_r)
+// get mayu filename
+static bool getFilenameFromRegistry(
+  istring *o_name, istring *o_filename, std::list<istring> *o_symbols)
 {
-  char *e;
-  if ((e = getenv("HOME")) != NULL)
-    if (index-- == 0) { *path_r = e; return true; }
-  if (getenv("HOMEDRIVE") && getenv("HOMEPATH"))
-    if (index-- == 0)
+  Registry reg(MAYU_REGISTRY_ROOT);
+  int index;
+  reg.read(".mayuIndex", &index, 0);
+  char buf[100];
+  snprintf(buf, sizeof(buf), ".mayu%d", index);
+
+  istring entry;
+  if (!reg.read(buf, &entry))
+    return false;
+  
+  Regexp getFilename("^([^;]*);([^;]*);(.*)$");
+  if (!getFilename.doesMatch(entry))
+    return false;
+  
+  if (o_name)
+    *o_name = getFilename[1];
+  if (o_filename)
+    *o_filename = getFilename[2];
+  if (o_symbols)
+  {
+    istring symbols = getFilename[3];
+    Regexp symbol("-D([^;]*)");
+    while (symbol.doesMatch(symbols))
     {
-      *path_r = istring(getenv("HOMEDRIVE")) + getenv("HOMEPATH");
-      return true;
+      o_symbols->push_back(symbol[1]);
+      symbols = symbols.substr(symbol.subBegin(1));
     }
-  if ((e = getenv("USERPROFILE")) != NULL)
-    if (index-- == 0) { *path_r = e; return true; }
+  }
+  return true;
+}
+
+
+// get home directory path
+void getHomeDirectories(std::list<istring> *o_pathes)
+{
+  istring filename;
+  if (getFilenameFromRegistry(NULL, &filename, NULL))
+  {
+    Regexp getPath("^(.*[/\\\\])[^/\\\\]*$");
+    if (getPath.doesMatch(filename))
+      o_pathes->push_back(getPath[1]);
+  }
+  
+  const char *home = getenv("HOME");
+  if (home)
+    o_pathes->push_back(home);
+
+  const char *homedrive = getenv("HOMEDRIVE");
+  const char *homepath = getenv("HOMEPATH");
+  if (homedrive && homepath)
+    o_pathes->push_back(istring(homedrive) + homepath);
+
+  const char *userprofile = getenv("USERPROFILE");
+  if (userprofile)
+    o_pathes->push_back(userprofile);
   
   char buf[GANA_MAX_PATH];
-#ifdef SHGetFolderPath
-#define GANAWARE_MAYU "\\GANAware\\mayu"
-  // $USERPROFILE\Local Settings\Application data
-  if (S_OK == SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL,
-			      SHGFP_TYPE_CURRENT, buf))
-    if (index-- == 0) { *path_r = istring(buf) + GANAWARE_MAYU; return true; }
-  // $USERPROFILE\Application data
-  if (S_OK == SHGetFolderPath(NULL, CSIDL_APPDATA, NULL,
-			      SHGFP_TYPE_CURRENT, buf))
-    if (index-- == 0) { *path_r = istring(buf) + GANAWARE_MAYU; return true; }
-  // My Document
-  if (S_OK == SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL,
-			      SHGFP_TYPE_CURRENT, buf))
-    if (index-- == 0) { *path_r = buf; return true; }
-  // All Users\Application data
-  if (S_OK == SHGetFolderPath(NULL, CSIDL_COMMON_APPDATA, NULL,
-			      SHGFP_TYPE_CURRENT, buf))
-    if (index-- == 0) { *path_r = istring(buf) + GANAWARE_MAYU; return true; }
-#endif // SHGetFolderPath
   if (GetModuleFileName(GetModuleHandle(NULL), buf, lengthof(buf)))
-    if (index-- == 0)
-    {
-      PathRemoveFileSpec(buf);
-      *path_r = buf;
-      return true;
-    }
-  return false;
+  {
+    PathRemoveFileSpec(buf);
+    o_pathes->push_back(buf);
+  }
 }
 
 
@@ -459,7 +482,7 @@ void SettingLoader::load_KEYMAP_DEFINITION(Token *which)
     ActionFunction af;
     af.function = Function::search(id);
     assert( af.function );
-    keySeq = setting->keySeqs.add(name->getString(), KeySeq().add(af));
+    keySeq = setting->keySeqs.add(KeySeq(name->getString()).add(af));
   }
   
   currentKeymap =
@@ -472,7 +495,7 @@ void SettingLoader::load_KEYMAP_DEFINITION(Token *which)
 // <KEY_SEQUENCE>
 KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
 {
-  KeySeq keySeq;
+  KeySeq keySeq(name);
   while (!isEOL())
   {
     Modifier modifier = load_MODIFIER(Modifier::KEYSEQ, defaultKeySeqModifier);
@@ -707,6 +730,33 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
 	      break;
 	    }
 
+	    case 'G': // gravity
+	    {
+	      getToken();
+	      const struct { int m_gravity; char *m_name; } gravity[] =
+	      {
+		Function::GravityC, "C", 
+		Function::GravityN, "N", Function::GravityE, "E",
+		Function::GravityW, "W", Function::GravityS, "S",
+		Function::GravityNW, "NW", Function::GravityNW, "WN",
+		Function::GravityNE, "NE", Function::GravityNE, "EN",
+		Function::GravitySW, "SW", Function::GravitySW, "WS",
+		Function::GravitySE, "SE", Function::GravitySE, "ES",
+	      };
+	      t->setData(Function::GravityNW);
+	      int i;
+	      for (i = 0; i < lengthof(gravity); i++)
+		if (*t == gravity[i].m_name)
+		{
+		  t->setData(gravity[i].m_gravity);
+		  break;
+		}
+	      if (i == lengthof(gravity))
+		throw ErrorMessage() << "`" << *t
+				     << "': unknown gravity symbol.";
+	      break;
+	    }
+
 	    case 'b': // bool
 	    {
 	      getToken();
@@ -714,6 +764,19 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
 		t->setData(0);
 	      else
 		t->setData(1);
+	      break;
+	    }
+
+	    case 'D': // dialog
+	    {
+	      getToken();
+	      if (*t == "Investigate")
+		t->setData(Function::mayuDlgInvestigate);
+	      else if (*t == "Log")
+		t->setData(Function::mayuDlgLog);
+	      else
+		throw ErrorMessage() << "`" << *t
+				     << "': unknown dialog box.";
 	      break;
 	    }
 
@@ -749,7 +812,7 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
       keySeq.add(ActionKey(mkey));
     }
   }
-  return setting->keySeqs.add(name, keySeq);
+  return setting->keySeqs.add(keySeq);
 }
 
 
@@ -1004,7 +1067,7 @@ static bool prefixSortPred(const istring &a, const istring &b)
 }
 
 
-// load
+// load (called from load(Setting *, const istring &) only)
 void SettingLoader::load(const istring &filename)
 {
   currentFilename = filename;
@@ -1103,6 +1166,8 @@ void SettingLoader::load(const istring &filename)
 // is the filename readable ?
 bool SettingLoader::isReadable(const istring &filename) const 
 {
+  if (filename.empty())
+    return false;
   ifstream ist(filename.c_str());
   if (ist.good())
   {
@@ -1124,28 +1189,30 @@ bool SettingLoader::isReadable(const istring &filename) const
   }
 }
 
-
+#if 0
 // get filename from registry
-bool SettingLoader::getFilenameFromRegistry(istring *path_r) const
+bool SettingLoader::getFilenameFromRegistry(istring *o_path) const
 {
+  // get from registry
   Registry reg(MAYU_REGISTRY_ROOT);
   int index;
   reg.read(".mayuIndex", &index, 0);
   char buf[100];
   snprintf(buf, sizeof(buf), ".mayu%d", index);
-  if (!reg.read(buf, path_r))
+  if (!reg.read(buf, o_path))
     return false;
 
+  // parse registry entry
   Regexp getFilename("^[^;]*;([^;]*);(.*)$");
-  if (!getFilename.doesMatch(*path_r))
+  if (!getFilename.doesMatch(*o_path))
     return false;
   
   istring path = getFilename[1];
   istring options = getFilename[2];
   
-  if (0 < path.size() && !isReadable(path))
+  if (!(0 < path.size() && isReadable(path)))
     return false;
-  *path_r = path;
+  *o_path = path;
   
   // set symbols
   Regexp symbol("-D([^;]*)");
@@ -1157,49 +1224,55 @@ bool SettingLoader::getFilenameFromRegistry(istring *path_r) const
   
   return true;
 }
+#endif
 
 
 // get filename
-bool SettingLoader::getFilename(const istring &name_, istring *path_r) const
+bool SettingLoader::getFilename(const istring &i_name, istring *o_path) const
 {
-  const istring &name = name_.empty() ? istring(".mayu") : name_;
-    
-  if (name_.empty())
-    if (getFilenameFromRegistry(path_r))
-      return true;
+  // the default filename is ".mayu"
+  const istring &name = i_name.empty() ? istring(".mayu") : i_name;
+  
+  bool isFirstTime = true;
 
-  Registry reg(MAYU_REGISTRY_ROOT);
-  int index;
-  reg.read(".mayuIndex", &index, 0);
-  char buf[100];
-  snprintf(buf, sizeof(buf), ".mayu%d", index);
-  if (reg.read(buf, path_r))
+  while (true)
   {
-    Regexp getPath("^[^;]*;([^;]*[/\\\\])[^;/\\\\]*;");
-    if (getPath.doesMatch(*path_r))
+    // find file from registry
+    if (i_name.empty())				// called not from 'include'
     {
-      *path_r = getPath[1] + name;
-      if (isReadable(*path_r))
+      std::list<istring> symbols;
+      if (getFilenameFromRegistry(NULL, o_path, &symbols))
+      {
+	if (!isReadable(*o_path))
+	  return false;
+	for (std::list<istring>::iterator
+	       i = symbols.begin(); i != symbols.end(); i ++)
+	  setting->symbols.insert(*i);
+	return true;
+      }
+    }
+    
+    if (!isFirstTime)
+      return false;
+    
+    // find file from home directory
+    std::list<istring> pathes;
+    getHomeDirectories(&pathes);
+    for (std::list<istring>::iterator
+	   i = pathes.begin(); i != pathes.end(); i ++)
+    {
+      *o_path = *i + "\\" + name;
+      if (isReadable(*o_path))
 	return true;
     }
-  }
-  
-  for (int i = 0; getHomeDirectory(i, path_r); i++)
-  {
-    *path_r += "\\";
-    *path_r += name;
-    if (isReadable(*path_r))
-      return true;
-  }
     
-  if (!name_.empty())
-    return false;
-
-  if (!DialogBox(hInst, MAKEINTRESOURCE(IDD_DIALOG_setting),
-		 NULL, dlgSetting_dlgProc))
-    return false;
-  
-  return getFilenameFromRegistry(path_r);
+    if (!i_name.empty())
+      return false;				// called by 'include'
+    
+    if (!DialogBox(hInst, MAKEINTRESOURCE(IDD_DIALOG_setting),
+		   NULL, dlgSetting_dlgProc))
+      return false;
+  }
 }
 
 
@@ -1216,7 +1289,10 @@ SettingLoader::SettingLoader(SyncObject *soLog_, ostream *log_)
 }
 
 
-// load setting
+/* load setting
+   If called by "include", 'filename' describes filename.
+   Otherwise the 'filename' is empty.
+ */
 bool SettingLoader::load(Setting *setting_r, const istring &filename)
 {
   setting = setting_r;
@@ -1240,7 +1316,7 @@ bool SettingLoader::load(Setting *setting_r, const istring &filename)
   ActionFunction af;
   af.function = Function::search(Function::OtherWindowClass);
   assert( af.function );
-  KeySeq *globalDefault = setting->keySeqs.add("", KeySeq().add(af));
+  KeySeq *globalDefault = setting->keySeqs.add(KeySeq("").add(af));
   
   // add default keymap
   currentKeymap = setting->keymaps.add(

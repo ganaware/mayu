@@ -70,7 +70,9 @@ public:
     VK,				/// virtual key
     Wait,			/// wait
     InvestigateCommand,		/// investigate WM_COMMAND, WM_SYSCOMMAND
-    //Input,			/// input string
+    MayuDialog,			/// show mayu dialog box
+    DescribeBindings,		/// describe bindings
+    //input,			/// input string
     
     /// IME
     IME = 0x30000,
@@ -89,6 +91,7 @@ public:
     WindowVMaximize,		///
     WindowMove,			///
     WindowMoveVisibly,		///
+    WindowMoveTo,		///
     WindowClingToLeft,		///
     WindowClingToRight,		///
     WindowClingToTop,		///
@@ -98,6 +101,7 @@ public:
     WindowIdentify,		///
     WindowSetAlpha,		///
     WindowRedraw,		///
+    WindowResizeTo,		///
     //ScreenSaver,		///
     
     /// mouse
@@ -149,6 +153,31 @@ public:
     toParentWindow = 1,		///
   };
 
+  /** for WindowMoveTo
+      @name ANONYMOUS3 */
+  enum
+  {
+    GravityC = 0,				/// center
+    GravityN = 1 << 0,				/// north
+    GravityE = 1 << 1,				/// east
+    GravityW = 1 << 2,				/// west
+    GravityS = 1 << 3,				/// south
+    GravityNW = GravityN | GravityW,		/// north west
+    GravityNE = GravityN | GravityE,		/// north east
+    GravitySW = GravityS | GravityW,		/// south west
+    GravitySE = GravityS | GravityE,		/// south east
+  };
+
+  /** for MayuDialog
+      @name ANONYMOUS3 */
+  enum
+  {
+    mayuDlgInvestigate = 0x1000,		/// 
+    mayuDlgLog         = 0x2000,		/// 
+    mayuDlgMask        = 0xffff000,		/// 
+  };
+
+
   ///
   class FuncData
   {
@@ -168,17 +197,19 @@ public:
   Id id;	/// function id
   char *name;	/// function name
   /** argument's type.
+      '<code>&amp;</code>':rest is optional
+      '<code>D</code>':dialog,
+      '<code>G</code>':gravity,
       '<code>K</code>':keymap,
+      '<code>M</code>':modifier,
       '<code>S</code>':keyseq,
-      '<code>l</code>':/lock\d/,
-      '<code>s</code>':string,
-      '<code>d</code>':digit,
       '<code>V</code>':vkey,
       '<code>W</code>':showWindow,
-      '<code>w</code>':window,
-      '<code>M</code>':modifier,
       '<code>b</code>':bool,
-      '<code>&amp;</code>':rest is optional
+      '<code>d</code>':digit,
+      '<code>l</code>':/lock\d/,
+      '<code>s</code>':string,
+      '<code>w</code>':window,
   */
   char *argType;
   Func func;	///
@@ -187,6 +218,10 @@ public:
   
   static const Function *search(Id id);	/// search function in functions
   static const Function *search(const istring &name);	///
+
+  /// stream output
+  friend std::ostream &
+  operator<<(std::ostream &i_ost, const Function &i_f);
 };
 
 

@@ -110,6 +110,14 @@ public:
   
   /// is the key's scan code the prefix of this key's scan code ?
   bool isPrefixScanCode(const Key &key) const;
+  
+  /// stream output
+  friend std::ostream &
+  operator<<(std::ostream &i_ost, const Key &i_key);
+  
+  /// < 
+  bool operator<(const Key &i_key) const
+  { return getName() < i_key.getName(); }
 };
 
 
@@ -208,6 +216,15 @@ public:
   bool isPressed(Type t) const { return !!(modifiers & ((MODIFIERS(1))<<t)); }
   ///
   bool isDontcare(Type t) const { return !!(dontcares & ((MODIFIERS(1))<<t)); }
+  
+  /// stream output
+  friend std::ostream &
+  operator<<(std::ostream &i_ost, const Modifier &i_m);
+  
+  /// < 
+  bool operator<(const Modifier &i_m) const
+  { return modifiers < i_m.modifiers ||
+      (modifiers == i_m.modifiers && dontcares < i_m.dontcares ); }
 };
 
 
@@ -228,6 +245,15 @@ public:
   ///
   bool operator==(const ModifiedKey &mk) const
   { return modifier == mk.modifier && key == mk.key; }
+
+  /// stream output
+  friend std::ostream &
+  operator<<(std::ostream &i_ost, const ModifiedKey &i_mk);
+
+  /// < 
+  bool operator<(const ModifiedKey &i_mk) const
+  { return *key < *i_mk.key ||
+      (!(*i_mk.key < *key) && modifier < i_mk.modifier); }
 };
 
 

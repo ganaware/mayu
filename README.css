@@ -1,5 +1,5 @@
 body			{ color:#ffffff; background-color:#000000;
-			  font-size:medium; font-family:Arial;  }
+			  font-size:medium; font-family:"ＭＳ Ｐゴシック";  }
 
 /* contents */
 
@@ -21,12 +21,12 @@ body			{ color:#ffffff; background-color:#000000;
 			  padding-left:4ex; background-color:#222222;
 			  margin-top:0.5ex; margin-bottom:0.5ex; }
 
-.subsection tt		{ color:#ffdddd; font-family:Courier New;
+.subsection tt		{ color:#ffdddd; font-family:"ＭＳ ゴシック";
 			  font-size:x-small; }
 
 .subsubsection		{ font-size:x-small; margin-left:6ex;
 			  text-indent:-2ex; }
-.subsubsection tt	{ color:#ffdddd; font-family:Courier New;
+.subsubsection tt	{ color:#ffdddd; font-family:"ＭＳ ゴシック";
 			  font-size:x-small; }
 
 /* manual */
@@ -45,7 +45,7 @@ body			{ color:#ffffff; background-color:#000000;
 
 ul			{ margin-top:1ex; margin-bottom:1ex; }
 ol			{ margin-top:1ex; margin-bottom:1ex; }
-tt			{ color:#ffdddd; font-family:Courier New;
+tt			{ color:#ffdddd; font-family:"ＭＳ ゴシック";
 			  font-size:x-small; }
 
 .h1			{ color:#ffffff; background-color:#555555;
@@ -79,10 +79,23 @@ kbd			{ font-family:"Arial"; font-weight:bold;
 			  color:#ddffdd; 
 			  font-size:x-small; }
 
-.sample			{ font-family:Courier New; font-size:x-small;
+.sample			{ font-family:"ＭＳ ゴシック"; font-size:x-small;
 			  margin:0.5ex; margin-left:1.5ex; padding:0.5ex;
 			  color:#ffdddd;  border-color:#222222; border-width:2;
 			  border-style: solid solid solid solid; }
 
 .bug			{ font-family:"Arial"; font-weight:bold;
 			  color:#ff0000; }
+
+table.DefaultSettings	{ 
+			  color:#ffdddd; font-family:"ＭＳ ゴシック";
+			  font-size:x-small; border-width:1px;
+			  border-style: solid; }
+
+table.DefaultSettings td
+			{ background-color:#222222;
+			  color:#ffdddd; font-family:"ＭＳ ゴシック";
+			  font-size:x-small; }
+table.DefaultSettings th
+			{ background-color:#555555;
+			  color:#ffffff; }

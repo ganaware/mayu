@@ -58,6 +58,8 @@ guilibsmt	= import32.lib cw32mt.lib
 conxlibsmt	= $(conlibsmt)
 guixlibsmt	= $(guilibsmt)
 
+DEPENDFLAGS	= --cpp=bcc32 $(CPPFLAGS)
+
 # rule
 
 .dll.lib:

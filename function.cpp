@@ -13,44 +13,6 @@
 using namespace std;
 
 
-/// get toplevel (non-child) window
-static HWND getToplevelWindow(HWND hwnd, bool *isMDI)
-{
-  while (hwnd)
-  {
-    LONG style = GetWindowLong(hwnd, GWL_STYLE);
-    if ((style & WS_CHILD) == 0)
-      break;
-    if (isMDI && *isMDI)
-    {
-      LONG exStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
-      if (exStyle & WS_EX_MDICHILD)
-	return hwnd;
-    }
-    hwnd = GetParent(hwnd);
-  }
-  if (isMDI)
-    *isMDI = false;
-  return hwnd;
-}
-
-
-/// move window asynchronously
-static void asyncMoveWindow(HWND hwnd, int x, int y)
-{
-  SetWindowPos(hwnd, NULL, x, y, 0, 0,
-	       SWP_ASYNCWINDOWPOS | SWP_NOACTIVATE | SWP_NOOWNERZORDER |
-	       SWP_NOSIZE | SWP_NOZORDER);
-}
-/// move window asynchronously
-static void asyncMoveWindow(HWND hwnd, int x, int y, int w, int h)
-{
-  SetWindowPos(hwnd, NULL, x, y, w, h,
-	       SWP_ASYNCWINDOWPOS | SWP_NOACTIVATE | SWP_NOOWNERZORDER |
-	       SWP_NOZORDER);
-}
-
-
 /// undefined key
 static void undefined(const Function::FuncData &fd)
 {
@@ -143,6 +105,17 @@ static void investigateCommand(const Function::FuncData &fd)
 }
 
 
+/// mayu dialog
+static void mayuDialog(const Function::FuncData &fd)
+{
+  if (!fd.isPressed)
+    return;
+  PostMessage(fd.engine.getAssociatedWndow(), WM_engineNotify,
+	      engineNotify_showDlg,
+	      fd.args[0].getData() | fd.args[1].getData());
+}
+
+
 // input string
 //  static void INPUT(const Function::FuncData &fd)
 //  {
@@ -169,24 +142,24 @@ static void investigateCommand(const Function::FuncData &fd)
   bool isMDI = (fd.args.size() == i + 1 && fd.args[i].getData());	\
   HWND hwnd = getToplevelWindow(fd.hwnd, &isMDI);			\
   if (!hwnd)								\
-    return;
+    return;								\
+  RECT rc, rcd;								\
+  if (isMDI)								\
+  {									\
+    getChildWindowRect(hwnd, &rc);					\
+    GetClientRect(GetParent(hwnd), &rcd);				\
+  }									\
+  else									\
+  {									\
+    GetWindowRect(hwnd, &rc);						\
+    SystemParametersInfo(SPI_GETWORKAREA, 0, (void *)&rcd, FALSE);	\
+  }
 
 
 /// window cling to ...
 static void windowClingTo(const Function::FuncData &fd)
 {
   MDI_WINDOW_ROUTINE(0);
-  RECT rc, rcd;
-  if (isMDI)
-  {
-    getChildWindowRect(hwnd, &rc);
-    GetClientRect(GetParent(hwnd), &rcd);
-  }
-  else
-  {
-    GetWindowRect(hwnd, &rc);
-    SystemParametersInfo(SPI_GETWORKAREA, 0, (void *)&rcd, FALSE);
-  }
   int x = rc.left, y = rc.top;
   if (fd.id == Function::WindowClingToLeft)
     x = rcd.left;
@@ -286,6 +259,20 @@ static void windowIdentify(const Function::FuncData &fd)
       Acquire a(&fd.engine.log, 0);
       fd.engine.log << "CLASS:\t" << className << endl;
       fd.engine.log << "TITLE:\t" << titleName << endl;
+
+      HWND hwnd = getToplevelWindow(fd.hwnd, NULL);
+      RECT rc;
+      GetWindowRect(hwnd, &rc);
+      fd.engine.log << "Toplevel Window Position/Size: ("
+		    << rc.left << ", "<< rc.top << ") / ("
+		    << rcWidth(&rc) << "x" << rcHeight(&rc) << ")" << endl;
+      
+      SystemParametersInfo(SPI_GETWORKAREA, 0, (void *)&rc, FALSE);
+      fd.engine.log << "Desktop Window Position/Size: ("
+		    << rc.left << ", "<< rc.top << ") / ("
+		    << rcWidth(&rc) << "x" << rcHeight(&rc) << ")" << endl;
+
+      fd.engine.log << endl;
       ok = true;
     }
   }
@@ -333,12 +320,6 @@ static void windowHVMaximize(const Function::FuncData &fd)
     PostMessage(hwnd, WM_SYSCOMMAND, SC_RESTORE, 0);
   else
   {
-    RECT rc;
-    if (isMDI)
-      getChildWindowRect(hwnd, &rc);
-    else
-      GetWindowRect(hwnd, &rc);
-    
     Engine::WindowPosition::Mode mode = Engine::WindowPosition::ModeNormal;
     
     if (target != end)
@@ -362,16 +343,10 @@ static void windowHVMaximize(const Function::FuncData &fd)
 	Engine::WindowPosition(hwnd, rc, mode));
     }
     
-    RECT rc_max;
-    if (isMDI)
-      GetClientRect(GetParent(hwnd), &rc_max);
-    else
-      SystemParametersInfo(SPI_GETWORKAREA, 0, (void *)&rc_max, FALSE);
-    
     if ((int)mode & (int)Engine::WindowPosition::ModeH)
-      rc.left = rc_max.left, rc.right = rc_max.right;
+      rc.left = rcd.left, rc.right = rcd.right;
     if ((int)mode & (int)Engine::WindowPosition::ModeV)
-      rc.top = rc_max.top, rc.bottom = rc_max.bottom;
+      rc.top = rcd.top, rc.bottom = rcd.bottom;
     
     asyncMoveWindow(hwnd, rc.left, rc.top, rcWidth(&rc), rcHeight(&rc));
   }
@@ -382,12 +357,6 @@ static void windowHVMaximize(const Function::FuncData &fd)
 static void windowMove(const Function::FuncData &fd)
 {
   MDI_WINDOW_ROUTINE(2);
-  
-  RECT rc;
-  if (isMDI)
-    getChildWindowRect(hwnd, &rc);
-  else
-    GetWindowRect(hwnd, &rc);
   asyncMoveWindow(hwnd, rc.left + fd.args[0].getNumber(),
 		  rc.top  + fd.args[1].getNumber());
 }
@@ -397,18 +366,6 @@ static void windowMove(const Function::FuncData &fd)
 static void windowMoveVisibly(const Function::FuncData &fd)
 {
   MDI_WINDOW_ROUTINE(0);
-  
-  RECT rc, rcd;
-  if (isMDI)
-  {
-    getChildWindowRect(hwnd, &rc);
-    GetClientRect(GetParent(hwnd), &rcd);
-  }
-  else
-  {
-    GetWindowRect(hwnd, &rc);
-    SystemParametersInfo(SPI_GETWORKAREA, 0, (void *)&rcd, FALSE);
-  }
   int x = rc.left, y = rc.top;
   if (rc.left < rcd.left)
     x = rcd.left;
@@ -512,6 +469,45 @@ static void windowRedraw(const Function::FuncData &fd)
   WINDOW_ROUTINE;
   RedrawWindow(hwnd, NULL, NULL,
 	       RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
+}
+
+
+/// resize
+static void windowResizeTo(const Function::FuncData &fd)
+{
+  MDI_WINDOW_ROUTINE(2);
+  int w = fd.args[0].getNumber();
+  if (w == 0)
+    w = rcWidth(&rc);
+  else if (w < 0)
+    w += rcWidth(&rcd);
+  
+  int h = fd.args[1].getNumber();
+  if (h == 0)
+    h = rcHeight(&rc);
+  else if (h < 0)
+    h += rcHeight(&rcd);
+  
+  asyncResize(hwnd, w, h);
+}
+
+/// move
+static void windowMoveTo(const Function::FuncData &fd)
+{
+  MDI_WINDOW_ROUTINE(3);
+  int arg_x = fd.args[1].getNumber(), arg_y = fd.args[2].getNumber();
+  int gravity = fd.args[0].getData();
+  int x = rc.left + arg_x, y = rc.top + arg_y;
+
+  if (gravity & Function::GravityN)
+    y = arg_y + rcd.top;
+  if (gravity & Function::GravityE)
+    x = arg_x + rcd.right - rcWidth(&rc);
+  if (gravity & Function::GravityW)
+    x = arg_x + rcd.left;
+  if (gravity & Function::GravityS)
+    y = arg_y + rcd.bottom - rcHeight(&rc);
+  asyncMoveWindow(hwnd, x, y);
 }
 
 
@@ -729,6 +725,8 @@ const Function Function::functions[] =
   { FUNC(VK),				"V", vk, },
   { FUNC(Wait),				"d", NULL, },
   { FUNC(InvestigateCommand),		NULL, investigateCommand, },
+  { FUNC(MayuDialog),			"DW", mayuDialog, },
+  { FUNC(DescribeBindings),		NULL, NULL, },
   //{ FUNC(Input),			1, INPUT, },
   
   // IME
@@ -745,6 +743,7 @@ const Function Function::functions[] =
   { FUNC(WindowHMaximize),		"&b", windowHVMaximize, },
   { FUNC(WindowVMaximize),		"&b", windowHVMaximize, },
   { FUNC(WindowMove),			"dd&b", windowMove, },
+  { FUNC(WindowMoveTo),			"Gdd&b", windowMoveTo, },
   { FUNC(WindowMoveVisibly),		"&b", windowMoveVisibly, },
   { FUNC(WindowClingToLeft),		"&b", windowClingTo, },
   { FUNC(WindowClingToRight),		"&b", windowClingTo, },
@@ -755,6 +754,7 @@ const Function Function::functions[] =
   { FUNC(WindowIdentify),		NULL, windowIdentify, },
   { FUNC(WindowSetAlpha),		"d",  windowSetAlpha, },
   { FUNC(WindowRedraw),			NULL, windowRedraw, },
+  { FUNC(WindowResizeTo),		"dd&b", windowResizeTo, },
   //{ FUNC(ScreenSaver),		NULL, screenSaver, },
 
   // mouse
@@ -802,3 +802,9 @@ const Function *Function::search(const istring &name)
   return NULL;
 }
 
+/// stream output
+std::ostream &
+operator<<(std::ostream &i_ost, const Function &i_f)
+{
+  return i_ost << "&" << i_f.name;
+}

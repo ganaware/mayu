@@ -22,6 +22,7 @@
 
 #  define snprintf _snprintf
 #  define setmode _setmode
+#  define for if (false) ; else for
 
 
 // ////////////////////////////////////////////////////////////////////////////

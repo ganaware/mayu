@@ -60,7 +60,8 @@ class ActionFunction : public Action
 public:
   Modifier modifier;		/// modifier for &Sync
   Function const *function;	/// function
-  std::vector<Token> args;	/// arguments
+  typedef std::vector<Token> Args;
+  Args args;	/// arguments
   ///
   ActionFunction() : Action(Action::ActFunction), function(NULL) { }
 };
@@ -70,6 +71,7 @@ public:
 class KeySeq
 {
   std::vector<Action *> actions;		///
+  istring m_name;				/// 
   
   ///
   void copy();
@@ -78,7 +80,7 @@ class KeySeq
   
 public:
   ///
-  KeySeq();
+  KeySeq(const istring &i_name);
   ///
   KeySeq(const KeySeq &ks);
   ///
@@ -96,6 +98,13 @@ public:
   KeySeq &add(const ActionKeySeq &aks);
   ///
   KeySeq &add(const ActionFunction &af);
+
+  ///
+  const istring &getName() const { return m_name; }
+  
+  /// stream output
+  friend std::ostream &
+  operator<<(std::ostream &i_ost, const KeySeq &i_ks);
 };
 
 
@@ -136,6 +145,12 @@ public:
     ///
     KeyAssignment(const ModifiedKey &mk, KeySeq *keySeq_)
       : modifiedKey(mk), keySeq(keySeq_) { }
+    ///
+    KeyAssignment(const KeyAssignment &i_o)
+      : modifiedKey(i_o.modifiedKey), keySeq(i_o.keySeq) { }
+
+    bool operator<(const KeyAssignment &i_o) const
+    { return modifiedKey < i_o.modifiedKey; }
   };
 
   /// modifier assignments
@@ -216,6 +231,10 @@ public:
   /// get modAssignments
   const ModAssignments &getModAssignments(Modifier::Type mt) const
   { return modAssignments[mt]; }
+
+  /// describe
+  typedef std::list<ModifiedKey> DescribedKeys;
+  void describe(std::ostream &i_ost, DescribedKeys *o_mk) const;
 };
 
 
@@ -247,6 +266,7 @@ public:
 ///
 class KeySeqs
 {
+#if 0
   ///
   class NamedKeySeq
   {
@@ -259,10 +279,13 @@ class KeySeqs
   };
   typedef std::list<NamedKeySeq> NamedKeySeqs;	///
   NamedKeySeqs namedKeySeqs;			///
+#endif
+  typedef std::list<KeySeq> KeySeqList;		///
+  KeySeqList keySeqList;			///
   
 public:
   /// add a named keyseq (name can be empty)
-  KeySeq *add(const istring &name, const KeySeq &keySeq);
+  KeySeq *add(const KeySeq &keySeq);
   
   /// search by name
   KeySeq *searchByName(const istring &name);

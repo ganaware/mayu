@@ -49,6 +49,18 @@ extern void unsetSmallIcon(HWND hwnd);
 ///
 extern void unsetBigIcon(HWND hwnd);
 
+/// get toplevel (non-child) window
+extern HWND getToplevelWindow(HWND hwnd, bool *isMDI);
+
+/// move window asynchronously
+extern void asyncMoveWindow(HWND hwnd, int x, int y);
+
+/// move window asynchronously
+extern void asyncMoveWindow(HWND hwnd, int x, int y, int w, int h);
+
+/// resize asynchronously
+extern void asyncResize(HWND hwnd, int w, int h);
+
 
 // ////////////////////////////////////////////////////////////////////////////
 // dialog

@@ -84,9 +84,6 @@ private:
   /// is the filename readable ?
   bool isReadable(const istring &filename) const;
 
-  /// get filename from registry
-  bool getFilenameFromRegistry(istring *path_r) const;
-
   /// get filename
   bool getFilename(const istring &name_, istring *path_r) const;
 
@@ -100,6 +97,6 @@ public:
 
 
 /// get home directory path
-extern bool getHomeDirectory(int index, istring *path_r);
+extern void getHomeDirectories(std::list<istring> *o_path);
 
 #endif // __setting_h__

@@ -48,7 +48,6 @@ keymap Global
  key W-Right		=> &MouseMove(16, 0)	#	V
  key W-Up		=> &MouseMove(0, -16)	#	V
  key W-Down		=> &MouseMove(0, 16)	#	V
- key W-A-Down		=> &MouseMove(0, 16)	#	V
  key W-A-C-Left		=> &MouseMove(-1, 0)	#	V
  key W-A-C-Right	=> &MouseMove(1, 0)	#	V
  key W-A-C-Up		=> &MouseMove(0, -1)	#	V
@@ -102,6 +101,8 @@ keymap Global
    key C-«		=> C-A-S-«		#	V
    key C-©		=> C-A-S-©		#	V
    key C-¨		=> C-A-S-¨		#	V
+   key C-S-Y		=> &WindowResizeTo(0, -64) &WindowMoveVisibly \
+			   &Wait(100) &WindowClingToBottom
  endif
 
  if ( MAP-ESCAPE-TO-META )
@@ -130,7 +131,7 @@ window	MayuInvestigate /mayu\.exe:#32770:mayuFocus$/ : KeymapDefault
 
 include	"emacsedit.mayu"
 
-window	EditControl	/:(|Rich|T)Edit$/ : EmacsEdit
+window	EditControl	/:(Edit|TEdit|RichEdit(20[AW])?)$/ : EmacsEdit
 window	SysListView32	/:SysListView32$/ : EmacsMove
 window	SysTreeView32	/:SysTreeView32$/ : EmacsMove
 window	ComboBox	/:ComboBox(:Edit)?$/ : EmacsEdit
@@ -283,6 +284,9 @@ window	ASTEC-X /:ASTEC-X$/ : Global
 window BeckyInternetMail /Rebecca\.exe:BeckyComposeFrameClass:/ : EmacsEdit
  key C-X		=> &Prefix(GeneralC-X)
 
+window BeckyInternetMail2 /B2\.exe:Becky2ComposeFrame:/ : EmacsEdit
+ key C-X		=> &Prefix(GeneralC-X)
+
 
 ## Microsoft Power Point ......................................................
 
@@ -320,6 +324,12 @@ window	NetscapeNavigator /Netscape\.exe:/ : Global
  key C-S		=> C-F			# ŒŸõ
 
 
+## Mozilla ....................................................................
+## http://www.mozilla.org/
+
+window	Mozilla /:MozillaWindowClass$/ : EmacsEdit
+
+
 ## Personal Dictionary ........................................................
 ## http://member.nifty.ne.jp/TaN/
 
@@ -352,7 +362,7 @@ window	TeraTerm /TTermPRO\.exe:VTWin32$/ : Global
 
  keyseq	$WaffleMark/cancel		= Left Right
 
-window	Waffle /WITALK2\.EXE:.*:RichEdit$/ : Global
+window	Waffle /WITALK2\.EXE:.*:RichEdit(20A)?$/ : Global
 keymap2	WaffleMark : Waffle => $WaffleMark/cancel &KeymapParent
 
 keymap	Waffle
@@ -452,3 +462,12 @@ window WindowsMineSweeper /winmine.exe:ƒ}ƒCƒ“ƒXƒC[ƒp$/ : Global
  key	Num7	=> &MouseMove(-16, -16)
  key	Num8	=> &MouseMove(  0, -16)
  key	Num9	=> &MouseMove( 16, -16)
+
+
+## ICQ2000 ....................................................................
+
+if ( GANA )
+  window ICQMessageSession \
+	( /ICQ.exe:#32770:Edit$/ && /Message Session/ ) : EmacsEdit
+   key Enter  => M-S
+endif

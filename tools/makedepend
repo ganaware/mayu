@@ -1,0 +1,454 @@
+#!/usr/local/bin/perl -w
+# -*- cperl -*-
+
+###############################################################################
+#
+#	Make dependency informations for Makefile on ANY platform.
+#
+#	Copyright (c) 1998-2000 TAGA Nayuta <nayuta@ganaware.org>
+#	All rights reserved.
+#
+#	Redistribution and use in source and binary forms, with or
+#	without modification, are permitted provided that the
+#	following conditions are met:
+#	1. Redistributions of source code must retain the above
+#	   copyright notice, this list of conditions and the following
+#	   disclaimer.
+#	2. Redistributions in binary form must reproduce the above
+#	   copyright notice, this list of conditions and the following
+#	   disclaimer in the documentation and/or other materials
+#	   provided with the distribution.
+#	3. The name of the author may not be used to endorse or
+#	   promote products derived from this software without
+#	   specific prior written permission.
+#
+#	THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY
+#	EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+#	THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+#	PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE
+#	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+#	SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+#	NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+#	LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+#	HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+#	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+#	EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+###############################################################################
+
+sub usage {
+  print <<'__EOM__'
+Usage: makedepend [OPTION]... <SRCS>...
+Make dependency informations for Makefile on ANY platform.
+
+-a
+	Append the dependencies to the end of the file instead of
+	replacing them.
+
+-f<MAKEFILE>
+	Filename.  This allows you to specify an alternate makefile in
+	which makedepend can place its output.  Specifying "-" as the
+	file name (i.e., -f-) sends the output to standard output
+	instead of modifying an existing file.  The default is
+	"Makefile".
+
+-o<OBJSUFFIX>
+	Object file suffix.  Some systems may have object files whose
+	suffix is something other than ".o".  This option allows you
+	to specify another suffix, such as ".obj" with -o.obj and so
+	forth.
+
+-p<OBJPREFIX>
+	Object file prefix.  The prefix is prepended to the name of
+	the object file.  This is usually used to designate a
+	different directory for the object file.  The default is the
+	empty string.
+
+-s<STRING>
+	Starting string delimiter.  This option permits you to specify
+	a different string for makedepend to look for in the makefile.
+	The default is "# DO NOT DELETE".
+
+-w<WIDTH>
+	Line width.  Normally, makedepend will ensure that every
+	output line that it writes will be no wider than 78 characters
+	for the sake of readability.  This option enables you to
+	change this width.
+
+-- [OPTION]... --
+	If makedepend encounters a double hyphen (--) in the argument
+	list, then any unrecognized argument following it will be
+	silently ignored; a second double hyphen terminates this
+	special treatment.  In this way, makedepend can be made to
+	safely ignore esoteric compiler arguments that might normally
+	be found in a CFLAGS make macro.  All options that makedepend
+	recognizes and appear between the pair of double hyphens are
+	processed normally.
+
+--cpp=<PREPROCESSORTYPE>
+	The preprocessor.  Currently supported <PREPROCESSORTYPES>s are:
+		gcc   ... it uses gcc with -E (default).
+		g++   ... it uses g++ with -E.
+		vc    ... it uses cl.exe with -E.
+		bcc32 ... it uses cpp32.exe with -ocon (too slow).
+
+--ignore=<INCLUDEPATH>
+	A list of default include pathes separated by ";".  Makedepend
+	ignores header files in the default include pathes as if a
+	source had no dependency on them.  Currently the default is
+	the system include directory if PREPROCESSORTYPE is gcc, g++
+	or vc.  However it is empty PREPROCESSORTYPE is bcc32.
+
+--newline=<NEWLINE>
+	Newline code.  If NEWLINE is:
+		unix ... 0x0a (unix default).
+		dos  ... 0x0d 0x0a (windows default).
+		mac  ... 0x0d .
+
+--verbose[=LEVEL]
+	0, 1 or 2.  The default LEVEL is 1.
+
+-D<NAME>=<DEF> or -D<NAME> or -I<INCLUDEDIR>
+	They are simply passed to the preprocessor.
+
+-m or -v or -Y<INCLUDEDIR>
+	They are ignored.
+
+Copyright (c) 1998-2000 TAGA Nayuta <nayuta@ganaware.org>
+__EOM__
+  ;
+  exit;
+}
+
+
+$isWindows = $^O eq "MSWin32";
+$ignoreCase = $isWindows;
+
+if ( $isWindows ) {
+  $nullDevice = "nul";
+} else {
+  $nullDevice = "/dev/null";
+}
+
+
+###############################################################################
+# options
+
+
+$OPTION_APPEND = 0;
+$OPTION_FILENAME = "Makefile";
+$OPTION_SUFFIX = ".o";
+$OPTION_PREFIX = "";
+$OPTION_STRING = "# DO NOT DELETE";
+$OPTION_WIDTH = 78;
+$OPTION_CPP = "gcc";
+$OPTION_NEWLINE = $isWindows ? "\x0d\x0a" : "\x0a";
+$OPTION_VERBOSE = 0;
+@OPTION_OPTIONS = ();
+@OPTION_IGNORE = ();
+@OPTION_SRCS = ();
+$OPTION_IGNORE_OK = 0;
+
+$isInMixed = 0;			# is in -- <OPTIONS> -- ?
+
+foreach $i ( @ARGV ) {
+  if ( $i =~ /^-a(.*)$/ ) {
+    $OPTION_APPEND = 1;
+    
+  } elsif ( $i =~ /^-f(.*)$/ ) {
+    $OPTION_FILENAME = $1;
+
+  } elsif ( $i =~ /^-o(.*)$/ ) {
+    $OPTION_SUFFIX = $1;
+
+  } elsif ( $i =~ /^-p(.*)$/ ) {
+    $OPTION_PREFIX = $1;
+
+  } elsif ( $i =~ /^-s(.*)$/ ) {
+    $OPTION_STRING = $1;
+
+  } elsif ( $i =~ /^-w(.*)$/ ) {
+    $OPTION_WIDTH = $1;
+
+  } elsif ( $i =~ /^--$/ ) {
+    $isInMixed = 1 - $isInMixed;
+
+  } elsif ( $i =~ /^--cpp=(.*)$/ ) {
+    $OPTION_CPP = $1;
+
+  } elsif ( $i =~ /^--ignore=(.*)$/ ) {
+    &parseIgnore($1);
+    $OPTION_IGNORE_OK = 1;
+
+  } elsif ( $i =~ /^--newline=(.*)$/ ) {
+    if ( $1 eq "unix" ) {
+      $OPTION_NEWLINE = "\x0a";
+    } elsif ( $1 eq "dos" ) {
+      $OPTION_NEWLINE = "\x0d\x0a";
+    } elsif ( $1 eq "mac" ) {
+      $OPTION_NEWLINE = "\x0d";
+    } else {
+      &usage;
+    }
+
+  } elsif ( $i =~ /^--verbose$/ ) {
+    $OPTION_VERBOSE = 1;
+
+  } elsif ( $i =~ /^--verbose=(\d+)$/ ) {
+    $OPTION_VERBOSE = $1;
+
+  } elsif ( $i =~ /^-[DI]/ ) {
+    push(@OPTION_OPTIONS, $i);
+
+  } elsif ( $i =~ /^(-m|-v|-Y.*)$/ ) {
+    # ignored
+
+  } else {
+    if ( $isInMixed ) {
+      push(@OPTION_OPTIONS, $i);
+
+    } elsif ( $i =~ /^-/ ) {
+      &usage;
+
+    } else {
+      # eliminate 'dir/..'
+      while ( $i =~ m:(.+)/[^/]+/\.\.(|/(.*))$: ) {
+	$i = $1 . "/" . $3;
+      }
+      push(@OPTION_SRCS, $i);
+    }
+  }
+}
+
+&usage if ( @OPTION_SRCS == 0 );
+
+
+###############################################################################
+# select preprocessor and set $IGNORE
+
+# $commandline
+#	It executes a C/C++ preprocessor.  The preprocessed source
+#	code must be printed to the stdout.
+
+# $line
+#	It is a regexp to retrieve included filename from preprocessor
+#	output.  $1 must be a filename.
+
+# $path_delimiter
+#	$1 of $line is separated by this $path_delimiter.  Makedepend
+#	automatically replaces it with '/'.
+
+if ( $OPTION_CPP eq "gcc" || $OPTION_CPP eq "g++" ) {
+  $commandline = $OPTION_CPP . " -E ";
+  $line = '^# \\d+ "(.*)"';
+  
+} elsif ( $OPTION_CPP eq "vc" ) {
+  $commandline = "cl.exe -E -nologo ";
+  $line = '^#line \\d+ "(.*)"';
+  $path_delimiter = '\\\\';
+
+} elsif ( $OPTION_CPP eq "bcc32" ) {
+  $commandline = "cpp32.exe -ocon ";
+  $line = '^/[*] (\\S+) \\d+: [*]/';
+  $path_delimiter = '\\';
+
+} else {
+  &usage;
+
+}
+
+
+###############################################################################
+# set @OPTION_IGNORE
+
+
+sub parseIgnore {
+  @OPTION_IGNORE = split( /;/ , $_[0]);
+  my($i);
+  for ( $i = 0; $i < @OPTION_IGNORE; $i ++ ) {
+    # DOS-style-path to UNIX path
+    $OPTION_IGNORE[$i] =~ s:\\:/:g if ( $isWindows );
+    $OPTION_IGNORE[$i] =~ s/^\s*(\S.*\S)\s*$/$1/;
+  }
+}
+
+if ( ! $OPTION_IGNORE_OK ) {
+  if ( $OPTION_CPP eq "gcc" || $OPTION_CPP eq "g++" ) {
+    my($get_cpp_path) = "gcc -print-prog-name=cpp";
+    if ( 2 <= $OPTION_VERBOSE ) {
+      print STDERR "Getting cpp path ...\n";
+      print STDERR "  $get_cpp_path\n";
+      print STDERR "\n";
+    }
+    my($cpp) = `$get_cpp_path`;
+    chomp($cpp);
+    $cpp .= " -lang-c++" if ( $OPTION_CPP eq "g++" );
+    $cpp = "sh -c '$cpp -v < $nullDevice 2>&1'";
+    if ( 2 <= $OPTION_VERBOSE ) {
+      print STDERR "Getting system include directories ...\n";
+      print STDERR "  $cpp\n";
+      print STDERR "\n";
+    }
+    open(CPP, "$cpp|") || die $!;
+    while (<CPP>) {
+      goto get_inc_list if ( /^#include <...> search starts here:/ );
+    }
+    goto end_get_inc_list;
+  get_inc_list:
+    while (<CPP>) {
+      last if ( /^End of search list./ );
+      chomp;
+      push(@OPTION_IGNORE, $1) if ( /^\s+(\S.*)\s*$/ );
+    }
+    close CPP;
+  end_get_inc_list:
+  
+  } elsif ( $OPTION_CPP eq "vc" ) {
+    &parseIgnore($ENV{include});
+
+  } elsif ( $OPTION_CPP eq "bcc32" ) {
+    ;
+  }
+}
+
+if ( 2 <= $OPTION_VERBOSE && !$OPTION_IGNORE_OK && 0 < @OPTION_IGNORE) {
+  print STDERR "The following system include directories are ignored.\n";
+  foreach $i (@OPTION_IGNORE) {
+    print STDERR "  " . $i . "\n";
+  }
+  print "\n";
+}
+
+
+###############################################################################
+# create cpp commandline
+
+
+foreach $i ( @OPTION_OPTIONS ) {
+  # quote
+  if ( $isWindows ) {
+    $i =~ s/\"/\"\"\"\"/g;
+  } else {
+    $i =~ s/\"/\\\"/g;
+  }
+  $commandline .= $i . " ";
+}
+
+
+###############################################################################
+# prepare output
+
+
+if ( $OPTION_FILENAME eq "-" ) {
+  binmode STDOUT;
+} else {
+  $bak = $OPTION_FILENAME . ".bak";
+  unlink $bak;
+  rename $OPTION_FILENAME, $bak;
+  open(MAKEFILEBAK, "<$bak") || die $!;
+  open(MAKEFILE, ">$OPTION_FILENAME") || die $!;
+  binmode MAKEFILE;
+  select MAKEFILE;
+  while (<MAKEFILEBAK>) {
+    chomp;
+    if ( /^\Q$OPTION_STRING\E/ ) {
+      if ( $OPTION_APPEND ) {
+	$OPTION_STRING = "";
+      } else {
+	last;
+      }
+    }
+    print $_ . $OPTION_NEWLINE;
+  }
+  close(MAKEFILEBAK);
+}
+
+if ( $OPTION_STRING ) {
+  print $OPTION_STRING . $OPTION_NEWLINE;
+  print $OPTION_NEWLINE;
+}
+
+
+###############################################################################
+# cpp
+
+
+sub getRelativeDirectory {
+  my($path) = @_;
+  if ( ( $ignoreCase  && "$path\n$ENV{PWD}" =~ m:^(.*)/(.*)\n\1/(.*)$:i ) ||
+       ( !$ignoreCase && "$path\n$ENV{PWD}" =~ m:^(.*)/(.*)\n\1/(.*)$:  ) ) {
+    my($path) = $2;
+    my($dir) = $3;
+    $dir =~ s:[^/]+:..:g;
+    return "$dir/$path";
+  } else {
+    return $path;
+  }
+}
+
+# make dependency information
+foreach $source ( @OPTION_SRCS ) {
+
+  $source = getRelativeDirectory($source);
+  if ( $OPTION_VERBOSE == 1 ) {
+    print STDERR "$source\n";
+  } elsif ( 2 <= $OPTION_VERBOSE ) {
+    print STDERR "Running preprocessor ...\n";
+    print STDERR "  $commandline $source\n";
+  }
+  
+  open(CXX, "$commandline $source|") || next;
+
+  my(%dependFiles);
+
+  while (<CXX>) {
+    chomp;
+    next if ( ! /$line/o );
+    $_ = $1;
+
+    # replace path delimiter
+    s/\Q$path_delimiter\E/\//og if ( $path_delimiter );
+
+    # exclude source file name
+    if ( $ignoreCase ) {
+      next if ( /^\Q$source\E$/i );
+    } else {
+      next if ( /^\Q$source\E$/ );
+    }
+    $dependFiles{$_} = 1;
+  }
+
+  close (CXX);
+
+  # output object filename
+  $source =~ s/(\.(C|c|cc|cxx|cpp)|)$/$OPTION_SUFFIX/;
+  print $OPTION_PREFIX . $source . ":";
+  $len = length($OPTION_PREFIX . $source . ":");
+
+  # output header filename
+ HEADER: foreach $i ( sort(keys(%dependFiles)) ) {
+
+    # exclude standard header file
+    foreach $j ( @OPTION_IGNORE ) {
+      next if ( $j eq "" );
+      if ( $ignoreCase ) {
+	next HEADER if ( $i =~ /^\Q$j\E/i );
+      } else {
+	next HEADER if ( $i =~ /^\Q$j\E/ );
+      }
+    }
+
+    # get relative directory
+    $i = &getRelativeDirectory($i);
+
+    # output
+    if ( $OPTION_WIDTH - 2 <= $len + length(" " . $i) ) {
+      printf " \\" . $OPTION_NEWLINE;
+      $len = 0;
+    }
+    print " ", $i;
+    $len += length(" " . $i);
+  }
+  print $OPTION_NEWLINE;
+}

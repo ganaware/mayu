@@ -5,6 +5,7 @@
 #include "keymap.h"
 #include "errormessage.h"
 #include "stringtool.h"
+#include <algorithm>
 
 
 using namespace std;
@@ -43,13 +44,15 @@ void KeySeq::clear()
 }
 
 
-KeySeq::KeySeq()
+KeySeq::KeySeq(const istring &i_name)
+  : m_name(i_name)
 {
 }
 
 
 KeySeq::KeySeq(const KeySeq &ks)
-  : actions(ks.actions)
+  : actions(ks.actions),
+    m_name(ks.m_name)
 {
   copy();
 }
@@ -91,6 +94,46 @@ KeySeq &KeySeq::add(const ActionFunction &af)
 {
   actions.push_back(new ActionFunction(af));
   return *this;
+}
+
+
+// stream output
+std::ostream &
+operator<<(std::ostream &i_ost, const KeySeq &i_ks)
+{
+  for (std::vector<Action *>::const_iterator
+	 i = i_ks.actions.begin(); i != i_ks.actions.end(); i ++)
+  {
+    switch ((*i)->type)
+    {
+      case Action::ActKey:
+	i_ost << ((ActionKey *)(*i))->modifiedKey;
+	break;
+      case Action::ActKeySeq:
+	i_ost << "$" << ((ActionKeySeq *)(*i))->keySeq->m_name;
+	break;
+      case Action::ActFunction:
+      {
+	ActionFunction *af = (ActionFunction *)(*i);
+	i_ost << af->modifier << *af->function;
+	if (af->args.size())
+	{
+	  i_ost << "(";
+	  for (ActionFunction::Args::iterator
+		 i = af->args.begin(); i != af->args.end(); i ++)
+	  {
+	    if (i != af->args.begin())
+	      i_ost << ", ";
+	    i_ost << *i;
+	  }
+	  i_ost << ")";
+	}
+	break;
+      }
+    }
+    i_ost << " ";
+  }
+  return i_ost;
 }
 
 
@@ -307,6 +350,49 @@ void Keymap::adjustModifier(Keyboard &keyboard)
   }
 }
 
+/// describe
+void Keymap::describe(std::ostream &i_ost, DescribedKeys *o_dk) const
+{
+  switch (type)
+  {
+    case TypeKeymap: i_ost << "keymap "; break;
+    case TypeWindowAnd: i_ost << "window "; break;
+    case TypeWindowOr: i_ost << "window "; break;
+  }
+  i_ost << name << " /.../";
+  if (parentKeymap)
+    i_ost << " : " << parentKeymap->name;
+  i_ost << " => " << *defaultKeySeq << endl;
+
+  typedef std::vector<KeyAssignment> SortedKeyAssignments;
+  SortedKeyAssignments ska;
+  for (size_t i = 0; i < lengthof_hashedKeyAssignment; i ++)
+  {
+    const KeyAssignments &ka = hashedKeyAssignments[i];
+    for (KeyAssignments::const_iterator j = ka.begin(); j != ka.end(); j ++)
+      ska.push_back(*j);
+  }
+  std::sort(ska.begin(), ska.end());
+  for (SortedKeyAssignments::iterator i = ska.begin(); i != ska.end(); i ++)
+  {
+    if (o_dk)
+    {
+      DescribedKeys::iterator
+	j = find(o_dk->begin(), o_dk->end(), i->modifiedKey);
+      if (j != o_dk->end())
+	continue;
+    }
+    i_ost << " key " << i->modifiedKey << "\t=> " << *i->keySeq << endl;
+    if (o_dk)
+      o_dk->push_back(i->modifiedKey);
+  }
+  i_ost << endl;
+
+  if (parentKeymap)
+    parentKeymap->describe(i_ost, o_dk);
+}
+
+
 
 // ////////////////////////////////////////////////////////////////////////////
 // Keymaps
@@ -365,25 +451,24 @@ void Keymaps::adjustModifier(Keyboard &keyboard)
 
 
 // add a named keyseq (name can be empty)
-KeySeq *KeySeqs::add(const istring &name, const KeySeq &keySeq)
+KeySeq *KeySeqs::add(const KeySeq &keySeq)
 {
-  if (!name.empty())
+  if (!keySeq.getName().empty())
   {
-    KeySeq *ks = searchByName(name);
+    KeySeq *ks = searchByName(keySeq.getName());
     if (ks)
       return &(*ks = keySeq);
   }
-  namedKeySeqs.push_front(NamedKeySeq(name, keySeq));
-  return &namedKeySeqs.front().keySeq;
+  keySeqList.push_front(keySeq);
+  return &keySeqList.front();
 }
 
 
 // search by name
 KeySeq *KeySeqs::searchByName(const istring &name)
 {
-  for (NamedKeySeqs::iterator i = namedKeySeqs.begin();
-       i != namedKeySeqs.end(); i++)
-    if ((*i).name == name)
-      return &(*i).keySeq;
+  for (KeySeqList::iterator i = keySeqList.begin(); i != keySeqList.end(); i++)
+    if ((*i).getName() == name)
+      return &(*i);
   return NULL;
 }

@@ -29,6 +29,9 @@ DEBUG_FLAG	=
 conxlibsmt	= $(conlibsmt) libcpmt.lib
 guixlibsmt	= $(guilibsmt) libcpmt.lib
 
+DEPENDFLAGS	= --cpp=vc --ignore="$(INCLUDE)" \
+		-GX $(cdebug) $(cflags) $(cvarsmt) $(DEFINES) $(DEBUG_FLAG)
+
 
 # tools		###############################################################
 

@@ -189,37 +189,21 @@ void Engine::outputToLog(const Key *key, const ModifiedKey &mkey,
     return;
   }
   
-  log << "  ";
+  log << "  " << mkey << endl;
+}
+
+
+// describe bindings
+void Engine::describeBindings()
+{
+  Acquire a(&log, 0);
+
+  Keymap::DescribedKeys dk;
   
-  const static struct
-  {
-    Modifier::Type mt;
-    const char *symbol;
-  } mods[] =
-    {
-      { Modifier::Up, "U-" }, { Modifier::Down, "  " },
-      { Modifier::Shift, "S-" }, { Modifier::Alt, "A-" },
-      { Modifier::Control, "C-" }, { Modifier::Windows, "W-" },
-      { Modifier::ImeLock, "IL-" }, { Modifier::ImeComp, "IC-" },
-      { Modifier::ImeComp, "I-" }, { Modifier::NumLock, "NL-" },
-      { Modifier::CapsLock, "CL-" }, { Modifier::ScrollLock, "SL-" },
-      { Modifier::Mod0, "M0-" }, { Modifier::Mod1, "M1-" },
-      { Modifier::Mod2, "M2-" }, { Modifier::Mod3, "M3-" },
-      { Modifier::Mod4, "M4-" }, { Modifier::Mod5, "M5-" },
-      { Modifier::Mod6, "M6-" }, { Modifier::Mod7, "M7-" },
-      { Modifier::Mod8, "M8-" }, { Modifier::Mod9, "M9-" },
-      { Modifier::Lock0, "L0-" }, { Modifier::Lock1, "L1-" },
-      { Modifier::Lock2, "L2-" }, { Modifier::Lock3, "L3-" },
-      { Modifier::Lock4, "L4-" }, { Modifier::Lock5, "L5-" },
-      { Modifier::Lock6, "L6-" }, { Modifier::Lock7, "L7-" },
-      { Modifier::Lock8, "L8-" }, { Modifier::Lock9, "L9-" },
-    };
-  for (i = 0; i < lengthof(mods); i++)
-    if (!mkey.modifier.isDontcare(mods[i].mt) &&
-	mkey.modifier.isPressed(mods[i].mt))
-      log << mods[i].symbol;
-  
-  log << mkey.key->getName() << endl;
+  for (std::list<Keymap *>::iterator i = currentFocusOfThread->keymaps.begin();
+       i != currentFocusOfThread->keymaps.end(); i ++)
+    (*i)->describe(log, &dk);
+  log << endl;
 }
 
 
@@ -606,6 +590,18 @@ void Engine::generateActionEvents(const Current &c, const Action *a,
 	    Sleep(ms);
 	    cs.acquire();
 	    isSynchronizing = false;
+	    break;
+	  }
+
+	  case Function::DescribeBindings:
+	  {
+	    if (!is_down)
+	      break;
+	    {
+	      Acquire a(&log, 1);
+	      log << endl;
+	    }
+	    describeBindings();
 	    break;
 	  }
 	  
