@@ -11,37 +11,6 @@
 #include "keyque.c"
 
 ///////////////////////////////////////////////////////////////////////////////
-// Protorypes (TODO)
-
-
-NTSTATUS DriverEntry       (IN PDRIVER_OBJECT, IN PUNICODE_STRING);
-VOID mayuUnloadDriver      (IN PDRIVER_OBJECT);
-VOID mayuDetourReadCancel (IN PDEVICE_OBJECT, IN PIRP);
-
-NTSTATUS filterGenericCompletion (IN PDEVICE_OBJECT, IN PIRP, IN PVOID);
-NTSTATUS filterReadCompletion    (IN PDEVICE_OBJECT, IN PIRP, IN PVOID);
-
-NTSTATUS mayuGenericDispatch (IN PDEVICE_OBJECT, IN PIRP);
-NTSTATUS detourCreate        (IN PDEVICE_OBJECT, IN PIRP);
-NTSTATUS detourClose         (IN PDEVICE_OBJECT, IN PIRP);
-NTSTATUS detourRead          (IN PDEVICE_OBJECT, IN PIRP);
-NTSTATUS detourWrite         (IN PDEVICE_OBJECT, IN PIRP);
-NTSTATUS detourCleanup       (IN PDEVICE_OBJECT, IN PIRP);
-NTSTATUS detourDeviceControl (IN PDEVICE_OBJECT, IN PIRP);
-NTSTATUS filterRead          (IN PDEVICE_OBJECT, IN PIRP);
-NTSTATUS filterPassThrough   (IN PDEVICE_OBJECT, IN PIRP);
-#ifndef MAYUD_NT4
-NTSTATUS detourPower         (IN PDEVICE_OBJECT, IN PIRP);
-NTSTATUS filterPower         (IN PDEVICE_OBJECT, IN PIRP);
-#endif // !MAYUD_NT4
-
-
-#ifdef ALLOC_PRAGMA
-#pragma alloc_text( init, DriverEntry )
-#endif // ALLOC_PRAGMA
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Device Extensions
 
 struct _DetourDeviceExtension;
@@ -71,6 +40,38 @@ typedef struct _FilterDeviceExtension
   PIRP irpq;
   KeyQue readQue; // when IRP_MJ_READ, the contents of readQue are returned
 } FilterDeviceExtension;
+
+///////////////////////////////////////////////////////////////////////////////
+// Protorypes (TODO)
+
+
+NTSTATUS DriverEntry       (IN PDRIVER_OBJECT, IN PUNICODE_STRING);
+VOID mayuUnloadDriver      (IN PDRIVER_OBJECT);
+VOID mayuDetourReadCancel (IN PDEVICE_OBJECT, IN PIRP);
+
+NTSTATUS filterGenericCompletion (IN PDEVICE_OBJECT, IN PIRP, IN PVOID);
+NTSTATUS filterReadCompletion    (IN PDEVICE_OBJECT, IN PIRP, IN PVOID);
+
+NTSTATUS mayuGenericDispatch (IN PDEVICE_OBJECT, IN PIRP);
+NTSTATUS detourCreate        (IN PDEVICE_OBJECT, IN PIRP);
+NTSTATUS detourClose         (IN PDEVICE_OBJECT, IN PIRP);
+NTSTATUS detourRead          (IN PDEVICE_OBJECT, IN PIRP);
+NTSTATUS detourWrite         (IN PDEVICE_OBJECT, IN PIRP);
+NTSTATUS detourCleanup       (IN PDEVICE_OBJECT, IN PIRP);
+NTSTATUS detourDeviceControl (IN PDEVICE_OBJECT, IN PIRP);
+NTSTATUS filterRead          (IN PDEVICE_OBJECT, IN PIRP);
+NTSTATUS filterPassThrough   (IN PDEVICE_OBJECT, IN PIRP);
+#ifndef MAYUD_NT4
+NTSTATUS detourPower         (IN PDEVICE_OBJECT, IN PIRP);
+NTSTATUS filterPower         (IN PDEVICE_OBJECT, IN PIRP);
+#endif // !MAYUD_NT4
+
+NTSTATUS readq(KeyQue*, PIRP);
+
+#ifdef ALLOC_PRAGMA
+#pragma alloc_text( init, DriverEntry )
+#endif // ALLOC_PRAGMA
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Global Constants / Variables
@@ -115,7 +116,7 @@ NTSTATUS DriverEntry(IN PDRIVER_OBJECT driverObject,
   FilterDeviceExtension *filterDevExt = NULL;
   
   UNREFERENCED_PARAMETER(registryPath);
-  
+
   // initialize global variables
   _IopInvalidDeviceRequest = driverObject->MajorFunction[IRP_MJ_CREATE];
   
@@ -301,7 +302,7 @@ VOID mayuDetourReadCancel(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
   DetourDeviceExtension *devExt =
     (DetourDeviceExtension *)deviceObject->DeviceExtension;
   KIRQL currentIrql;
-  
+
   IoReleaseCancelSpinLock(irp->CancelIrql);
   KeAcquireSpinLock(&devExt->lock, &currentIrql);
   if (devExt->irpq && irp == deviceObject->CurrentIrp)
@@ -370,12 +371,12 @@ NTSTATUS filterReadCompletion(IN PDEVICE_OBJECT deviceObject,
   } else {
     status = STATUS_SUCCESS;
   }
-  if (irp->IoStatus.Status == STATUS_SUCCESS)
+
+  if (detourDevExt->isOpen)
   {
     KeAcquireSpinLock(&detourDevExt->lock, &currentIrql);
-    IoAcquireCancelSpinLock(&cancelIrql);
-    if (detourDevExt->isOpen)
-      // if detour is opened, key datum are forwarded to detour
+    // if detour is opened, key datum are forwarded to detour
+    if (irp->IoStatus.Status == STATUS_SUCCESS)
     {
       PIO_STACK_LOCATION irpSp = IoGetCurrentIrpStackLocation(irp);
       
@@ -385,34 +386,50 @@ NTSTATUS filterReadCompletion(IN PDEVICE_OBJECT deviceObject,
 
       irp->IoStatus.Status = STATUS_CANCELLED;
       irp->IoStatus.Information = 0;
-      irpCancel = detourDevObj->CurrentIrp;
     }
 
     if (detourDevExt->irpq) {
-      PIO_STACK_LOCATION irpSp;
-      ULONG len;
-
-      IoSetCancelRoutine(detourDevExt->irpq, NULL);
-      irpSp = IoGetCurrentIrpStackLocation(detourDevExt->irpq);
-      len = KqDeque(&detourDevExt->readQue,
-		    (KEYBOARD_INPUT_DATA *)detourDevExt->irpq->AssociatedIrp.SystemBuffer,
-		    irpSp->Parameters.Read.Length / sizeof(KEYBOARD_INPUT_DATA));
-
-      detourDevExt->irpq->IoStatus.Status = STATUS_SUCCESS;
-      detourDevExt->irpq->IoStatus.Information =
-	len * sizeof(KEYBOARD_INPUT_DATA);
-      irpSp->Parameters.Read.Length = detourDevExt->irpq->IoStatus.Information;
-      IoCompleteRequest(detourDevExt->irpq, IO_NO_INCREMENT);
-      detourDevExt->irpq = NULL;
+      if (readq(&detourDevExt->readQue, detourDevExt->irpq) ==
+	  STATUS_SUCCESS) {
+	IoAcquireCancelSpinLock(&cancelIrql);
+	IoSetCancelRoutine(detourDevExt->irpq, NULL);
+	IoReleaseCancelSpinLock(cancelIrql);
+	IoCompleteRequest(detourDevExt->irpq, IO_NO_INCREMENT);
+	detourDevExt->irpq = NULL;
+      }
     }
-    IoReleaseCancelSpinLock(cancelIrql);
     KeReleaseSpinLock(&detourDevExt->lock, currentIrql);
+
+    KeAcquireSpinLock(&filterDevExt->lock, &currentIrql);
+    status = readq(&filterDevExt->readQue, irp);
+    KeReleaseSpinLock(&filterDevExt->lock, currentIrql);
   }
+
   if (status == STATUS_SUCCESS)
     irp->IoStatus.Status = STATUS_SUCCESS;
   return status;
 }
 
+NTSTATUS readq(KeyQue *readQue, PIRP irp)
+{
+  if (!KqIsEmpty(readQue)) {
+    PIO_STACK_LOCATION irpSp;
+    ULONG len;
+
+    irpSp = IoGetCurrentIrpStackLocation(irp);
+    len = KqDeque(readQue,
+		  (KEYBOARD_INPUT_DATA *)irp->AssociatedIrp.SystemBuffer,
+		  irpSp->Parameters.Read.Length / sizeof(KEYBOARD_INPUT_DATA));
+    irp->IoStatus.Status = STATUS_SUCCESS;
+    irp->IoStatus.Information = len * sizeof(KEYBOARD_INPUT_DATA);
+    //    irpSp->Parameters.Read.Length = irp->IoStatus.Information;
+    return STATUS_SUCCESS;
+  } else {
+    irp->IoStatus.Status = STATUS_PENDING;
+    irp->IoStatus.Information = 0;
+    return STATUS_PENDING;
+  }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Dispatch Functions
@@ -493,28 +510,24 @@ NTSTATUS detourRead(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
   PIO_STACK_LOCATION irpSp = IoGetCurrentIrpStackLocation(irp);
   DetourDeviceExtension *detourDevExt =
     (DetourDeviceExtension*)deviceObject->DeviceExtension;
+  KIRQL currentIrql;
 
+  KeAcquireSpinLock(&detourDevExt->lock, &currentIrql);
   if (irpSp->Parameters.Read.Length == 0)
     status = STATUS_SUCCESS;
   else if (irpSp->Parameters.Read.Length % sizeof(KEYBOARD_INPUT_DATA))
     status = STATUS_BUFFER_TOO_SMALL;
   else
-    status = STATUS_PENDING;
-  irp->IoStatus.Status = status;
-  irp->IoStatus.Information = 0;
-  if (status == STATUS_PENDING)
-  {
-    KIRQL currentIrql;
-
+    status = readq(&detourDevExt->readQue, irp);
+  if (status == STATUS_PENDING) {
     IoMarkIrpPending(irp);
-    KeAcquireSpinLock(&detourDevExt->lock, &currentIrql);
     detourDevExt->irpq = irp;
     IoSetCancelRoutine(irp, mayuDetourReadCancel);
-    KeReleaseSpinLock(&detourDevExt->lock, currentIrql);
   }
   else {
     IoCompleteRequest(irp, IO_NO_INCREMENT);
   }
+  KeReleaseSpinLock(&detourDevExt->lock, currentIrql);
   return status;
 }
 
@@ -546,7 +559,7 @@ NTSTATUS detourWrite(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
     IoAcquireCancelSpinLock(&cancelIrql);
     
     len /= sizeof(KEYBOARD_INPUT_DATA);
-    len = KqEnque(&detourDevExt->readQue,
+    len = KqEnque(&filterDevExt->readQue,
 		  (KEYBOARD_INPUT_DATA *)irp->AssociatedIrp.SystemBuffer,
 		  len);
     irp->IoStatus.Information = len * sizeof(KEYBOARD_INPUT_DATA);
@@ -701,26 +714,14 @@ NTSTATUS filterRead(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
       status = STATUS_SUCCESS;
     else if (len % sizeof(KEYBOARD_INPUT_DATA))
       status = STATUS_BUFFER_TOO_SMALL;
-    else if (KqIsEmpty(&detourDevExt->readQue))
-      status = STATUS_PENDING;
     else
-    {
-      len = KqDeque(&detourDevExt->readQue,
-		    (KEYBOARD_INPUT_DATA *)irp->AssociatedIrp.SystemBuffer,
-		    len / sizeof(KEYBOARD_INPUT_DATA));
-	
-      irp->IoStatus.Information = len * sizeof(KEYBOARD_INPUT_DATA);
-      irpSp->Parameters.Read.Length = irp->IoStatus.Information;
-      status = STATUS_SUCCESS;
-    }
-
-    if (status != STATUS_PENDING)
-    {
+      status = readq(&filterDevExt->readQue, irp);
+    KeReleaseSpinLock(&detourDevExt->lock, currentIrql);
+    if (status != STATUS_PENDING) {
       irp->IoStatus.Status = status;
       IoCompleteRequest(irp, IO_NO_INCREMENT);
       return status;
     }
-    KeReleaseSpinLock(&detourDevExt->lock, currentIrql);
   }
   KeAcquireSpinLock(&filterDevExt->lock, &currentIrql);
   filterDevExt->irpq = irp;
