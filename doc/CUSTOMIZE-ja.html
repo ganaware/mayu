@@ -431,8 +431,8 @@
 		  <p><code>mod0</code>〜<code>mod9</code> は「窓使いの憂鬱」の中でのみ有効なモディファイヤで、例えば以下のように使用します。</p>
 		  
 		  <p class="sample">
-		  mod mod0 = ↑<br>
-		  key M0-← = ← ↑
+		  mod mod0 = Up<br>
+		  key M0-Left = Left Up
 		  </p>
 		  
 		  <p class="continue">このように割り当てると、<kbd>[↑]</kbd> を押しながら <kbd>[←]</kbd> を押すとカーソルが左斜め上へ移動することになります。</p>
@@ -461,10 +461,12 @@
 			  <p class="continue">その<em>モディファイヤキー名</em>に割り当てられているモディファイヤを全て<em>真のモディファイヤ</em>に変更します。</p>
 			</div>
 			
-		    <dt class="h3"><a name="oneShotModifier">One Shot モディファイヤ</a>
+		    <dt class="h3"><a name="oneShotModifier">One Shot モディファイヤ (SandS)</a>
 			
 		    <dd class="d3">
 			<div>
+			  <p>(一般的には SandS と呼ばれている機能です。Space and Shift の略)</p>
+			  
 			  <p>モディファイヤにしたいキーの前に "<code>!!</code>" を付けると、<em>One Shot モディファイヤ</em>になります。たとえば、</p>
 			  
 			  <p class="sample">
@@ -491,7 +493,7 @@
 			  <p><em>One Shot モディファイヤ</em>は通常キーリピートしませんが、"<code>!!!</code>" を付けると、キーリピートをするようになります。たとえば、</p>
 			  
 			  <p class="sample">
-			  mod shift = !!!↑<br>
+			  mod shift = !!!Up<br>
 			  </p>
 			  
 			  <p>とすると、<kbd>[↑]</kbd> を押しながら何か別のキー (例えば <kbd>[A]</kbd>) を押すと <kbd>[Shift]</kbd> + <kbd>[A]</kbd> と同じことになりますが、<kbd>[↑]</kbd> を押しっぱなしにすると <kbd>[↑]</kbd> がキーリピートして、カーソルが上へ動くということになります。</p>
@@ -1095,7 +1097,7 @@
 		    <dd class="d3">
 			<div>
 			  <p>IMEのON/OFFを切り替えます。<code><em>status</em></code>は<code>on</code>, <code>off</code>, <code>toggle</code>のいずれかで、省略時は<code>toggle</code>として扱われます。</p>
-			  <p>MSーIME2002/2003と一部のアプリケーション(例えばMS Word2002/2003)の組み合わせでは「詳細なテキストサービス」を無効にしない限り機能しません。</p>
+			  <p>MS-IME2002/2003と一部のアプリケーション(例えばMS Word2002/2003)の組み合わせでは「詳細なテキストサービス」を無効にしない限り機能しません。</p>
 			</div>
 			
 		    <dt class="h3"><a name="function_SetImeString"><code>&amp;SetImeString(<em>text</em>)</code></a>

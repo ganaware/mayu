@@ -28,7 +28,8 @@ em {
 }
 kbd {
   font-weight:bold;
-  font-family:Courier New,monospace;
+  /*font-family:Courier New,monospace;*/
+  font-family: monospace;
   color:#55a;
 }
 p.noindent {
@@ -237,6 +238,7 @@ p.noindent {
   border-style: solid;
   margin-left:4pt;
   background-color:#fff;
+  overflow:auto;
 }
 
 .manual .bug {
@@ -295,3 +297,4 @@ p.tree {
 p.tree span {
   color:#55a;
 }
+
