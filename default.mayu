@@ -81,10 +81,10 @@ keymap Global
 
  if ( KBD109 )
    mod control += âpêî				# âpêîÇ Control Ç…
-   key *âpêî		=> *LControl		#	ÅV
+   def subst *âpêî	=> *LControl		#	ÅV
  else
    mod control += CapsLock			# CapsLock Ç Control Ç…
-   key *CapsLock	=> *LControl		#	ÅV
+   def subst *CapsLock	=> *LControl		#	ÅV
  endif
 
  if ( GANA )
@@ -125,10 +125,10 @@ keymap Global
 keymap	KeymapDefault => &Default
  if ( KBD109 )
    mod control += âpêî				# âpêîÇ Control Ç…
-   key *âpêî		=> *LControl		#	ÅV
+   def subst *âpêî	=> *LControl		#	ÅV
  else
    mod control += CapsLock			# CapsLock Ç Control Ç…
-   key *CapsLock	=> *LControl		#	ÅV
+   def subst *CapsLock	=> *LControl		#	ÅV
  endif
  if ( GANA )
    if ( KBD109 )
