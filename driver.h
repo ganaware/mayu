@@ -22,12 +22,8 @@
 
 #  endif
 
-/// Ioctl value (equivalent to CancelIo API)
-#  define IOCTL_MAYU_DETOUR_CANCEL					 \
-CTL_CODE(FILE_DEVICE_KEYBOARD, 0x801, METHOD_BUFFERED, FILE_ANY_ACCESS)
-
-#  define IOCTL_MAYU_GET_VERSION					 \
-CTL_CODE(FILE_DEVICE_KEYBOARD, 0x802, METHOD_BUFFERED, FILE_ANY_ACCESS)
+/// Ioctl value
+#include "d/ioctl.h"
 
 
 /// derived from w2kddk/inc/ntddkbd.h
