@@ -287,7 +287,8 @@ void Engine::generateKeyEvent(Key *i_key, bool i_doPress, bool i_isByAssign)
 	kid.Flags |= KEYBOARD_INPUT_DATA::BREAK;
       DWORD len;
 #if defined(_WINNT)
-      CHECK_TRUE( WriteFile(m_device, &kid, sizeof(kid), &len, NULL) );
+      WriteFile(m_device, &kid, sizeof(kid), &len, &m_ol);
+      CHECK_TRUE( GetOverlappedResult(m_device, &m_ol, &len, TRUE) );
 #elif defined(_WIN95)
       DeviceIoControl(m_device, 2, &kid, sizeof(kid), NULL, 0, &len, NULL);
 #else
@@ -644,6 +645,11 @@ void Engine::keyboardHandler(void *i_this)
 }
 void Engine::keyboardHandler()
 {
+#if defined(_WINNT)
+  m_ol.Offset = 0;
+  m_ol.OffsetHigh = 0;
+  m_ol.hEvent = m_eEvent;
+#endif // _WINNT
   // initialize ok
   CHECK_TRUE( SetEvent(m_eEvent) );
     
@@ -654,18 +660,34 @@ void Engine::keyboardHandler()
     KEYBOARD_INPUT_DATA kid;
     
     DWORD len;
-    if (
 #if defined(_WINNT)
-      !ReadFile(m_device, &kid, sizeof(kid), &len, NULL)
+    if (!ReadFile(m_device, &kid, sizeof(kid), &len, &m_ol))
+    {
+      switch (GetLastError())
+      {
+        case ERROR_IO_PENDING:
+	  // m_eEvent is signaled when either key input or Engine::stop
+	  if (WaitForSingleObject(m_eEvent, INFINITE) == WAIT_OBJECT_0)
+	    if (m_doForceTerminate)
+	    {
+	      CancelIo(m_device);
+	      continue;
+	    }
+	  if (!GetOverlappedResult(m_device, &m_ol, &len, FALSE))
+	    continue;
+	  break;
+        default:
+	  continue;
+      }
+    }
 #elif defined(_WIN95)
-      !DeviceIoControl(m_device, 1, NULL, 0, &kid, sizeof(kid), &len, NULL)
-#else
-#  error
-#endif
-      )
+    if (!DeviceIoControl(m_device, 1, NULL, 0, &kid, sizeof(kid), &len, NULL))
     {
       continue; // TODO
     }
+#else
+#  error
+#endif
 
     checkFocusWindow();
 
@@ -681,7 +703,8 @@ void Engine::keyboardHandler()
       else
       {
 #if defined(_WINNT)
-	WriteFile(m_device, &kid, sizeof(kid), &len, NULL);
+	WriteFile(m_device, &kid, sizeof(kid), &len, &m_ol);
+	GetOverlappedResult(m_device, &m_ol, &len, TRUE);
 #elif defined(_WIN95)
 	DeviceIoControl(m_device, 2, &kid, sizeof(kid), NULL, 0, &len, NULL);
 #else
@@ -698,7 +721,8 @@ void Engine::keyboardHandler()
 	!m_currentKeymap)
     {
 #if defined(_WINNT)
-      WriteFile(m_device, &kid, sizeof(kid), &len, NULL);
+      WriteFile(m_device, &kid, sizeof(kid), &len, &m_ol);
+      GetOverlappedResult(m_device, &m_ol, &len, TRUE);
 #elif defined(_WIN95)
       DeviceIoControl(m_device, 2, &kid, sizeof(kid), NULL, 0, &len, NULL);
 #else
@@ -881,7 +905,8 @@ Engine::Engine(tomsgstream &i_log)
   // open mayu m_device
 #if defined(_WINNT)
   m_device = CreateFile(MAYU_DEVICE_FILE_NAME, GENERIC_READ | GENERIC_WRITE,
-			0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+			0, NULL, OPEN_EXISTING,
+			FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, NULL);
 #elif defined(_WIN95)
   m_device = CreateFile(MAYU_DEVICE_FILE_NAME, 0,
 			0, NULL, CREATE_NEW, FILE_FLAG_DELETE_ON_CLOSE, NULL);
@@ -908,7 +933,8 @@ Engine::Engine(tomsgstream &i_log)
     
     // open mayu m_device
     m_device = CreateFile(MAYU_DEVICE_FILE_NAME, GENERIC_READ | GENERIC_WRITE,
-			  0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+			  0, NULL, OPEN_EXISTING,
+			  FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, NULL);
     if (m_device == INVALID_HANDLE_VALUE)
 #endif // _WINNT
       throw ErrorMessage() << loadString(IDS_driverNotInstalled);
@@ -936,9 +962,8 @@ void Engine::stop()
     m_doForceTerminate = true;
     do
     {
-      // cancel m_device ... TODO: this does not work on W2k
 #if defined(_WINNT)
-      CancelIo(m_device);
+      SetEvent(m_eEvent);
 #elif defined(_WIN95)
       DeviceIoControl(m_device, 3, NULL, 0, NULL, 0, NULL, NULL);
 #endif

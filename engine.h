@@ -149,6 +149,10 @@ private:
   bool m_didMayuStartDevice;			/** Did the mayu start the
                                                     mayu-device ? */
   HANDLE m_eEvent;				/// event for engine thread
+#if defined(_WINNT)
+  OVERLAPPED m_ol;				/** for async read/write of
+						    mayu device */
+#endif // _WINNT
   bool volatile m_doForceTerminate;		/// terminate engine thread
   bool volatile m_isLogMode;			/// is logging mode ?
   bool volatile m_isEnabled;			/// is enabled  ?
