@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# mayu file syntax version 0.04 by GANA
+# mayu file syntax
 #
 ###############################################################################
 
@@ -248,6 +248,7 @@
 		| <ARGUMENT_VK>
 		| <ARGUMENT_SHOW_WINDOW>
 		| <ARGUMENT_WINDOW>
+		| <ARGUMENT_TARGET_WINDOW_TYPE>
 		| <ASSIGN_MODIFIER>*
 		| <bool>
 
@@ -270,6 +271,8 @@
 		| "toMainWindow"
 		| "toItself"
 		| "toParentWindow"
+
+	<ARGUMENT_TARGET_WINDOW_TYPE> : "overlapped" | "mdi"
 
 # Local Variables:
 # mode: text

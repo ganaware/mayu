@@ -239,6 +239,8 @@
 		  </ul>
 		  </div>
 
+		  <p>WindowsNT/2000 版では、"<code>.</code>" は必ず 1 文字にマッチしますが、Windows9x 版では漢字などは 2 文字分 ("<code>.</code>") を占めることに注意してください。</p>
+
 	      <dt class="h3"><a name="parentKeymap">親キーマップ</a>
 		  
 	      <dd class="d3">
@@ -1139,6 +1141,7 @@
 			<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|</code><br>
 			<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---</code>contrib/ ...<br>
 			<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---</code>d/ ...<br>
+			<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---</code>d_win9x/ ...<br>
 			<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---</code>r/ ...<br>
 			<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---</code>s/ ...<br>
 			<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---</code>tools/ ...<br>
@@ -1158,16 +1161,18 @@
 			<p class="sample">
 			C:\Program Files\mayu&gt; nmake -f mayu-vc.mak nodebug=1
 			</p>
+			<p>Windows9x 用にコンパイルするには、<code>TARGETOS=WIN95</code> を引数に追加します。</p>
 			<p><code>s</code> ディレクトリ以下にはインストーラが、<code>d</code> ディレクトリ以下にはドライバのソースが入っているので、必要なら適当にコンパイルしてください。</p>
 			</div>
 
 		    <dt class="h4">Borland C++ 5.5 の場合
 		    <dd class="d4">
 			<div>
-			<p>Borland C++ 5.5 のコンパイラなどにパスを通しておいて、さらに <code>bcc.mak</code> の冒頭の注意に従ってライブラリパスに <code>lib/psdk</code> を含めてください。</p>
+			<p><em>(3.19 では未サポート)</em> Borland C++ 5.5 のコンパイラなどにパスを通しておいて、さらに <code>bcc.mak</code> の冒頭の注意に従ってライブラリパスに <code>lib/psdk</code> を含めてください。</p>
 			<p class="sample">
 			C:\Program Files\mayu&gt; make -f mayu-bcc.mak nodebug=1
 			</p>
+			<p>Windows9x 用にコンパイルするには、<code>TARGETOS=WIN95</code> を引数に追加します。</p>
 			<p><code>s</code> ディレクトリ以下のインストーラをコンパイルすることはできますが、<code>d</code> ディレクトリ以下にのドライバをコンパイルする方法は不明です。</p>
 			</div>
 		    <dt class="h4">デバッグ情報

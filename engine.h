@@ -262,7 +262,7 @@ private:
   void funcOtherWindowClass(FunctionParam *i_param);
   /// prefix key
   void funcPrefix(FunctionParam *i_param, const Keymap *i_keymap,
-		  bool i_doesIgnoreModifiers = true);
+		  BooleanType i_doesIgnoreModifiers = BooleanType_true);
   /// other keymap's key
   void funcKeymap(FunctionParam *i_param, const Keymap *i_keymap);
   /// sync
@@ -308,38 +308,58 @@ private:
   /// show variable
   void funcHelpVariable(FunctionParam *i_param, const tstring &i_title);
   /// raise window
-  void funcWindowRaise(FunctionParam *i_param, bool i_isMdi = false);
+  void funcWindowRaise(FunctionParam *i_param,
+		       TargetWindowType i_twt = TargetWindowType_overlapped);
   /// lower window
-  void funcWindowLower(FunctionParam *i_param, bool i_isMdi = false);
+  void funcWindowLower(FunctionParam *i_param, 
+		       TargetWindowType i_twt = TargetWindowType_overlapped);
   /// minimize window
-  void funcWindowMinimize(FunctionParam *i_param, bool i_isMdi = false);
+  void funcWindowMinimize(FunctionParam *i_param, TargetWindowType i_twt
+			  = TargetWindowType_overlapped);
   /// maximize window
-  void funcWindowMaximize(FunctionParam *i_param, bool i_isMdi = false);
+  void funcWindowMaximize(FunctionParam *i_param, TargetWindowType i_twt
+			  = TargetWindowType_overlapped);
   /// maximize window horizontally
-  void funcWindowHMaximize(FunctionParam *i_param, bool i_isMdi = false);
+  void funcWindowHMaximize(FunctionParam *i_param, TargetWindowType i_twt
+			   = TargetWindowType_overlapped);
   /// maximize window virtically
-  void funcWindowVMaximize(FunctionParam *i_param, bool i_isMdi = false);
+  void funcWindowVMaximize(FunctionParam *i_param, TargetWindowType i_twt
+			   = TargetWindowType_overlapped);
   /// maximize window virtically or horizontally
-  void funcWindowHVMaximize(FunctionParam *i_param, bool i_isHorizontal,
-			    bool i_isMdi = false);
+  void funcWindowHVMaximize(FunctionParam *i_param, BooleanType i_isHorizontal,
+			    TargetWindowType i_twt
+			    = TargetWindowType_overlapped);
   /// move window
   void funcWindowMove(FunctionParam *i_param, int i_dx, int i_dy,
-		      bool i_isMdi = false);
+		      TargetWindowType i_twt
+		      = TargetWindowType_overlapped);
   /// move window to ...
   void funcWindowMoveTo(FunctionParam *i_param, GravityType i_gravityType,
-			int i_dx, int i_dy, bool i_isMdi = false);
+			int i_dx, int i_dy, TargetWindowType i_twt
+			= TargetWindowType_overlapped);
   /// move window visibly
-  void funcWindowMoveVisibly(FunctionParam *i_param, bool i_isMdi = false);
+  void funcWindowMoveVisibly(FunctionParam *i_param, 
+			     TargetWindowType i_twt
+			     = TargetWindowType_overlapped);
   ///
-  void funcWindowClingToLeft(FunctionParam *i_param, bool i_isMdi = false);
+  void funcWindowClingToLeft(FunctionParam *i_param, 
+			     TargetWindowType i_twt
+			     = TargetWindowType_overlapped);
   ///
-  void funcWindowClingToRight(FunctionParam *i_param, bool i_isMdi = false);
+  void funcWindowClingToRight(FunctionParam *i_param, 
+			      TargetWindowType i_twt
+			      = TargetWindowType_overlapped);
   ///
-  void funcWindowClingToTop(FunctionParam *i_param, bool i_isMdi = false);
+  void funcWindowClingToTop(FunctionParam *i_param, 
+			    TargetWindowType i_twt
+			    = TargetWindowType_overlapped);
   ///
-  void funcWindowClingToBottom(FunctionParam *i_param, bool i_isMdi = false);
+  void funcWindowClingToBottom(FunctionParam *i_param, 
+			       TargetWindowType i_twt
+			       = TargetWindowType_overlapped);
   /// close window
-  void funcWindowClose(FunctionParam *i_param, bool i_isMdi = false);
+  void funcWindowClose(FunctionParam *i_param, 
+		       TargetWindowType i_twt = TargetWindowType_overlapped);
   /// toggle top-most flag of the window
   void funcWindowToggleTopMost(FunctionParam *i_param);
   /// identify the window
@@ -349,15 +369,16 @@ private:
   /// redraw the window
   void funcWindowRedraw(FunctionParam *i_param);
   /// resize window to
-  void funcWindowResizeTo(FunctionParam *i_param,
-			  int i_width, int i_height, bool i_isMdi = false);
+  void funcWindowResizeTo(FunctionParam *i_param, int i_width, int i_height, 
+			  TargetWindowType i_twt
+			  = TargetWindowType_overlapped);
   /// move the mouse cursor
   void funcMouseMove(FunctionParam *i_param, int i_dx, int i_dy);
   /// send a mouse-wheel-message to Windows
   void funcMouseWheel(FunctionParam *i_param, int i_delta);
   /// convert the contents of the Clipboard to upper case or lower case
   void funcClipboardChangeCase(FunctionParam *i_param,
-			       bool i_doesConvertToUpperCase);
+			       BooleanType i_doesConvertToUpperCase);
   /// convert the contents of the Clipboard to upper case
   void funcClipboardUpcaseWord(FunctionParam *i_param);
   /// convert the contents of the Clipboard to lower case

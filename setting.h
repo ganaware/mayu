@@ -53,7 +53,7 @@ public:
   class FunctionCreator
   {
   public:
-    const char *m_name;				/// 
+    const _TCHAR *m_name;			/// 
     FunctionData *m_creator;			/// 
   };
 
@@ -67,7 +67,7 @@ private:
   bool m_isThereAnyError;			/// is there any error ?
 
   SyncObject *m_soLog;				/// guard log output stream
-  std::wostream *m_log;				/// log output stream
+  tostream *m_log;				/// log output stream
   
   tstringi m_currentFilename;			/// current filename
   
@@ -122,6 +122,9 @@ private:
   void load_ARGUMENT(MayuDialogType *o_arg);	/// &lt;ARGUMENT&gt;
   void load_ARGUMENT(ModifierLockType *o_arg);	/// &lt;ARGUMENT_LOCK&gt;
   void load_ARGUMENT(ShowCommandType *o_arg);	///&lt;ARGUMENT_SHOW_WINDOW&gt;
+  void load_ARGUMENT(TargetWindowType *o_arg);
+					/// &lt;ARGUMENT_TARGET_WINDOW_TYPE&gt;
+  void load_ARGUMENT(BooleanType *o_arg);	/// &lt;bool&gt;
   void load_ARGUMENT(Modifier *o_arg);		/// &lt;ARGUMENT&gt;
   void load_ARGUMENT(const Keymap **o_arg);	/// &lt;ARGUMENT&gt;
   void load_ARGUMENT(const KeySeq **o_arg);	/// &lt;ARGUMENT&gt;
@@ -145,7 +148,7 @@ private:
 
 public:
   ///
-  SettingLoader(SyncObject *i_soLog, std::wostream *i_log);
+  SettingLoader(SyncObject *i_soLog, tostream *i_log);
 
   /// load setting
   bool load(Setting *o_setting, const tstringi &i_filename = _T(""));
@@ -153,7 +156,8 @@ public:
 
 
 /// get home directory path
-extern void getHomeDirectories(std::list<tstringi> *o_path);
+typedef std::list<tstringi> HomeDirectories;
+extern void getHomeDirectories(HomeDirectories *o_path);
 
 
 #endif // !_SETTING_H

@@ -305,6 +305,28 @@ tstring interpretMetaCharacters(const _TCHAR *i_str, size_t i_len,
 }
 
 
+#ifdef _MBCS
+// escape regexp special characters in MBCS trail bytes
+std::string guardRegexpFromMbcs(const char *i_str)
+{
+  size_t len = strlen(i_str);
+  std::auto_ptr<char> buf(new char[len * 2 + 1]);
+  char *p = buf.get();
+  while (*i_str)
+  {
+    if (_ismbblead(static_cast<u_char>(*i_str)) && i_str[1])
+    {
+      *p ++ = *i_str ++;
+      if (strchr(".*?+(){}[]^$", *i_str))
+	*p ++ = '\\';
+    }
+    *p ++ = *i_str ++;
+  }
+  return std::string(buf.get(), p);
+}
+#endif // !_MBCS
+
+
 // converter
 std::wstring to_wstring(const std::string &i_str)
 {

@@ -41,42 +41,48 @@ const SetupFile::Data g_setupFiles[] =
   { i_kind, i_os, _T(i_from), i_destination, _T(i_to) }
   
   // executables
-  SN(Dll , NT , "mayu.dll"		    , ToDest),
-  SN(File, NT , "mayu.exe"		    , ToDest),
-  SN(File, NT , "setup.exe"		    , ToDest),
+  SN(Dll , ALL, "mayu.dll"		    , ToDest),
+  SN(File, ALL, "mayu.exe"		    , ToDest),
+  SN(File, ALL, "setup.exe"		    , ToDest),
 					    
-  // drivers				    
+  // drivers
+#if defined(_WINNT)
   SN(File, NT , "mayud.sys"		    , ToDest),
   SN(File, NT , "mayudnt4.sys"		    , ToDest),
   DN(File, W2k, "mayud.sys"		    , ToDriver, "mayud.sys"),
   DN(File, NT4, "mayudnt4.sys"		    , ToDriver, "mayud.sys"),
+#elif defined(_WIN95)
+  SN(File, W9x, "mayud.vxd"		    , ToDest),
+#else
+#  error
+#endif
 					    
   // setting files			    
-  SN(File, NT , "104.mayu"		    , ToDest),
-  SN(File, NT , "104on109.mayu"		    , ToDest),
-  SN(File, NT , "109.mayu"		    , ToDest),
-  SN(File, NT , "109on104.mayu"		    , ToDest),
-  SN(File, NT , "default.mayu"		    , ToDest),
-  SN(File, NT , "dot.mayu"		    , ToDest),
-  SN(File, NT , "emacsedit.mayu"	    , ToDest),
+  SN(File, ALL, "104.mayu"		    , ToDest),
+  SN(File, ALL, "104on109.mayu"		    , ToDest),
+  SN(File, ALL, "109.mayu"		    , ToDest),
+  SN(File, ALL, "109on104.mayu"		    , ToDest),
+  SN(File, ALL, "default.mayu"		    , ToDest),
+  SN(File, ALL, "dot.mayu"		    , ToDest),
+  SN(File, ALL, "emacsedit.mayu"	    , ToDest),
 					    
   // documents				    
-  SN(File, NT , "CONTENTS.html"		    , ToDest),
-  SN(File, NT , "CUSTOMIZE.html"	    , ToDest),
-  SN(File, NT , "MANUAL.html"		    , ToDest),
-  SN(File, NT , "README.css"		    , ToDest),
-  SN(File, NT , "README.html"		    , ToDest),
-  SN(File, NT , "mayu-banner.png"	    , ToDest),
-  SN(File, NT , "syntax.txt"		    , ToDest),
-  SN(File, NT , "mayu-mode.el"		    , ToDest),
+  SN(File, ALL, "CONTENTS.html"		    , ToDest),
+  SN(File, ALL, "CUSTOMIZE.html"	    , ToDest),
+  SN(File, ALL, "MANUAL.html"		    , ToDest),
+  SN(File, ALL, "README.css"		    , ToDest),
+  SN(File, ALL, "README.html"		    , ToDest),
+  SN(File, ALL, "mayu-banner.png"	    , ToDest),
+  SN(File, ALL, "syntax.txt"		    , ToDest),
+  SN(File, ALL, "mayu-mode.el"		    , ToDest),
 					    
-  SN(File, NT , "source.cab"		    , ToDest),
+  SN(File, ALL, "source.cab"		    , ToDest),
 					    
-  SN(Dir , NT , "contrib"		    , ToDest), // mkdir
-  SN(File, NT , "contrib\\mayu-settings.txt", ToDest),
-  SN(File, NT , "contrib\\dvorak.mayu"	    , ToDest),
-  SN(File, NT , "contrib\\keitai.mayu"	    , ToDest),
-  SN(File, NT , "contrib\\ax.mayu"	    , ToDest),
+  SN(Dir , ALL, "contrib"		    , ToDest), // mkdir
+  SN(File, ALL, "contrib\\mayu-settings.txt", ToDest),
+  SN(File, ALL, "contrib\\dvorak.mayu"	    , ToDest),
+  SN(File, ALL, "contrib\\keitai.mayu"	    , ToDest),
+  SN(File, ALL, "contrib\\ax.mayu"	    , ToDest),
 };
 
 
@@ -158,6 +164,7 @@ private:
     if (g_wasExecutedBySFX)
       removeSrcFiles(g_setupFiles, NUMBER_OF(g_setupFiles), srcDir);
 
+#if defined(_WINNT)
     // driver
     DWORD err =
       createDriverService(_T("mayud"),
@@ -170,6 +177,7 @@ private:
       removeFiles(g_setupFiles, NUMBER_OF(g_setupFiles), g_destDir);
       return 1;
     }
+#endif // _WINNT
     
     // create shortcut
     if (m_doRegisterToStartMenu)
@@ -177,14 +185,16 @@ private:
       tstringi shortcut = getStartMenuName(loadString(IDS_shortcutName));
       if (!shortcut.empty())
 	createLink((g_destDir + _T("\\mayu.exe")).c_str(), shortcut.c_str(),
-		   g_resource->loadString(IDS_shortcutName));
+		   g_resource->loadString(IDS_shortcutName),
+		   g_destDir.c_str());
     }
     if (m_doRegisterToStartUp)
     {
       tstringi shortcut = getStartUpName(loadString(IDS_shortcutName));
       if (!shortcut.empty())
 	createLink((g_destDir + _T("\\mayu.exe")).c_str(), shortcut.c_str(),
-		   g_resource->loadString(IDS_shortcutName));
+		   g_resource->loadString(IDS_shortcutName),
+		   g_destDir.c_str());
     }
 
     // set registry
@@ -346,12 +356,14 @@ int uninstall()
   if (IDYES != message(IDS_removeOk, MB_YESNO | MB_ICONQUESTION))
     return 1;
 
+#if defined(_WINNT)
   DWORD err = removeDriverService(_T("mayud"));
   if (err != ERROR_SUCCESS)
   {
     driverServiceError(err);
     return 1;
   }
+#endif // _WINNT
 
   DeleteFile(getStartMenuName(
     g_resource->loadString(IDS_shortcutName)).c_str());
@@ -380,7 +392,15 @@ int WINAPI WinMain(HINSTANCE i_hInstance, HINSTANCE /* hPrevInstance */,
   g_resource = &resource;
 
   // check OS
-  if (!checkOs(SetupFile::NT))
+  if (
+#if defined(_WINNT)
+      !checkOs(SetupFile::NT)
+#elif defined(_WIN95)
+      !checkOs(SetupFile::W9x)
+#else
+#  error
+#endif
+    )
   {
     message(IDS_invalidOS, MB_OK | MB_ICONSTOP);
     return 1;
@@ -401,7 +421,8 @@ int WINAPI WinMain(HINSTANCE i_hInstance, HINSTANCE /* hPrevInstance */,
 
   int retval = 1;
   
-  if (__argc == 2 && _tcsicmp(__targv[1], _T("-u")) == 0)
+  if (__argc == 2 && stricmp(__argv[1], "-u") == 0) // why ?
+    // _tcsicmp(__targv[1], _T("-u")) == 0)
     retval = uninstallStep1(_T("-u"));
   else
   {
@@ -409,12 +430,14 @@ int WINAPI WinMain(HINSTANCE i_hInstance, HINSTANCE /* hPrevInstance */,
     HANDLE mutex = CreateMutex(NULL, TRUE, MUTEX_MAYU_EXCLUSIVE_RUNNING);
     if (GetLastError() == ERROR_ALREADY_EXISTS) // mayu is running
       message(IDS_mayuRunning, MB_OK | MB_ICONSTOP);
-    else if (__argc == 3 && _tcsicmp(__targv[1], _T("-u")) == 0)
+    else if (__argc == 3 && stricmp(__argv[1], "-u") == 0)
+      // _tcsicmp(__targv[1], _T("-u")) == 0)
     {
       uninstallStep2(__targv[2]);
       retval = uninstall();
     }
-    else if (__argc == 2 && _tcsicmp(__targv[1], _T("-s")) == 0)
+    else if (__argc == 2 && stricmp(__argv[1], "-s") == 0)
+      // _tcsicmp(__targv[1], _T("-s")) == 0)
     {
       g_wasExecutedBySFX = true;
       retval = DialogBox(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_main), NULL,

@@ -8,10 +8,19 @@
 #  include <winioctl.h>
 
 
+#  if defined(_WINNT)
+
 /// mayu device file name
-#  define MAYU_DEVICE_FILE_NAME _T("\\\\.\\MayuDetour1")
+#    define MAYU_DEVICE_FILE_NAME _T("\\\\.\\MayuDetour1")
 ///
-#  define MAYU_DRIVER_NAME _T("mayud")
+#    define MAYU_DRIVER_NAME _T("mayud")
+
+#  elif defined(_WIN95)
+
+///
+#    define MAYU_DEVICE_FILE_NAME _T("\\\\.\\mayud.vxd")
+
+#  endif
 
 /// Ioctl value (equivalent to CancelIo API)
 #  define IOCTL_MAYU_DETOUR_CANCEL					 \

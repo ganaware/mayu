@@ -9,39 +9,111 @@
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Action
+
+//
+tostream &operator<<(tostream &i_ost, const Action &i_action)
+{
+  return i_action.output(i_ost);
+}
+
+
+//
+ActionKey::ActionKey(const ModifiedKey &i_mk)
+  : m_modifiedKey(i_mk)
+{
+}
+
+//
+Action::Type ActionKey::getType() const
+{
+  return Type_key;
+}
+
+// create clone
+Action *ActionKey::clone() const
+{
+  return new ActionKey(m_modifiedKey);
+}
+
+// stream output
+tostream &ActionKey::output(tostream &i_ost) const
+{
+  return i_ost << m_modifiedKey;
+}
+
+//
+ActionKeySeq::ActionKeySeq(KeySeq *i_keySeq)
+  : m_keySeq(i_keySeq)
+{
+}
+
+//
+Action::Type ActionKeySeq::getType() const
+{
+  return Type_keySeq;
+}
+
+// create clone
+Action *ActionKeySeq::clone() const
+{
+  return new ActionKeySeq(m_keySeq);
+}
+
+// stream output
+tostream &ActionKeySeq::output(tostream &i_ost) const
+{
+  return i_ost << _T("$") << m_keySeq->getName();
+}
+
+//
+ActionFunction::ActionFunction(FunctionData *i_functionData,
+			       Modifier i_modifier)
+  : m_functionData(i_functionData),
+    m_modifier(i_modifier)
+{
+}
+
+//
+ActionFunction::~ActionFunction()
+{
+  delete m_functionData;
+}
+
+//
+Action::Type ActionFunction::getType() const
+{
+  return Type_function;
+}
+
+// create clone
+Action *ActionFunction::clone() const
+{
+  return new ActionFunction(m_functionData->clone(), m_modifier);
+}
+
+// stream output
+tostream &ActionFunction::output(tostream &i_ost) const
+{
+  return i_ost << m_modifier << m_functionData;
+}
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // KeySeq
 
 
 void KeySeq::copy()
 {
-  for (Actions::iterator i = m_actions.begin();
-       i != m_actions.end(); ++ i)
-    switch ((*i)->m_type)
-    {
-      case Action::Type_key:
-	(*i) = new ActionKey(*reinterpret_cast<ActionKey *>(*i)); break;
-      case Action::Type_keySeq:
-	(*i) = new ActionKeySeq(*reinterpret_cast<ActionKeySeq *>(*i)); break;
-      case Action::Type_function:
-	(*i) = new ActionFunction(*reinterpret_cast<ActionFunction *>(*i));
-	break;
-    }
+  for (Actions::iterator i = m_actions.begin(); i != m_actions.end(); ++ i)
+    (*i) = (*i)->clone();
 }
 
 
 void KeySeq::clear()
 {
-  for (Actions::iterator i = m_actions.begin();
-       i != m_actions.end(); ++ i)
-    switch ((*i)->m_type)
-    {
-      case Action::Type_key:
-	delete reinterpret_cast<ActionKey *>(*i); break;
-      case Action::Type_keySeq:
-	delete reinterpret_cast<ActionKeySeq *>(*i); break;
-      case Action::Type_function:
-	delete reinterpret_cast<ActionFunction *>(*i); break;
-    }
+  for (Actions::iterator i = m_actions.begin(); i != m_actions.end(); ++ i)
+    delete (*i);
 }
 
 
@@ -77,23 +149,9 @@ KeySeq &KeySeq::operator=(const KeySeq &i_ks)
 }
 
 
-KeySeq &KeySeq::add(const ActionKey &i_ak)
+KeySeq &KeySeq::add(const Action &i_action)
 {
-  m_actions.push_back(new ActionKey(i_ak));
-  return *this;
-}
-
-
-KeySeq &KeySeq::add(const ActionKeySeq &i_aks)
-{
-  m_actions.push_back(new ActionKeySeq(i_aks));
-  return *this;
-}
-
-
-KeySeq &KeySeq::add(const ActionFunction &i_af)
-{
-  m_actions.push_back(new ActionFunction(i_af));
+  m_actions.push_back(i_action.clone());
   return *this;
 }
 
@@ -103,26 +161,7 @@ tostream &operator<<(tostream &i_ost, const KeySeq &i_ks)
 {
   for (KeySeq::Actions::const_iterator
 	 i = i_ks.m_actions.begin(); i != i_ks.m_actions.end(); ++ i)
-  {
-    switch ((*i)->m_type)
-    {
-      case Action::Type_key:
-	i_ost << reinterpret_cast<const ActionKey *>(*i)->m_modifiedKey;
-	break;
-      case Action::Type_keySeq:
-	i_ost << _T("$")
-	      << reinterpret_cast<const ActionKeySeq *>(*i)->m_keySeq->m_name;
-	break;
-      case Action::Type_function:
-      {
-	const ActionFunction *af =
-	  reinterpret_cast<const ActionFunction *>(*i);
-	i_ost << af->m_modifier << af->m_functionData;
-	break;
-      }
-    }
-    i_ost << _T(" ");
-  }
+    i_ost << **i << _T(" ");
   return i_ost;
 }
 
@@ -348,11 +387,23 @@ void Keymap::describe(tostream &i_ost, DescribedKeys *o_dk) const
 {
   switch (m_type)
   {
-    case Type_keymap: i_ost << _T("keymap "); break;
-    case Type_windowAnd: i_ost << _T("window "); break;
-    case Type_windowOr: i_ost << _T("window "); break;
+    case Type_keymap:
+      i_ost << _T("keymap ") << m_name;
+      break;
+    case Type_windowAnd:
+      i_ost << _T("window ") << m_name << _T(" ");
+      if (m_windowTitle.str() == _T(".*"))
+	i_ost << _T("/") << m_windowClass.str() << _T("/");
+      else
+	i_ost << _T("( /") << m_windowClass.str() << _T("/ && /")
+	      << m_windowTitle.str() << _T("/ )");
+      break;
+    case Type_windowOr:
+      i_ost << _T("window ") << m_name << _T(" ( /")
+	    << m_windowClass.str() << _T("/ || /") << m_windowTitle.str()
+	    << _T("/ )");
+      break;
   }
-  i_ost << m_name << _T(" /.../");
   if (m_parentKeymap)
     i_ost << _T(" : ") << m_parentKeymap->m_name;
   i_ost << _T(" => ") << *m_defaultKeySeq << std::endl;
@@ -386,6 +437,21 @@ void Keymap::describe(tostream &i_ost, DescribedKeys *o_dk) const
     m_parentKeymap->describe(i_ost, o_dk);
 }
 
+// set default keySeq and parent keymap if default keySeq has not been set
+bool Keymap::setIfNotYet(KeySeq *i_keySeq, Keymap *i_parentKeymap)
+{
+  if (m_defaultKeySeq)
+    return false;
+  m_defaultKeySeq = i_keySeq;
+  m_parentKeymap = i_parentKeymap;
+  return true;
+}
+
+// stream output
+extern tostream &operator<<(tostream &i_ost, const Keymap *i_keymap)
+{
+  return i_ost << i_keymap->getName();
+}
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -424,9 +490,7 @@ void Keymaps::searchWindow(KeymapPtrList *o_keymapPtrList,
 // add keymap
 Keymap *Keymaps::add(const Keymap &i_keymap)
 {
-  Keymap *k;
-  k = searchByName(i_keymap.getName());
-  if (k)
+  if (Keymap *k = searchByName(i_keymap.getName()))
     return k;
   m_keymapList.push_front(i_keymap);
   return &m_keymapList.front();

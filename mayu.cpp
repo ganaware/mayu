@@ -366,7 +366,7 @@ private:
 		break;
 	      case ID_MENUITEM_help:
 	      {
-		TCHAR buf[GANA_MAX_PATH];
+		_TCHAR buf[GANA_MAX_PATH];
 		CHECK_TRUE( GetModuleFileName(g_hInst, buf, NUMBER_OF(buf)) );
 		CHECK_TRUE( PathRemoveFileSpec(buf) );
 	    
@@ -515,10 +515,9 @@ public:
     CHECK_TRUE( Register_tasktray() );
 
     // change dir
-    std::list<tstringi> pathes;
+    HomeDirectories pathes;
     getHomeDirectories(&pathes);
-    for (std::list<tstringi>::iterator
-	   i = pathes.begin(); i != pathes.end(); i ++)
+    for (HomeDirectories::iterator i = pathes.begin(); i != pathes.end(); ++ i)
       if (SetCurrentDirectory(i->c_str()))
 	break;
     

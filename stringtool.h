@@ -70,6 +70,8 @@ inline size_t tcslcpy(unsigned char *o_dest, const unsigned char *i_src,
 inline size_t tcslcpy(wchar_t *o_dest, const wchar_t *i_src, size_t i_destSize)
 { return wcslcpy(o_dest, i_src, i_destSize); }
 
+// escape regexp special characters in MBCS trail bytes
+std::string guardRegexpFromMbcs(const char *i_str);
 /// converter
 std::wstring to_wstring(const std::string &i_str);
 /// converter
@@ -87,14 +89,14 @@ public:
   ///
   tstringi(const tstring &i_str) : tstring(i_str) { }
   ///
-  tstringi(const TCHAR *i_str) : tstring(i_str) { }
+  tstringi(const _TCHAR *i_str) : tstring(i_str) { }
   ///
-  tstringi(const TCHAR *i_str, size_t i_n) : tstring(i_str, i_n) { }
+  tstringi(const _TCHAR *i_str, size_t i_n) : tstring(i_str, i_n) { }
   ///
-  tstringi(const TCHAR *i_str, size_t i_pos, size_t i_n)
+  tstringi(const _TCHAR *i_str, size_t i_pos, size_t i_n)
     : tstring(i_str, i_pos, i_n) { }
   ///
-  tstringi(size_t i_n, TCHAR i_c) : tstring(i_n, i_c) { }
+  tstringi(size_t i_n, _TCHAR i_c) : tstring(i_n, i_c) { }
   ///
   int compare(const tstringi &i_str) const
   { return compare(i_str.c_str()); }
@@ -102,7 +104,7 @@ public:
   int compare(const tstring &i_str) const
   { return compare(i_str.c_str()); }
   ///
-  int compare(const TCHAR *i_str) const
+  int compare(const _TCHAR *i_str) const
   { return _tcsicmp(c_str(), i_str); }
   ///
   tstring &getString() { return *this; }
@@ -111,10 +113,10 @@ public:
 };
 
 /// case insensitive string comparison
-inline bool operator<(const tstringi &i_str1, const TCHAR *i_str2)
+inline bool operator<(const tstringi &i_str1, const _TCHAR *i_str2)
 { return i_str1.compare(i_str2) < 0; }
 /// case insensitive string comparison
-inline bool operator<(const TCHAR *i_str1, const tstringi &i_str2)
+inline bool operator<(const _TCHAR *i_str1, const tstringi &i_str2)
 { return 0 < i_str2.compare(i_str1); }
 /// case insensitive string comparison
 inline bool operator<(const tstringi &i_str1, const tstring &i_str2)
@@ -127,10 +129,10 @@ inline bool operator<(const tstringi &i_str1, const tstringi &i_str2)
 { return i_str1.compare(i_str2) < 0; }
 
 /// case insensitive string comparison
-inline bool operator==(const TCHAR *i_str1, const tstringi &i_str2)
+inline bool operator==(const _TCHAR *i_str1, const tstringi &i_str2)
 { return i_str2.compare(i_str1) == 0; }
 /// case insensitive string comparison
-inline bool operator==(const tstringi &i_str1, const TCHAR *i_str2)
+inline bool operator==(const tstringi &i_str1, const _TCHAR *i_str2)
 { return i_str1.compare(i_str2) == 0; }
 /// case insensitive string comparison
 inline bool operator==(const tstring &i_str1, const tstringi &i_str2)
@@ -148,10 +150,10 @@ inline bool operator==(const tstringi &i_str1, const tstringi &i_str2)
 
 
 /// case insensitive string comparison
-inline bool operator!=(const TCHAR *i_str1, const tstringi &i_str2)
+inline bool operator!=(const _TCHAR *i_str1, const tstringi &i_str2)
 { return i_str2.compare(i_str1) != 0; }
 /// case insensitive string comparison
-inline bool operator!=(const tstringi &i_str1, const TCHAR *i_str2)
+inline bool operator!=(const tstringi &i_str1, const _TCHAR *i_str2)
 { return i_str1.compare(i_str2) != 0; }
 /// case insensitive string comparison
 inline bool operator!=(const tstring &i_str1, const tstringi &i_str2)

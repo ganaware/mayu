@@ -24,6 +24,8 @@ public:
   virtual const _TCHAR *getName() const = 0;
   ///
   virtual tostream &output(tostream &i_ost) const = 0;
+  ///
+  virtual FunctionData *clone() const = 0;
 };
 
 /// stream output
@@ -142,6 +144,34 @@ extern tostream &operator<<(tostream &i_ost, ShowCommandType i_data);
   
 // get value of ShowCommandType
 extern bool getTypeValue(ShowCommandType *o_type, const tstring &i_name);
+
+
+///
+enum TargetWindowType
+{
+  TargetWindowType_overlapped	= 0, /// 
+  TargetWindowType_mdi		= 1, /// 
+};
+
+/// stream output
+extern tostream &operator<<(tostream &i_ost, TargetWindowType i_data);
+  
+// get value of ShowCommandType
+extern bool getTypeValue(TargetWindowType *o_type, const tstring &i_name);
+
+
+///
+enum BooleanType
+{
+  BooleanType_false	= 0, /// 
+  BooleanType_true	= 1, /// 
+};
+
+/// stream output
+extern tostream &operator<<(tostream &i_ost, BooleanType i_data);
+  
+// get value of ShowCommandType
+extern bool getTypeValue(BooleanType *o_type, const tstring &i_name);
 
 
 #endif // !_FUNCTION_H

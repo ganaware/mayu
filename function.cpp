@@ -282,6 +282,73 @@ bool getTypeValue(ShowCommandType *o_type, const tstring &i_name)
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TargetWindowType
+
+
+// ModifierLockType table
+typedef TypeTable<TargetWindowType> TypeTable_TargetWindowType;
+static const TypeTable_TargetWindowType g_targetWindowType[] =
+{
+  { TargetWindowType_overlapped, _T("overlapped") },
+  { TargetWindowType_mdi,        _T("mdi")        },
+};
+
+
+// stream output
+tostream &operator<<(tostream &i_ost, TargetWindowType i_data)
+{
+  tstring name;
+  if (getTypeName(&name, i_data,
+		  g_targetWindowType, NUMBER_OF(g_targetWindowType)))
+    i_ost << name;
+  else
+    i_ost << _T("(TargetWindowType internal error)");
+  return i_ost;
+}
+
+
+// get value of TargetWindowType
+bool getTypeValue(TargetWindowType *o_type, const tstring &i_name)
+{
+  return getTypeValue(o_type, i_name, g_targetWindowType,
+		      NUMBER_OF(g_targetWindowType));
+}
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// BooleanType
+
+
+// ModifierLockType table
+typedef TypeTable<BooleanType> TypeTable_BooleanType;
+static const TypeTable_BooleanType g_booleanType[] =
+{
+  { BooleanType_false, _T("false") },
+  { BooleanType_true,  _T("true")  },
+};
+
+
+// stream output
+tostream &operator<<(tostream &i_ost, BooleanType i_data)
+{
+  tstring name;
+  if (getTypeName(&name, i_data, g_booleanType, NUMBER_OF(g_booleanType)))
+    i_ost << name;
+  else
+    i_ost << _T("(BooleanType internal error)");
+  return i_ost;
+}
+
+
+// get value of BooleanType
+bool getTypeValue(BooleanType *o_type, const tstring &i_name)
+{
+  return getTypeValue(o_type, i_name, g_booleanType,
+		      NUMBER_OF(g_booleanType));
+}
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // FunctionData
 
 
@@ -346,28 +413,32 @@ bool getSuitableWindow(FunctionParam *i_param, HWND *o_hwnd)
 }
 
 //
-bool getSuitableMdiWindow(FunctionParam *i_param, HWND *o_hwnd, bool *io_isMDI,
+bool getSuitableMdiWindow(FunctionParam *i_param, HWND *o_hwnd,
+			  TargetWindowType *io_twt,
 			  RECT *o_rcWindow = NULL, RECT *o_rcParent = NULL)
 {
   if (!i_param->m_isPressed)
     return false;
-  *o_hwnd = getToplevelWindow(i_param->m_hwnd, io_isMDI);
+  bool isMdi = *io_twt == TargetWindowType_mdi;
+  *o_hwnd = getToplevelWindow(i_param->m_hwnd, &isMdi);
+  *io_twt = isMdi ? TargetWindowType_mdi : TargetWindowType_overlapped;
   if (!*o_hwnd)
     return false;
-  if (*io_isMDI)
+  switch (*io_twt)
   {
-    if (o_rcWindow)
-      getChildWindowRect(*o_hwnd, o_rcWindow);
-    if (o_rcParent)
-      GetClientRect(GetParent(*o_hwnd), o_rcParent);
-  }
-  else
-  {
-    if (o_rcWindow)
-      GetWindowRect(*o_hwnd, o_rcWindow);
-    if (o_rcParent)
-      SystemParametersInfo(SPI_GETWORKAREA, 0,
-			   reinterpret_cast<void *>(o_rcParent), FALSE);
+    case TargetWindowType_overlapped:
+      if (o_rcWindow)
+	GetWindowRect(*o_hwnd, o_rcWindow);
+      if (o_rcParent)
+	SystemParametersInfo(SPI_GETWORKAREA, 0,
+			     reinterpret_cast<void *>(o_rcParent), FALSE);
+      break;
+    case TargetWindowType_mdi:
+      if (o_rcWindow)
+	getChildWindowRect(*o_hwnd, o_rcWindow);
+      if (o_rcParent)
+	GetClientRect(GetParent(*o_hwnd), o_rcParent);
+      break;
   }
   return true;
 }
@@ -564,7 +635,7 @@ void Engine::funcOtherWindowClass(FunctionParam *i_param)
 
 // prefix key
 void Engine::funcPrefix(FunctionParam *i_param, const Keymap *i_keymap,
-			bool i_doesIgnoreModifiers)
+			BooleanType i_doesIgnoreModifiers)
 {
   if (!i_param->m_isPressed)
     return;
@@ -576,7 +647,7 @@ void Engine::funcPrefix(FunctionParam *i_param, const Keymap *i_keymap,
   
   m_isPrefix = true;
   m_doesEditNextModifier = false;
-  m_doesIgnoreModifierForPrefix = i_doesIgnoreModifiers;
+  m_doesIgnoreModifierForPrefix = !!i_doesIgnoreModifiers;
 
   {
     Acquire a(&m_log, 1);
@@ -615,7 +686,13 @@ void Engine::funcSync(FunctionParam *i_param)
   g_hookData->m_syncKey = sc->m_scan;
   g_hookData->m_syncKeyIsExtended = !!(sc->m_flags & ScanCode::E0E1);
   m_isSynchronizing = true;
+#if defined(_WINNT)
   generateKeyEvent(sync, false, false);
+#elif defined(_WIN95)
+  generateKeyEvent(sync, true, false);
+#else
+#  error
+#endif
   
   m_cs.release();
   DWORD r = WaitForSingleObject(m_eSync, 5000);
@@ -664,12 +741,9 @@ void Engine::funcVariable(FunctionParam *i_param, int i_mag, int i_inc)
 void Engine::funcRepeat(FunctionParam *i_param, const KeySeq *i_keySeq,
 			int i_max)
 {
-  if (!i_param->m_isPressed)
-    return;
-  
   if (i_param->m_isPressed)
   {
-    int end = MAX(m_variable, i_max);
+    int end = MIN(m_variable, i_max);
     for (int i = 0; i < end - 1; ++ i)
       generateKeySeqEvents(i_param->m_c, i_keySeq, Part_all);
     if (0 < end)
@@ -903,7 +977,7 @@ void Engine::funcHelpMessage(FunctionParam *i_param, const tstring &i_title,
 
   m_helpTitle = i_title;
   m_helpMessage = i_message;
-  bool doesShow = i_title.size() == 0 && i_message.size() == 0;
+  bool doesShow = !(i_title.size() == 0 && i_message.size() == 0);
   PostMessage(getAssociatedWndow(), WM_APP_engineNotify,
 	      EngineNotify_helpMessage, doesShow);
 }
@@ -924,52 +998,54 @@ void Engine::funcHelpVariable(FunctionParam *i_param, const tstring &i_title)
 }
 
 // raise window
-void Engine::funcWindowRaise(FunctionParam *i_param, bool i_isMdi)
+void Engine::funcWindowRaise(FunctionParam *i_param,
+			     TargetWindowType i_twt)
 {
   HWND hwnd;
-  if (!getSuitableMdiWindow(i_param, &hwnd, &i_isMdi))
+  if (!getSuitableMdiWindow(i_param, &hwnd, &i_twt))
     return;
   SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0,
 	       SWP_ASYNCWINDOWPOS | SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOSIZE);
 }
 
 // lower window
-void Engine::funcWindowLower(FunctionParam *i_param, bool i_isMdi)
+void Engine::funcWindowLower(FunctionParam *i_param, TargetWindowType i_twt)
 {
   HWND hwnd;
-  if (!getSuitableMdiWindow(i_param, &hwnd, &i_isMdi))
+  if (!getSuitableMdiWindow(i_param, &hwnd, &i_twt))
     return;
   SetWindowPos(hwnd, HWND_BOTTOM, 0, 0, 0, 0,
 	       SWP_ASYNCWINDOWPOS | SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOSIZE);
 }
 
 // minimize window
-void Engine::funcWindowMinimize(FunctionParam *i_param, bool i_isMdi)
+void Engine::funcWindowMinimize(FunctionParam *i_param, TargetWindowType i_twt)
 {
   HWND hwnd;
-  if (!getSuitableMdiWindow(i_param, &hwnd, &i_isMdi))
+  if (!getSuitableMdiWindow(i_param, &hwnd, &i_twt))
     return;
   PostMessage(hwnd, WM_SYSCOMMAND,
 	      IsIconic(hwnd) ? SC_RESTORE : SC_MINIMIZE, 0);
 }
 
 // maximize window
-void Engine::funcWindowMaximize(FunctionParam *i_param, bool i_isMdi)
+void Engine::funcWindowMaximize(FunctionParam *i_param, TargetWindowType i_twt)
 {
   HWND hwnd;
-  if (!getSuitableMdiWindow(i_param, &hwnd, &i_isMdi))
+  if (!getSuitableMdiWindow(i_param, &hwnd, &i_twt))
     return;
   PostMessage(hwnd, WM_SYSCOMMAND,
 	      IsZoomed(hwnd) ? SC_RESTORE : SC_MAXIMIZE, 0);
 }
 
 // maximize horizontally or virtically
-void Engine::funcWindowHVMaximize(FunctionParam *i_param, bool i_isHorizontal,
-				  bool i_isMdi)
+void Engine::funcWindowHVMaximize(FunctionParam *i_param,
+				  BooleanType i_isHorizontal,
+				  TargetWindowType i_twt)
 {
   HWND hwnd;
   RECT rc, rcd;
-  if (!getSuitableMdiWindow(i_param, &hwnd, &i_isMdi, &rc, &rcd))
+  if (!getSuitableMdiWindow(i_param, &hwnd, &i_twt, &rc, &rcd))
     return;
 
   // erase non window
@@ -1031,32 +1107,34 @@ void Engine::funcWindowHVMaximize(FunctionParam *i_param, bool i_isHorizontal,
 }
 
 // maximize window horizontally
-void Engine::funcWindowHMaximize(FunctionParam *i_param, bool i_isMdi)
+void Engine::funcWindowHMaximize(FunctionParam *i_param,
+				 TargetWindowType i_twt)
 {
-  funcWindowHVMaximize(i_param, true, i_isMdi);
+  funcWindowHVMaximize(i_param, BooleanType_true, i_twt);
 }
 
 // maximize window virtically
-void Engine::funcWindowVMaximize(FunctionParam *i_param, bool i_isMdi)
+void Engine::funcWindowVMaximize(FunctionParam *i_param,
+				 TargetWindowType i_twt)
 {
-  funcWindowHVMaximize(i_param, false, i_isMdi);
+  funcWindowHVMaximize(i_param, BooleanType_false, i_twt);
 }
 
 // move window
 void Engine::funcWindowMove(FunctionParam *i_param, int i_dx, int i_dy,
-			    bool i_isMdi)
+			    TargetWindowType i_twt)
 {
-  funcWindowMoveTo(i_param, GravityType_C, i_dx, i_dy, i_isMdi);
+  funcWindowMoveTo(i_param, GravityType_C, i_dx, i_dy, i_twt);
 }
 
 // move window to ...
 void Engine::funcWindowMoveTo(FunctionParam *i_param,
 			      GravityType i_gravityType,
-			      int i_dx, int i_dy, bool i_isMdi)
+			      int i_dx, int i_dy, TargetWindowType i_twt)
 {
   HWND hwnd;
   RECT rc, rcd;
-  if (!getSuitableMdiWindow(i_param, &hwnd, &i_isMdi, &rc, &rcd))
+  if (!getSuitableMdiWindow(i_param, &hwnd, &i_twt, &rc, &rcd))
     return;
   
   int x = rc.left + i_dx;
@@ -1075,11 +1153,12 @@ void Engine::funcWindowMoveTo(FunctionParam *i_param,
 
 
 // move window visibly
-void Engine::funcWindowMoveVisibly(FunctionParam *i_param, bool i_isMdi)
+void Engine::funcWindowMoveVisibly(FunctionParam *i_param,
+				   TargetWindowType i_twt)
 {
   HWND hwnd;
   RECT rc, rcd;
-  if (!getSuitableMdiWindow(i_param, &hwnd, &i_isMdi, &rc, &rcd))
+  if (!getSuitableMdiWindow(i_param, &hwnd, &i_twt, &rc, &rcd))
     return;
 
   int x = rc.left;
@@ -1096,34 +1175,38 @@ void Engine::funcWindowMoveVisibly(FunctionParam *i_param, bool i_isMdi)
 }
 
 //
-void Engine::funcWindowClingToLeft(FunctionParam *i_param, bool i_isMdi)
+void Engine::funcWindowClingToLeft(FunctionParam *i_param,
+				   TargetWindowType i_twt)
 {
-  funcWindowMoveTo(i_param, GravityType_W, 0, 0, i_isMdi);
+  funcWindowMoveTo(i_param, GravityType_W, 0, 0, i_twt);
 }
 
 //
-void Engine::funcWindowClingToRight(FunctionParam *i_param, bool i_isMdi)
+void Engine::funcWindowClingToRight(FunctionParam *i_param,
+				    TargetWindowType i_twt)
 {
-  funcWindowMoveTo(i_param, GravityType_E, 0, 0, i_isMdi);
+  funcWindowMoveTo(i_param, GravityType_E, 0, 0, i_twt);
 }
 
 //
-void Engine::funcWindowClingToTop(FunctionParam *i_param, bool i_isMdi)
+void Engine::funcWindowClingToTop(FunctionParam *i_param,
+				  TargetWindowType i_twt)
 {
-  funcWindowMoveTo(i_param, GravityType_N, 0, 0, i_isMdi);
+  funcWindowMoveTo(i_param, GravityType_N, 0, 0, i_twt);
 }
 
 //
-void Engine::funcWindowClingToBottom(FunctionParam *i_param, bool i_isMdi)
+void Engine::funcWindowClingToBottom(FunctionParam *i_param,
+				     TargetWindowType i_twt)
 {
-  funcWindowMoveTo(i_param, GravityType_S, 0, 0, i_isMdi);
+  funcWindowMoveTo(i_param, GravityType_S, 0, 0, i_twt);
 }
 
 // close window
-void Engine::funcWindowClose(FunctionParam *i_param, bool i_isMdi)
+void Engine::funcWindowClose(FunctionParam *i_param, TargetWindowType i_twt)
 {
   HWND hwnd;
-  if (!getSuitableMdiWindow(i_param, &hwnd, &i_isMdi))
+  if (!getSuitableMdiWindow(i_param, &hwnd, &i_twt))
     return;
   PostMessage(hwnd, WM_SYSCOMMAND, SC_CLOSE, 0);
 }
@@ -1195,6 +1278,7 @@ void Engine::funcWindowIdentify(FunctionParam *i_param)
 // set alpha blending parameter to the window
 void Engine::funcWindowSetAlpha(FunctionParam *i_param, int i_alpha)
 {
+#if defined(_WINNT)
   HWND hwnd;
   if (!getSuitableWindow(i_param, &hwnd))
     return;
@@ -1244,6 +1328,7 @@ void Engine::funcWindowSetAlpha(FunctionParam *i_param, int i_alpha)
     RedrawWindow(hwnd, NULL, NULL,
 		 RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
   }
+#endif // _WINNT
 }
 
 
@@ -1258,12 +1343,12 @@ void Engine::funcWindowRedraw(FunctionParam *i_param)
 }
 
 // resize window to
-void Engine::funcWindowResizeTo(FunctionParam *i_param,
-				int i_width, int i_height, bool i_isMdi)
+void Engine::funcWindowResizeTo(FunctionParam *i_param, int i_width,
+				int i_height, TargetWindowType i_twt)
 {
   HWND hwnd;
   RECT rc, rcd;
-  if (!getSuitableMdiWindow(i_param, &hwnd, &i_isMdi, &rc, &rcd))
+  if (!getSuitableMdiWindow(i_param, &hwnd, &i_twt, &rc, &rcd))
     return;
   
   if (i_width == 0)
@@ -1299,7 +1384,7 @@ void Engine::funcMouseWheel(FunctionParam *i_param, int i_delta)
 
 // convert the contents of the Clipboard to upper case
 void Engine::funcClipboardChangeCase(FunctionParam *i_param,
-				     bool i_doesConvertToUpperCase)
+				     BooleanType i_doesConvertToUpperCase)
 {
   if (!i_param->m_isPressed)
     return;
@@ -1336,13 +1421,13 @@ void Engine::funcClipboardChangeCase(FunctionParam *i_param,
 // convert the contents of the Clipboard to upper case
 void Engine::funcClipboardUpcaseWord(FunctionParam *i_param)
 {
-  funcClipboardChangeCase(i_param, true);
+  funcClipboardChangeCase(i_param, BooleanType_true);
 }
 
 // convert the contents of the Clipboard to lower case
 void Engine::funcClipboardDowncaseWord(FunctionParam *i_param)
 {
-  funcClipboardChangeCase(i_param, false);
+  funcClipboardChangeCase(i_param, BooleanType_false);
 }
 
 // set the contents of the Clipboard to the string

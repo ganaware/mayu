@@ -264,7 +264,13 @@ void Engine::generateKeyEvent(Key *i_key, bool i_doPress, bool i_isByAssign)
       if (!i_doPress)
 	kid.Flags |= KEYBOARD_INPUT_DATA::BREAK;
       DWORD len;
+#if defined(_WINNT)
       CHECK_TRUE( WriteFile(m_device, &kid, sizeof(kid), &len, NULL) );
+#elif defined(_WIN95)
+      DeviceIoControl(m_device, 2, &kid, sizeof(kid), NULL, 0, &len, NULL);
+#else
+#  error
+#endif
     }
     
     m_lastPressedKey = i_doPress ? i_key : NULL;
@@ -382,7 +388,7 @@ void Engine::generateModifierEvents(const Modifier &i_mod)
 void Engine::generateActionEvents(const Current &i_c, const Action *i_a,
 				  bool i_doPress)
 {
-  switch (i_a->m_type)
+  switch (i_a->getType())
   {
     // key
     case Action::Type_key:
@@ -465,7 +471,7 @@ void Engine::generateActionEvents(const Current &i_c, const Action *i_a,
 void Engine::generateKeySeqEvents(const Current &i_c, const KeySeq *i_keySeq,
 				  Part i_part)
 {
-  const std::vector<Action *> &actions = i_keySeq->getActions();
+  const KeySeq::Actions &actions = i_keySeq->getActions();
   if (actions.empty())
     return;
   if (i_part == Part_up)
@@ -592,8 +598,18 @@ void Engine::keyboardHandler()
     KEYBOARD_INPUT_DATA kid;
     
     DWORD len;
-    if (!ReadFile(m_device, &kid, sizeof(kid), &len, NULL))
+    if (
+#if defined(_WINNT)
+      !ReadFile(m_device, &kid, sizeof(kid), &len, NULL)
+#elif defined(_WIN95)
+      !DeviceIoControl(m_device, 1, NULL, 0, &kid, sizeof(kid), &len, NULL)
+#else
+#  error
+#endif
+      )
+    {
       continue; // TODO
+    }
 
     checkFocusWindow();
 
@@ -608,7 +624,13 @@ void Engine::keyboardHandler()
       }
       else
       {
+#if defined(_WINNT)
 	WriteFile(m_device, &kid, sizeof(kid), &len, NULL);
+#elif defined(_WIN95)
+	DeviceIoControl(m_device, 2, &kid, sizeof(kid), NULL, 0, &len, NULL);
+#else
+#  error
+#endif
       }
       continue;
     }
@@ -618,7 +640,13 @@ void Engine::keyboardHandler()
     if (!m_currentFocusOfThread ||
 	!m_currentKeymap)
     {
+#if defined(_WINNT)
       WriteFile(m_device, &kid, sizeof(kid), &len, NULL);
+#elif defined(_WIN95)
+      DeviceIoControl(m_device, 2, &kid, sizeof(kid), NULL, 0, &len, NULL);
+#else
+#  error
+#endif
       Acquire a(&m_log, 0);
       if (!m_currentFocusOfThread)
 	m_log << _T("internal error: m_currentFocusOfThread == NULL")
@@ -770,11 +798,19 @@ Engine::Engine(tomsgstream &i_log)
     m_currentLock.release(static_cast<Modifier::Type>(i));
   
   // open mayu m_device
+#if defined(_WINNT)
   m_device = CreateFile(MAYU_DEVICE_FILE_NAME, GENERIC_READ | GENERIC_WRITE,
 			0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+#elif defined(_WIN95)
+  m_device = CreateFile(MAYU_DEVICE_FILE_NAME, 0,
+			0, NULL, CREATE_NEW, FILE_FLAG_DELETE_ON_CLOSE, NULL);
+#else
+#  error
+#endif
 
   if (m_device == INVALID_HANDLE_VALUE)
   {
+#if defined(_WINNT)
     // start mayud
     SC_HANDLE hscm = OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT);
     if (hscm)
@@ -793,8 +829,8 @@ Engine::Engine(tomsgstream &i_log)
     m_device = CreateFile(MAYU_DEVICE_FILE_NAME, GENERIC_READ | GENERIC_WRITE,
 			  0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
     if (m_device == INVALID_HANDLE_VALUE)
+#endif // _WINNT
       throw ErrorMessage() << loadString(IDS_driverNotInstalled);
-//    throw ErrorMessage() << loadString(IDS_cannotOpenM_Device);
   }
 
   // create event for sync
@@ -830,6 +866,7 @@ void Engine::stop()
     CHECK_TRUE( CloseHandle(m_eEvent) );
     m_eEvent = NULL;
 
+#if defined(_WINNT)
     // stop mayud
     if (m_didMayuStartDevice)
     {
@@ -846,6 +883,7 @@ void Engine::stop()
 	CloseServiceHandle(hscm);
       }
     }
+#endif // _WINNT
   }
 }
 

@@ -117,7 +117,8 @@ bool Registry::write(HKEY i_root, const tstring &i_path,
 		     KEY_ALL_ACCESS, NULL, &hkey, &disposition))
     return false;
   RegSetValueEx(hkey, i_name.c_str(), NULL, REG_SZ,
-		(BYTE *)i_value.c_str(), i_value.size() + 1);
+		(BYTE *)i_value.c_str(),
+		(i_value.size() + 1) * sizeof(tstring::value_type));
   RegCloseKey(hkey);
   return true;
 }

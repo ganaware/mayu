@@ -196,6 +196,11 @@ __EOM__
   print <<"__EOM__";
     return i_ost;
   }
+
+  virtual FunctionData *clone() const
+  {
+    return new FunctionData_${name}(*this);
+  }
 };
 
 __EOM__

@@ -116,7 +116,7 @@ BEGIN
     IDS_error               "インストール中にエラーが起こりました。"
     IDS_alreadyUninstalled  "窓使いの憂鬱のアンインストールが既に実行されています。\n再起動してからインストールしなおしてください。"
     IDS_notAdministrator    "Administrator で実行してください。"
-    IDS_invalidOS           "WindowsNT4.0/2000 専用です。"
+    IDS_invalidOS           "この OS では動作しません。"
     IDS_mayuFile            "窓使いの憂鬱ファイル"
     IDS_mayuShellOpen       "notepad.exe ""%1"""
     IDS_mayu                "窓使いの憂鬱"

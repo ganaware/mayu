@@ -7,7 +7,20 @@
 
 VERSION		= 3.19
 
-COMMON_DEFINES	= -DSTRICT -D_WIN32_IE=0x0500 -DUNICODE -D_UNICODE
+!if "$(TARGETOS)" == "WINNT"
+OS_SPECIFIC_DEFINES	=  -DUNICODE -D_UNICODE
+DISTRIB_OS	= nt
+!endif
+!if "$(TARGETOS)" == "WIN95"
+OS_SPECIFIC_DEFINES	=  -D_MBCS
+DISTRIB_OS	= 9x
+!endif
+!if "$(TARGETOS)" == "BOTH"
+!error Must specify TARGETOS=WIN95 or TARGETOS=WINNT
+!endif
+
+
+COMMON_DEFINES	= -DSTRICT -D_WIN32_IE=0x0500 $(OS_SPECIFIC_DEFINES)
 BOOST_DIR	= ../boost
 
 
@@ -106,17 +119,23 @@ DISTRIB_CONTRIBS =				\
 		contrib\mayu-settings.txt	\
 		contrib\dvorak.mayu		\
 		contrib\keitai.mayu		\
-		contrib\a.mayu			\
+		contrib\ax.mayu			\
+
+!if "$(TARGETOS)" == "WINNT"
+DISTRIB_DRIVER	= mayud.sys mayudnt4.sys
+!endif
+!if "$(TARGETOS)" == "WIN95"
+DISTRIB_DRIVER	= mayud.vxd
+!endif
 
 DISTRIB		=			\
 		$(TARGET_1)		\
 		$(TARGET_2)		\
-		mayud.sys		\
-		mayudnt4.sys		\
 		setup.exe		\
 		$(DISTRIB_SETTINGS)	\
 		$(DISTRIB_MANUAL)	\
 		$(DISTRIB_CONTRIBS)	\
+		$(DISTRIB_DRIVER)	\
 
 DISTRIBSRC	=			\
 		Makefile		\
@@ -144,6 +163,11 @@ DISTRIBSRC	=			\
 		d\nt4\Makefile		\
 		d\nt4\SOURCES		\
 		d\nt4\*.c		\
+					\
+		d_win9x\Makefile	\
+		d_win9x\mayud.asm	\
+		d_win9x\mayud.def	\
+		d_win9x\mayud.vxd	\
 					\
 		tools\makedepend	\
 		tools\dos2unix		\
@@ -186,11 +210,12 @@ distrib:
 		@$(ECHO) "  cd d/nt4; build                                                            "
 		@$(ECHO) "============================================================================="
 		-@$(RM) source.cab
-		-@$(RM) mayu-$(VERSION).cab
-		-@$(RM) mayu-$(VERSION).exe
+		-@$(RM) mayu-$(VERSION)-$(DISTRIB_OS).cab
+		-@$(RM) mayu-$(VERSION)-$(DISTRIB_OS).exe
 		@$(CAB) -a source.cab -ml:21 $(DISTRIBSRC)
 		@$(COPY) d\i386\mayud.sys .
 		@$(COPY) d\nt4\i386\mayudnt4.sys .
+		@$(COPY) d_win9x\mayud.vxd .
 		@$(COPY) s\setup.exe setup.exe
 		@$(ECHO) "============================================================================="
 		@$(ECHO) "   解凍時のタイトル(T):                   なし                               "
@@ -201,11 +226,11 @@ distrib:
 		@$(ECHO) "レ プログラム終了後、解凍されたファイルを削除する                            "
 		@$(ECHO) "============================================================================="
 		$(UNIX2DOS) $(DISTRIB_SETTINGS) $(DISTRIB_CONTRIBS)
-		$(CAB) -a mayu-$(VERSION).cab -ml:21 $(DISTRIB) source.cab
+		$(CAB) -a mayu-$(VERSION)-$(DISTRIB_OS).cab -ml:21 $(DISTRIB) source.cab
 		$(DOS2UNIX) $(DISTRIB_SETTINGS) $(DISTRIB_CONTRIBS)
-		-@$(RM) source.cab mayud.sys mayudnt4.sys setup.exe
-		$(CAB) -f mayu-$(VERSION).cab
-		-@$(RM) mayu-$(VERSION).cab
+		-@$(RM) source.cab mayud.sys mayudnt4.sys mayud.vxd setup.exe
+		$(CAB) -f mayu-$(VERSION)-$(DISTRIB_OS).cab
+		-@$(RM) mayu-$(VERSION)-$(DISTRIB_OS).cab
 
 srcdesc::
 		@$(ECHO) USE DOC++ 3.4.4 OR HIGHER
@@ -232,7 +257,7 @@ engine.obj: compiler_specific.h driver.h engine.h errormessage.h function.h \
 focus.obj: compiler_specific.h focus.h misc.h stringtool.h windowstool.h
 function.obj: compiler_specific.h driver.h engine.h function.h functions.h \
  hook.h keyboard.h keymap.h misc.h msgstream.h multithread.h parser.h \
- setting.h stringtool.h windowstool.h
+ setting.h stringtool.h vkeytable.h windowstool.h
 keyboard.obj: compiler_specific.h driver.h keyboard.h misc.h stringtool.h
 keymap.obj: compiler_specific.h driver.h errormessage.h function.h \
  keyboard.h keymap.h misc.h stringtool.h
@@ -252,7 +277,7 @@ setting.obj: compiler_specific.h dlgsetting.h driver.h errormessage.h \
 stringtool.obj: compiler_specific.h misc.h stringtool.h
 target.obj: compiler_specific.h mayurc.h misc.h stringtool.h target.h \
  windowstool.h
-vkeytable.obj: vkeytable.h
+vkeytable.obj: compiler_specific.h misc.h vkeytable.h
 windowstool.obj: compiler_specific.h misc.h stringtool.h windowstool.h
 hook.obj: compiler_specific.h hook.h misc.h stringtool.h
 stringtool.obj: compiler_specific.h misc.h stringtool.h

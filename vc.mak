@@ -11,7 +11,7 @@
 # VC++ rules	###############################################################
 
 APPVER		= 5.0
-TARGETOS	= WINNT
+#TARGETOS	= WINNT
 #TARGETLANG	= LANG_JAPANESE
 _WIN32_IE	= 0x0500
 !include <win32.mak>

@@ -85,7 +85,8 @@ namespace Installer
 
   // createLink - uses the shell's IShellLink and IPersistFile interfaces 
   //   to create and store a shortcut to the specified object. 
-  HRESULT createLink(LPCTSTR i_pathObj, LPCTSTR i_pathLink, LPCTSTR i_desc);
+  HRESULT createLink(LPCTSTR i_pathObj, LPCTSTR i_pathLink, LPCTSTR i_desc,
+		     LPCTSTR i_workingDirectory = NULL);
   
   // create file extension information
   void createFileExtension(const tstringi &i_ext, const tstring &i_contentType,

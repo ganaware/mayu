@@ -35,7 +35,8 @@ namespace Installer
 		address of a buffer containing the description of the
 		shell link.
   */
-  HRESULT createLink(LPCTSTR i_pathObj, LPCTSTR i_pathLink, LPCTSTR i_desc)
+  HRESULT createLink(LPCTSTR i_pathObj, LPCTSTR i_pathLink, LPCTSTR i_desc,
+		     LPCTSTR i_workingDirectory)
   { 
     // Get a pointer to the IShellLink interface. 
     IShellLink* psl;
@@ -47,6 +48,8 @@ namespace Installer
       // Set the path to the shortcut target and add the description. 
       psl->SetPath(i_pathObj);
       psl->SetDescription(i_desc);
+      if (i_workingDirectory)
+	psl->SetWorkingDirectory(i_workingDirectory);
  
       // Query IShellLink for the IPersistFile interface for saving the 
       // shortcut in persistent storage. 
@@ -380,6 +383,18 @@ namespace Installer
 	}
       }
     }
+#if 0
+    {
+      tstringi to_(to), from_(from);
+      for (size_t i = 0; i < to_.size(); ++ i)
+	if (!to_[i])
+	  to_[i] = ' ';
+      for (size_t i = 0; i < from_.size(); ++ i)
+	if (!from_[i])
+	  from_[i] = ' ';
+      MessageBox(NULL, to_.c_str(), from_.c_str(), MB_OK);
+    }
+#endif
 
     SHFILEOPSTRUCT fo;
     ::ZeroMemory(&fo, sizeof(fo));
@@ -522,7 +537,7 @@ namespace Installer
     };
 
     // set locale information
-    const _TCHAR *localeString = _tsetlocale(LC_ALL, _T(""));
+    const _TCHAR *localeString = ::_tsetlocale(LC_ALL, _T(""));
     
     static const LocaleInformaton locales[] =
     {

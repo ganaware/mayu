@@ -5,7 +5,20 @@
 ###############################################################################
 
 
-DEFINES		= -DSTRICT -D_WIN32_IE=0x0400 -DUNICODE -D_UNICODE \
+!if "$(TARGETOS)" == "WINNT"
+OS_SPECIFIC_DEFINES	=  -DUNICODE -D_UNICODE
+DISTRIB_OS	= nt
+!endif
+!if "$(TARGETOS)" == "WIN95"
+OS_SPECIFIC_DEFINES	=  -D_MBCS
+DISTRIB_OS	= 9x
+!endif
+!if "$(TARGETOS)" == "BOTH"
+!error Must specify TARGETOS=WIN95 or TARGETOS=WINNT
+!endif
+
+
+DEFINES		= -DSTRICT -D_WIN32_IE=0x0400 $(OS_SPECIFIC_DEFINES) \
 		  $(DEBUGDEFINES)
 BOOST_DIR	= ../../boost
 

@@ -110,7 +110,8 @@ private:
                                                     of a token */
   
   size_t m_internalLineNumber;			/// next line number
-  tistream &m_ist;				/// input stream
+  const _TCHAR *m_ptr;				/// read pointer
+  const _TCHAR *m_end;				/// end pointer
 
 private:
   /// get a line
@@ -118,7 +119,7 @@ private:
   
 public:
   ///
-  Parser(tistream &i_ist);
+  Parser(const _TCHAR *i_str, size_t i_length);
 
   /** get a parsed line.  if no more lines exist, returns false */
   bool getLine(Tokens *o_tokens);

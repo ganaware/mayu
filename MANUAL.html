@@ -23,7 +23,7 @@ Copyright &copy; 1999-2001, <a href="http://www.ganaware.org" target="_top">TAGA
       <p>いかんともしがたい理由により UN*X Wizard が窓使いにジョブチェンジする時、その操作体系の違いにより憂鬱な日々を送らざるを得ないことは想像に難くありません。「窓使いの憂鬱」は、その憂鬱を少しだけ和らげることができるアイテムです。</p>
       
       <ul>
-	<li>WindowsNT4.0 SP4 以降や、Windows2000 で動く汎用キーバインディング変更ソフトです。
+	<li>WindowsNT4.0 SP4 以降や、Windows2000, Windows9x で動く汎用キーバインディング変更ソフトです。
 	<li>2 ストロークキーを設定できます。
 	<li>個々のウィンドウに別々のキーバインディングを割り当てることができます。
 	<li>Control などのモディファイヤキーを自由に作成することができます。
@@ -37,7 +37,6 @@ Copyright &copy; 1999-2001, <a href="http://www.ganaware.org" target="_top">TAGA
       <ul>
 	<li>キーボードドライバレベルでのカスタマイズが可能なため、Control キーや Windows キーをはじめ任意のキーを自由にカスタマイズできます。
 	<li>より安定しています。
-	<li>Windows95/98/ME はサポートしません。
 	<li>マウスイベントを置き換えることはできません。
 	<li>USB キーボードでは利用できません。
       </ul>
@@ -62,7 +61,7 @@ Copyright &copy; 1999-2001, <a href="http://www.ganaware.org" target="_top">TAGA
 	    </ul>
 	<li>以前のバージョンの「窓使いの憂鬱」を利用している場合は、終了させます。
 	    <ul>
-	      <li>Windows2000 の場合は、メニューの終了を選んだ後に何かのキ−を押さないと実際に終了しません。(<a href="#BUGS">BUG</a> です)
+	      <li>WindowsNT4.0 以外 (9x, Me, 2000) の場合は、メニューの終了を選んだ後に何かのキ−を押さないと実際に終了しません。(<a href="#BUGS">BUG</a> です)
 	      <li>終了させるだけでよく、アンインストールする必要はありません。
 	    </ul>
 	<li>ダウンロードした実行ファイルを Administrator 権限で実行してください。すると「窓使いの憂鬱」がインストールされます。
@@ -157,7 +156,7 @@ Copyright &copy; 1999-2001, <a href="http://www.ganaware.org" target="_top">TAGA
 	<dt class="h2">Q7. 「窓使いの憂鬱」では USB キーボードは使えないのですか。
 	<dd class="d2"><p>現在のところ使えません。対応するつもりではありますが、いつになるかはわかりません。</p>
 	<dt class="h2">Q8. 「窓使いの憂鬱」は Windows95/98/ME では使えないのですか。
-	<dd class="d2"><p>使えません。ただし、USB キーボードに対応した暁には、USB キーボードのみサポートするかもしれません。</p>
+	<dd class="d2"><p>小林義明さんがドライバを書いてくれたので、バージョン 3.19 から使用できるようになりました。</p>
 	<dt class="h2">Q9. mayu は<a href="http://www.tactics.co.jp/qtactics/one.htm" target="_top">椎名繭</a>なのですか。
 	<dd class="d2"><p>違います。ぜんぜん違います。GTO の繭君でもないです。</p>
       </dl>
@@ -168,7 +167,7 @@ Copyright &copy; 1999-2001, <a href="http://www.ganaware.org" target="_top">TAGA
   <dd class="d1">
       <ul>
 	<li><span class="bug">[仕様]</span> コマンドプロンプトではロックキーとIMEの状態を区別することができません。また、コマンドプロンプトのプロパティに対しては無力です。
-	<li><span class="bug">[仕様]</span> Windows2000 では、「窓使いの憂鬱」を終了させたあとに何かのキーを押さないと終了しません。
+	<li><span class="bug">[仕様]</span> WindowsNT4.0 以外 (9x, Me, 2000) では、「窓使いの憂鬱」を終了させたあとに何かのキーを押さないと終了しません。
 	<li><span class="bug">[バグ]</span> <a href="http://www.pgpi.org/products/pgp/versions/freeware/win32/7.0.3/" target="_top">PGPi</a> を利用しているとうまく動かないようです。
 	    
 	<li>TODO や Known Bug は<a href="http://sourceforge.net/pm/task.php?group_id=5403&group_project_id=7606&func=browse&set=open&order=priority" target="_top">SourceForge</a> で管理されています。
@@ -299,20 +298,24 @@ Copyright &copy; 1999-2001, <a href="http://www.ganaware.org" target="_top">TAGA
   <dd class="d1">
       <div>
       <dl class="history">
-	<dt>2001/??/?? version 3.19 (next release) (BETA)
+	<dt>2001/03/05 version 3.19 (BETA)
 	<dd>
 	    <ul>
 	      <li>このバージョンは内部構造を大幅に変えたので不安定である可能性が高いです。どうしてもこのバージョンが必要な人のみ使用してください。
 	      <li><kbd>[Control]</kbd> + <kbd>[U]</kbd> 操作の改良。
 	      <li><a href="default.mayu"><code>default.mayu</code></a> を使っている場合は、<code>Global</code> キーマップで <kbd>[英数]</kbd> を <kbd>[Control]</kbd> にしているが、<code>Global</code> キーマップを親キーマップとして持たない <a href="CUSTOMIZE.html#keymap2"><code>keymap2</code></a> の中では (当然ながら) <kbd>[英数]</kbd> を <kbd>[Control]</kbd> として使用できないので、ちゃんと <code>Global</code> キーマップを親キーマップとして持つように設定ファイルを修正。
 	      <li><a href="default.mayu"><code>default.mayu</code></a> で、<code>-DMAP-ESCAPE-TO-META</code> とすると <kbd>[Alt]</kbd> + <kbd>[X]</kbd> などを <kbd>[ESCAPE] [X]</kbd> で代用するようにした。
-	      <li>プログラム内部では全て UNICODE で処理するようにした。
-	      <li>設定ファイルの文字コードに、shift_jis だけでなく UTF-16LE/BE や UTF-8 を使用できるようになった。「メモ帳」で、「Unicode」や「Unicode big endien」や「UTF-8」を選んでセーブすれば、日本語だけでなくハングルなどの UNICODE で扱える文字が全て設定ファイルに書けるようになる。現在は文字コードは自動判別され、自動判別に失敗した場合の救済措置はない。自動判別に失敗するようなら自動判別できそうな文字をコメントにでも書いておくこと。
+	      <li>WindowsNT/2000 版のプログラム内部では全て UNICODE で処理するようにした。
+	      <li>WindowsNT/2000 版では、設定ファイルの文字コードに、shift_jis だけでなく UTF-16LE/BE や UTF-8 を使用できるようになった。「メモ帳」で、「Unicode」や「Unicode big endien」や「UTF-8」を選んでセーブすれば、日本語だけでなくハングルなどの UNICODE で扱える文字が全て設定ファイルに書けるようになる。現在は文字コードは自動判別され、自動判別に失敗した場合の救済措置はない。自動判別に失敗するようなら自動判別できそうな文字をコメントにでも書いておくこと。
 	      <li>正規表現ライブラリを <a href="http://ourworld.compuserve.com/homepages/John_Maddock/regexpp.htm" target="_top">Regex++</a> に変更した。
 	      <li>いろいろ変えた結果多分 bcc32 ではコンパイルできなくなった。少し修正するだけだと思うが。
 	      <li><a href="contrib/ax.mayu"><code>contrib/ax.mayu</code></a> を追加。(Thanks to KAWABE Nobukazu)
 	      <li><a href="#RELATEDWORK">related work</a> に MetaX を追加。
-	      <li><a href="CUSTOMIZE.html#defaultModifier">デフォルトモディファイヤの変更</a>のサンプルが間違っていたので直した。(<code>key IC-* =</code> ではなく <code>key *IC- =</code> が正しい)
+	      <li><a href="CUSTOMIZE.html#defaultModifier">デフォルトモディファイヤの変更</a>のサンプルが間違っていたので直した。(<code>key IC-* =</code> ではなく <code>key *IC- =</code> が正しい) (Thanks to Hirotaka Kasaki)
+	      <li><a href="CUSTOMIZE.html#defaultKey">デフォルトキー</a>の中で定義中のキーマップ名を参照できなかったバグを修正した。つまり、<code>keymap Hoge =&gt; &amp;Prefix(Hoge)</code> などができるようになった。(Thanks to HANAWA Yoshio)
+	      <li>Windows9x 用のドライバを作成されたので、このバージョンから WindowsNT/2000 用のパッケージと Windows9x 用のパッケージが存在します。(Thanks to 小林義明)
+	      <li>現在、Windows9x では、<a href="CUSTOMIZE.html#function_HelpMessage"><code>&amp;HelpMessage</code></a>、<a href="CUSTOMIZE.html#function_HelpVariable"><code>&amp;HelpVariable</code></a>、<a href="CUSTOMIZE.html#function_WindowSetAlpha"><code>&amp;WindowSetAlpha</code></a> は使用できません。
+	      <li><a href="default.mayu"><code>default.mayu</code></a> を使用している場合、シンボル <code>ZXCV</code> を定義しておくと、<kbd>[Control]</kbd> + <kbd>[Z]</kbd>, <kbd>[Control]</kbd> + <kbd>[X]</kbd>, <kbd>[Control]</kbd> + <kbd>[C]</kbd>, <kbd>[Control]</kbd> + <kbd>[V]</kbd> が Windows と同じ動きをするようになります。(Thanks to HANAWA Yoshio)
 	    </ul>
 	<dt>2000/12/17 version 3.18
 	<dd>

@@ -112,11 +112,12 @@ tostream &operator<<(tostream &i_ost, const Token &i_token)
 // Parser
 
 
-Parser::Parser(tistream &i_ist)
+Parser::Parser(const _TCHAR *i_str, size_t i_length)
   : m_lineNumber(1),
     m_prefixes(NULL),
     m_internalLineNumber(1),
-    m_ist(i_ist)
+    m_ptr(i_str),
+    m_end(i_str + i_length)
 {
 }
 
@@ -131,27 +132,40 @@ void Parser::setPrefixes(const Prefixes *i_prefixes)
 bool Parser::getLine(tstringi *o_line)
 {
   o_line->resize(0);
-  while (true)
-  {
-    _TCHAR linebuf[1024] = _T("");
-    m_ist.get(linebuf, NUMBER_OF(linebuf), _T('\n'));
-    if (m_ist.eof())
-      break;
-    m_ist.clear();
-    *o_line += linebuf;
-    _TCHAR c;
-    m_ist.get(c);
-    if (m_ist.eof())
-      break;
-    if (c == _T('\n'))
-    {
-      m_internalLineNumber ++;
-      break;
-    }
-    *o_line += c;
-  }
+
+  if (m_ptr == m_end)
+    return false;
   
-  return !(o_line->empty() && m_ist.eof());
+  const _TCHAR *begin = m_ptr;
+  const _TCHAR *end = m_end;
+  
+  // lines are separated by: "\r\n", "\n", "\x2028" (Unicode Line Separator)
+  while (m_ptr != m_end)
+    switch (*m_ptr)
+    {
+      case _T('\n'):
+#ifdef UNICODE
+      case _T('\x2028'):	//  (U+2028)
+#endif
+	end = m_ptr;
+	++ m_ptr;
+	goto got_line_end;
+      case _T('\r'):
+	if (m_ptr + 1 != m_end && m_ptr[1] == _T('\n'))
+	{
+	  end = m_ptr;
+	  m_ptr += 2;
+	  goto got_line_end;
+	}
+	// fall through
+      default:
+	++ m_ptr;
+	break;
+    }
+  got_line_end:
+  ++ m_internalLineNumber;
+  o_line->assign(begin, end);
+  return true;
 }
 
 // symbol test
@@ -270,6 +284,10 @@ bool Parser::getLine(std::vector<Token> *o_tokens)
 	
 	tstring str =
 	  interpretMetaCharacters(tokenStart, t - tokenStart, q, isRegexp);
+#ifdef _MBCS
+	if (isRegexp)
+	  str = guardRegexpFromMbcs(str.c_str());
+#endif
 	o_tokens->push_back(Token(str, true, isRegexp));
 	if (*t != _T('\0'))
 	  t ++;

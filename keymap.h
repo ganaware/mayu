@@ -22,15 +22,23 @@ public:
     Type_function,				///
   };
 
+private:
+  Action(const Action &i_action);
+  
 public:
+  Action() { }
   ///
-  const Type m_type;
-
-public:
+  virtual ~Action() { }
   ///
-  Action(Type i_type) : m_type(i_type) { }
+  virtual Type getType() const = 0;
+  /// create clone
+  virtual Action *clone() const = 0;
+  /// stream output
+  virtual tostream &output(tostream &i_ost) const = 0;
 };
 
+///
+tostream &operator<<(tostream &i_ost, const Action &i_action);
 
 ///
 class ActionKey : public Action
@@ -39,10 +47,18 @@ public:
   ///
   const ModifiedKey m_modifiedKey;
 
+private:
+  ActionKey(const ActionKey &i_actionKey);
+  
 public:
   ///
-  ActionKey(const ModifiedKey &i_mk)
-    : Action(Action::Type_key), m_modifiedKey(i_mk) { }
+  ActionKey(const ModifiedKey &i_mk);
+  ///
+  virtual Type getType() const;
+  /// create clone
+  virtual Action *clone() const;
+  /// stream output
+  virtual tostream &output(tostream &i_ost) const;
 };
 
 
@@ -53,10 +69,18 @@ class ActionKeySeq : public Action
 public:
   KeySeq * const m_keySeq;			///
 
+private:
+  ActionKeySeq(const ActionKeySeq &i_actionKeySeq);
+  
 public:
   ///
-  ActionKeySeq(KeySeq *i_keySeq)
-    : Action(Action::Type_keySeq), m_keySeq(i_keySeq) { }
+  ActionKeySeq(KeySeq *i_keySeq);
+  ///
+  virtual Type getType() const;
+  /// create clone
+  virtual Action *clone() const;
+  /// stream output
+  virtual tostream &output(tostream &i_ost) const;
 };
 
 
@@ -64,12 +88,24 @@ public:
 class ActionFunction : public Action
 {
 public:
-  Modifier m_modifier;				/// modifier for &Sync
-  FunctionData *m_functionData;			/// function data
+  FunctionData * const m_functionData;		/// function data
+  const Modifier m_modifier;			/// modifier for &Sync
 
+private:
+  ActionFunction(const ActionFunction &i_actionFunction);
+  
 public:
   ///
-  ActionFunction() : Action(Action::Type_function), m_functionData(NULL) { }
+  ActionFunction(FunctionData *i_functionData,
+		 Modifier i_modifier = Modifier());
+  ///
+  virtual ~ActionFunction();
+  ///
+  virtual Type getType() const;
+  /// create clone
+  virtual Action *clone() const;
+  /// stream output
+  virtual tostream &output(tostream &i_ost) const;
 };
 
 
@@ -104,11 +140,7 @@ public:
   KeySeq &operator=(const KeySeq &i_ks);
   
   /// add
-  KeySeq &add(const ActionKey &i_ak);
-  ///
-  KeySeq &add(const ActionKeySeq &i_aks);
-  ///
-  KeySeq &add(const ActionFunction &i_af);
+  KeySeq &add(const Action &i_action);
 
   ///
   const tstringi &getName() const { return m_name; }
@@ -244,7 +276,14 @@ public:
 
   /// describe
   void describe(tostream &i_ost, DescribedKeys *o_mk) const;
+
+  /// set default keySeq and parent keymap if default keySeq has not been set
+  bool setIfNotYet(KeySeq *i_keySeq, Keymap *i_parentKeymap);
 };
+
+
+/// stream output
+extern tostream &operator<<(tostream &i_ost, const Keymap *i_keymap);
 
 
 ///

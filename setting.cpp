@@ -16,7 +16,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iomanip>
-
+#include <sys/stat.h>
 #include <shlwapi.h>
 
 
@@ -37,7 +37,7 @@ namespace Event
 
 // get mayu filename
 static bool getFilenameFromRegistry(
-  tstringi *o_name, tstringi *o_filename, std::list<tstringi> *o_symbols)
+  tstringi *o_name, tstringi *o_filename, Setting::Symbols *o_symbols)
 {
   Registry reg(MAYU_REGISTRY_ROOT);
   int index;
@@ -65,7 +65,7 @@ static bool getFilenameFromRegistry(
     tcmatch_results symbolResult;
     while (boost::regex_search(symbols, symbolResult, symbol))
     {
-      o_symbols->push_back(symbolResult.str(1));
+      o_symbols->insert(symbolResult.str(1));
       symbols = symbolResult.str(2);
     }
   }
@@ -74,10 +74,11 @@ static bool getFilenameFromRegistry(
 
 
 // get home directory path
-void getHomeDirectories(std::list<tstringi> *o_pathes)
+void getHomeDirectories(HomeDirectories *o_pathes)
 {
   tstringi filename;
-  if (getFilenameFromRegistry(NULL, &filename, NULL))
+  if (getFilenameFromRegistry(NULL, &filename, NULL) &&
+      !filename.empty())
   {
     tregex getPath(_T("^(.*[/\\\\])[^/\\\\]*$"));
     tcmatch_results getPathResult;
@@ -93,7 +94,7 @@ void getHomeDirectories(std::list<tstringi> *o_pathes)
   const _TCHAR *homepath = _tgetenv(_T("HOMEPATH"));
   if (homedrive && homepath)
     o_pathes->push_back(tstringi(homedrive) + homepath);
-
+  
   const _TCHAR *userprofile = _tgetenv(_T("USERPROFILE"));
   if (userprofile)
     o_pathes->push_back(userprofile);
@@ -459,6 +460,7 @@ void SettingLoader::load_KEYMAP_DEFINITION(const Token *i_which)
   KeySeq *keySeq = NULL;
   Keymap *parentKeymap = NULL;
   bool isKeymap2 = false;
+  bool doesLoadDefaultKeySeq = false;
 
   if (!isEOL())
   {
@@ -497,45 +499,49 @@ void SettingLoader::load_KEYMAP_DEFINITION(const Token *i_which)
       ASSERT(false);
     
     if (!isEOL())
-    {
-      t = lookToken();
-      // <KEYMAP_PARENT>
-      if (*t == _T(":"))
-      {
-	getToken();
-	t = getToken();
-	parentKeymap = m_setting->m_keymaps.searchByName(t->getString());
-	if (!parentKeymap)
-	  throw ErrorMessage() << _T("`") << *t
-			       << _T("': unknown keymap name.");
-      }
-      if (!isEOL())
-      {
-	t = getToken();
-	if (*t != _T("=>"))
-	  throw ErrorMessage() << _T("`") << *t << _T("': syntax error.");
-	keySeq = SettingLoader::load_KEY_SEQUENCE();
-      }
-    }
+      doesLoadDefaultKeySeq = true;
   }
 
+  m_currentKeymap = m_setting->m_keymaps.add(
+    Keymap(type, name->getString(), windowClassName, windowTitleName,
+	   NULL, NULL));
+
+  if (doesLoadDefaultKeySeq)
+  {
+    Token *t = lookToken();
+    // <KEYMAP_PARENT>
+    if (*t == _T(":"))
+    {
+      getToken();
+      t = getToken();
+      parentKeymap = m_setting->m_keymaps.searchByName(t->getString());
+      if (!parentKeymap)
+	throw ErrorMessage() << _T("`") << *t
+			     << _T("': unknown keymap name.");
+    }
+    if (!isEOL())
+    {
+      t = getToken();
+      if (*t != _T("=>"))
+	throw ErrorMessage() << _T("`") << *t << _T("': syntax error.");
+      keySeq = SettingLoader::load_KEY_SEQUENCE();
+    }
+  }
   if (keySeq == NULL)
   {
-    ActionFunction af;
+    FunctionData *fd;
     if (type == Keymap::Type_keymap && !isKeymap2)
-      af.m_functionData = createFunctionData(_T("KeymapParent"));
+      fd = createFunctionData(_T("KeymapParent"));
     else if (type == Keymap::Type_keymap && !isKeymap2)
-      af.m_functionData = createFunctionData(_T("Undefined"));
+      fd = createFunctionData(_T("Undefined"));
     else // (type == Keymap::Type_windowAnd || type == Keymap::Type_windowOr)
-      af.m_functionData = createFunctionData(_T("KeymapParent"));
-    ASSERT( af.m_functionData );
-    keySeq = m_setting->m_keySeqs.add(KeySeq(name->getString()).add(af));
+      fd = createFunctionData(_T("KeymapParent"));
+    ASSERT( fd );
+    keySeq = m_setting->m_keySeqs.add(
+      KeySeq(name->getString()).add(ActionFunction(fd)));
   }
-  
-  m_currentKeymap =
-    m_setting->m_keymaps.add(
-      Keymap(type, name->getString(), windowClassName, windowTitleName,
-	     keySeq, parentKeymap));
+
+  m_currentKeymap->setIfNotYet(keySeq, parentKeymap);
 }
 
 
@@ -663,6 +669,27 @@ void SettingLoader::load_ARGUMENT(ShowCommandType *o_arg)
 }
 
 
+// &lt;ARGUMENT_TARGET_WINDOW&gt;
+void SettingLoader::load_ARGUMENT(TargetWindowType *o_arg)
+{
+  Token *t = getToken();
+  if (getTypeValue(o_arg, t->getString()))
+    return;
+  throw ErrorMessage() << _T("`") << *t
+		       << _T("': unknown target window type.");
+}
+
+
+// &lt;bool&gt;
+void SettingLoader::load_ARGUMENT(BooleanType *o_arg)
+{
+  Token *t = getToken();
+  if (getTypeValue(o_arg, t->getString()))
+    return;
+  throw ErrorMessage() << _T("`") << *t << _T("': must be true or false.");
+}
+
+
 // &lt;ARGUMENT&gt;
 void SettingLoader::load_ARGUMENT(Modifier *o_arg)
 {
@@ -741,9 +768,7 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const tstringi &i_name,
       t = getToken();
       
       // search function
-      ActionFunction af;
-      af.m_modifier = modifier;
-      af.m_functionData = createFunctionData(t->getString());
+      ActionFunction af(createFunctionData(t->getString()), modifier);
       if (af.m_functionData == NULL)
 	throw ErrorMessage() << _T("`&") << *t
 			     << _T("': unknown function name.");
@@ -1047,16 +1072,19 @@ static bool prefixSortPred(const tstringi &i_a, const tstringi &i_b)
 }
 
 
-// read file (UTF-16 LE/BE, UTF-8, locale specific multibyte encoding)
-bool readFile(std::wstring *o_data, const std::wstring &i_filename)
+/*
+  _UNICODE: read file (UTF-16 LE/BE, UTF-8, locale specific multibyte encoding)
+  _MBCS: read file
+*/
+bool readFile(tstring *o_data, const tstringi &i_filename)
 {
   // get size of file
   struct _stat sbuf;
-  if (_wstat(i_filename.c_str(), &sbuf) < 0 || sbuf.st_size == 0)
+  if (_tstat(i_filename.c_str(), &sbuf) < 0 || sbuf.st_size == 0)
     return false;
 
   // open
-  FILE *fp = _wfopen(i_filename.c_str(), _L("rb"));
+  FILE *fp = _tfopen(i_filename.c_str(), _T("rb"));
   if (!fp)
     return false;
   
@@ -1070,6 +1098,7 @@ bool readFile(std::wstring *o_data, const std::wstring &i_filename)
   buf.get()[sbuf.st_size] = 0;			// mbstowcs() requires null
 						// terminated string
 
+#ifdef _UNICODE
   //
   if (buf.get()[0] == 0xffU && buf.get()[1] == 0xfeU &&
       sbuf.st_size % 2 == 0)
@@ -1169,6 +1198,7 @@ bool readFile(std::wstring *o_data, const std::wstring &i_filename)
     
     not_UTF_8: ;
   }
+#endif // _UNICODE
 
   // assume ascii
   o_data->resize(sbuf.st_size);
@@ -1183,8 +1213,8 @@ bool readFile(std::wstring *o_data, const std::wstring &i_filename)
 void SettingLoader::load(const tstringi &i_filename)
 {
   m_currentFilename = i_filename;
-#ifdef UNICODE
-  std::wstring data;
+  
+  tstring data;
   if (!readFile(&data, m_currentFilename))
   {
     Acquire a(m_soLog);
@@ -1192,11 +1222,7 @@ void SettingLoader::load(const tstringi &i_filename)
     m_isThereAnyError = true;
     return;
   }
-  std::wstringstream ist(data);
-#else
-  tifstream ist(m_currentFilename.c_str());
-#endif
-
+  
   // prefix
   if (m_prefixesRefCcount == 0)
   {
@@ -1223,7 +1249,7 @@ void SettingLoader::load(const tstringi &i_filename)
   m_prefixesRefCcount ++;
 
   // create parser
-  Parser parser(ist);
+  Parser parser(data.c_str(), data.size());
   parser.setPrefixes(m_prefixes);
     
   while (true)
@@ -1240,7 +1266,7 @@ void SettingLoader::load(const tstringi &i_filename)
       {
 	Acquire a(m_soLog);
 	*m_log << m_currentFilename << _T("(") << parser.getLineNumber()
-	     << _T(") : error: ") << e << std::endl;
+	       << _T(") : error: ") << e << std::endl;
       }
       m_isThereAnyError = true;
       continue;
@@ -1371,13 +1397,30 @@ bool SettingLoader::getFilename(const tstringi &i_name, tstringi *o_path) const
     // find file from registry
     if (i_name.empty())				// called not from 'include'
     {
-      std::list<tstringi> symbols;
+      Setting::Symbols symbols;
       if (getFilenameFromRegistry(NULL, o_path, &symbols))
       {
-	if (!isReadable(*o_path))
-	  return false;
-	for (std::list<tstringi>::iterator
-	       i = symbols.begin(); i != symbols.end(); i ++)
+	if (o_path->empty())
+	  // find file from home directory
+	{
+	  HomeDirectories pathes;
+	  getHomeDirectories(&pathes);
+	  for (HomeDirectories::iterator
+		 i = pathes.begin(); i != pathes.end(); ++ i)
+	  {
+	    *o_path = *i + _T("\\") + name;
+	    if (isReadable(*o_path))
+	      goto add_symbols;
+	  }
+	}
+	else
+	{
+	  if (!isReadable(*o_path))
+	    return false;
+	}
+	add_symbols:
+	for (Setting::Symbols::iterator
+	       i = symbols.begin(); i != symbols.end(); ++ i)
 	  m_setting->m_symbols.insert(*i);
 	return true;
       }
@@ -1387,10 +1430,9 @@ bool SettingLoader::getFilename(const tstringi &i_name, tstringi *o_path) const
       return false;
     
     // find file from home directory
-    std::list<tstringi> pathes;
+    HomeDirectories pathes;
     getHomeDirectories(&pathes);
-    for (std::list<tstringi>::iterator
-	   i = pathes.begin(); i != pathes.end(); i ++)
+    for (HomeDirectories::iterator i = pathes.begin(); i != pathes.end(); ++ i)
     {
       *o_path = *i + _T("\\") + name;
       if (isReadable(*o_path))
@@ -1444,9 +1486,7 @@ bool SettingLoader::load(Setting *i_setting, const tstringi &i_filename)
   }
 
   // create global keymap's default keySeq
-  ActionFunction af;
-  af.m_functionData = createFunctionData(_T("OtherWindowClass"));
-  ASSERT( af.m_functionData );
+  ActionFunction af(createFunctionData(_T("OtherWindowClass")));
   KeySeq *globalDefault = m_setting->m_keySeqs.add(KeySeq(_T("")).add(af));
   
   // add default keymap
