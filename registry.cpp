@@ -64,7 +64,7 @@ bool Registry::write(HKEY i_root, const tstring &i_path, const tstring &i_name,
   HKEY hkey;
   DWORD disposition;
   if (ERROR_SUCCESS !=
-      RegCreateKeyEx(i_root, i_path.c_str(), 0, _T("REG_SZ"),
+      RegCreateKeyEx(i_root, i_path.c_str(), 0, _T(""),
 		     REG_OPTION_NON_VOLATILE,
 		     KEY_ALL_ACCESS, NULL, &hkey, &disposition))
     return false;
@@ -89,13 +89,17 @@ bool Registry::read(HKEY i_root, const tstring &i_path, const tstring &i_name,
     if (ERROR_MORE_DATA ==
 	RegQueryValueEx(hkey, i_name.c_str(), NULL, &type, &dummy, &size))
     {
-      Array<BYTE> buf(size);
-      if (ERROR_SUCCESS ==
-	  RegQueryValueEx(hkey, i_name.c_str(), NULL, &type, buf.get(), &size))
+      if (0 < size)
       {
-	*o_value = reinterpret_cast<_TCHAR *>(buf.get());
-	RegCloseKey(hkey);
-	return true;
+	Array<BYTE> buf(size);
+	if (ERROR_SUCCESS == RegQueryValueEx(hkey, i_name.c_str(),
+					     NULL, &type, buf.get(), &size))
+	{
+	  buf.back() = 0;
+	  *o_value = reinterpret_cast<_TCHAR *>(buf.get());
+	  RegCloseKey(hkey);
+	  return true;
+	}
       }
     }
     RegCloseKey(hkey);
@@ -113,13 +117,80 @@ bool Registry::write(HKEY i_root, const tstring &i_path,
   HKEY hkey;
   DWORD disposition;
   if (ERROR_SUCCESS !=
-      RegCreateKeyEx(i_root, i_path.c_str(), 0, _T("REG_SZ"),
+      RegCreateKeyEx(i_root, i_path.c_str(), 0, _T(""),
 		     REG_OPTION_NON_VOLATILE,
 		     KEY_ALL_ACCESS, NULL, &hkey, &disposition))
     return false;
   RegSetValueEx(hkey, i_name.c_str(), NULL, REG_SZ,
 		(BYTE *)i_value.c_str(),
 		(i_value.size() + 1) * sizeof(tstring::value_type));
+  RegCloseKey(hkey);
+  return true;
+}
+
+
+// read list of string
+bool Registry::read(HKEY i_root, const tstring &i_path, const tstring &i_name,
+		    tstrings *o_value, const tstrings &i_defaultValue)
+{
+  HKEY hkey;
+  if (ERROR_SUCCESS ==
+      RegOpenKeyEx(i_root, i_path.c_str(), 0, KEY_READ, &hkey))
+  {
+    DWORD type = REG_MULTI_SZ;
+    DWORD size = 0;
+    BYTE dummy;
+    if (ERROR_MORE_DATA ==
+	RegQueryValueEx(hkey, i_name.c_str(), NULL, &type, &dummy, &size))
+    {
+      if (0 < size)
+      {
+	Array<BYTE> buf(size);
+	if (ERROR_SUCCESS == RegQueryValueEx(hkey, i_name.c_str(),
+					     NULL, &type, buf.get(), &size))
+	{
+	  buf.back() = 0;
+	  o_value->clear();
+	  const _TCHAR *p = reinterpret_cast<_TCHAR *>(buf.get());
+	  const _TCHAR *end = reinterpret_cast<_TCHAR *>(buf.end());
+	  while (p < end && *p)
+	  {
+	    o_value->push_back(p);
+	    p += o_value->back().length() + 1;
+	  }
+	  RegCloseKey(hkey);
+	  return true;
+	}
+      }
+    }
+    RegCloseKey(hkey);
+  }
+  if (!i_defaultValue.empty())
+    *o_value = i_defaultValue;
+  return false;
+}
+
+
+// write list of string
+bool Registry::write(HKEY i_root, const tstring &i_path,
+		     const tstring &i_name, const tstrings &i_value)
+{
+  HKEY hkey;
+  DWORD disposition;
+  if (ERROR_SUCCESS !=
+      RegCreateKeyEx(i_root, i_path.c_str(), 0, _T(""),
+		     REG_OPTION_NON_VOLATILE,
+		     KEY_ALL_ACCESS, NULL, &hkey, &disposition))
+    return false;
+  tstring value;
+  for (tstrings::const_iterator i = i_value.begin(); i != i_value.end(); ++ i)
+  {
+    value += *i;
+    value += _T('\0');
+  }
+  RegSetValueEx(hkey, i_name.c_str(), NULL, REG_MULTI_SZ,
+		(BYTE *)value.c_str(),
+		(value.size() + 1) * sizeof(tstring::value_type));
   RegCloseKey(hkey);
   return true;
 }
@@ -160,7 +231,7 @@ bool Registry::write(HKEY i_root, const tstring &i_path, const tstring &i_name,
   HKEY hkey;
   DWORD disposition;
   if (ERROR_SUCCESS !=
-      RegCreateKeyEx(i_root, i_path.c_str(), 0, _T("REG_BINARY"),
+      RegCreateKeyEx(i_root, i_path.c_str(), 0, _T(""),
 		     REG_OPTION_NON_VOLATILE,
 		     KEY_ALL_ACCESS, NULL, &hkey, &disposition))
     return false;

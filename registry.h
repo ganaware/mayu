@@ -6,6 +6,7 @@
 #  define _REGISTRY_H
 
 #  include "stringtool.h"
+#  include <list>
 
 
 /// registry access class
@@ -13,6 +14,9 @@ class Registry
 {
   HKEY m_root;					/// registry root
   tstring m_path;				/// path from registry root
+
+public:
+  typedef std::list<tstring> tstrings;
   
 public:
   ///
@@ -48,6 +52,14 @@ public:
   bool write(const tstring &i_name, const tstring &i_value) const
   { return write(m_root, m_path, i_name, i_value); }
 
+  /// read list of tstring
+  bool read(const tstring &i_name, tstrings *o_value, 
+	    const tstrings &i_defaultValue = tstrings()) const
+  { return read(m_root, m_path, i_name, o_value, i_defaultValue); }
+  /// write list of tstring
+  bool write(const tstring &i_name, const tstrings &i_value) const
+  { return write(m_root, m_path, i_name, i_value); }
+
   /// read binary data
   bool read(const tstring &i_name, BYTE *o_value, DWORD i_valueSize,
 	    const BYTE *i_defaultValue = NULL, DWORD i_defaultValueSize = 0)
@@ -80,6 +92,13 @@ public:
   /// write tstring
   static bool write(HKEY i_root, const tstring &i_path, const tstring &i_name,
 		    const tstring &i_value);
+  
+  /// read list of tstring
+  static bool read(HKEY i_root, const tstring &i_path, const tstring &i_name,
+		   tstrings *o_value, const tstrings &i_defaultValue = tstrings());
+  /// write list of tstring
+  static bool write(HKEY i_root, const tstring &i_path, const tstring &i_name,
+		    const tstrings &i_value);
   
   /// read binary data
   static bool read(HKEY i_root, const tstring &i_path, const tstring &i_name,
