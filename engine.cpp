@@ -1351,6 +1351,7 @@ bool Engine::setFocus(HWND i_hwndFocus, DWORD i_threadId,
 bool Engine::setLockState(bool i_isNumLockToggled,
 			  bool i_isCapsLockToggled,
 			  bool i_isScrollLockToggled,
+			  bool i_isKanaLockToggled,
 			  bool i_isImeLockToggled,
 			  bool i_isImeCompToggled)
 {
@@ -1360,6 +1361,7 @@ bool Engine::setLockState(bool i_isNumLockToggled,
   m_currentLock.on(Modifier::Type_NumLock, i_isNumLockToggled);
   m_currentLock.on(Modifier::Type_CapsLock, i_isCapsLockToggled);
   m_currentLock.on(Modifier::Type_ScrollLock, i_isScrollLockToggled);
+  m_currentLock.on(Modifier::Type_KanaLock, i_isKanaLockToggled);
   m_currentLock.on(Modifier::Type_ImeLock, i_isImeLockToggled);
   m_currentLock.on(Modifier::Type_ImeComp, i_isImeCompToggled);
   return true;

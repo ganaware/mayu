@@ -152,6 +152,7 @@ private:
 	  m_engine.setLockState(n->m_isNumLockToggled,
 				n->m_isCapsLockToggled,
 				n->m_isScrollLockToggled,
+				n->m_isKanaLockToggled,
 				n->m_isImeLockToggled,
 				n->m_isImeCompToggled);
 	  break;

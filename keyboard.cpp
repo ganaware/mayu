@@ -84,6 +84,7 @@ Modifier::Modifier()
   {
     Type_Up, Type_Down, Type_Repeat,
     Type_ImeLock, Type_ImeComp, Type_NumLock, Type_CapsLock, Type_ScrollLock,
+	Type_KanaLock,
     Type_Maximized, Type_Minimized, Type_MdiMaximized, Type_MdiMinimized,
     Type_Lock0, Type_Lock1, Type_Lock2, Type_Lock3, Type_Lock4,
     Type_Lock5, Type_Lock6, Type_Lock7, Type_Lock8, Type_Lock9,
@@ -128,6 +129,7 @@ tostream &operator<<(tostream &i_ost, const Modifier &i_m)
     { Modifier::Type_NumLock, _T("NL-") },
     { Modifier::Type_CapsLock, _T("CL-") },
     { Modifier::Type_ScrollLock, _T("SL-") },
+    { Modifier::Type_KanaLock, _T("KL-") },
     { Modifier::Type_Maximized, _T("MAX-") },
     { Modifier::Type_Minimized, _T("MIN-") },
     { Modifier::Type_MdiMaximized, _T("MMAX-") },

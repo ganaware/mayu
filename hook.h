@@ -61,6 +61,7 @@ struct NotifyLockState
   bool m_isNumLockToggled;			///
   bool m_isCapsLockToggled;			///
   bool m_isScrollLockToggled;			///
+  bool m_isKanaLockToggled;			///
   bool m_isImeLockToggled;			///
   bool m_isImeCompToggled;			///
 };

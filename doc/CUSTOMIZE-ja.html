@@ -46,12 +46,15 @@
 			  <p><code><em>KEY</em></code> の前に以下のような記号を付けることによって、コントロールキーなどの状態を表現できます。また、これらをモディファイヤと呼ぶことにします。</p>
 			  
 			  <ul>
-			    <li><code>C-</code> は、<kbd>[Control]</kbd> が押されていることを表します
-			    <li><code>M-</code> か <code>A-</code> は、<kbd>[Alt]</kbd> が押されていることを表します
-			    <li><code>S-</code> は、<kbd>[Shift]</kbd> が押されていることを表します
-			    <li><code>NL-</code> は、<kbd>[NumLock]</kbd> がロック状態であることを表します
-			    <li><code>CL-</code> は、<kbd>[CapsLock]</kbd> がロック状態であることを表します
-			    <li><code>SL-</code> は、<kbd>[ScrollLock]</kbd> がロック状態であることを表します
+			    <li><code>C-</code> は、<kbd>[Control]</kbd> が押されていることを表します。
+			    <li><code>M-</code> か <code>A-</code> は、<kbd>[Alt]</kbd> が押されていることを表します。
+			    <li><code>S-</code> は、<kbd>[Shift]</kbd> が押されていることを表します。
+			    <li><code>NL-</code> は、<kbd>[NumLock]</kbd> がロック状態であることを表します。
+			    <li><code>CL-</code> は、<kbd>[CapsLock]</kbd> がロック状態であることを表します。
+			    <li><code>SL-</code> は、<kbd>[ScrollLock]</kbd> がロック状態であることを表します。
+			    <li><code>KL-</code> は、<kbd>[カナ]</kbd> がロック状態であることを表します。<br>
+				109 キーボードなら、<kbd>[Control]</kbd> + <kbd>[Shift]</kbd> + <kbd>[ひらがな]</kbd>。<br>
+				104 キーボードなら、<kbd>[Control]</kbd> + <kbd>[Shift]</kbd> + <kbd>[CapsLock]</kbd>。
 			    <li><code>IL-</code> は、IME が on になっていることを表します
 			    <li><code>IC-</code> は、IME で変換中であることを表します
 			    <li><code>MAX-</code> は、ウィンドウが最大化されていることを表します。
@@ -80,7 +83,7 @@
 			  
 			  <p class="continue">このように記述すると、<kbd>[F9]</kbd> 又は <kbd>[Shift]</kbd> + <kbd>[F9]</kbd> でウィンドウを最小化することができますが、例えば、<kbd>[Control]</kbd> + <kbd>[F9]</kbd> ではできません。</p>
 			  
-			  <p>デフォルトでは、暗黙に <code>~C-~M-~S-*NL-*CL-*SL-*IL-~IC-*MAX-*MIN-*MMAX-*MMIN-</code> が指定されていることになっていますが、<a href="#defaultModifier">変更</a>できます。</p>
+			  <p>デフォルトでは、暗黙に <code>~C-~M-~S-*NL-*CL-*SL-*KL-*IL-~IC-*MAX-*MIN-*MMAX-*MMIN-</code> が指定されていることになっていますが、<a href="#defaultModifier">変更</a>できます。</p>
 			  
 			  <p>また、<kbd>[Shift]</kbd> は必ず押されていてほしいがほかのモディファイヤはどうでもいいという場合は、</p>
 			  
@@ -159,13 +162,13 @@
 		    <dt class="h3"><a name="defaultModifier">デフォルトモディファイヤの変更</a>
 		    <dd class="d3">
 			<div>
-			  <p>デフォルトでは、左側のキーには <code>~C-~M-~S-*NL-*CL-*SL-*IL-~IC-*MAX-*MIN-*MMAX-*MMIN-</code> が指定されていますが、これを変更することができます。例えば、</p>
+			  <p>デフォルトでは、左側のキーには <code>~C-~M-~S-*NL-*CL-*SL-*KL-*IL-~IC-*MAX-*MIN-*MMAX-*MMIN-</code> が指定されていますが、これを変更することができます。例えば、</p>
 			  
 			  <p class="sample">
 			  key *IC- =
 			  </p>
 			  
-			  <p class="continue">と記述すると、この文以降のデフォルトモディファイヤは <code>~C-~M-~S-*NL-*CL-*SL-*IL-*IC-</code> となります。</p>
+			  <p class="continue">と記述すると、この文以降のデフォルトモディファイヤは <code>~C-~M-~S-*NL-*CL-*SL-*KL-*IL-*IC-</code> となります。</p>
 			  
 			  <p>デフォルトモディファイヤの変更を複数行うときには、例えば、</p>
 			  

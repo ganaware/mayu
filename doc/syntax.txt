@@ -19,7 +19,7 @@
 #		5. FUNCTION_NAME
 #		6. SYMBOL
 #	* the default of <...MODIFIED_KEY_NAME>'s modifier-settings is:
-#		1. "IL-", "NL-", "CL-", "SL-",
+#		1. "IL-", "NL-", "CL-", "SL-", "KL-",
 #		   "MAX-", "MIN-", "MMAX-", "MMIN-",
 #		   /L[0-9]/, "U-" and "D-"
 #		   are specified with "*"
@@ -197,10 +197,11 @@
 		| "NL-"		# if Num Lock on
 		| "CL-"		# if Caps Lock on
 		| "SL-"		# if Scroll Lock on
-		| "MAX-"		# if Window maximized
-		| "MIN-"		# if Window minimized
-		| "MMAX-"		# if MDI child Window maximized
-		| "MMIN-"		# if MDI child Window minimized
+		| "KL-"		# if Kana Lock on
+		| "MAX-"	# if Window maximized
+		| "MIN-"	# if Window minimized
+		| "MMAX-"	# if MDI child Window maximized
+		| "MMIN-"	# if MDI child Window minimized
 		| /M[0-9]/	# user defined modifier
 		| /L[0-9]/	# user defined lock
 

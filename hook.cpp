@@ -412,6 +412,7 @@ DllExport void notifyLockState()
   n.m_isNumLockToggled = !!(GetKeyState(VK_NUMLOCK) & 1);
   n.m_isCapsLockToggled = !!(GetKeyState(VK_CAPITAL) & 1);
   n.m_isScrollLockToggled = !!(GetKeyState(VK_SCROLL) & 1);
+  n.m_isKanaLockToggled = !!(GetKeyState(VK_KANA) & 1);
   n.m_isImeLockToggled = g.m_isImeLock;
   n.m_isImeCompToggled = g.m_isImeCompositioning;
   notify(&n, sizeof(n));

@@ -401,6 +401,7 @@ Modifier SettingLoader::load_MODIFIER(
       { _T("NL-"), Modifier::Type_NumLock },
       { _T("CL-"), Modifier::Type_CapsLock },
       { _T("SL-"), Modifier::Type_ScrollLock },
+      { _T("KL-"), Modifier::Type_KanaLock },
       { _T("MAX-"), Modifier::Type_Maximized },
       { _T("MIN-"), Modifier::Type_Minimized },
       { _T("MMAX-"), Modifier::Type_MdiMaximized },

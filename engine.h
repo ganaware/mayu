@@ -519,8 +519,8 @@ public:
 
   /// lock state
   bool setLockState(bool i_isNumLockToggled, bool i_isCapsLockToggled,
-		    bool i_isScrollLockToggled, bool i_isImeLockToggled,
-		    bool i_isImeCompToggled);
+		    bool i_isScrollLockToggled, bool i_isKanaLockToggled,
+		    bool i_isImeLockToggled, bool i_isImeCompToggled);
 
   /// show
   void checkShow(HWND i_hwnd);

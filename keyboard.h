@@ -167,10 +167,11 @@ public:
     Type_NumLock,				/// &lt;ASSIGN_MODIFIER&gt;
     Type_CapsLock,				/// &lt;ASSIGN_MODIFIER&gt;
     Type_ScrollLock,				/// &lt;ASSIGN_MODIFIER&gt;
+    Type_KanaLock,				/// &lt;ASSIGN_MODIFIER&gt;
     Type_Maximized,				/// &lt;ASSIGN_MODIFIER&gt;
     Type_Minimized,				/// &lt;ASSIGN_MODIFIER&gt;
-    Type_MdiMaximized,			/// &lt;ASSIGN_MODIFIER&gt;
-    Type_MdiMinimized,			/// &lt;ASSIGN_MODIFIER&gt;
+    Type_MdiMaximized,				/// &lt;ASSIGN_MODIFIER&gt;
+    Type_MdiMinimized,				/// &lt;ASSIGN_MODIFIER&gt;
     Type_Mod0,					/// &lt;ASSIGN_MODIFIER&gt;
     Type_Mod1,					/// &lt;ASSIGN_MODIFIER&gt;
     Type_Mod2,					/// &lt;ASSIGN_MODIFIER&gt;
