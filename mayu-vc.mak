@@ -53,7 +53,7 @@ clean::
 
 boost:
 		cd $(BOOST_DIR)/libs/regex/build/
-		$(MAKE) -f $(MAYU_REGEX_VC).mak $(REGEXPP_XCFLAGS) main_dir boost_regex_vc7_mss_dir ./vc7/boost_regex_vc7_mss.lib
+		$(MAKE) -f $(MAYU_REGEX_VC).mak $(REGEXPP_XCFLAGS) main_dir boost_regex_$(MAYU_REGEX_VC)_mss_dir ./$(MAYU_REGEX_VC)/boost_regex_$(MAYU_REGEX_VC)_mss.lib
 		cd ../../../../mayu
 
 distclean::	clean
