@@ -44,7 +44,7 @@ public:
     ///
     TERMSRV_SET_LED = 8,
     /// Define the keyboard overrun MakeCode.
-    KEYBOARD_OVERRUN_MAKE_CODE = 0xFF,
+    KEYBOARD_OVERRUN_MAKE_CODE_ = 0xFF,
   };
 
 public:
