@@ -91,6 +91,7 @@ const SetupFile::Data g_setupFiles[] =
   DN(File, ALL, "MANUAL-ja.html"     , ToDest, "doc\\MANUAL-ja.html"	 ),
   DN(File, ALL, "README-ja.html"     , ToDest, "doc\\README-ja.html"	 ),
   DN(File, ALL, "README.css"	     , ToDest, "doc\\README.css"	 ),
+  DN(File, ALL, "syntax.txt"	     , ToDest, "doc\\syntax.txt"	 ),
   
   SN(File, ALL, "mayu-mode.el"	     , ToDest),
 				    
