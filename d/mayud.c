@@ -217,6 +217,7 @@ NTSTATUS DriverEntry(IN PDRIVER_OBJECT driverObject,
     detourDevExt->MajorFunction[IRP_MJ_PNP] = detourPnP;
 #endif // MAYUD_PNP
   }
+  detourDevObj->Flags &= ~DO_DEVICE_INITIALIZING;  
   
   return STATUS_SUCCESS;
   
@@ -289,6 +290,7 @@ NTSTATUS mayuAddDevice(IN PDRIVER_OBJECT driverObject,
 #ifdef MAYUD_PNP
   filterDevExt->MajorFunction[IRP_MJ_PNP] = filterPnP;
 #endif // MAYUD_PNP
+  filterDevObj->Flags &= ~DO_DEVICE_INITIALIZING;  
 
   return STATUS_SUCCESS;
 
@@ -465,7 +467,7 @@ NTSTATUS filterReadCompletion(IN PDEVICE_OBJECT deviceObject,
 	IoAcquireCancelSpinLock(&cancelIrql);
 	IoSetCancelRoutine(detourDevExt->irpq, NULL);
 	IoReleaseCancelSpinLock(cancelIrql);
-	IoCompleteRequest(detourDevExt->irpq, IO_NO_INCREMENT);
+	IoCompleteRequest(detourDevExt->irpq, IO_KEYBOARD_INCREMENT);
 	detourDevExt->irpq = NULL;
       }
     }
@@ -493,7 +495,7 @@ NTSTATUS readq(KeyQue *readQue, PIRP irp)
 		  irpSp->Parameters.Read.Length / sizeof(KEYBOARD_INPUT_DATA));
     irp->IoStatus.Status = STATUS_SUCCESS;
     irp->IoStatus.Information = len * sizeof(KEYBOARD_INPUT_DATA);
-    //    irpSp->Parameters.Read.Length = irp->IoStatus.Information;
+    irpSp->Parameters.Read.Length = irp->IoStatus.Information;
     return STATUS_SUCCESS;
   } else {
     irp->IoStatus.Status = STATUS_PENDING;
@@ -615,7 +617,7 @@ NTSTATUS detourRead(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
     IoReleaseCancelSpinLock(cancelIrql);
   }
   else {
-    IoCompleteRequest(irp, IO_NO_INCREMENT);
+    IoCompleteRequest(irp, IO_KEYBOARD_INCREMENT);
   }
   KeReleaseSpinLock(&detourDevExt->lock, currentIrql);
   return status;
