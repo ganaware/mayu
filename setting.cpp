@@ -1444,7 +1444,8 @@ void SettingLoader::load(const tstringi &i_filename)
 
 
 // is the filename readable ?
-bool SettingLoader::isReadable(const tstringi &i_filename) const 
+bool SettingLoader::isReadable(const tstringi &i_filename,
+			       int i_debugLevel) const 
 {
   if (i_filename.empty())
     return false;
@@ -1457,8 +1458,8 @@ bool SettingLoader::isReadable(const tstringi &i_filename) const
   {
     if (m_log && m_soLog)
     {
-      Acquire a(m_soLog, 1);
-      *m_log << _T("loading: ") << i_filename << std::endl;
+      Acquire a(m_soLog, i_debugLevel);
+      *m_log << _T("  loading: ") << i_filename << std::endl;
     }
     return true;
   }
@@ -1466,8 +1467,8 @@ bool SettingLoader::isReadable(const tstringi &i_filename) const
   {
     if (m_log && m_soLog)
     {
-      Acquire a(m_soLog, 1);
-      *m_log << _T("     no: ") << i_filename << std::endl;
+      Acquire a(m_soLog, i_debugLevel);
+      *m_log << _T("not found: ") << i_filename << std::endl;
     }
     return false;
   }
@@ -1512,7 +1513,8 @@ bool SettingLoader::getFilenameFromRegistry(tstringi *o_path) const
 
 
 // get filename
-bool SettingLoader::getFilename(const tstringi &i_name, tstringi *o_path) const
+bool SettingLoader::getFilename(const tstringi &i_name, tstringi *o_path,
+				int i_debugLevel) const
 {
   // the default filename is ".mayu"
   const tstringi &name = i_name.empty() ? tstringi(_T(".mayu")) : i_name;
@@ -1536,13 +1538,14 @@ bool SettingLoader::getFilename(const tstringi &i_name, tstringi *o_path) const
 		 i = pathes.begin(); i != pathes.end(); ++ i)
 	  {
 	    *o_path = *i + _T("\\") + name;
-	    if (isReadable(*o_path))
+	    if (isReadable(*o_path, i_debugLevel))
 	      goto add_symbols;
 	  }
+	  return false;
 	}
 	else
 	{
-	  if (!isReadable(*o_path))
+	  if (!isReadable(*o_path, i_debugLevel))
 	    return false;
 	}
 	add_symbols:
@@ -1562,7 +1565,7 @@ bool SettingLoader::getFilename(const tstringi &i_name, tstringi *o_path) const
     for (HomeDirectories::iterator i = pathes.begin(); i != pathes.end(); ++ i)
     {
       *o_path = *i + _T("\\") + name;
-      if (isReadable(*o_path))
+      if (isReadable(*o_path, i_debugLevel))
 	return true;
     }
     
@@ -1604,7 +1607,7 @@ bool SettingLoader::load(Setting *i_setting, const tstringi &i_filename)
     if (i_filename.empty())
     {
       Acquire a(m_soLog);
-      *m_log << _T("error: failed to load ~/.mayu") << std::endl;
+      getFilename(i_filename, &path, 0);	// show filenames
       return false;
     }
     else

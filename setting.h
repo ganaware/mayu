@@ -148,11 +148,11 @@ private:
   void load(const tstringi &i_filename);
 
   /// is the filename readable ?
-  bool isReadable(const tstringi &i_filename) const;
+  bool isReadable(const tstringi &i_filename, int i_debugLevel = 1) const;
 
   /// get filename
   bool getFilename(const tstringi &i_name,
-		   tstringi *o_path) const;
+		   tstringi *o_path, int i_debugLevel = 1) const;
 
 public:
   ///
