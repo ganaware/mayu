@@ -420,8 +420,7 @@ int WINAPI _tWinMain(HINSTANCE i_hInstance, HINSTANCE /* hPrevInstance */,
 
   int retval = 1;
   
-  if (__argc == 2 && stricmp(__argv[1], "-u") == 0) // why ?
-    // _tcsicmp(__targv[1], _T("-u")) == 0)
+  if (__argc == 2 && _tcsicmp(__targv[1], _T("-u")) == 0)
     retval = uninstallStep1(_T("-u"));
   else
   {
@@ -429,14 +428,12 @@ int WINAPI _tWinMain(HINSTANCE i_hInstance, HINSTANCE /* hPrevInstance */,
     HANDLE mutex = CreateMutex(NULL, TRUE, MUTEX_MAYU_EXCLUSIVE_RUNNING);
     if (GetLastError() == ERROR_ALREADY_EXISTS) // mayu is running
       message(IDS_mayuRunning, MB_OK | MB_ICONSTOP);
-    else if (__argc == 3 && stricmp(__argv[1], "-u") == 0)
-      // _tcsicmp(__targv[1], _T("-u")) == 0)
+    else if (__argc == 3 && _tcsicmp(__targv[1], _T("-u")) == 0)
     {
       uninstallStep2(__targv[2]);
       retval = uninstall();
     }
-    else if (__argc == 2 && stricmp(__argv[1], "-s") == 0)
-      // _tcsicmp(__targv[1], _T("-s")) == 0)
+    else if (__argc == 2 && _tcsicmp(__targv[1], _T("-s")) == 0)
     {
       g_wasExecutedBySFX = true;
       retval = DialogBox(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_main), NULL,

@@ -175,8 +175,9 @@
 	  <dt class="h2">Q10. 「窓使いの憂鬱」は Windows95/98/ME では使えないのですか。
 	  <dd class="d2"><p>小林義明さんがドライバを書いてくださったので、バージョン 3.19 から使用できるようになりました。</p>
 	  <dt class="h2">Q11. このマニュアルをNetscape4で見るとぐちゃぐちゃなんですけど、そういうもんですか。
-	  <dd class="d2"><p>そういうもんです。Netscape4のcssサポートが腐っているせいです。cssをオフにすればまだましになりますけど、やっぱり見にくいです。</p>
-<p>ちなみに作者はIE5.5でしか確認していません。IE5.0では細かい見栄えが少しだけ違ったりします。</p>
+	  <dd class="d2">
+	      <p>そういうもんです。Netscape4 の css サポートが腐っているせいです。css をオフにすればまだましになりますけど、やっぱり見にくいです。</p>
+	      <p>ちなみに作者は IE5.5 と Mozilla 0.92 でしか確認していません。IE5.0 では細かい見栄えが少しだけ違ったりします。</p>
 
 	  <dt class="h2">Q12. mayu は<a href="http://www.tactics.co.jp/qtactics/one.htm" target="_top">椎名繭</a>なのですか。
 	  <dd class="d2"><p>違います。ぜんぜん違います。GTO の繭君でもないです。</p>
@@ -326,12 +327,22 @@
   <dd class="d1">
       <div>
 	<dl class="history">
-	  <dt>2001/08/?? 3.25
+	  <dt>2001/08/13 3.25
 	  <dd>
 	      <ul>
 		<li><code>*.mayu</code> のアイコンが間違っていたのを直した。
 		<li><a href="CUSTOMIZE.html#mod"><code>-=</code></a> で複数キーを設定しても一つしか有効にならないバグの修正。
 		<li>WindowsNT4.0 以外 (9x, Me, 2000) で、「窓使いの憂鬱」を終了させたあとに何かのキーを押さないと終了しないバグの退治。(Thanks to 小林)
+		<li>設定ファイルで隣り合う複数の文字列を一つの文字列として取り扱うようにした。
+		    <p class="sample">
+		    key X =&gt; &HelpMessage("サンプル C-x-", \<br>
+		    &nbsp;"C-x C-s\t上書き保存\r\n" \<br>
+		    &nbsp;"C-x C-f\t開く\t\r\n" \<br>
+		    &nbsp;"C-x k\t\t新規作成\r\n" \<br>
+		    &nbsp;"C-x C-c\t終了")
+		    </p>
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_DescribeBindings"><code>&amp;DescribeBindings</code></a> を微妙に改良。
+		<li>アンインストールができなくなっていたのを修正。(Thanks to 小林)
 	      </ul>
 	  <dt>2001/08/05 3.24
 	  <dd>
