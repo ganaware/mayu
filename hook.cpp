@@ -121,12 +121,31 @@ DllExport bool notify(void *i_data, size_t i_dataSize)
     CreateFile(NOTIFY_MAILSLOT_NAME, GENERIC_WRITE, FILE_SHARE_READ,
 	       (SECURITY_ATTRIBUTES *)NULL, OPEN_EXISTING,
 	       FILE_ATTRIBUTE_NORMAL, (HANDLE)NULL);
-  if (hMailslot == INVALID_HANDLE_VALUE)
+  HANDLE hNotifyMutex = OpenMutex(MUTEX_ALL_ACCESS, FALSE, NOTIFY_MUTEX_NAME);
+  HANDLE hNotifyEvent =
+    OpenEvent(EVENT_MODIFY_STATE, FALSE, NOTIFY_EVENT_NAME);
+  HANDLE hReceiptEvent =
+    OpenEvent(EVENT_ALL_ACCESS, FALSE, RECEIPT_EVENT_NAME);
+  HANDLE hExitEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, EXIT_EVENT_NAME);
+  if (hMailslot == INVALID_HANDLE_VALUE ||
+      hNotifyMutex == INVALID_HANDLE_VALUE ||
+      hNotifyEvent == INVALID_HANDLE_VALUE ||
+      hReceiptEvent == INVALID_HANDLE_VALUE ||
+      hExitEvent == INVALID_HANDLE_VALUE)
     return false;
     
   DWORD len;
+  HANDLE handles[] = {hReceiptEvent, hExitEvent};
+  WaitForSingleObject(hNotifyMutex, INFINITE);
   WriteFile(hMailslot, i_data, i_dataSize, &len, (OVERLAPPED *)NULL);
   CloseHandle(hMailslot);
+  SetEvent(hNotifyEvent);
+  CloseHandle(hNotifyEvent);
+  WaitForMultipleObjects(NUMBER_OF(handles), handles, FALSE, INFINITE);
+  CloseHandle(hReceiptEvent);
+  CloseHandle(hExitEvent);
+  ReleaseMutex(hNotifyMutex);
+  CloseHandle(hNotifyMutex);
   return true;
 }
 

@@ -97,14 +97,19 @@ private:
   ///
   void notifyHandler()
   {
-    DWORD mailslotReadTimeout = MAILSLOT_WAIT_FOREVER;
-#if defined(_WIN95)
-    mailslotReadTimeout = 0;
-#endif
     HANDLE hMailslot =
       CreateMailslot(NOTIFY_MAILSLOT_NAME, NOTIFY_MESSAGE_SIZE,
-		     mailslotReadTimeout, (SECURITY_ATTRIBUTES *)NULL);
+		     MAILSLOT_WAIT_FOREVER, (SECURITY_ATTRIBUTES *)NULL);
+    HANDLE hNotifyMutex = CreateMutex(NULL, FALSE, NOTIFY_MUTEX_NAME);
+    HANDLE hNotifyEvent = CreateEvent(NULL, FALSE, FALSE, NOTIFY_EVENT_NAME);
+    HANDLE hReceiptEvent = CreateEvent(NULL, FALSE, FALSE, RECEIPT_EVENT_NAME);
+    HANDLE hExitEvent = CreateEvent(NULL, TRUE, FALSE, EXIT_EVENT_NAME);
     ASSERT(hMailslot != INVALID_HANDLE_VALUE);
+    ASSERT(hNotifyMutex != INVALID_HANDLE_VALUE);
+    ASSERT(hNotifyEvent != INVALID_HANDLE_VALUE);
+    ASSERT(hReceiptEvent != INVALID_HANDLE_VALUE);
+    ASSERT(hExitEvent != INVALID_HANDLE_VALUE);
+    ResetEvent(hExitEvent);
 
     // initialize ok
     CHECK_TRUE( SetEvent(m_mhEvent) );
@@ -116,21 +121,20 @@ private:
       BYTE buf[NOTIFY_MESSAGE_SIZE];
       
       // wait for message
-      if (!ReadFile(hMailslot, buf, NOTIFY_MESSAGE_SIZE, &len,
-		    (OVERLAPPED *)NULL))
-	continue;
-#if defined(_WIN95)
-      if (len == 0)
-      {
-        Sleep(1);
-        continue;
-      }
-#endif
+      WaitForSingleObject(hNotifyEvent, INFINITE);
+      while (!ReadFile(hMailslot, buf, NOTIFY_MESSAGE_SIZE, &len,
+		       (OVERLAPPED *)NULL));
+      SetEvent(hReceiptEvent);
       switch (reinterpret_cast<Notify *>(buf)->m_type)
       {
 	case Notify::Type_mayuExit:		// terminate thread
 	{
+	  SetEvent(hExitEvent);
 	  CHECK_TRUE( CloseHandle(hMailslot) );
+	  CHECK_TRUE( CloseHandle(hNotifyMutex) );
+	  CHECK_TRUE( CloseHandle(hNotifyEvent) );
+	  CHECK_TRUE( CloseHandle(hReceiptEvent) );
+	  CHECK_TRUE( CloseHandle(hExitEvent) );
 	  CHECK_TRUE( SetEvent(m_mhEvent) );
 	  return;
 	}
