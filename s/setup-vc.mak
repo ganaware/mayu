@@ -43,13 +43,13 @@ strres.h:	setup.rc
 batch:
 !if "$(MAYU_VC)" != "vct"
 		-$(MAKE) -k -f setup-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WINNT
-		-$(MAKE) -k -f setup-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WIN95
+#		-$(MAKE) -k -f setup-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WIN95
 !endif
 		-$(MAKE) -k -f setup-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WINNT nodebug=1
-		-$(MAKE) -k -f setup-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WIN95 nodebug=1
+#		-$(MAKE) -k -f setup-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WIN95 nodebug=1
 
 batch_clean:
 		-$(MAKE) -k -f setup-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WINNT nodebug=1 clean
 		-$(MAKE) -k -f setup-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WINNT clean
-		-$(MAKE) -k -f setup-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WIN95 nodebug=1 clean
-		-$(MAKE) -k -f setup-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WIN95 clean
+#		-$(MAKE) -k -f setup-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WIN95 nodebug=1 clean
+#		-$(MAKE) -k -f setup-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WIN95 clean
