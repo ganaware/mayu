@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=iso-2022-jp">
 <link rel="stylesheet" type="text/css" href="README.css">
-<link rel="prev" href="CONTENTS.html">
+<link rel="prev" href="CONTENTS-ja.html">
 <link rel="next" href="CUSTOMIZE-ja.html">
 <title>窓使いの憂鬱 - MANUAL</title>
 </head>
@@ -65,7 +65,7 @@
 	<li>ダウンロードした実行ファイルを Administrator 権限で実行してください。すると「窓使いの憂鬱」がインストールされます。
 	<li>インストールが終わったらいったんログアウトしてください。さもないとさまざまなアプリケーションが落ちる可能性があります。
 	<li>お好みにより、スタートアップにショートカットを作るのもいいでしょう。
-	<li>標準の設定ファイルの内容は <a href="contrib/mayu-settings.txt"><code>contrib/mayu-settings.txt</code></a> が参考になります。
+	<li>標準の設定ファイルの内容は <a href="../contrib/mayu-settings.txt"><code>contrib/mayu-settings.txt</code></a> が参考になります。
 	<li><code>mayu.exe</code> を実行することで開始します。
       </ol>
       
@@ -338,7 +338,7 @@ Internet Explorerの動きを前章のようにしましたが、
 		  0x2a   U-LeftShift<br>
 		  </p>
 		  
-		  <p>1, 6 行目は <kbd>[Shift]</kbd> キーの押し/離しです。2, 5 行目のような表示があるかもしれませんが、無視してください (参照：<a href="#faq">FAQ</a>)。3, 4 行目から、<code>S-↓</code> が書くべきキー名ということになります。ここの <code>S-</code> というのは、<kbd>[Shift]</kbd> が押されている、というキーの状態を表す記号です。<kbd>[Shift]</kbd> キー以外にも、<kbd>[Windows]</kbd> や <kbd>[Alt]</kbd> や <kbd>[Control]</kbd> の状態、また <kbd>[CapsLock]</kbd> や <kbd>[NumLock]</kbd> などのキーがロック状態にあるかどうかもやはり同様です。これらの特別なキーを、「窓使いの憂鬱」では、モディファイヤと呼んでいます。
+		  <p>1, 6 行目は <kbd>[Shift]</kbd> キーの押し/離しです。2, 5 行目のような表示があるかもしれませんが、無視してください (参照：<a href="#FAQ">FAQ</a>)。3, 4 行目から、<code>S-↓</code> が書くべきキー名ということになります。ここの <code>S-</code> というのは、<kbd>[Shift]</kbd> が押されている、というキーの状態を表す記号です。<kbd>[Shift]</kbd> キー以外にも、<kbd>[Windows]</kbd> や <kbd>[Alt]</kbd> や <kbd>[Control]</kbd> の状態、また <kbd>[CapsLock]</kbd> や <kbd>[NumLock]</kbd> などのキーがロック状態にあるかどうかもやはり同様です。これらの特別なキーを、「窓使いの憂鬱」では、モディファイヤと呼んでいます。
 キー割り当て変更は、このようにモディファイヤを含めて指定することができます。
   </p>
 <p>
@@ -393,7 +393,7 @@ Internet Explorerの動きを前章のようにしましたが、
 		  
 		  <p>ここまで読めばもうチュートリアルは卒業です。ここまでの内容が完璧なら、上級者を名乗れるほどのレベルまで来ています。5,6章が難しいかもしれませんが、習うより慣れろで、調査ウインドウであれこれ試してみてください。自分好みの設定をあれこれ書き加えていくうちに、上にある各リンクの内容に目を通す必要が出てくるはずですが、そうしているうちにマニュアルの見方にも慣れてくるはずです。</p>
 		  
-		  <p>さらなる機能としては、<a href="CUSTOMIZE-ja.html#function_prefix">2 ストロークキーの設定</a>、<a href="CUSTOMIZE-ja.html#oneShotModifier">OneShot モディファイヤ</a>、Window操作をはじめとした<a href="CUSTOMIZE-ja.html#function">豊富な関数群</a>、<a href="CUSTOMIZE-ja.html#def_subst">代用定義</a>などがあります。これらは必要な場合のみ目を通せば十分です。</p>
+		  <p>さらなる機能としては、<a href="CUSTOMIZE-ja.html#function_Prefix">2 ストロークキーの設定</a>、<a href="CUSTOMIZE-ja.html#oneShotModifier">OneShot モディファイヤ</a>、Window操作をはじめとした<a href="CUSTOMIZE-ja.html#function">豊富な関数群</a>、<a href="CUSTOMIZE-ja.html#def_subst">代用定義</a>などがあります。これらは必要な場合のみ目を通せば十分です。</p>
 		</div>
 		
 	  </dl>
@@ -668,7 +668,7 @@ Internet Explorerの動きを前章のようにしましたが、
 		<li><a href="CUSTOMIZE-ja.html#oneShotModifier">One Shot モディファイヤ</a>の例が間違っていたので修正。(Thanks to 小林)
 		<li>Windows 側では離されていることになっているキーについて、「窓使いの憂鬱」がキーを離すスキャンコードを Windows 側へ送ることがないようにした。(Thanks to 小林)
 		<li><a href="#RELATEDWORK">related work</a> に Word Emacs を追加。
-		<li><a href="mayu-mode.el" target="MANUAL"><code>mayu-mode.el</code></a> で <code>M-;</code> (<code>indent-for-comment</code>) が使用できるようになった (Thanks to 永野圭一郎)
+		<li><a href="../mayu-mode.el" target="MANUAL"><code>mayu-mode.el</code></a> で <code>M-;</code> (<code>indent-for-comment</code>) が使用できるようになった (Thanks to 永野圭一郎)
 		<li>戯れに <code><em>FUNCTION</em></code> <a href="CUSTOMIZE-ja.html#function_DirectSSTP"><code>&amp;DirectSSTP</code></a> を追加してみた。
 	      </ul>
 	  <dt>2001/08/13 3.25
@@ -691,11 +691,11 @@ Internet Explorerの動きを前章のようにしましたが、
 	  <dt>2001/08/05 3.24
 	  <dd>
 	      <ul>
-		<li><a href="default.mayu"><code>default.mayu</code></a> で、<kbd>[英数]</kbd> を <kbd>[Control]</kbd> として使用している場合に <code>C-Q</code> が正しく働かない問題を修正。version 3.19 で修正したものと原因は同じ。(Thanks to hanawa)
+		<li><a href="../default.mayu"><code>default.mayu</code></a> で、<kbd>[英数]</kbd> を <kbd>[Control]</kbd> として使用している場合に <code>C-Q</code> が正しく働かない問題を修正。version 3.19 で修正したものと原因は同じ。(Thanks to hanawa)
 		<li>Windows9x のドライバを更新。青画面でも操作できるようになりました。(Thanks to 小林)
 		<li><a href="CUSTOMIZE-ja.html#oneShotModifier">One Shot モディファイヤ</a>であると宣言したキーが押されている間にキーが押された時のみ、モディファイヤとして扱われるようにした。今までは、離された時にもモディファイヤ扱いになっていた。
 		<li>一時停止にしたときにタスクトレイのアイコンを変化させるようにした。
-		<li><a href="CUSTOMIZE-ja.html#keyRepeat"><code>R-</code></a> を新設。(Thanks to hanawa)。<a href="mayu-mode.el" target="MANUAL"><code>mayu-mode.el</code></a> で色がつくようにした。
+		<li><a href="CUSTOMIZE-ja.html#keyRepeat"><code>R-</code></a> を新設。(Thanks to hanawa)。<a href="../mayu-mode.el" target="MANUAL"><code>mayu-mode.el</code></a> で色がつくようにした。
 		<li><a href="http://www.borland.co.jp/cppbuilder/freecompiler/index.html" target="_top">Borland C++ 5.5.1</a> で<a href="CUSTOMIZE-ja.html#compile">ビルド</a>できるようにした。
 		<li><a href="CUSTOMIZE-ja.html#oneShotModifier">One Shot モディファイヤ</a>を離したときに有効なモディファイヤは押したときと同じになるようにした。
 		<li><a href="CUSTOMIZE-ja.html#function_EmacsEditKillLine"><code>&amp;EmacsEditKillLineFunc</code></a>, <a href="CUSTOMIZE-ja.html#function_EmacsEditKillLine"><code>&amp;EmacsEditKillLinePred</code></a> の説明を追加。
@@ -705,10 +705,10 @@ Internet Explorerの動きを前章のようにしましたが、
 	  <dt>2001/07/06 3.23 (BETA)
 	  <dd>
 	      <ul>
-		<li><a href="104on109.mayu"><code>104on109.mayu</code></a> で「`」が入力できなかったバグを直した。(Thanks to Oiwa)
+		<li><a href="../104on109.mayu"><code>104on109.mayu</code></a> で「`」が入力できなかったバグを直した。(Thanks to Oiwa)
 		<li><a href="CUSTOMIZE-ja.html#oneShotRepeatableModifier">One Shot (キーリピート有)</a> を追加。
 		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE-ja.html#function_Toggle"><code>&amp;Toggle</code></a> で、強制的にオンオフできるようにした。
-		<li><a href="109.mayu"><code>109.mayu</code></a> に VAIO タワー用の特殊キーを追加。
+		<li><a href="../109.mayu"><code>109.mayu</code></a> に VAIO タワー用の特殊キーを追加。
 		<li>WindowsNT4.0 でインストールできなくなっていた問題を修正。(Makefile の書き方のミス)
 		<li>Windows9x のドライバを更新。
 		<li>新規インストールした時に「ホームディレクトリから」が選択されていてキー入力ができなくなってしまう問題を修正。
@@ -717,8 +717,8 @@ Internet Explorerの動きを前章のようにしましたが、
 	  <dt>2001/03/24 3.22 (BETA)
 	  <dd>
 	      <ul>
-		<li><a href="CUSTOMIZE-ja.html#def_subst">代用定義</a>を追加した。おかげで <a href="104on109.mayu"><code>104on109.mayu</code></a> などがスマートに定義できるようになった。
-		<li><a href="mayu-mode.el" target="MANUAL"><code>mayu-mode.el</code></a> で代用定義にも色がつくようにした。
+		<li><a href="CUSTOMIZE-ja.html#def_subst">代用定義</a>を追加した。おかげで <a href="../104on109.mayu"><code>104on109.mayu</code></a> などがスマートに定義できるようになった。
+		<li><a href="../mayu-mode.el" target="MANUAL"><code>mayu-mode.el</code></a> で代用定義にも色がつくようにした。
 		<li>間違ってデバッグビルドしたものを収録していたのをリリースビルドを収録するようにした。
 		<li>間違って壊れた Windows9x のドライバを収録してしまったので正しいドライバを入れた。
 	      </ul>
@@ -728,7 +728,7 @@ Internet Explorerの動きを前章のようにしましたが、
 		<li>Windows95 で CPU 時間を 100% 占めてしまう問題がなおった。(Thanks to 小林義明)
 		<li>NEC PC-98x1 で動作しない問題がなおった。(Thanks to 小林義明)
 		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE-ja.html#function_LoadSetting"><code>&amp;LoadSetting</code></a> で、どの設定をロードするか指定できるようになった。
-		<li><a href="contrib/98x1.mayu"><code>contrib/98x1.mayu</code></a> を追加。(Thanks to HAJANO Na&ograve;qui)
+		<li><a href="../contrib/98x1.mayu"><code>contrib/98x1.mayu</code></a> を追加。(Thanks to HAJANO Na&ograve;qui)
 		<li><a href="CUSTOMIZE-ja.html#HOME">ホームディレクトリ</a> に、<code>mayu.exe</code> のカレントディレクトリを追加。		  
 	      </ul>
 	  <dt>2001/03/10 version 3.20 (BETA)
@@ -744,27 +744,27 @@ Internet Explorerの動きを前章のようにしましたが、
 	      <ul>
 		<li>このバージョンは内部構造を大幅に変えたので不安定である可能性が高いです。どうしてもこのバージョンが必要な人のみ使用してください。
 		<li><kbd>[Control]</kbd> + <kbd>[U]</kbd> 操作の改良。
-		<li><a href="default.mayu"><code>default.mayu</code></a> を使っている場合は、<code>Global</code> キーマップで <kbd>[英数]</kbd> を <kbd>[Control]</kbd> にしているが、<code>Global</code> キーマップを親キーマップとして持たない <a href="CUSTOMIZE-ja.html#keymap2"><code>keymap2</code></a> の中では (当然ながら) <kbd>[英数]</kbd> を <kbd>[Control]</kbd> として使用できないので、ちゃんと <code>Global</code> キーマップを親キーマップとして持つように設定ファイルを修正。
-		<li><a href="default.mayu"><code>default.mayu</code></a> で、<code>-DMAP-ESCAPE-TO-META</code> とすると <kbd>[Alt]</kbd> + <kbd>[X]</kbd> などを <kbd>[ESCAPE] [X]</kbd> で代用するようにした。
+		<li><a href="../default.mayu"><code>default.mayu</code></a> を使っている場合は、<code>Global</code> キーマップで <kbd>[英数]</kbd> を <kbd>[Control]</kbd> にしているが、<code>Global</code> キーマップを親キーマップとして持たない <a href="CUSTOMIZE-ja.html#keymap2"><code>keymap2</code></a> の中では (当然ながら) <kbd>[英数]</kbd> を <kbd>[Control]</kbd> として使用できないので、ちゃんと <code>Global</code> キーマップを親キーマップとして持つように設定ファイルを修正。
+		<li><a href="../default.mayu"><code>default.mayu</code></a> で、<code>-DMAP-ESCAPE-TO-META</code> とすると <kbd>[Alt]</kbd> + <kbd>[X]</kbd> などを <kbd>[ESCAPE] [X]</kbd> で代用するようにした。
 		<li>WindowsNT/2000 版のプログラム内部では全て UNICODE で処理するようにした。
 		<li>WindowsNT/2000 版では、設定ファイルの文字コードに、shift_jis だけでなく UTF-16LE/BE や UTF-8 を使用できるようになった。「メモ帳」で、「Unicode」や「Unicode big endien」や「UTF-8」を選んでセーブすれば、日本語だけでなくハングルなどの UNICODE で扱える文字が全て設定ファイルに書けるようになる。現在は文字コードは自動判別され、自動判別に失敗した場合の救済措置はない。自動判別に失敗するようなら自動判別できそうな文字をコメントにでも書いておくこと。
 		<li>正規表現ライブラリを <a href="http://ourworld.compuserve.com/homepages/John_Maddock/regexpp.htm" target="_top">Regex++</a> に変更した。
 		<li>いろいろ変えた結果多分 bcc32 ではコンパイルできなくなった。少し修正するだけだと思うが。
-		<li><a href="contrib/ax.mayu"><code>contrib/ax.mayu</code></a> を追加。(Thanks to KAWABE Nobukazu)
+		<li><a href="../contrib/ax.mayu"><code>contrib/ax.mayu</code></a> を追加。(Thanks to KAWABE Nobukazu)
 		<li><a href="#RELATEDWORK">related work</a> に MetaX を追加。
 		<li><a href="CUSTOMIZE-ja.html#defaultModifier">デフォルトモディファイヤの変更</a>のサンプルが間違っていたので直した。(<code>key IC-* =</code> ではなく <code>key *IC- =</code> が正しい) (Thanks to Hirotaka Kasaki)
 		<li><a href="CUSTOMIZE-ja.html#defaultKey">デフォルトキー</a>の中で定義中のキーマップ名を参照できなかったバグを修正した。つまり、<code>keymap Hoge =&gt; &amp;Prefix(Hoge)</code> などができるようになった。(Thanks to HANAWA Yoshio)
 		<li>Windows9x 用のドライバを作成されたので、このバージョンから WindowsNT/2000 用のパッケージと Windows9x 用のパッケージが存在します。(Thanks to 小林義明)
 		<li>現在、Windows9x では、<a href="CUSTOMIZE-ja.html#function_HelpMessage"><code>&amp;HelpMessage</code></a>、<a href="CUSTOMIZE-ja.html#function_HelpVariable"><code>&amp;HelpVariable</code></a>、<a href="CUSTOMIZE-ja.html#function_WindowSetAlpha"><code>&amp;WindowSetAlpha</code></a> は使用できません。
-		<li><a href="default.mayu"><code>default.mayu</code></a> を使用している場合、シンボル <code>ZXCV</code> を定義しておくと、<kbd>[Control]</kbd> + <kbd>[Z]</kbd>, <kbd>[Control]</kbd> + <kbd>[X]</kbd>, <kbd>[Control]</kbd> + <kbd>[C]</kbd>, <kbd>[Control]</kbd> + <kbd>[V]</kbd> が Windows と同じ動きをするようになります。(Thanks to HANAWA Yoshio)
+		<li><a href="../default.mayu"><code>default.mayu</code></a> を使用している場合、シンボル <code>ZXCV</code> を定義しておくと、<kbd>[Control]</kbd> + <kbd>[Z]</kbd>, <kbd>[Control]</kbd> + <kbd>[X]</kbd>, <kbd>[Control]</kbd> + <kbd>[C]</kbd>, <kbd>[Control]</kbd> + <kbd>[V]</kbd> が Windows と同じ動きをするようになります。(Thanks to HANAWA Yoshio)
 	      </ul>
 	  <dt>2000/12/17 version 3.18
 	  <dd>
 	      <ul>
 		<li>ヘルプが開けないバグの修正。
-		<li><a href="mayu-mode.el" target="MANUAL"><code>mayu-mode.el</code></a> が展開されていなかったのを直した。ついでに少しだけ修正。
+		<li><a href="../mayu-mode.el" target="MANUAL"><code>mayu-mode.el</code></a> が展開されていなかったのを直した。ついでに少しだけ修正。
 		<li><code>IC-</code> が時々無視されるバグが直ったはず。
-		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE-ja.html#function_HelpMessage"><code>&amp;HelpMessage</code></a> を追加。<a href="default.mayu"><code>default.mayu</code></a> を使っている場合はメモ帳で <kbd>[Control]</kbd> + <kbd>[X]</kbd> を押してみよう (ただし IE5.0 以上を使っている場合のみ)。
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE-ja.html#function_HelpMessage"><code>&amp;HelpMessage</code></a> を追加。<a href="../default.mayu"><code>default.mayu</code></a> を使っている場合はメモ帳で <kbd>[Control]</kbd> + <kbd>[X]</kbd> を押してみよう (ただし IE5.0 以上を使っている場合のみ)。
 		<li><a href="CUSTOMIZE-ja.html#event"><code>event</code></a> を追加。
 		<li>これらの追加により、プレフィックスキーが押された時にメッセージを表示することが可能になった。
 		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE-ja.html#function_KeymapWindow"><code>&amp;KeymapWindow</code></a> を追加。
@@ -789,9 +789,9 @@ Internet Explorerの動きを前章のようにしましたが、
 		<li><a href="#FAQ">FAQ</a> を追加。
 		<li><code>mailto:</code> をドキュメントから削除。
 		<li><a href="http://www.linuxsupportline.com/~doc++/" target="_top">DOC++</a> で表示できるようにソースのコメントを書き換えた。
-		<li>Emacs で設定ファイルを編集する人のために <a href="mayu-mode.el"><code>mayu-mode.el</code></a> を追加。ただし、色がつくだけです。
+		<li>Emacs で設定ファイルを編集する人のために <a href="../mayu-mode.el"><code>mayu-mode.el</code></a> を追加。ただし、色がつくだけです。
 		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE-ja.html#function_WindowIdentify"><code>&amp;WindowIdentify</code></a> で、ウィンドウの位置と大きさも表示するようにした。
-		<li><a href="contrib/keitai.mayu"><code>contrib/keitai.mayu</code></a> を追加。テンキーで携帯電話式ひらがな入力をしようという画期的設定ファイル (注:Joke)。(Thanks to HANAWA Yoshio)
+		<li><a href="../contrib/keitai.mayu"><code>contrib/keitai.mayu</code></a> を追加。テンキーで携帯電話式ひらがな入力をしようという画期的設定ファイル (注:Joke)。(Thanks to HANAWA Yoshio)
 		<li>設定ファイルが見つからなかったときはエラーを出すようになった。
 		<li>設定ファイルを更新。
 		<li>調査ダイアログを動かすとログウィンドウも動くようにした。
@@ -852,8 +852,8 @@ Internet Explorerの動きを前章のようにしましたが、
 	  <dt>2000/05/06 version 3.11
 	  <dd>
 	      <ul>
-		<li><a href="contrib/dvorak.mayu"><code>contrib/dvorak.mayu</code></a> を更新。(Thanks to KANAI Makoto)
-		<li><a href="contrib/mayu-settings.txt"><code>contrib/mayu-settings.txt</code></a> を更新。(Thanks to HANAWA Yoshio)
+		<li><a href="../contrib/dvorak.mayu"><code>contrib/dvorak.mayu</code></a> を更新。(Thanks to KANAI Makoto)
+		<li><a href="../contrib/mayu-settings.txt"><code>contrib/mayu-settings.txt</code></a> を更新。(Thanks to HANAWA Yoshio)
 	      </ul>
 	  <dt>2000/05/05 version 3.10
 	  <dd>
@@ -868,7 +868,7 @@ Internet Explorerの動きを前章のようにしましたが、
 	  <dt>2000/04/24 version 3.09
 	  <dd>
 	      <ul>
-		<li><a href="contrib/dvorak.mayu"><code>contrib/dvorak.mayu</code></a> を追加。(Thanks to KANAI Makoto)
+		<li><a href="../contrib/dvorak.mayu"><code>contrib/dvorak.mayu</code></a> を追加。(Thanks to KANAI Makoto)
 		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE-ja.html#function_InvestigateCommand"><code>&amp;InvestigateCommand</code></a> を追加。<a href="CUSTOMIZE-ja.html#function_PostMessage"><code>&amp;PostMessage</code></a> の為の調査用。
 		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE-ja.html#function_EditNextModifier"><code>&amp;EditNextModifier</code></a> を追加。<kbd>[Alt]</kbd> + <kbd>[X]</kbd> などを <kbd>[ESCAPE] [X]</kbd> などで代用することが可能に。
 		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE-ja.html#function_Prefix"><code>&amp;Prefix</code></a> を変更。<a href="CUSTOMIZE-ja.html#keymap2"><code>keymap2</code></a> を使うときのお約束 (<code>mod !shift !alt !control !windows</code>) が不要に。
@@ -880,7 +880,7 @@ Internet Explorerの動きを前章のようにしましたが、
 		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE-ja.html#function_WindowSetAlpha"><code>&amp;WindowSetAlpha</code></a> を追加。
 		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE-ja.html#function_WindowRedraw"><code>&amp;WindowRedraw</code></a> を追加。
 		<li><a href="#RELATEDWORK">related work</a> に KillGates を追加。
-		<li><a href="contrib/mayu-settings.txt"><code>contrib/mayu-settings.txt</code></a> を更新。(Thanks to HANAWA Yoshio)
+		<li><a href="../contrib/mayu-settings.txt"><code>contrib/mayu-settings.txt</code></a> を更新。(Thanks to HANAWA Yoshio)
 		<li>設定ファイルを更新。
 	      </ul>
 	  <dt>2000/04/01 version 3.07
@@ -925,7 +925,7 @@ Internet Explorerの動きを前章のようにしましたが、
 		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE-ja.html#function_WindowMaxMinHVMax"><code>&amp;WindowHMaximize</code></a> を追加。
 		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE-ja.html#function_WindowIdentify"><code>&amp;WindowIdentify</code></a> を追加。
 		<li>設定ファイルを大幅に更新した。
-		<li><a href="contrib/mayu-settings.txt"><code>contrib/mayu-settings.txt</code></a> の追加。(Thanks to HANAWA Yoshio)
+		<li><a href="../contrib/mayu-settings.txt"><code>contrib/mayu-settings.txt</code></a> の追加。(Thanks to HANAWA Yoshio)
 		<li>Windows2000 用のドライバをパワーマネジメント対応にした。
 		<li>コンソールのフォーカスの追跡に時々失敗していたのが直ったかもしれない。
 		<li>PlayStation2 の発売日。
@@ -945,7 +945,7 @@ Internet Explorerの動きを前章のようにしましたが、
 	  <dt>1999/10/30 version 3.01
 	  <dd>
 	      <ul>
-		<li><a href="104on109.mayu"><code>104on109.mayu</code></a> と <a href="109on104.mayu"><code>109on104.mayu</code></a> を作った。
+		<li><a href="../104on109.mayu"><code>104on109.mayu</code></a> と <a href="../109on104.mayu"><code>109on104.mayu</code></a> を作った。
 	      </ul>
 	  <dt>1999/10/29 version 3.00
 	  <dt>1999/09/08 cmkey version 2.21
