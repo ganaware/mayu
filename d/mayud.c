@@ -652,14 +652,6 @@ NTSTATUS detourCleanup(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
   PIRP  currentIrp = NULL, irpCancel;
   DetourDeviceExtension *detourDevExt =
     (DetourDeviceExtension*)deviceObject->DeviceExtension;
-  FilterDeviceExtension *filterDevExt =
-    (FilterDeviceExtension*)detourDevExt->filterDevObj->DeviceExtension;
-
-  // cancel io
-  KeAcquireSpinLock(&filterDevExt->lock, &currentIrql);
-  if (filterDevExt->irpq)
-    IoCancelIrp(filterDevExt->irpq);
-  KeReleaseSpinLock(&filterDevExt->lock, currentIrql);
 
   KeAcquireSpinLock(&detourDevExt->lock, &currentIrql);
   IoAcquireCancelSpinLock(&cancelIrql);
@@ -829,6 +821,8 @@ NTSTATUS filterPnP(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
   PIO_STACK_LOCATION irpSp = IoGetCurrentIrpStackLocation(irp);
   FilterDeviceExtension *filterDevExt =
     (FilterDeviceExtension*)deviceObject->DeviceExtension;
+  DetourDeviceExtension *detourDevExt =
+    (DetourDeviceExtension*)filterDevExt->detourDevObj->DeviceExtension;
   KIRQL currentIrql;
   NTSTATUS status;
   ULONG minor;
@@ -838,6 +832,20 @@ NTSTATUS filterPnP(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
   status = IoCallDriver(filterDevExt->kbdClassDevObj, irp);
   switch (minor) {
   case IRP_MN_REMOVE_DEVICE:
+    KeAcquireSpinLock(&detourDevExt->lock, &currentIrql);
+    if (detourDevExt->filterDevObj == deviceObject) {
+      PDEVICE_OBJECT devObj = deviceObject->DriverObject->DeviceObject;
+
+      detourDevExt->filterDevObj = NULL;
+      while (devObj->NextDevice) {
+	if (devObj != deviceObject) {
+	  detourDevExt->filterDevObj = devObj;
+	  break;
+	}
+	devObj = devObj->NextDevice;
+      }
+    }
+    KeReleaseSpinLock(&detourDevExt->lock, currentIrql);
     // detach
     IoDetachDevice(filterDevExt->kbdClassDevObj);
 
