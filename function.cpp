@@ -1897,6 +1897,33 @@ void Engine::funcSetImeStatus(FunctionParam *i_param, ToggleType i_toggle)
   }
 }
 
+// set IME open status
+void Engine::funcSetImeString(FunctionParam *i_param, const StrExprArg &i_data)
+{
+#if defined(_WINNT)
+  if (!i_param->m_isPressed)
+    return;
+  if (m_hwndFocus)
+  {
+    UINT WM_MAYU_MESSAGE = RegisterWindowMessage(WM_MAYU_MESSAGE_NAME);
+    PostMessage(m_hwndFocus, WM_MAYU_MESSAGE, MayuMessage_funcSetImeString, i_data.eval().size() * sizeof(_TCHAR));
+
+    DWORD len = 0;
+    DWORD error;
+    DisconnectNamedPipe(m_hookPipe);
+    ConnectNamedPipe(m_hookPipe, NULL);
+    error = WriteFile(m_hookPipe, i_data.eval().c_str(),
+		      i_data.eval().size() * sizeof(_TCHAR),
+		      &len, NULL);
+
+    //FlushFileBuffers(m_hookPipe);
+  }
+#else
+  Acquire a(&m_log);
+  m_log << _T("supported on only Windows NT/2000/XP") << std::endl;
+#endif
+}
+
 // Direct SSTP Server
 class DirectSSTPServer
 {

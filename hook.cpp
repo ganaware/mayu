@@ -291,6 +291,7 @@ static void funcRecenter(HWND i_hwnd)
   SendMessage(i_hwnd, EM_LINESCROLL, 0, caretLine - line);
 }
 
+
 // &SetImeStatus
 static void funcSetImeStatus(HWND i_hwnd, int i_status)
 {
@@ -306,6 +307,44 @@ static void funcSetImeStatus(HWND i_hwnd, int i_status)
   ImmSetOpenStatus(hIMC, i_status);
   ImmReleaseContext(i_hwnd, hIMC);
 }
+
+
+// &SetImeString
+static void funcSetImeString(HWND i_hwnd, int i_size)
+{
+#if defined(_WINNT)
+  _TCHAR *buf = new _TCHAR(i_size);
+  DWORD len = 0;
+  _TCHAR ImeDesc[GANA_MAX_ATOM_LENGTH];
+  UINT ImeDescLen;
+  DWORD error;
+  DWORD denom = 1;
+  HANDLE hPipe
+    = CreateFile(HOOK_PIPE_NAME, GENERIC_READ,
+		 FILE_SHARE_READ, (SECURITY_ATTRIBUTES *)NULL,
+		 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, (HANDLE)NULL);
+  error = ReadFile(hPipe, buf, i_size, &len, NULL);
+  CloseHandle(hPipe);
+
+  ImeDescLen = ImmGetDescription(GetKeyboardLayout(0),
+				 ImeDesc, sizeof(ImeDesc));
+  if (_tcsncmp(ImeDesc, _T("SKKIME"), ImeDescLen) > 0)
+    denom = sizeof(_TCHAR);
+
+  HIMC hIMC = ImmGetContext(i_hwnd);
+  if (hIMC == INVALID_HANDLE_VALUE)
+    return;
+
+  int status = ImmGetOpenStatus(hIMC);
+  ImmSetCompositionString(hIMC, SCS_SETSTR, buf, len / denom, NULL, 0);
+  delete buf;
+  ImmNotifyIME(hIMC, NI_COMPOSITIONSTR, CPS_COMPLETE, 0);
+  if (!status)
+    ImmSetOpenStatus(hIMC, status);
+  ImmReleaseContext(i_hwnd, hIMC);
+#endif // _WINNT
+}
+
 
 /// notify lock state
 DllExport void notifyLockState()
@@ -377,6 +416,9 @@ LRESULT CALLBACK getMessageProc(int i_nCode, WPARAM i_wParam, LPARAM i_lParam)
 	    break;
 	  case MayuMessage_funcSetImeStatus:
 	    funcSetImeStatus(msg.hwnd, msg.lParam);
+	    break;
+	  case MayuMessage_funcSetImeString:
+	    funcSetImeString(msg.hwnd, msg.lParam);
 	    break;
 	}
       }

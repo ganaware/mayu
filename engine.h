@@ -158,6 +158,7 @@ private:
   HANDLE m_terminateThreadEvent;		/// terminate thread event
   OVERLAPPED m_ol;				/** for async read/write of
 						    mayu device */
+  HANDLE m_hookPipe;				/// named pipe for &SetImeString
 #endif // _WINNT
   bool volatile m_doForceTerminate;		/// terminate engine thread
   bool volatile m_isLogMode;			/// is logging mode ?
@@ -449,6 +450,8 @@ private:
 		  BooleanType i_doesCreateThread = BooleanType_false);
   /// set IME open status
   void funcSetImeStatus(FunctionParam *i_param, ToggleType i_toggle = ToggleType_toggle);
+  /// set string to IME
+  void funcSetImeString(FunctionParam *i_param, const StrExprArg &i_data);
   // END OF FUNCTION DEFINITION
 #  define FUNCTION_FRIEND
 #  include "functions.h"

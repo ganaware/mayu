@@ -9,6 +9,9 @@
 #  include <tchar.h>
 
 ///
+#  define HOOK_PIPE_NAME \
+ _T("\\\\.\\pipe\\GANAware\\mayu\\{4B22D464-7A4E-494b-982A-C2B2BBAAF9F3}") _T(VERSION)
+///
 #  define WM_MAYU_MESSAGE_NAME _T("GANAware\\mayu\\WM_MAYU_MESSAGE")
 
 ///
@@ -17,6 +20,7 @@ enum MayuMessage
   MayuMessage_notifyName,
   MayuMessage_funcRecenter,
   MayuMessage_funcSetImeStatus,
+  MayuMessage_funcSetImeString,
 };
 
 

@@ -979,6 +979,12 @@ Engine::Engine(tomsgstream &i_log)
 
   // create event for sync
   CHECK_TRUE( m_eSync = CreateEvent(NULL, FALSE, FALSE, NULL) );
+#if defined(_WINNT)
+  // create named pipe for &SetImeString
+  m_hookPipe = CreateNamedPipe(HOOK_PIPE_NAME, PIPE_ACCESS_OUTBOUND,
+			       PIPE_TYPE_BYTE, 1,
+			       0, 0, 0, NULL);
+#endif // _WINNT
 }
 
 
@@ -1056,6 +1062,11 @@ Engine::~Engine()
   
   // close m_device
   CHECK_TRUE( CloseHandle(m_device) );
+#if defined(_WINNT)
+  // destroy named pipe for &SetImeString
+  DisconnectNamedPipe(m_hookPipe);
+  CHECK_TRUE( CloseHandle(m_hookPipe) );
+#endif // _WINNT
 }
 
 // set m_setting
