@@ -5,6 +5,7 @@
 #include "engine.h"
 #include "hook.h"
 #include "mayu.h"
+#include "mayurc.h"
 #include "misc.h"
 #include "registry.h"
 #include "vkeytable.h"
@@ -420,6 +421,22 @@ bool getTypeValue(LogicalOperatorType *o_type, const tstring &i_name)
 {
   return getTypeValue(o_type, i_name, g_logicalOperatorType,
 		      NUMBER_OF(g_logicalOperatorType));
+}
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// std::list<tstring>
+
+
+/// stream output
+tostream &operator<<(tostream &i_ost, const std::list<tstring> &i_data)
+{
+  for (std::list<tstring>::const_iterator
+	 i = i_data.begin(); i != i_data.end(); ++ i)
+  {
+    i_ost << *i << _T(", ");
+  }
+  return i_ost;
 }
 
 
@@ -1667,4 +1684,182 @@ void Engine::funcLogClear(FunctionParam *i_param)
     return;
   PostMessage(getAssociatedWndow(), WM_APP_engineNotify,
 	      EngineNotify_clearLog, 0);
+}
+
+
+// Direct SSTP Server
+class DirectSSTPServer
+{
+public:
+  tstring m_path;
+  HWND m_hwnd;
+  tstring m_name;
+  tstring m_keroname;
+
+public:
+  DirectSSTPServer()
+    : m_hwnd(NULL)
+  {
+  }
+};
+
+
+class ParseDirectSSTPData
+{
+  typedef boost::match_results<std::string::const_iterator,
+					    boost::regex::alloc_type> MR;
+
+public:
+  typedef std::map<tstring, DirectSSTPServer> DirectSSTPServers;
+
+private:
+  DirectSSTPServers *m_directSSTPServers;
+  
+public:
+  // constructor
+  ParseDirectSSTPData(DirectSSTPServers *i_directSSTPServers)
+    : m_directSSTPServers(i_directSSTPServers)
+  {
+  }
+  
+  bool operator()(const MR& i_what)
+  {
+#ifdef _UNICODE
+    tstring id(to_wstring(std::string(i_what[1].first, i_what[1].second)));
+    tstring member(to_wstring(std::string(i_what[2].first, i_what[2].second)));
+    tstring value(to_wstring(std::string(i_what[3].first, i_what[3].second)));
+#else
+    tstring id(i_what[1].first, i_what[1].second);
+    tstring member(i_what[2].first, i_what[2].second);
+    tstring value(i_what[3].first, i_what[3].second);
+#endif
+
+    if (member == _T("path"))
+      (*m_directSSTPServers)[id].m_path = value;
+    else if (member == _T("hwnd"))
+      (*m_directSSTPServers)[id].m_hwnd =
+	reinterpret_cast<HWND>(_ttoi(value.c_str()));
+    else if (member == _T("name"))
+      (*m_directSSTPServers)[id].m_name = value;
+    else if (member == _T("keroname"))
+      (*m_directSSTPServers)[id].m_keroname = value;
+    return true; 
+  }
+};
+
+// Direct SSTP
+void Engine::funcDirectSSTP(FunctionParam *i_param,
+			    const tregex &i_name,
+			    const tstring &i_protocol,
+			    const std::list<tstring> &i_headers)
+{
+  if (!i_param->m_isPressed)
+    return;
+
+  // check Direct SSTP server exist ?
+  if (HANDLE hm = OpenMutex(MUTEX_ALL_ACCESS, FALSE, _T("sakura")))
+    CloseHandle(hm);
+  else
+  {
+    Acquire a(&m_log, 0);
+    m_log << _T(" Error(1): Direct SSTP server does not exist.");
+    return;
+  }
+
+  HANDLE hfm = OpenFileMapping(FILE_MAP_READ, FALSE, _T("Sakura"));
+  if (!hfm)
+  {
+    Acquire a(&m_log, 0);
+    m_log << _T(" Error(2): Direct SSTP server does not provide data.");
+    return;
+  }
+  
+  char *data =
+    reinterpret_cast<char *>(MapViewOfFile(hfm, FILE_MAP_READ, 0, 0, 0));
+  if (!data)
+  {
+    CloseHandle(hfm);
+    Acquire a(&m_log, 0);
+    m_log << _T(" Error(3): Direct SSTP server does not provide data.");
+    return;
+  }
+  
+  long length = *(long *)data;
+  const char *begin = data + 4;
+  const char *end = data + length;
+  boost::regex getSakura("([0-9a-fA-F]{32})\\.([^\x01]+)\x01(.*?)\r\n");
+  
+  ParseDirectSSTPData::DirectSSTPServers servers;
+  boost::regex_grep(ParseDirectSSTPData(&servers), begin, end, getSakura);
+
+  // make request
+  tstring request;
+  if (!i_protocol.size())
+    request += _T("NOTIFY SSTP/1.1");
+  else
+    request += i_protocol;
+  request += _T("\r\n");
+
+  bool hasSender = false;
+  for (std::list<tstring>::const_iterator
+	 i = i_headers.begin(); i != i_headers.end(); ++ i)
+  {
+    if (_tcsnicmp(_T("Charset"), i->c_str(), 7) == 0 ||
+	_tcsnicmp(_T("Hwnd"),    i->c_str(), 4) == 0)
+      continue;
+    if (_tcsnicmp(_T("Sender"), i->c_str(), 6) == 0)
+      hasSender = true;
+    request += i->c_str();
+    request += _T("\r\n");
+  }
+
+  if (!hasSender)
+  {
+    request += _T("Sender: ");
+    request += loadString(IDS_mayu);
+    request += _T("\r\n");
+  }
+  
+  _TCHAR buf[100];
+  _sntprintf(buf, NUMBER_OF(buf), _T("HWnd: %d\r\n"),
+	     reinterpret_cast<int>(m_hwndAssocWindow));
+  request += buf;
+
+#ifdef _UNICODE
+  request += _T("Charset: UTF-8\r\n");
+#else
+  request += _T("Charset: Shift_JIS\r\n");
+#endif
+  request += _T("\r\n");
+
+#ifdef _UNICODE
+  std::string request_UTF_8 = to_UTF_8(request);
+#endif
+
+  // send request to Direct SSTP Server which matches i_name;
+  for (ParseDirectSSTPData::DirectSSTPServers::iterator
+	 i = servers.begin(); i != servers.end(); ++ i)
+  {
+    tcmatch_results what;
+    if (boost::regex_match(i->second.m_name, what, i_name))
+    {
+      COPYDATASTRUCT cd;
+      cd.dwData = 9801;
+#ifdef _UNICODE
+      cd.cbData = request_UTF_8.size();
+      cd.lpData = (void *)request_UTF_8.c_str();
+#else
+      cd.cbData = request.size();
+      cd.lpData = (void *)request.c_str();
+#endif
+      DWORD result;
+      SendMessageTimeout(i->second.m_hwnd, WM_COPYDATA,
+			 reinterpret_cast<WPARAM>(m_hwndAssocWindow),
+			 reinterpret_cast<LPARAM>(&cd),
+			 SMTO_ABORTIFHUNG | SMTO_BLOCK, 5000, &result);
+    }
+  }
+  
+  UnmapViewOfFile(data);
+  CloseHandle(hfm);
 }

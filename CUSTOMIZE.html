@@ -740,6 +740,42 @@
 				<p><code>&amp;DescribeBindings</code> は、現在のキーマップでどのようなキー操作をするとどのような動作が起こるかを表示します。が、表示形式がいまいち分かりにくいのでどうしようか思案中。</p>
 			      </div>
 			      
+			  <dt class="h3"><a name="function_DirectSSTP"><code>&amp;DirectSSTP(<em>/name/</em>, <em>protocol</em> <em>[</em>, <em>header ...]</em>)</code></a>
+			      
+			  <dd class="d3">
+			      <div>
+				<p><a href="http://sakura.mikage.to/directsstp.html" target="_top">Direct</a> <a href="http://sakura.mikage.to/sstp.html" target="_top">SSTP</a> プロトコルをしゃべります。</p>
+
+				<p><code><em>/name/</em></code> にマッチする名前のゴーストへリクエストを Direct SSTP を使用して送ります。</p>
+
+				<p><code><em>protocol</em></code> を省略すると <code>NOTIFY SSTP/1.1</code> になります。</p>
+
+				<p><code><em>header</em></code> にカンマで区切ってヘッダを書き並べます。<code>Sender</code> ヘッダを省略すると「窓使いの憂鬱」の名前が挿入されます。<code>HWnd</code> ヘッダと <code>Charset</code> ヘッダは「窓使いの憂鬱」が適切に指定するので引数として指定してはいけません。</p>
+
+				<p>選択肢などを表示しても答えを受け取ることはできませんが、「窓使いの憂鬱」はゴーストから返事を 5 秒間待ちます。</p>
+
+				<p>例:</p>
+				
+				<p class="sample">
+				key F12 =&gt; \<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&amp;DirectSSTP(/カレン/, \<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"SEND SSTP/1.2", \<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Script: " \<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"\\1こんにちわ" \<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"\\_w[1000]\\0\\s3カレンのこと呼んだ？" \<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"\\_w[1000]\\1＞みんな" \<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"\\_w[1000]\\0\\s4\\n\\n……。" \<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"\\e" ) \<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&amp;DirectSSTP(/双葉/, \<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"SEND SSTP/1.2", \<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Sender: まゆ", \<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Script: " \<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"\\_w[1000]\\0よばれてますよただきちさん。" \<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"\\_w[1000]\\1きにするな。" \<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"\\e" ) \<br>
+				</p>
+			      </div>
+			      
 			  <dt class="h3"><a name="function_EditNextModifier"><code>&amp;EditNextModifier(<em>モディファイヤ</em>)</code></a>
 
 			  <dd class="d3">

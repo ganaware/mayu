@@ -631,6 +631,22 @@ void SettingLoader::load_ARGUMENT(tstring *o_arg)
 
 
 // &lt;ARGUMENT&gt;
+void SettingLoader::load_ARGUMENT(std::list<tstring> *o_arg)
+{
+  while (true)
+  {
+    if (!lookToken()->isString())
+      return;
+    o_arg->push_back(getToken()->getString());
+    
+    if (!lookToken()->isComma())
+      return;
+    getToken();
+  }
+}
+
+
+// &lt;ARGUMENT&gt;
 void SettingLoader::load_ARGUMENT(tregex *o_arg)
 {
   *o_arg = getToken()->getRegexp();

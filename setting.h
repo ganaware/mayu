@@ -118,6 +118,7 @@ private:
   void load_ARGUMENT(unsigned int *o_arg);	/// &lt;ARGUMENT&gt;
   void load_ARGUMENT(long *o_arg);		/// &lt;ARGUMENT&gt;
   void load_ARGUMENT(tstring *o_arg);		/// &lt;ARGUMENT&gt;
+  void load_ARGUMENT(std::list<tstring> *o_arg); /// &lt;ARGUMENT&gt;
   void load_ARGUMENT(tregex *o_arg);		/// &lt;ARGUMENT&gt;
   void load_ARGUMENT(VKey *o_arg);		/// &lt;ARGUMENT_VK&gt;
   void load_ARGUMENT(ToWindowType *o_arg);	/// &lt;ARGUMENT_WINDOW&gt;

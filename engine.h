@@ -415,6 +415,11 @@ private:
   void funcEmacsEditKillLineFunc(FunctionParam *i_param);
   /// clear log
   void funcLogClear(FunctionParam *i_param);
+  /// Direct SSTP
+  void funcDirectSSTP(FunctionParam *i_param,
+		      const tregex &i_name,
+		      const tstring &i_protocol,
+		      const std::list<tstring> &i_headers);
   // END OF FUNCTION DEFINITION
 #  define FUNCTION_FRIEND
 #  include "functions.h"

@@ -203,4 +203,8 @@ extern tostream &operator<<(tostream &i_ost, LogicalOperatorType i_data);
 extern bool getTypeValue(LogicalOperatorType *o_type, const tstring &i_name);
 
 
+/// stream output
+extern tostream &operator<<(tostream &i_ost, const std::list<tstring> &i_data);
+
+
 #endif // !_FUNCTION_H
