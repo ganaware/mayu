@@ -522,7 +522,16 @@ private:
 	default:
 	  if (i_message == This->m_WM_TaskbarRestart)
 	  {
-	    This->showTasktrayIcon(true);
+	    if (This->showTasktrayIcon(true))
+	    {
+	      Acquire a(&This->m_log, 0);
+	      This->m_log << _T("Tasktray icon is updated.") << std::endl;
+	    }
+	    else
+	    {
+	      Acquire a(&This->m_log, 1);
+	      This->m_log << _T("Tasktray icon already exists.") << std::endl;
+	    }
 	    return 0;
 	  }
       }
@@ -578,11 +587,11 @@ private:
   }
   
   // change the task tray icon
-  void showTasktrayIcon(bool i_doesAdd = false)
+  bool showTasktrayIcon(bool i_doesAdd = false)
   {
     m_ni.hIcon  = m_tasktrayIcon[m_engine.getIsEnabled() ? 1 : 0];
     m_ni.szInfo[0] = m_ni.szInfoTitle[0] = _T('\0');
-    CHECK_TRUE( Shell_NotifyIcon(i_doesAdd ? NIM_ADD : NIM_MODIFY, &m_ni) );
+    return !!Shell_NotifyIcon(i_doesAdd ? NIM_ADD : NIM_MODIFY, &m_ni);
   }
 
   void showBanner(bool i_isCleared)
@@ -881,6 +890,10 @@ int WINAPI _tWinMain(HINSTANCE i_hInstance, HINSTANCE /* i_hPrevInstance */,
     // another mayu already running
     tstring text = loadString(IDS_mayuAlreadyExists);
     tstring title = loadString(IDS_mayu);
+    if (g_hookData) {
+	UINT WM_TaskbarRestart = RegisterWindowMessage(_T("TaskbarCreated"));
+	PostMessage(g_hookData->m_hwndTaskTray, WM_TaskbarRestart, 0, 0);
+    }
     MessageBox((HWND)NULL, text.c_str(), title.c_str(), MB_OK | MB_ICONSTOP);
     return 1;
   }
