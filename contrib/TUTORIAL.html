@@ -5,354 +5,217 @@
 <link rel="stylesheet" type="text/css" href="../README.css">
 <link rel="prev" href="CONTENTS.html">
 <link rel="next" href="CUSTOMIZE.html">
-<title>窓使いの憂鬱 - TUTORIAL</title>
+<title>mayu - MANUAL - TUTORIAL</title>
 </head>
 
 <body class="manual">
 
-<div class="title">
-窓使いの憂鬱 - TUTORIAL / written by はなわ
-</div>
+<div class="main">
+  <dl>
+    <dt class="h1"><a name="TUTORIAL" href="../MANUAL.html#TUTORIAL">4. tutorial</a> written by はなわ
 
-<!--div class="copyright">
-  Copyright &copy; 1999-2001, <a href="http://www.ganaware.org" target="_top">TAGA Nayuta</a> &lt;nayuta&#64;users.sourceforge.net&gt;
-</div-->
+    <dd class="d1">
+	<div>
+	  <!--p>「窓使いの憂鬱」は非常に高機能なキーバインディング変更ツールなのですが、チュートリアルもGUIでの設定ツールもなく、一方でマニュアルは長大なため、初めて使うユーザーには並外れて敷居の高い状態が続いていました。</p-->
+	  
+	  <p>この章では、「窓使いの憂鬱」の初心者に向けて、厳密なことにはこだわらず、簡単な設定であれば問題なくできるレベルに到達することを目指します。</p>
+	  
+	  <p>また、マニュアルを読み進めるための機能別索引のような役割も持っています。この文章より厳密なことが知りたい場合には、各章にあるリンク先で詳細を読むことができます。</p>
+	  
+	  <p>前置きはここまでです。<a href="../MANUAL.html#INSTALL">インストール</a>は済んでいますよね？<a href="../MANUAL.html#tasktray">デフォルト設定</a>では飽き足らないからこれを読んでいるんですよね？では早速使ってみましょう。</p>
+	
+	  <dl>
+	    <dt class="h2"><a name="dotmayu">i. 自分用の設定ファイルを作る</a>
+		
+	    <dd class="d2">
+		<div>
+		  <p>まず、タスクトレイメニューの「選択」の「 (ホームディレクトリから) 」で使われる自分用の設定ファイル、<code>.mayu</code> ファイルを作ります。</p>
 
-<dl>
-  <dt class="h1"><a name="ABSTRACT">1. この文章の目的</a>
-      
-  <dd class="d1">
-<!--p>
-「窓使いの憂鬱」は非常に高機能なキーバインディング変更ツールなのですが、
-チュートリアルもGUIでの設定ツールもなく、一方でマニュアルは長大なため、
-初めて使うユーザーには並外れて敷居の高い状態が続いていました。
-</p-->
+		  <p>まず、環境変数 <code>HOME</code> で、<a href="../CUSTOMIZE.html#HOME">ホームディレクトリ</a>の位置を指定します。ホームディレクトリは、例えばあなたの名前が mayu であれば、「<code>c:\home\mayu</code>」のようなディレクトリを作るのが UNIX 風でお薦めです。</p>
 
-<p>
-この文章は、「窓使いの憂鬱」の初心者に向けて、
-簡単な設定であれば問題なくできるレベルに到達するまでに
-必要なことだけを説明するような、いわゆるチュートリアルです。
-厳密なことにはこだわらず、とりあえず使える状態を目指します。
-</p>
-<p>
-また、マニュアルを読み進めるための機能別索引のような役割も持っています。
-この文章より厳密なことが知りたい場合には、
-各章にあるリンク先のマニュアル本体で詳細を読むことができます。
-</p>
-<p>
-前置きはここまでです。
-<a href="../MANUAL.html#INSTALL">インストール</a>は済んでいますよね？
-<a href="../MANUAL.html#tasktray">デフォルト設定</a>では飽き足らないからこれを読んでいるんですよね？
-では早速使ってみましょう。
-</p>
+		  <dl>
+		    <dt class="h3">WindowsNT/2000 の場合
+		    <dd class="d3">
+			<div>
+			  <p>デスクトップの「マイコンピュータ」の右クリックメニューの「プロパティ」の「詳細」の「環境変数」で、ユーザー環境変数 <code>HOME</code> を作成し、<code>c:\home\mayu</code> に設定します。</p>
+			</div>
 
-</dd>
-      
-  <dt class="h1"><a name="INSTALL">2. 自分用の設定ファイルを作る</a>
+		    <dt class="h3">Windows95/98/Me の場合
+		    <dd class="d3">
+			<div>
+			  <p><code>C:\AUTOEXEC.BAT</code> に次のような一行を書きます。</p>
+			  
+			  <p class="sample">
+			  set HOME=c:\home\mayu
+			  </p>
+			</div>
+		  </dl>
+		  
+		  <p>そして <code>c:\home\mayu</code> というディレクトリを作成しておきます。</p>
+		  
+		  <p>このディレクトリに、<code>.mayu</code> というファイルを作ります。一部のエディタではドットから始まるファイル名は作れないかもしれませんが、そのようなエディタを使っている場合には、この際乗り換えましょう。有名どころのテキストエディタでは大抵作れると思いますが、特に Emacs が忘れられない人には <a href="http://www.jsdlab.co.jp/~kamei/">xyzzy</a> や <a href="">Meadow</a> などがお薦めです。</p>
+			  
+			  <p>新たに <code>.mayu</code> を設定したり、ディレクトリを作るのが嫌な場合は、マイドキュメントの直下に作っても OK です。</p>
+		  <p>参照: <a href="../CUSTOMIZE.html#HOME">ホームディレクトリ</a></p>
+		</div>
+		
+	    <dt class="h2"><a name="minimum">ii. 作った設定ファイルに最低限の設定を書く</a>
+		
+	    <dd class="d2">
+		<div>
+		  
+		  <p>まず、いくつかの必要なファイルの内容を取り込む必要があります。<!-- 詳細は <a href="./mayu-settings.txt"><code>contrib/mayu-settings.txt</code></a> を見てください。 --></p>
 
-  <dd class="d1">
-      
-<p>
-まず、タスクトレイメニューの「選択」の「（ホームディレクトリから）」
-で使われる自分用の設定ファイル、<code>.mayu</code>ファイルを作ります。
-</p>
+		  <dl>
+		    <dt class="h3">109 日本語キーボードの場合
+		    <dd class="d3">
+			<div>
+			  <p><code>.mayu</code> ファイルの先頭に以下のような1行を作ります。</p>
+			  
+			  <p class="sample">
+			  include "109.mayu"	# 109 キーボード設定
+			  </p>
+			  
+			  <p>好みに応じて、以下の各行を書くか書かないかを決めてください。 (タスクトレイメニュー「選択」のデフォルト設定に対応しています) </p>
+			  
+			  <p class="sample">
+			  include "104on109.mayu"	# 109 キーボードを 104 キーボード風に<br>
+			  include "default.mayu"	# Emacs ライクなさまざまな設定
+			  </p>
+			</div>
 
-      <ol class="decimal">
-	<li>WindowsNT/2000の場合
+		    <dt class="h3">104 英語キーボードの場合
+		    <dd class="d3">
+			<div>
+			  <p><code>.mayu</code> ファイルの先頭に以下のような一行を作ります。</p>
+			  
+			  <p class="sample">
+			  include "104.mayu"	# 104 キーボード設定
+			  </p>
+			  
+			  <p>好みに応じて、以下の各行を書くか書かないかを決めてください。 (タスクトレイメニュー「選択」のデフォルト設定に対応しています) </p>
+			  
+			  <p class="sample">
+			  include "109on104.mayu"	# 104 キーボードを 109 キーボード風に<br>
+			  include "default.mayu"	# Emacs ライクなさまざまな設定
+			  </p>
+			</div>
+			
+		  </dl>
+		  
+		  <p>ここまで書き込んだら、タスクトレイメニューの「再読み込み」をしてみてください。ログウインドウにエラーメッセージが出ないようであれば、ここまではうまくいっています。これで準備完了です。この先に自分好みの設定を書き加えていくことになります。</p>
+		  
+		  <p>参照: <a href="./mayu-settings.txt"><code>contrib/mayu-settings.txt</code></a></p>
+		</div>
+		
+	    <dt class="h2"><a name="key">iii. 普通のキーを入れ替えてみる</a>
+		
+	    <dd class="d2">
+		<div>
+		  
+		  <p>以下、説明の便宜上 109 キーボードを使っているものとして話をすすめていきます。まず、<kbd>[Esc]</kbd> キーと <kbd>[半角/全角]</kbd> キーを入れ替えたい、と思ったとします。これは、先ほどのファイルの末尾に以下のように書けばOKです。</p>
 
-<p>
-まず、環境変数<code>HOME</code>で、<a href="../CUSTOMIZE.html#HOME"
->ホームディレクトリ</a>の位置を指定します。
-デスクトップの「マイコンピュータ」の右クリックメニューの
-「プロパティ」の「詳細」の「環境変数」で、
-ユーザー環境変数<code>HOME</code>を作成してください。ユーザー名がnayutaであれば、
-「c:\home\nayuta」のようなディレクトリに設定するのがUNIX風でお薦めです。
-</p>
+		  <p class="sample">
+		  keymap Global<br>
+		  key Esc       =&gt; 半角/全角<br>
+		  key 半角/全角 =&gt; Esc<br>
+		  </p>
+		  
+		  <p>再読み込みをして確認してみてください。</p>
 
-<p>
-このディレクトリの下に、<code>.mayu</code>というファイルを作ります。
-一部のエディタではドットから始まるファイル名は作れないかもしれませんが、
-そのようなエディタを使っている場合には、この際乗り換えましょう。
-有名どころのテキストエディタでは大抵作れると思いますが、
-特にEmacsが忘れられない人にはxyzzyやMeadowなどがお薦めです。
-</p>
+		  <p>1 行目の <code>keymap Global</code> は、次の <code>keymap</code> までの間の記述は全てのウインドウで有効な設定とする、という指示です。</p>
 
-<p>
-新たに<code>.mayu</code>を設定したり、ディレクトリを作るのが嫌な場合は、
-マイドキュメントの直下に作ってもOKです。
-</p>
+		  <p>2, 3 行目のように <code>key キー名 =&gt; キー名</code> と書くことで、あるキーを押したときの挙動を変更できます。上の例であれば、<kbd>[Esc]</kbd> が押されたときは <kbd>[半角/全角]</kbd> が押されたように、<kbd>[半角/全角]</kbd> が押されたときは <kbd>[Esc]</kbd> が押されたような動作になります。</p>
 
+		  <p>キー名は、タスクトレイメニュー「調査(I)...」の「スキャンコードの調査」で調べたいキーを押すことでわかります。<kbd>[Esc]</kbd> キーと、<kbd>[半角/全角]</kbd> キーを順に押したときのログウインドウには、例えば以下のように表示されているはずです。</p>
 
-	<li>Windows95/98/Meの場合
-<p>
-筆者の手元に環境がないのでわかりません。
-<code>AUTOEXEC.BAT</code>でNT同様に<code
->HOME</code>を設定することになるのかもしれませんし、
-マイドキュメントに作ってもうまくいくのかもしれません。
-タスクトレイメニューの「設定...」で
-明示的にファイルを指定することもできます。
-</p>
+		  <p class="sample">
+		  0x01   D-Esc<br>
+		  0x01   U-Esc<br>
+		  0x29   D-半角/全角<br>
+		  0x29   U-半角/全角<br>
+		  </p>
 
-      </ol>
-<p>
-参照: <a href="../CUSTOMIZE.html#HOME">ホームディレクトリ</a>
-</p>
-</dd>
-      
-  <dt class="h1"><a name="UNINSTALL">3. 作った設定ファイルに最低限の設定を書く</a>
-      
-  <dd class="d1">
-<p>
-まず、いくつかの必要なファイルの内容を取り込む必要があります。
-詳細は<a href="./mayu-settings.txt"><code>contrib/mayu-settings.txt</code></a
->を見てください。
-</p>
+		  <p><code>D-半角/全角</code> のキー名の前の <code>D-</code> というのはキーが押された、<code>U-半角/全角</code> の <code>U-</code> というのはキーが離された、という状態をそれぞれ表します。</p>
+		  
+		  <p>参照: <a href="../CUSTOMIZE.html#key">キー割り当ての変更</a></p>
+		</div>
 
-      <ol class="decimal">
-	<li>109日本語キーボードの場合
+	    <dt class="h2"><a name="window">iv. 特定のウインドウのみでキー割り当てを変更してみる</a>
 
-<p>
-<code>.mayu</code>ファイルの先頭に以下のような1行を作ります。
-</p>
-<p class="sample">
-include "109.mayu"	# 109 キーボード設定
-</p>
-<p>
-好みに応じて、以下の各行を書くか書かないかを決めてください。
-（タスクトレイメニュー「選択」のデフォルト設定に対応しています）
-</p>
-<p class="sample">
-include "104on109.mayu"	# 109 キーボードを 104 キーボード風に<br>
-include	"default.mayu"	# Emacs ライクなさまざまな設定
-</p>
+	    <dd class="d2">
+		<div>
+		  
+		  <p>つぎに、他のアプリケーションでの動きはそのままで、Internet Explorer についてのみ、<kbd>[Shift]</kbd> + <kbd>[↑]</kbd>/<kbd>[↓]</kbd> キーで、<kbd>[PageUp]</kbd>/<kbd>[PageDown]</kbd> の動きをさせたいとします。<code>.mayu</code> の設定は以下のようになります。</p>
+		  
+		  <p class="sample">
+		  window	InternetExplorer /iexplore\.exe/ : Global<br>
+		  key     S-↑ =&gt; PageUp<br>
+		  key     S-↓ =&gt; PageDown<br>
+		  </p>
+		  
+		  <p>1 行目の、<code>window キーマップ名 ウィンドウクラス名 : 親キーマップ</code> というのは、以降の指定は特定のウインドウについてのみ有効とする、という指示です。キーマップ名は適当な名前で、親キーマップはデフォルトのキーマップを指定します。(Emacs っぽくするなら <code>EmacsMove</code> や <code>EmacsEdit</code> に、そうでなければ <code>Global</code> にすればよいでしょう)</p>
+		  
+		  <p>ウインドウクラス名は、タスクトレイメニュー「調査(I)...」の「ウィンドウの調査」で、調べたい窓やコントロールにターゲットをドラッグすることでわかります。</p>
+		  
+		  <p>Internet Explorer にドラッグすると (途中にさわった全てのウインドウやコントロールの情報が出るので、他にもいろいろ出るはずですが)、次のような表示が出るはずです。</p>
+		  
+		  <p class="sample">
+		  CLASS:	C:\Program Files\Internet Explorer\iexplore.exe:IEFrame<br>
+		  TITLE:	C:\Program Files\Internet Explorer\iexplore.exe:窓使いの憂鬱 - TUTORIAL - Microsoft Internet Explorer<br>
+		  Toplevel Window Position/Size: (-4, -4) / (1032x748)<br>
+		  Desktop Window Position/Size: (0, 0) / (1024x740)<br>
+		  </p>
+		  
+		  <p>この <code>CLASS</code> の部分から特徴的な文字列を抽出し、<a href="../CUSTOMIZE.html#regexp">正規表現</a>と呼ばれる記法で <code>/文字列/</code> のように書けば OK です。正規表現がよくわからない場合も、<code>\</code> と <code>.</code> についてはそれぞれ <code>\\</code> と <code>\.</code> と書くことに注意していればそれほど問題はないはずです。</p>
+		  
+		  <p>2, 3 行目のキーの指定については、やはりスキャンコードの調査で調べます。<kbd>[Shift]</kbd> + <kbd>[↓]</kbd> を打つと、次のようになるはずです。</p>
+		  
+		  <p class="sample">
+		  0x2a   D-LeftShift<br>
+		  E0-0x2a <br>
+		  E0-0x50   D-S-↓<br>
+		  E0-0x50   U-S-↓<br>
+		  E0-0x2a <br>
+		  0x2a   U-LeftShift<br>
+		  </p>
+		  
+		  <p>1, 6 行目は <kbd>[Shift]</kbd> キーの押し/離しです。2, 5 行目のような表示があるかもしれませんが、無視してください (参照：<a href="../MANUAL.html#faq">FAQ</a>)。3, 4 行目から、<code>S-↓</code> が書くべきキー名ということになります。ここの <code>S-</code> というのは、<kbd>[Shift]</kbd> が押されている、というキーの状態を表す記号です。<kbd>[Shift]</kbd> キー以外にも、<kbd>[Windows]</kbd> や <kbd>[Alt]</kbd> や <kbd>[Control]</kbd> の状態、また <kbd>[CapsLock]</kbd> や <kbd>[NumLock]</kbd> などのキーがロック状態にあるかどうかもやはり同様です。これらの特別なキーを、「窓使いの憂鬱」では、モディファイヤと呼んでいます。</p>
+		  
+		  <p>参照: <a href="../CUSTOMIZE.html#windowClass">ウィンドウクラス/タイトル名</a>・<a href="../CUSTOMIZE.html#regexp">正規表現</a>・<a href="../CUSTOMIZE.html#modifier">モディファイヤの指定</a></p>
+		</div>
+		
+	    <dt class="h2"><a name="modifier">v. モディファイヤになっているキーを置き換える</a>
+		
+	    <dd class="d2">
+		<div>
+		  <p>キー割り当ての変更の際に、モディファイヤキーを置き換えたり、モディファイヤキーに置き換える場合には、特別な設定が必要になります。</p>
+		  
+		  <p>たとえば、<kbd>[無変換]</kbd> キーを左 <kbd>[Alt]</kbd> キーとして使いたいとします。</p>
 
-	<li>104英語キーボードの場合
+		  <p class="sample">
+		  mod alt += 無変換<br>
+		  key 無変換 =&gt; LeftAlt<br>
+		  </p>
 
-<p>
-<code>.mayu</code>ファイルの先頭に以下のような1行を作ります。
-</p>
-<p class="sample">
-include "104.mayu"	# 104 キーボード設定
-</p>
-<p>
-好みに応じて、以下の各行を書くか書かないかを決めてください。
-（タスクトレイメニュー「選択」のデフォルト設定に対応しています）
-</p>
-<p class="sample">
-include "109on104.mayu"	# 104 キーボードを 109 キーボード風に<br>
-include	"default.mayu"	# Emacs ライクなさまざまな設定
-</p>
+		  <p>2 行目は今まで通りの指定ですが、1行目のように、<code>mod モディファイヤ名 += キー名</code> という指定により、新たにモディファイヤとして登録する必要があります。</p>
 
-      </ol>
-
-<p>
-ここまで書き込んだら、
-タスクトレイメニューの「再読み込み」をしてみてください。
-ログウインドウにエラーメッセージが出ないようであれば、
-ここまではうまくいっています。
-これで準備完了です。
-この先に自分好みの設定を書き加えていくことになります。
-</p>
-<p>
-参照: <a href="./mayu-settings.txt"><code>contrib/mayu-settings.txt</code></a>
-</p>
-
-  <dt class="h1"><a name="CUSTOMIZE">4. 普通のキーを入れ替えてみる</a>
-      
-  <dd class="d1">
-
-<p>
-以下、説明の便宜上109キーボードを使っているものとして
-話をすすめていきます。
-まず、<kbd>[Esc]</kbd>キーと<kbd
->[半角/全角]</kbd>キーを入れ替えたい、と思ったとします。
-これは、先ほどのファイルの末尾に以下のように書けばOKです。
-</p>
-
-<p class="sample">
-keymap Global<br>
-key Esc       =&gt; 半角/全角<br>
-key 半角/全角 =&gt; Esc<br>
-</p>
-
-<p>
-再読み込みをして確認してみてください。
-</p>
-
-<p>
-1行目の<code>keymap Global</code>は、次の<code>keymap</code>までの間の記述は
-全てのウインドウで有効な設定とする、という指示です。
-</p>
-
-<p>
-2,3行目のように
-<code>key キー名 =&gt; キー名</code>
-と書くことで、あるキーを押したときの挙動を変更できます。
-上の例であれば、<kbd>[Esc]</kbd
->が押されたときは<kbd>[半角/全角]</kbd>が押されたように、
-<kbd>[半角/全角]</kbd
->が押されたときは<kbd>[Esc]</kbd>が押されたような動作になります。
-</p>
-
-<p>
-キー名は、タスクトレイメニュー「調査(I)...」の「スキャンコードの調査」で
-調べたいキーを押すことでわかります。
-<kbd>[Esc]</kbd>キーと、<kbd
->[半角/全角]</kbd>キーを順に押したときのログウインドウには、
-例えば以下のように表示されているはずです。
-</p>
-
-<p class="sample">
-   0x01   D-Esc<br>
-   0x01   U-Esc<br>
-   0x29   D-半角/全角<br>
-   0x29   U-半角/全角<br>
-</p>
-
-<p>
-<code>D-半角/全角</code>のキー名の前の<code>D-</code>というのはキーが押された、
-<code>U-半角/全角</code>の<code>U-</code>というのはキーが離された、
-という状態をそれぞれ表します。
-</p>
-<p>
-参照: <a href="../CUSTOMIZE.html#key">キー割り当ての変更</a>
-</p>
-
-  <dt class="h1"><a name="CUSTOMIZE">5. 特定のウインドウのみでキー割り当てを変更してみる</a>
-
-  <dd class="d1">
-
-<p>      
-つぎに、
-他のアプリケーションでの動きはそのままで、
-Internet Explorerについてのみ、
-<kbd>[Shift]</kbd>+<kbd>[↑]</kbd>/<kbd>[↓]</kbd>キーで、
-<kbd>[PageUp]</kbd>/<kbd>[PageDown]</kbd>の動きをさせたいとします。
-<code>.mayu</code>の設定は以下のようになります。
-</p>
-<p class="sample">
-window	InternetExplorer /iexplore\.exe/ : Global<br>
-key     S-↑ =&gt; PageUp<br>
-key     S-↓ =&gt; PageDown<br>
-</p>
-<p>
-1行目の、
-<code>window キーマップ名 ウィンドウクラス名 : 親キーマップ</code>
-というのは、
-以降の指定は特定のウインドウについてのみ有効とする、
-という指示です。
-キーマップ名は適当な名前で、
-親キーマップはデフォルトのキーマップを指定します。
-(Emacsっぽくするなら<code>EmacsMove</code>や<code>EmacsEdit</code>に、
-そうでなければ<code>Global</code>にすればよいでしょう)
-</p>
-<p>
-ウインドウクラス名は、
-タスクトレイメニュー「調査(I)...」の「ウィンドウの調査」で、
-調べたい窓/コントロールにターゲットをドラッグすることでわかります。
-</p>
-<p>
-Internet Explorerにドラッグすると
-（途中にさわった全てのウインドウやコントロールの情報が出るので、
-他にもいろいろ出るはずですが）、
-次のような表示が出るはずです。
-</p>
-<p class="sample">
-CLASS:	C:\Program Files\Internet Explorer\iexplore.exe:IEFrame<br>
-TITLE:	C:\Program Files\Internet Explorer\iexplore.exe:窓使いの憂鬱 - TUTORIAL - Microsoft Internet Explorer<br>
-Toplevel Window Position/Size: (-4, -4) / (1032x748)<br>
-Desktop Window Position/Size: (0, 0) / (1024x740)<br>
-</p>
-<p>
-このCLASSの部分から特徴的な文字列を抽出し、
-<a href="../CUSTOMIZE.html#regexp">正規表現</a>と呼ばれる記法で
-<code>/文字列/</code>のように書けばOKです。
-正規表現がよくわからない場合も、
-\と.についてはそれぞれ\\と\.と書くことに注意していれば
-それほど問題はないはずです。
-</p>
-<p>
-2,3行目のキーの指定については、
-やはりスキャンコードの調査で調べます。
-<kbd>[Shift]</kbd>+<kbd>[↓]</kbd>を打つと、次のようになるはずです。
-</p>
-<p class="sample">
-   0x2a   D-LeftShift<br>
-E0-0x2a <br>
-E0-0x50   D-S-↓<br>
-E0-0x50   U-S-↓<br>
-E0-0x2a <br>
-   0x2a   U-LeftShift<br>
-</p>
-<p>
-1,6行目は<kbd>[Shift]</kbd>キーの押し/離しです。
-2,5行目のような表示があるかもしれませんが、無視してください(参照：FAQ)。
-3,4行目から、<code>S-↓</code>が書くべきキー名ということになります。
-ここの<code>S-</code>というのは、
-<kbd>[Shift]</kbd>が押されている、というキーの状態を表す記号です。
-<kbd>[Shift]</kbd> キー以外にも、
-<kbd>[Windows]</kbd> や <kbd>[Alt]</kbd> や <kbd>[Control]</kbd> の状態、
-また<kbd>[CapsLock]</kbd> や 
-<kbd>[NumLock]</kbd>などのキーがロック状態にあるかどうかもやはり同様です。
-これらの特別なキーを、「窓使いの憂鬱」では、モディファイヤと呼んでいます。
-</p>
-<p>
-参照: <a href="../CUSTOMIZE.html#windowClass">ウィンドウクラス/タイトル名</a>
- ・ <a href="../CUSTOMIZE.html#regexp">正規表現</a>
- ・ <a href="../CUSTOMIZE.html#modifier">モディファイヤの指定</a>
-</p>
-
-  <dt class="h1"><a name="CUSTOMIZE">6. モディファイヤになっているキーを置き換える</a>
-      
-  <dd class="d1">
-
-<p>
-キー割り当ての変更の際に、
-モディファイヤキーを置き換えたり、
-モディファイヤキーに置き換える場合には、
-特別な設定が必要になります。
-</p>
-<p>
-たとえば、<kbd>[無変換]</kbd>キーを左<kbd>[Alt]</kbd>キーとして使いたいとします。
-</p>
-
-<p class="sample">
-mod alt += 無変換<br>
-key 無変換 =&gt; LeftAlt<br>
-</p>
-
-<p>
-2行目は今まで通りの指定ですが、
-1行目のように、<code>mod モディファイヤ名 += キー名</code>
-という指定により、
-新たにモディファイヤとして登録する必要があります。
-</p>
-
-<p>
-参照: <a href="../CUSTOMIZE.html#mod">モディファイヤキー割り当ての変更</a>
-</p>
-
-  <dt class="h1"><a name="CUSTOMIZE">7. より高度な設定</a>
-      
-  <dd class="d1">
-
-<p>
-ここまで読めばもうチュートリアルは卒業です。
-自分好みの設定をあれこれ書き加えていくうちに、
-上にある各リンクの内容に目を通す必要が出てくるはずですが、
-そうしているうちにマニュアルの見方にも慣れてくるはずです。
-</p>
-
-<p>
-さらなる機能としては、
-2ストロークキーの設定、
-OneShotモディファイヤ、
-豊富な関数群、
-代用定義
-などがあります。これらは必要な場合のみ目を通せば十分です。
-</p>
-
-</dl>
-
+		  <p>参照: <a href="../CUSTOMIZE.html#mod">モディファイヤキー割り当ての変更</a></p>
+		</div>
+		
+	    <dt class="h2"><a name="more">vi. より高度な設定</a>
+		
+	    <dd class="d2">
+		<div>
+		  
+		  <p>ここまで読めばもうチュートリアルは卒業です。自分好みの設定をあれこれ書き加えていくうちに、上にある各リンクの内容に目を通す必要が出てくるはずですが、そうしているうちにマニュアルの見方にも慣れてくるはずです。</p>
+		  
+		  <p>さらなる機能としては、<a href="../CUSTOMIZE.html#function_prefix">2 ストロークキーの設定</a>、<a href="../CUSTOMIZE.html#oneShotModifier">OneShot モディファイヤ</a>、<a href="../CUSTOMIZE.html#function">豊富な関数群</a>、<a href="../CUSTOMIZE.html#def_subst">代用定義</a>などがあります。これらは必要な場合のみ目を通せば十分です。</p>
+		</div>
+		
+	  </dl>
+	</div>
+  </dl>
+</div>    
 </body>
 </html>
