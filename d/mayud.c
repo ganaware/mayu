@@ -11,7 +11,7 @@
 #include "ioctl.h"
 #include "keyque.c"
 
-//#define USE_TOUCHPAD // very experimental!
+#define USE_TOUCHPAD // very experimental!
 
 #if DBG
 // Enable debug logging only on checked build:
