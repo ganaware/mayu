@@ -5,7 +5,7 @@
 ###############################################################################
 
 
-VERSION		= 3.19
+VERSION		= 3.20
 
 !if "$(TARGETOS)" == "WINNT"
 OS_SPECIFIC_DEFINES	=  -DUNICODE -D_UNICODE
