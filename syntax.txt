@@ -223,6 +223,7 @@
 	<ASSIGN_MODE>
 		: "!"		# true modifier (doesn't generate scan code)
 		| "!!"		# one shot modifier
+		| "!!!"		# one shot repeatable modifier
 
 #
 # KEY SEQUENCE DEFINITION

@@ -268,7 +268,8 @@ private:
   /// sync
   void funcSync(FunctionParam *i_param);
   /// toggle lock
-  void funcToggle(FunctionParam *i_param, ModifierLockType i_lock);
+  void funcToggle(FunctionParam *i_param, ModifierLockType i_lock,
+		  ToggleType i_toggle = ToggleType_toggle);
   /// edit next user input key's modifier
   void funcEditNextModifier(FunctionParam *i_param,
 			    const Modifier &i_modifier);

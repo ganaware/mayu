@@ -180,6 +180,7 @@ public:
     AM_true,					/** !  true modifier(doesn't
                                                     generate scan code) */
     AM_oneShot,					/// !! one shot modifier
+    AM_oneShotRepeatable,			/// !!! one shot modifier
   };
   
   /// key assignment

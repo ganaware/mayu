@@ -122,6 +122,7 @@ private:
   void load_ARGUMENT(GravityType *o_arg);	/// &lt;ARGUMENT&gt;
   void load_ARGUMENT(MayuDialogType *o_arg);	/// &lt;ARGUMENT&gt;
   void load_ARGUMENT(ModifierLockType *o_arg);	/// &lt;ARGUMENT_LOCK&gt;
+  void load_ARGUMENT(ToggleType *o_arg);	/// &lt;ARGUMENT&gt;
   void load_ARGUMENT(ShowCommandType *o_arg);	///&lt;ARGUMENT_SHOW_WINDOW&gt;
   void load_ARGUMENT(TargetWindowType *o_arg);
 					/// &lt;ARGUMENT_TARGET_WINDOW_TYPE&gt;

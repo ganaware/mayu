@@ -115,6 +115,21 @@ enum ModifierLockType
   ModifierLockType_Lock9 = Modifier::Type_Lock9, /// 
 };
 
+///
+enum ToggleType
+{
+  ToggleType_toggle	= -1, /// 
+  ToggleType_off	= 0, /// 
+  ToggleType_on		= 1, /// 
+};
+
+/// stream output
+extern tostream &operator<<(tostream &i_ost, ToggleType i_data);
+  
+// get value of ShowCommandType
+extern bool getTypeValue(ToggleType *o_type, const tstring &i_name);
+
+
 /// stream output
 extern tostream &operator<<(tostream &i_ost, ModifierLockType i_data);
 

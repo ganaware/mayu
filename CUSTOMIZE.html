@@ -444,6 +444,20 @@
 		  <p class="continue">その<em>モディファイヤキー名</em>に割り当てられているモディファイヤを全て<em>One Shot モディファイヤ</em>に変更します。</p>
 		  </div>
 
+	      <dt class="h3"><a name="oneShotRepeatableModifier">One Shot (キーリピート有)</a>
+		  
+	      <dd class="d3">
+		  <div>
+		  <p><em>One Shot モディファイヤ</em>は通常キーリピートしませんが、"<code>!!!</code>" を付けると、キーリピートをするようになります。たとえば、</p>
+		  
+		  <p class="sample">
+		  mod shift = !!!↑<br>
+		  </p>
+		  
+		  <p>とすると、<kbd>[↑]</kbd> を押しながら何か別のキー (例えば <kbd>[A]</kbd>) を押すと <kbd>[Shift]</kbd> + <kbd>[A]</kbd> と同じことになりますが、<kbd>[↑]</kbd> を押しっぱなしにすると <kbd>[↑]</kbd> がキーリピートして、カーソルが上へ動くということになります。</p>
+		  
+		  </div>
+
 	      <dt class="h3"><a name="lock">ロックキー</a>
 		  
 	      <dd class="d3">
@@ -971,7 +985,7 @@
 		  
 	      <dd class="d3">
 		  <div>
-		  <p>ロックキーをトグルします。<code>&amp;Toggle(Lock0)</code>〜<code>&amp;Toggle(Lock9)</code> が利用できます。</p>
+		  <p>ロックキーをトグルします。<code>&amp;Toggle(Lock0)</code>〜<code>&amp;Toggle(Lock9)</code> が利用できます。引数の最後に <code>on</code>, <code>off</code> を追加すると、ロックキーを強制的にオンにしたりオフにしたりできます。</p>
 		  </div>
 
 	      <dt class="h3"><a name="function_Undefined"><code>&amp;Undefined</code></a>

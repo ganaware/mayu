@@ -688,6 +688,16 @@ void SettingLoader::load_ARGUMENT(ModifierLockType *o_arg)
 }
 
 
+// &lt;ARGUMENT_LOCK&gt;
+void SettingLoader::load_ARGUMENT(ToggleType *o_arg)
+{
+  Token *t = getToken();
+  if (getTypeValue(o_arg, t->getString()))
+    return;
+  throw ErrorMessage() << _T("`") << *t << _T("': unknown toggle name.");
+}
+
+
 // &lt;ARGUMENT_SHOW_WINDOW&gt;
 void SettingLoader::load_ARGUMENT(ShowCommandType *o_arg)
 {
@@ -891,8 +901,9 @@ void SettingLoader::load_MODIFIER_ASSIGNMENT()
   while (true)
   {
     Keymap::AssignMode am = Keymap::AM_notModifier;
-    if      (*t == _T("!") ) am = Keymap::AM_true, t = getToken();
-    else if (*t == _T("!!")) am = Keymap::AM_oneShot, t = getToken();
+    if      (*t == _T("!")  ) am = Keymap::AM_true, t = getToken();
+    else if (*t == _T("!!") ) am = Keymap::AM_oneShot, t = getToken();
+    else if (*t == _T("!!!")) am = Keymap::AM_oneShotRepeatable, t = getToken();
     
     if      (*t == _T("shift")) mt = Modifier::Type_Shift;
     else if (*t == _T("alt")  ||
@@ -938,8 +949,9 @@ void SettingLoader::load_MODIFIER_ASSIGNMENT()
     // <ASSIGN_MODE>? 
     t = getToken();
     Keymap::AssignMode am = Keymap::AM_normal;
-    if      (*t == _T("!") ) am = Keymap::AM_true, t = getToken();
-    else if (*t == _T("!!")) am = Keymap::AM_oneShot, t = getToken();
+    if      (*t == _T("!")  ) am = Keymap::AM_true, t = getToken();
+    else if (*t == _T("!!") ) am = Keymap::AM_oneShot, t = getToken();
+    else if (*t == _T("!!!")) am = Keymap::AM_oneShotRepeatable, t = getToken();
     
     // <KEY_NAME>
     Key *key = m_setting->m_keyboard.searchKey(t->getString());
@@ -1259,7 +1271,7 @@ void SettingLoader::load(const tstringi &i_filename)
     static const _TCHAR *prefixes[] =
     {
       _T("="), _T("=>"), _T("&&"), _T("||"), _T(":"), _T("$"), _T("&"),
-      _T("-="), _T("+="), _T("!"), _T("!!"), 
+      _T("-="), _T("+="), _T("!!!"), _T("!!"), _T("!"), 
       _T("E0-"), _T("E1-"),			// <SCAN_CODE_EXTENTION>
       _T("S-"), _T("A-"), _T("M-"), _T("C-"),	// <BASIC_MODIFIER>
       _T("W-"), _T("*"), _T("~"),

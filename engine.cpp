@@ -748,7 +748,7 @@ void Engine::keyboardHandler()
       // true modifier doesn't generate scan code
       outputToLog(&key, c.m_mkey, 1);
     }
-    else if (am == Keymap::AM_oneShot)
+    else if (am == Keymap::AM_oneShot || am == Keymap::AM_oneShotRepeatable)
     {
       {
 	Acquire a(&m_log, 1);
@@ -757,7 +757,18 @@ void Engine::keyboardHandler()
       // oneShot modifier doesn't generate scan code
       outputToLog(&key, c.m_mkey, 1);
       if (isPhysicallyPressed)
-	m_oneShotKey = c.m_mkey.m_key;
+      {
+	if (am == Keymap::AM_oneShotRepeatable
+	    && m_oneShotKey == c.m_mkey.m_key)
+	{
+	  Current cnew = c;
+	  cnew.m_mkey.m_modifier.off(Modifier::Type_Up);
+	  cnew.m_mkey.m_modifier.on(Modifier::Type_Down);
+	  beginGeneratingKeyboardEvents(cnew, true);
+	}
+	else
+	  m_oneShotKey = c.m_mkey.m_key;
+      }
       else
       {
 	if (m_oneShotKey)

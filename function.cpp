@@ -199,6 +199,44 @@ bool getTypeValue(MayuDialogType *o_type, const tstring &i_name)
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// ToggleType
+
+
+// ToggleType table
+typedef TypeTable<ToggleType> TypeTable_ToggleType;
+static const TypeTable_ToggleType g_toggleType[] =
+{
+  { ToggleType_toggle, _T("toggle") },
+  { ToggleType_off, _T("off") },
+  { ToggleType_off, _T("false") },
+  { ToggleType_off, _T("released") },
+  { ToggleType_on,  _T("on")  },
+  { ToggleType_on,  _T("true")  },
+  { ToggleType_on,  _T("pressed")  },
+};
+
+
+// stream output
+tostream &operator<<(tostream &i_ost, ToggleType i_data)
+{
+  tstring name;
+  if (getTypeName(&name, i_data, g_toggleType, NUMBER_OF(g_toggleType)))
+    i_ost << name;
+  else
+    i_ost << _T("(ToggleType internal error)");
+  return i_ost;
+}
+
+
+// get value of ToggleType
+bool getTypeValue(ToggleType *o_type, const tstring &i_name)
+{
+  return getTypeValue(o_type, i_name, g_toggleType,
+		      NUMBER_OF(g_toggleType));
+}
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // ModifierLockType
 
 
@@ -709,13 +747,25 @@ void Engine::funcSync(FunctionParam *i_param)
 }
 
 // toggle lock
-void Engine::funcToggle(FunctionParam *i_param, ModifierLockType i_lock)
+void Engine::funcToggle(FunctionParam *i_param, ModifierLockType i_lock,
+			ToggleType i_toggle)
 {
   if (i_param->m_isPressed)			// ignore PRESS
     return;
-  
+
   Modifier::Type mt = static_cast<Modifier::Type>(i_lock);
-  m_currentLock.press(mt, !m_currentLock.isPressed(mt));
+  switch (i_toggle)
+  {
+    case ToggleType_toggle:
+      m_currentLock.press(mt, !m_currentLock.isPressed(mt));
+      break;
+    case ToggleType_off:
+      m_currentLock.press(mt, false);
+      break;
+    case ToggleType_on:
+      m_currentLock.press(mt, true);
+      break;
+  }
 }
 
 // edit next user input key's modifier
