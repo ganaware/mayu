@@ -147,7 +147,12 @@ __EOM__
       return;
 __EOM__
     }
-    print "    i_sl->load_ARGUMENT(&m_$argNames[$i]);\n"
+    if (0 < $i) {
+      print <<"__EOM__";
+    i_sl->getComma(false, FunctionData_${name}::getName()); // throw ...
+__EOM__
+    }
+    print "    i_sl->load_ARGUMENT(&m_$argNames[$i]);\n";
   }
   print <<"__EOM__";
     i_sl->getCloseParen(true, FunctionData_${name}::getName()); // throw ...

@@ -22,6 +22,7 @@ public:
     Type_regexp,				///
     Type_openParen,				///
     Type_closeParen,				///
+    Type_comma,					///
   };
   
 private:
@@ -57,6 +58,8 @@ public:
   bool isOpenParen() const { return m_type == Type_openParen; }
   ///
   bool isCloseParen() const { return m_type == Type_closeParen; }
+  ///
+  bool isComma() const { return m_type == Type_comma; }
   
   /// get numeric value
   int getNumber() const;
@@ -83,10 +86,15 @@ public:
   ///
   bool operator!=(const _TCHAR *i_str) const { return !(*this == i_str); }
   
-  /// paren equal c is '<code>(</code>' or '<code>)</code>'
+  /** paren equal
+      @param i_c '<code>(</code>' or '<code>)</code>' */
   bool operator==(const _TCHAR i_c) const;
-  ///
+  /** paren equal
+      @param i_c '<code>(</code>' or '<code>)</code>' */
   bool operator!=(const _TCHAR i_c) const { return !(*this == i_c); }
+
+  /// add string
+  void add(const tstringi &i_str);
 
   /// stream output
   friend tostream &operator<<(tostream &i_ost, const Token &i_token);

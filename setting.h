@@ -92,6 +92,7 @@ private:
   Token *lookToken();				/// look next token
   bool getOpenParen(bool i_doesThrow, const _TCHAR *i_name); /// argument "("
   bool getCloseParen(bool i_doesThrow, const _TCHAR *i_name); /// argument ")"
+  bool getComma(bool i_doesThrow, const _TCHAR *i_name); /// argument ","
   
   void load_LINE();				/// &lt;LINE&gt;
   void load_DEFINE();				/// &lt;DEFINE&gt;

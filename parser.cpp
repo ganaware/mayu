@@ -47,7 +47,8 @@ Token::Token(Type i_m_type)
     m_stringValue(_T("")),
     m_data(NULL)
 {
-  ASSERT(m_type == Type_openParen || m_type == Type_closeParen);
+  ASSERT(m_type == Type_openParen || m_type == Type_closeParen ||
+	 m_type == Type_comma);
 }
 
 // get numeric value
@@ -93,6 +94,12 @@ bool Token::operator==(const _TCHAR i_c) const
   return false;
 }
 
+// add string
+void Token::add(const tstringi &i_str)
+{
+  m_stringValue += i_str;
+}
+
 // stream output
 tostream &operator<<(tostream &i_ost, const Token &i_token)
 {
@@ -103,6 +110,7 @@ tostream &operator<<(tostream &i_ost, const Token &i_token)
     case Token::Type_regexp: i_ost << i_token.m_stringValue; break;
     case Token::Type_openParen: i_ost << _T("("); break;
     case Token::Type_closeParen: i_ost << _T(")"); break;
+    case Token::Type_comma: i_ost << _T(", "); break;
   }
   return i_ost;
 }
@@ -220,12 +228,13 @@ bool Parser::getLine(std::vector<Token> *o_tokens)
       
       const _TCHAR *tokenStart = t;
       
-      // empty token
+      // comma or empty token
       if (*t == _T(','))
       {
 	if (!isTokenExist)
 	  o_tokens->push_back(Token(_T(""), false));
 	isTokenExist = false;
+	o_tokens->push_back(Token(Token::Type_comma));
 	t ++;
 	goto continue_getTokenLoop;
       }
@@ -290,7 +299,13 @@ bool Parser::getLine(std::vector<Token> *o_tokens)
 	if (isRegexp)
 	  str = guardRegexpFromMbcs(str.c_str());
 #endif
-	o_tokens->push_back(Token(str, true, isRegexp));
+	// concatinate continuous string
+	if (!isRegexp &&
+	    0 < o_tokens->size() && o_tokens->back().isString() &&
+	    o_tokens->back().isQuoted())
+	  o_tokens->back().add(str);
+	else
+	  o_tokens->push_back(Token(str, true, isRegexp));
 	if (*t != _T('\0'))
 	  t ++;
 	goto continue_getTokenLoop;

@@ -168,6 +168,21 @@ bool SettingLoader::getCloseParen(bool i_doesThrow, const _TCHAR *i_name)
 }
 
 
+// argument ","
+bool SettingLoader::getComma(bool i_doesThrow, const _TCHAR *i_name)
+{
+  if (!isEOL() && lookToken()->isComma())
+  {
+    getToken();
+    return true;
+  }
+  if (i_doesThrow)
+    throw ErrorMessage() << _T("`&")  << i_name
+			 << _T("': comma expected.");
+  return false;
+}
+
+
 // <INCLUDE>
 void SettingLoader::load_INCLUDE()
 {
