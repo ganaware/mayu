@@ -65,5 +65,5 @@ batch_clean:
 		cd ..
 
 batch_distrib: batch
-		-$(MAKE) -k -f mayu-vc.mak TARGETOS=WINNT distrib
-		-$(MAKE) -k -f mayu-vc.mak TARGETOS=WIN95 distrib
+		-$(MAKE) -k -f mayu-vc.mak TARGETOS=WINNT nodebug=1 distrib
+		-$(MAKE) -k -f mayu-vc.mak TARGETOS=WIN95 nodebug=1 distrib
