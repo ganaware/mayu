@@ -18,11 +18,7 @@ struct _FilterDeviceExtension;
 
 typedef struct _DetourDeviceExtension
 {
-#ifdef MAYUD_PNP
   PDRIVER_DISPATCH MajorFunction[IRP_MJ_MAXIMUM_FUNCTION + 1];
-#else // !MAYUD_PNP
-  PDRIVER_DISPATCH MajorFunction[IRP_MJ_MAXIMUM_FUNCTION];
-#endif // !MAYUD_PNP
 
   KSPIN_LOCK lock; // lock below datum
   PDEVICE_OBJECT filterDevObj;
@@ -34,11 +30,7 @@ typedef struct _DetourDeviceExtension
 
 typedef struct _FilterDeviceExtension
 {
-#ifdef MAYUD_PNP
   PDRIVER_DISPATCH MajorFunction[IRP_MJ_MAXIMUM_FUNCTION + 1];
-#else // !MAYUD_PNP
-  PDRIVER_DISPATCH MajorFunction[IRP_MJ_MAXIMUM_FUNCTION];
-#endif // !MAYUD_PNP
   
   PDEVICE_OBJECT detourDevObj;
   PDEVICE_OBJECT kbdClassDevObj; // keyboard class device object
@@ -69,10 +61,8 @@ NTSTATUS detourCleanup       (IN PDEVICE_OBJECT, IN PIRP);
 NTSTATUS detourDeviceControl (IN PDEVICE_OBJECT, IN PIRP);
 NTSTATUS filterRead          (IN PDEVICE_OBJECT, IN PIRP);
 NTSTATUS filterPassThrough   (IN PDEVICE_OBJECT, IN PIRP);
-#ifdef MAYUD_PNP
 NTSTATUS detourPnP           (IN PDEVICE_OBJECT, IN PIRP);
 NTSTATUS filterPnP           (IN PDEVICE_OBJECT, IN PIRP);
-#endif // MAYUD_PNP
 #ifndef MAYUD_NT4
 NTSTATUS detourPower         (IN PDEVICE_OBJECT, IN PIRP);
 NTSTATUS filterPower         (IN PDEVICE_OBJECT, IN PIRP);
@@ -89,6 +79,7 @@ NTSTATUS readq(KeyQue*, PIRP);
 ///////////////////////////////////////////////////////////////////////////////
 // Global Constants / Variables
 
+BOOLEAN g_isPnP;
 BOOLEAN g_isXp;
 ULONG g_SpinLock_offset;
 ULONG g_RequestIsPending_offset;
@@ -103,10 +94,8 @@ UnicodeString(L"\\Device\\MayuDetour0");
 static UNICODE_STRING MayuDetourWin32DeviceName =
 UnicodeString(L"\\DosDevices\\MayuDetour1");
 
-#ifndef MAYUD_PNP
 static UNICODE_STRING KeyboardClassDeviceName =
 UnicodeString(DD_KEYBOARD_DEVICE_NAME_U L"0");
-#endif // !MAYUD_PNP
 
 // Global Variables
 PDRIVER_DISPATCH _IopInvalidDeviceRequest; // Default dispatch function
@@ -129,11 +118,23 @@ NTSTATUS DriverEntry(IN PDRIVER_OBJECT driverObject,
   ULONG i;
   PDEVICE_OBJECT detourDevObj = NULL;
   DetourDeviceExtension *detourDevExt = NULL;
+  ULONG start = 0;
+  RTL_QUERY_REGISTRY_TABLE query[2];
   
   UNREFERENCED_PARAMETER(registryPath);
 
 
   // Environment specific initialize
+  RtlZeroMemory(query, sizeof(query));
+  query[0].Name = L"Start";
+  query[0].Flags = RTL_QUERY_REGISTRY_DIRECT;
+  query[0].EntryContext = &start;
+  RtlQueryRegistryValues(RTL_REGISTRY_SERVICES, L"mayud", query, NULL, NULL);
+  if (start == 0x03) {
+    g_isPnP = TRUE;
+  } else {
+    g_isPnP = FALSE;
+  }
 #ifdef MAYUD_NT4
   g_isXp = FALSE;
   g_SpinLock_offset = 48;
@@ -158,17 +159,17 @@ NTSTATUS DriverEntry(IN PDRIVER_OBJECT driverObject,
   
   // set major functions
   driverObject->DriverUnload = mayuUnloadDriver;
-#ifdef MAYUD_PNP
-  driverObject->DriverExtension->AddDevice = mayuAddDevice;
-#endif // MAYUD_PNP
+  if (g_isPnP == TRUE) {
+    driverObject->DriverExtension->AddDevice = mayuAddDevice;
+  }
   for (i = 0; i < IRP_MJ_MAXIMUM_FUNCTION; i++)
 #ifdef MAYUD_NT4
     if (i != IRP_MJ_POWER)
 #endif // MAYUD_NT4
       driverObject->MajorFunction[i] = mayuGenericDispatch;
-#ifdef MAYUD_PNP
-  driverObject->MajorFunction[IRP_MJ_PNP] = mayuGenericDispatch;
-#endif // MAYUD_PNP
+  if (g_isPnP == TRUE) {
+    driverObject->MajorFunction[IRP_MJ_PNP] = mayuGenericDispatch;
+  }
   
   // create a device
   {
@@ -201,7 +202,7 @@ NTSTATUS DriverEntry(IN PDRIVER_OBJECT driverObject,
     if (!NT_SUCCESS(status)) goto error;
     is_symbolicLinkCreated = TRUE;
     
-#ifndef MAYUD_PNP
+    if (g_isPnP == FALSE)
     // attach filter device to keyboard class device
     {
       PFILE_OBJECT f;
@@ -219,7 +220,6 @@ NTSTATUS DriverEntry(IN PDRIVER_OBJECT driverObject,
 //			      &filterDevExt->kbdClassDevObj);
       if (!NT_SUCCESS(status)) goto error;
     }
-#endif // !MAYUD_PNP
     
     // initialize Major Functions
     for (i = 0; i < IRP_MJ_MAXIMUM_FUNCTION; i++)
@@ -237,9 +237,9 @@ NTSTATUS DriverEntry(IN PDRIVER_OBJECT driverObject,
 #ifndef MAYUD_NT4
     detourDevExt->MajorFunction[IRP_MJ_POWER] = detourPower;
 #endif // !MAYUD_NT4
-#ifdef MAYUD_PNP
-    detourDevExt->MajorFunction[IRP_MJ_PNP] = detourPnP;
-#endif // MAYUD_PNP
+    if (g_isPnP == TRUE) {
+      detourDevExt->MajorFunction[IRP_MJ_PNP] = detourPnP;
+    }
   }
   detourDevObj->Flags &= ~DO_DEVICE_INITIALIZING;  
   
@@ -311,9 +311,9 @@ NTSTATUS mayuAddDevice(IN PDRIVER_OBJECT driverObject,
 #ifndef MAYUD_NT4
   filterDevExt->MajorFunction[IRP_MJ_POWER] = filterPower;
 #endif // !MAYUD_NT4
-#ifdef MAYUD_PNP
-  filterDevExt->MajorFunction[IRP_MJ_PNP] = filterPnP;
-#endif // MAYUD_PNP
+  if (g_isPnP == TRUE) {
+    filterDevExt->MajorFunction[IRP_MJ_PNP] = filterPnP;
+  }
   filterDevObj->Flags &= ~DO_DEVICE_INITIALIZING;  
 
   return STATUS_SUCCESS;
@@ -886,7 +886,6 @@ NTSTATUS filterPower(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
   return PoCallDriver(filterDevExt->kbdClassDevObj, irp);
 }
 #endif // !MAYUD_NT4
-#ifdef MAYUD_PNP
 NTSTATUS filterPnP(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
 {
   PIO_STACK_LOCATION irpSp = IoGetCurrentIrpStackLocation(irp);
@@ -949,4 +948,3 @@ NTSTATUS detourPnP(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
   IoCompleteRequest(irp, IO_NO_INCREMENT);
   return STATUS_SUCCESS;
 }
-#endif // MAYUD_PNP
