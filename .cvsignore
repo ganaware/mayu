@@ -3,6 +3,7 @@ functions.h
 *.opt
 *.tgz
 *.pdb
+mayu-*-src.tar.bz2
 outvc6_*
 outvc7_*
 outvc71_*
