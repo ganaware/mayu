@@ -6,7 +6,6 @@
 
 
 #include "misc.h"
-
 #include "dlginvestigate.h"
 #include "dlglog.h"
 #include "dlgsetting.h"
@@ -24,8 +23,6 @@
 #include "setting.h"
 #include "target.h"
 #include "windowstool.h"
-
-#include <shlwapi.h>
 #include <process.h>
 #include <time.h>
 #include <commctrl.h>
@@ -368,9 +365,7 @@ private:
 	      {
 		_TCHAR buf[GANA_MAX_PATH];
 		CHECK_TRUE( GetModuleFileName(g_hInst, buf, NUMBER_OF(buf)) );
-		CHECK_TRUE( PathRemoveFileSpec(buf) );
-	    
-		tstringi helpFilename = buf;
+		tstringi helpFilename = pathRemoveFileSpec(buf);
 		helpFilename += _T("\\");
 		helpFilename += loadString(IDS_helpFilename);
 		ShellExecute(NULL, _T("open"), helpFilename.c_str(),
@@ -481,7 +476,6 @@ private:
   {
     if (m_canUseTasktrayBaloon)
     {
-      m_ni.uFlags |= NIF_INFO;
       if (i_doesShow)
       {
 	tstring helpMessage, helpTitle;
@@ -494,6 +488,11 @@ private:
       else
 	m_ni.szInfo[0] = m_ni.szInfoTitle[0] = _T('\0');
       CHECK_TRUE( Shell_NotifyIcon(i_doesAdd ? NIM_ADD : NIM_MODIFY, &m_ni) );
+    }
+    else
+    {
+      if (i_doesAdd)
+	CHECK_TRUE( Shell_NotifyIcon(NIM_ADD, &m_ni) );
     }
   }
 
@@ -566,7 +565,10 @@ public:
     tstring tip = loadString(IDS_mayu);
     tcslcpy(m_ni.szTip, tip.c_str(), NUMBER_OF(m_ni.szTip));
     if (m_canUseTasktrayBaloon)
+    {
       m_ni.cbSize = sizeof(m_ni);
+      m_ni.uFlags |= NIF_INFO;
+    }
     else
       m_ni.cbSize = NOTIFYICONDATA_V1_SIZE;
     showHelpMessage(false, true);
@@ -727,10 +729,14 @@ int WINAPI _tWinMain(HINSTANCE i_hInstance, HINSTANCE /* i_hPrevInstance */,
   CHECK_TRUE( _tsetlocale(LC_ALL, _T("")) );
 
   // common controls
+#if defined(_WIN95)
+  InitCommonControls();
+#else
   INITCOMMONCONTROLSEX icc;
   icc.dwSize = sizeof(icc);
   icc.dwICC = ICC_LISTVIEW_CLASSES;
   CHECK_TRUE( InitCommonControlsEx(&icc) );
+#endif
 
   // convert old registry to new registry
   convertRegistry();

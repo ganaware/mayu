@@ -8,6 +8,7 @@
 
 #include <windowsx.h>
 #include <malloc.h>
+#include <shlwapi.h>
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -284,3 +285,23 @@ BOOL (WINAPI *setLayeredWindowAttributes)
   (HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags)
   = initalizeLayerdWindow;
 
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Utility
+
+// PathRemoveFileSpec()
+tstring pathRemoveFileSpec(const tstring &i_path)
+{
+  const _TCHAR *str = i_path.c_str();
+  const _TCHAR *b = _tcsrchr(str, _T('\\'));
+  const _TCHAR *s = _tcsrchr(str, _T('/'));
+  if (b && s)
+    return tstring(str, MIN(b, s));
+  if (b)
+    return tstring(str, b);
+  if (s)
+    return tstring(str, s);
+  if (const _TCHAR *c = _tcsrchr(str, _T(':')))
+    return tstring(str, c + 1);
+  return i_path;
+}

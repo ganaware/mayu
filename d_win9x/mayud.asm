@@ -2,6 +2,7 @@ PAGE 58,132
    .386p
 
     .xlist
+	WIN40COMPAT EQU 1
     include vmm.inc
     include debug.inc
 	include	vwin32.inc

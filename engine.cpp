@@ -856,7 +856,9 @@ void Engine::stop()
     do
     {
       // cancel m_device ... TODO: this does not work on W2k
+#if defined(_WINNT)
       CancelIo(m_device);
+#endif // _WINNT
       //DWORD buf;
       //M_DeviceIoControl(m_device, IOCTL_MAYU_DETOUR_CANCEL,
       //                &buf, sizeof(buf), &buf, sizeof(buf), &buf, NULL);

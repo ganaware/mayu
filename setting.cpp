@@ -17,7 +17,6 @@
 #include <fstream>
 #include <iomanip>
 #include <sys/stat.h>
-#include <shlwapi.h>
 
 
 namespace Event
@@ -101,10 +100,7 @@ void getHomeDirectories(HomeDirectories *o_pathes)
   
   _TCHAR buf[GANA_MAX_PATH];
   if (GetModuleFileName(GetModuleHandle(NULL), buf, NUMBER_OF(buf)))
-  {
-    PathRemoveFileSpec(buf);
-    o_pathes->push_back(buf);
-  }
+    o_pathes->push_back(pathRemoveFileSpec(buf));
 }
 
 

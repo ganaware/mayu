@@ -11,10 +11,12 @@ VERSION		= 3.20
 OS_SPECIFIC_DEFINES	=  -DUNICODE -D_UNICODE
 DISTRIB_OS	= nt
 !endif
+
 !if "$(TARGETOS)" == "WIN95"
 OS_SPECIFIC_DEFINES	=  -D_MBCS
 DISTRIB_OS	= 9x
 !endif
+
 !if "$(TARGETOS)" == "BOTH"
 !error Must specify TARGETOS=WIN95 or TARGETOS=WINNT
 !endif
@@ -26,27 +28,27 @@ BOOST_DIR	= ../boost
 
 # mayu.exe	###############################################################
 
-TARGET_1	= mayu.exe
-OBJS_1		=			\
-		dlgeditsetting.obj	\
-		dlginvestigate.obj	\
-		dlglog.obj		\
-		dlgsetting.obj		\
-		dlgversion.obj		\
-		engine.obj		\
-		focus.obj		\
-		function.obj		\
-		keyboard.obj		\
-		keymap.obj		\
-		layoutmanager.obj	\
-		mayu.obj		\
-		parser.obj		\
-		registry.obj		\
-		setting.obj		\
-		stringtool.obj		\
-		target.obj		\
-		vkeytable.obj		\
-		windowstool.obj		\
+TARGET_1	= $(OUT_DIR)\mayu.exe
+OBJS_1		=				\
+		$(OUT_DIR)\dlgeditsetting.obj	\
+		$(OUT_DIR)\dlginvestigate.obj	\
+		$(OUT_DIR)\dlglog.obj		\
+		$(OUT_DIR)\dlgsetting.obj	\
+		$(OUT_DIR)\dlgversion.obj	\
+		$(OUT_DIR)\engine.obj		\
+		$(OUT_DIR)\focus.obj		\
+		$(OUT_DIR)\function.obj		\
+		$(OUT_DIR)\keyboard.obj		\
+		$(OUT_DIR)\keymap.obj		\
+		$(OUT_DIR)\layoutmanager.obj	\
+		$(OUT_DIR)\mayu.obj		\
+		$(OUT_DIR)\parser.obj		\
+		$(OUT_DIR)\registry.obj		\
+		$(OUT_DIR)\setting.obj		\
+		$(OUT_DIR)\stringtool.obj	\
+		$(OUT_DIR)\target.obj		\
+		$(OUT_DIR)\vkeytable.obj	\
+		$(OUT_DIR)\windowstool.obj	\
 
 SRCS_1		=			\
 		dlgeditsetting.cpp	\
@@ -69,29 +71,28 @@ SRCS_1		=			\
 		vkeytable.cpp		\
 		windowstool.cpp		\
 
-RES_1		= mayu.res
+RES_1		= $(OUT_DIR)\mayu.res
 
-LIBS_1		=		\
-		$(guixlibsmt)	\
-		shell32.lib	\
-		shlwapi.lib	\
-		comctl32.lib	\
-		mayu.lib	\
+LIBS_1		=			\
+		$(guixlibsmt)		\
+		shell32.lib		\
+		comctl32.lib		\
+		$(OUT_DIR)\mayu.lib	\
 
-EXTRADEP_1	= mayu.lib
+EXTRADEP_1	= $(OUT_DIR)\mayu.lib
 
 # mayu.dll	###############################################################
 
-TARGET_2	= mayu.dll
-OBJS_2		= hook.obj stringtool.obj
+TARGET_2	= $(OUT_DIR)\mayu.dll
+OBJS_2		= $(OUT_DIR)\hook.obj $(OUT_DIR)\stringtool.obj
 SRCS_2		= hook.cpp stringtool.cpp
 LIBS_2		= $(guixlibsmt) imm32.lib
 
 
 # mayu.lib	###############################################################
 
-TARGET_3	= mayu.lib
-DLL_3		= mayu.dll
+TARGET_3	= $(OUT_DIR)\mayu.lib
+DLL_3		= $(OUT_DIR)\mayu.dll
 
 
 # distribution	###############################################################
@@ -122,16 +123,16 @@ DISTRIB_CONTRIBS =				\
 		contrib\ax.mayu			\
 
 !if "$(TARGETOS)" == "WINNT"
-DISTRIB_DRIVER	= mayud.sys mayudnt4.sys
+DISTRIB_DRIVER	= d\i386\mayud.sys d\nt4\i386\mayudnt4.sys
 !endif
 !if "$(TARGETOS)" == "WIN95"
-DISTRIB_DRIVER	= mayud.vxd
+DISTRIB_DRIVER	= d_win9x\mayud.vxd
 !endif
 
 DISTRIB		=			\
 		$(TARGET_1)		\
 		$(TARGET_2)		\
-		setup.exe		\
+		s\$(OUT_DIR)\setup.exe	\
 		$(DISTRIB_SETTINGS)	\
 		$(DISTRIB_MANUAL)	\
 		$(DISTRIB_CONTRIBS)	\
@@ -169,68 +170,60 @@ DISTRIBSRC	=			\
 		d_win9x\mayud.def	\
 		d_win9x\mayud.vxd	\
 					\
-		tools\makedepend	\
+		tools\checkversion	\
 		tools\dos2unix		\
+		tools\makedepend	\
+		tools\makefunc		\
 		tools\unix2dos		\
 
 
 # tools		###############################################################
 
-CAB		= s\cab32.exe
+IEXPRESS	= iexpress
 DOCXX		= doc++.exe
 MAKEDEPEND	= perl tools/makedepend -o.obj
 DOS2UNIX	= perl tools/dos2unix
 UNIX2DOS	= perl tools/unix2dos
 MAKEFUNC	= perl tools/makefunc
+GETCVSFILES	= perl tools/getcvsfiles
+GENIEXPRESS	= perl tools/geniexpress
+
 
 # rules		###############################################################
 
-all:		boost $(TARGET_1) $(TARGET_2) $(TARGET_3)
+all:		boost $(OUT_DIR) $(TARGET_1) $(TARGET_2) $(TARGET_3)
 
-functions.h:	engine.h tools/makefunc
+$(OUT_DIR):
+		if not exist "$(OUT_DIR)\\" $(MKDIR) $(OUT_DIR)
+
+unctions.h:	engine.h tools/makefunc
 		$(MAKEFUNC) < engine.h > functions.h
 
-clean:
-		-$(RM) *.obj
+clean::
 		-$(RM) $(TARGET_1) $(TARGET_2) $(TARGET_3)
-		-$(RM) *.res *.exp
-		-$(RM) mayu.aps mayu.opt *.pdb
+		-$(RM) $(OUT_DIR)\*.obj
+		-$(RM) $(OUT_DIR)\*.res $(OUT_DIR)\*.exp
+		-$(RM) mayu.aps mayu.opt $(OUT_DIR)\*.pdb
 		-$(RM) *~ $(CLEAN)
+		-$(RMDIR) $(OUT_DIR)
 
 depend::
 		$(MAKEDEPEND) -fmayu-common.mak \
 		-- $(DEPENDFLAGS) -- $(SRCS_1) $(SRCS_2)
 
 distrib:
-		@$(ECHO) "============================================================================="
-		@$(ECHO) "before build package:                                                        "
-		@$(ECHO) "  (n)make -f ... clean all nodebug=1                                         "
-		@$(ECHO) "  cd s; (n)make -f ... clean all nodebug=1                                   "
-		@$(ECHO) "  cd d; build                                                                "
-		@$(ECHO) "  cd d/nt4; build                                                            "
-		@$(ECHO) "============================================================================="
-		-@$(RM) source.cab
-		-@$(RM) mayu-$(VERSION)-$(DISTRIB_OS).cab
-		-@$(RM) mayu-$(VERSION)-$(DISTRIB_OS).exe
-		@$(CAB) -a source.cab -ml:21 $(DISTRIBSRC)
-		@$(COPY) d\i386\mayud.sys .
-		@$(COPY) d\nt4\i386\mayudnt4.sys .
-		@$(COPY) d_win9x\mayud.vxd .
-		@$(COPY) s\setup.exe setup.exe
-		@$(ECHO) "============================================================================="
-		@$(ECHO) "   解凍時のタイトル(T):                   なし                               "
-		@$(ECHO) "   解凍メッセージ(M):                     なし                               "
-		@$(ECHO) "   標準の解凍先フォルダ(P):               ％temp％ (％ は %% でね)            "
-		@$(ECHO) "レ 解凍時に解凍先フォルダを問い合わせない                                    "
-		@$(ECHO) "   解凍後、実行または開くファイル名(C):   setup.exe -s                       "
-		@$(ECHO) "レ プログラム終了後、解凍されたファイルを削除する                            "
-		@$(ECHO) "============================================================================="
-		$(UNIX2DOS) $(DISTRIB_SETTINGS) $(DISTRIB_CONTRIBS)
-		$(CAB) -a mayu-$(VERSION)-$(DISTRIB_OS).cab -ml:21 $(DISTRIB) source.cab
-		$(DOS2UNIX) $(DISTRIB_SETTINGS) $(DISTRIB_CONTRIBS)
-		-@$(RM) source.cab mayud.sys mayudnt4.sys mayud.vxd setup.exe
-		$(CAB) -f mayu-$(VERSION)-$(DISTRIB_OS).cab
-		-@$(RM) mayu-$(VERSION)-$(DISTRIB_OS).cab
+		-$(RM) mayu-$(VERSION) 
+		-ln -s . mayu-$(VERSION)
+		-bash -c "tar cvzf mayu-$(VERSION)-src.tgz `$(GETCVSFILES) | sed 's/^./mayu-$(VERSION)/'`"
+		-$(RM) mayu-$(VERSION) 
+		-$(GENIEXPRESS) \
+			mayu-$(VERSION)-$(DISTRIB_OS).exe \
+			"MADO TSUKAI NO YUUTSU $(VERSION) $(TARGETOS)" \
+			setup.exe $(DISTRIB) > __mayu__.sed
+		-$(UNIX2DOS) $(DISTRIB_SETTINGS) $(DISTRIB_CONTRIBS)
+		-$(IEXPRESS) /N __mayu__.sed
+		-$(DOS2UNIX) $(DISTRIB_SETTINGS) $(DISTRIB_CONTRIBS)
+		-$(RM) __mayu__.sed
 
 srcdesc::
 		@$(ECHO) USE DOC++ 3.4.4 OR HIGHER
@@ -238,46 +231,51 @@ srcdesc::
 
 # DO NOT DELETE
 
-dlgeditsetting.obj: compiler_specific.h dlgeditsetting.h layoutmanager.h \
- mayurc.h misc.h stringtool.h windowstool.h
-dlginvestigate.obj: compiler_specific.h dlginvestigate.h driver.h engine.h \
- focus.h function.h functions.h hook.h keyboard.h keymap.h mayurc.h misc.h \
- msgstream.h multithread.h parser.h setting.h stringtool.h target.h \
+$(OUT_DIR)\dlgeditsetting.obj: compiler_specific.h dlgeditsetting.h \
+ layoutmanager.h mayurc.h misc.h stringtool.h windowstool.h
+$(OUT_DIR)\dlginvestigate.obj: compiler_specific.h dlginvestigate.h \
+ driver.h engine.h focus.h function.h functions.h hook.h keyboard.h \
+ keymap.h mayurc.h misc.h msgstream.h multithread.h parser.h setting.h \
+ stringtool.h target.h vkeytable.h windowstool.h
+$(OUT_DIR)\dlglog.obj: compiler_specific.h layoutmanager.h mayu.h mayurc.h \
+ misc.h msgstream.h multithread.h registry.h stringtool.h windowstool.h
+$(OUT_DIR)\dlgsetting.obj: compiler_specific.h dlgeditsetting.h driver.h \
+ function.h functions.h keyboard.h keymap.h layoutmanager.h mayu.h mayurc.h \
+ misc.h multithread.h parser.h registry.h setting.h stringtool.h \
+ windowstool.h
+$(OUT_DIR)\dlgversion.obj: compiler_specific.h mayu.h mayurc.h misc.h \
+ stringtool.h windowstool.h
+$(OUT_DIR)\engine.obj: compiler_specific.h driver.h engine.h errormessage.h \
+ function.h functions.h hook.h keyboard.h keymap.h mayurc.h misc.h \
+ msgstream.h multithread.h parser.h setting.h stringtool.h windowstool.h
+$(OUT_DIR)\focus.obj: compiler_specific.h focus.h misc.h stringtool.h \
+ windowstool.h
+$(OUT_DIR)\function.obj: compiler_specific.h driver.h engine.h function.h \
+ functions.h hook.h keyboard.h keymap.h misc.h msgstream.h multithread.h \
+ parser.h setting.h stringtool.h vkeytable.h windowstool.h
+$(OUT_DIR)\keyboard.obj: compiler_specific.h driver.h keyboard.h misc.h \
+ stringtool.h
+$(OUT_DIR)\keymap.obj: compiler_specific.h driver.h errormessage.h \
+ function.h keyboard.h keymap.h misc.h stringtool.h
+$(OUT_DIR)\layoutmanager.obj: compiler_specific.h layoutmanager.h misc.h \
+ stringtool.h windowstool.h
+$(OUT_DIR)\mayu.obj: compiler_specific.h dlginvestigate.h dlglog.h \
+ dlgsetting.h dlgversion.h driver.h engine.h errormessage.h focus.h \
+ function.h functions.h hook.h keyboard.h keymap.h mayu.h mayurc.h misc.h \
+ msgstream.h multithread.h parser.h registry.h setting.h stringtool.h \
+ target.h windowstool.h
+$(OUT_DIR)\parser.obj: compiler_specific.h errormessage.h misc.h parser.h \
+ stringtool.h
+$(OUT_DIR)\registry.obj: compiler_specific.h misc.h registry.h stringtool.h
+$(OUT_DIR)\setting.obj: compiler_specific.h dlgsetting.h driver.h \
+ errormessage.h function.h functions.h keyboard.h keymap.h mayu.h mayurc.h \
+ misc.h multithread.h parser.h registry.h setting.h stringtool.h \
  vkeytable.h windowstool.h
-dlglog.obj: compiler_specific.h layoutmanager.h mayu.h mayurc.h misc.h \
- msgstream.h multithread.h registry.h stringtool.h windowstool.h
-dlgsetting.obj: compiler_specific.h dlgeditsetting.h driver.h function.h \
- functions.h keyboard.h keymap.h layoutmanager.h mayu.h mayurc.h misc.h \
- multithread.h parser.h registry.h setting.h stringtool.h windowstool.h
-dlgversion.obj: compiler_specific.h mayu.h mayurc.h misc.h stringtool.h \
+$(OUT_DIR)\stringtool.obj: compiler_specific.h misc.h stringtool.h
+$(OUT_DIR)\target.obj: compiler_specific.h mayurc.h misc.h stringtool.h \
+ target.h windowstool.h
+$(OUT_DIR)\vkeytable.obj: compiler_specific.h misc.h vkeytable.h
+$(OUT_DIR)\windowstool.obj: compiler_specific.h misc.h stringtool.h \
  windowstool.h
-engine.obj: compiler_specific.h driver.h engine.h errormessage.h function.h \
- functions.h hook.h keyboard.h keymap.h mayurc.h misc.h msgstream.h \
- multithread.h parser.h setting.h stringtool.h windowstool.h
-focus.obj: compiler_specific.h focus.h misc.h stringtool.h windowstool.h
-function.obj: compiler_specific.h driver.h engine.h function.h functions.h \
- hook.h keyboard.h keymap.h misc.h msgstream.h multithread.h parser.h \
- setting.h stringtool.h vkeytable.h windowstool.h
-keyboard.obj: compiler_specific.h driver.h keyboard.h misc.h stringtool.h
-keymap.obj: compiler_specific.h driver.h errormessage.h function.h \
- keyboard.h keymap.h misc.h stringtool.h
-layoutmanager.obj: compiler_specific.h layoutmanager.h misc.h stringtool.h \
- windowstool.h
-mayu.obj: compiler_specific.h dlginvestigate.h dlglog.h dlgsetting.h \
- dlgversion.h driver.h engine.h errormessage.h focus.h function.h \
- functions.h hook.h keyboard.h keymap.h mayu.h mayurc.h misc.h msgstream.h \
- multithread.h parser.h registry.h setting.h stringtool.h target.h \
- windowstool.h
-parser.obj: compiler_specific.h errormessage.h misc.h parser.h stringtool.h
-registry.obj: compiler_specific.h misc.h registry.h stringtool.h
-setting.obj: compiler_specific.h dlgsetting.h driver.h errormessage.h \
- function.h functions.h keyboard.h keymap.h mayu.h mayurc.h misc.h \
- multithread.h parser.h registry.h setting.h stringtool.h vkeytable.h \
- windowstool.h
-stringtool.obj: compiler_specific.h misc.h stringtool.h
-target.obj: compiler_specific.h mayurc.h misc.h stringtool.h target.h \
- windowstool.h
-vkeytable.obj: compiler_specific.h misc.h vkeytable.h
-windowstool.obj: compiler_specific.h misc.h stringtool.h windowstool.h
-hook.obj: compiler_specific.h hook.h misc.h stringtool.h
-stringtool.obj: compiler_specific.h misc.h stringtool.h
+$(OUT_DIR)\hook.obj: compiler_specific.h hook.h misc.h stringtool.h
+$(OUT_DIR)\stringtool.obj: compiler_specific.h misc.h stringtool.h

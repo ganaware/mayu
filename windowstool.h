@@ -8,7 +8,6 @@
 
 #  include "stringtool.h"
 #  include <windows.h>
-#  include <shlwapi.h>
 
 
 /// instance handle of this application
@@ -125,6 +124,13 @@ extern void editInsertTextAtLast(HWND i_hwnd, const tstring &i_text,
 /// SetLayeredWindowAttributes API
 extern BOOL (WINAPI *setLayeredWindowAttributes)
   (HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags);
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Utility
+
+// PathRemoveFileSpec()
+tstring pathRemoveFileSpec(const tstring &i_path);
 
 
 #endif // _WINDOWSTOOL_H

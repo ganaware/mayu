@@ -1090,7 +1090,7 @@
 		  <div>
 		  <dl>
 		    <dt class="h4">コンパイラ
-		    <dd class="d4"><div><p>現在対応しているコンパイラは Visual C++ 6.0 SP3 又は Borland C++ 5.5 です。</p></div>
+		    <dd class="d4"><div><p>現在対応しているコンパイラは Visual C++ 6.0 SP3 <!--又は Borland C++ 5.5 -->です。</p></div>
 		    <dt class="h4">Platform SDK
 		    <dd class="d4"><div><p>Windows 2000 に対応したものが必要です。MSDN で配布されていますし、マイクロソフトの<a href="http://www.microsoft.com/msdownload/platformsdk/setuplauncher.htm" target="_top">サイト</a>でも配布されています。</p></div>
 		    <dt class="h4">DDK
@@ -1105,10 +1105,10 @@
 	      <dd class="d3">
 		  <div>
 		  <dl>
-		    <dt class="h4"><code>source.cab</code> の展開
+		    <dt class="h4">ソースの展開
 		    <dd class="d4">
 			<div>
-			<p><code>source.cab</code> はインストールした「窓使いの憂鬱」を作成した時のソースが格納されています。「窓使いの憂鬱」をインストールしたディレクトリへディレクトリ付きで展開してください。Windows 付属のもので展開するとディレクトリが無視されるかもしれないので、<a href="http://www.csdinc.co.jp/archiver/" target="_top">統合アーカイバプロジェクト</a>あたりにあるアーカイバを使用するといいでしょう。</p>
+			<p>SourfeForge の <a href="http://sourceforge.net/project/showfiles.php?group_id=5403">Download</a> から、ソースファイルをダウンロードします。ソースファイルの展開には Cygwin の tar を使うのが良いでしょう。
 			</div>
 		    <dt class="h4">cvs による取り寄せ
 		    <dd class="d4">
@@ -1137,7 +1137,7 @@
 			<code>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---</code>regex/ ...<br>
 			<code>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---</code>timer/ ...<br>
 			<code>&nbsp;&nbsp;&nbsp;|</code><br>
-			<code>&nbsp;&nbsp;&nbsp;+---</code>mayu/ ... <span>「窓使いの憂鬱｣本体ソース</span><br>
+			<code>&nbsp;&nbsp;&nbsp;+---</code>mayu-3.??/ ... <span>「窓使いの憂鬱｣本体ソース</span><br>
 			<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|</code><br>
 			<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---</code>contrib/ ...<br>
 			<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+---</code>d/ ...<br>
@@ -1159,12 +1159,12 @@
 			<p>Visual C++ 6.0 のコンパイラなどにパスを通しておいて、以下のようにします。
 			</p>
 			<p class="sample">
-			C:\Program Files\mayu&gt; nmake -f mayu-vc.mak nodebug=1
+			C:\Program Files\mayu&gt; nmake -f mayu-vc.mak batch
 			</p>
-			<p>Windows9x 用にコンパイルするには、<code>TARGETOS=WIN95</code> を引数に追加します。</p>
-			<p><code>s</code> ディレクトリ以下にはインストーラが、<code>d</code> ディレクトリ以下にはドライバのソースが入っているので、必要なら適当にコンパイルしてください。</p>
+			<p><code>out_win9x/</code>, <code>out_win9x_debug/</code>, <code>out_winnt/</code>, <code>out_winnt_debug/</code> の各ディレクトリに実行ファイルが作成されます。</p>
+			<p><code>d/</code>, <code>d_win9x/</code> ディレクトリ以下にはドライバのソースが入っているので、必要なら適当にコンパイルしてください。</p>
 			</div>
-
+<!--
 		    <dt class="h4">Borland C++ 5.5 の場合
 		    <dd class="d4">
 			<div>
@@ -1175,31 +1175,9 @@
 			<p>Windows9x 用にコンパイルするには、<code>TARGETOS=WIN95</code> を引数に追加します。</p>
 			<p><code>s</code> ディレクトリ以下のインストーラをコンパイルすることはできますが、<code>d</code> ディレクトリ以下にのドライバをコンパイルする方法は不明です。</p>
 			</div>
+			-->
 		    <dt class="h4">デバッグ情報
 		    <dd class="d4"><div><p>どちらのコンパイラを使う場合でも、<code>nodebug=1</code> を削除すれば、デバッグ情報を生成します。何かパッチを作ったらぜひ作者までお知らせください。</p>
-			<p>原因不明ですが、デバッグバージョンでビルドする場合のみ次のパッチを宛てる必要があります。さもないとリンクに失敗します。</p>
-
-<pre class="sample">*** boost/libs/regex/src/c_regex_traits.cpp~	Thu Nov 16 20:55:18 2000
---- boost/libs/regex/src/c_regex_traits.cpp	Sat Jan 13 19:35:36 2001
-***************
-*** 863,868 ****
---- 863,869 ----
-     BOOST_RE_GUARD_STACK
-     if(c &lt; 256)
-        return BOOST_RE_MAKE_BOOL(re_detail::wide_unicode_classes[c] &amp; f);
-+ #ifdef BOOST_RE_DEBUG
-     if((f &amp; char_class_alpha) &amp;&amp; std::iswalpha(c))
-        return true;
-     if((f &amp; char_class_cntrl) &amp;&amp; std::iswcntrl(c))
-***************
-*** 881,886 ****
---- 882,888 ----
-        return true;
-     if(f &amp; char_class_unicode)
-        return true;
-+ #endif
-     return false;
-  }</pre>
 			</div>
 	    </div>
       </dl>

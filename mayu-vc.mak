@@ -7,7 +7,6 @@
 #
 ###############################################################################
 
-
 INCLUDES	= -I$(BOOST_DIR)	# why here ?
 DEPENDIGNORE	= --ignore=$(BOOST_DIR)
 
@@ -35,7 +34,27 @@ $(TARGET_2):	$(OBJS_2) $(RES_2) $(EXTRADEP_2)
 
 $(TARGET_3):	$(DLL_3)
 
+REGEXPP_XCFLAGS	= $(REGEXPP_XCFLAGS) XCFLAGS=-D_WCTYPE_INLINE_DEFINED
+
 boost:
 		cd $(BOOST_DIR)/libs/regex/lib/
-		$(MAKE) -f vc6.mak
+		$(MAKE) -f vc6.mak $(REGEXPP_XCFLAGS)
 		cd ../../../../mayu
+
+distclean::	clean
+		cd $(BOOST_DIR)/libs/regex/lib/
+		-$(MAKE) -k -f vc6.mak clean
+		cd ../../../../mayu
+
+batch:
+		-$(MAKE) -k -f mayu-vc.mak TARGETOS=WINNT nodebug=1
+		-$(MAKE) -k -f mayu-vc.mak TARGETOS=WINNT
+		-$(MAKE) -k -f mayu-vc.mak TARGETOS=WIN95 nodebug=1
+		-$(MAKE) -k -f mayu-vc.mak TARGETOS=WIN95
+		cd s
+		-$(MAKE) -k -f setup-vc.mak batch
+		cd ..
+
+batch_distrib: batch
+		-$(MAKE) -k -f mayu-vc.mak TARGETOS=WINNT distrib
+		-$(MAKE) -k -f mayu-vc.mak TARGETOS=WIN95 distrib

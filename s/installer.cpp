@@ -239,6 +239,7 @@ namespace Installer
   }
 
 
+#if defined(_WINNT)
   // create driver service
   DWORD createDriverService(const tstringi &i_serviceName,
 			    const tstring &i_serviceDescription,
@@ -272,8 +273,10 @@ namespace Installer
     CloseServiceHandle(hscm);
     return ERROR_SUCCESS;
   }
+#endif // _WINNT
 
 
+#if defined(_WINNT)
   // remove driver service
   DWORD removeDriverService(const tstringi &i_serviceName)
   {
@@ -302,6 +305,7 @@ namespace Installer
     CloseServiceHandle(hscm);
     return err;
   }
+#endif // _WINNT
 
 
   // check operating system
