@@ -33,6 +33,7 @@ CodeBuf			dd	64	dup (0)
 ForceBuf		db	3		dup (0)
 BlockingID		dd	0
 PassThrough		dd	0
+Canceled		dd	0
 
 VXD_LOCKED_DATA_ENDS
 
@@ -58,6 +59,16 @@ BeginProc MAYUD_W32_DeviceIOControl
 	je		DevCtrl_Success
 	cmp		ecx, 1
 	je		ReadFromBuffer
+	cmp		ecx, 2
+	je		WriteToVKD
+CancelRead:
+	mov		Canceled, 1
+	mov		ecx, BlockingID
+	cmp		ecx, 0h
+	je		DevCtrl_Success
+	VMMCall _SignalID <ecx>
+	jmp		DevCtrl_Success
+
 WriteToVKD:
 	mov		eax, [esi].lpvInBuffer
 	mov		esi, offset32 ForceBuf
@@ -86,6 +97,10 @@ ForceKey:
 	jmp		DevCtrl_Success
 
 ReadFromBuffer:
+	mov		ecx, Canceled
+	mov		Canceled, 0
+	cmp		ecx, 1
+	je		DevCtrl_Fail
 	mov		ecx, readp
 	cmp		ecx, writep
 	je		BufferUnderRun
