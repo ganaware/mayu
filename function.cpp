@@ -709,7 +709,7 @@ void Engine::funcKeymapWindow(FunctionParam *i_param)
 void Engine::funcKeymapPrevPrefix(FunctionParam *i_param, int i_previous)
 {
   Current c(i_param->m_c);
-  if (0 < i_previous && i_previous <= m_keymapPrefixHistory.size())
+  if (0 < i_previous && 0 <= m_keymapPrefixHistory.size() - i_previous)
   {
     int n = i_previous - 1;
     KeymapPtrList::reverse_iterator i = m_keymapPrefixHistory.rbegin();
