@@ -15,7 +15,7 @@ TARGETOS	= WINNT
 !endif	# TARGETOS
 
 !if "$(TARGETOS)" == "WINNT"
-APPVER		= 4.0
+APPVER		= 5.0
 !ifdef nodebug
 OUT_DIR		= out$(MAYU_VC)_winnt
 !else	# nodebug
