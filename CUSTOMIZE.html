@@ -567,6 +567,52 @@
 
 		  <p>別名が既存のキー名と同じだった場合は、別名のほうが優先されます。</p>
 		  </div>
+		  
+	      <dt class="h3"><a name="def_subst">代用定義</a>
+		  
+	      <dd class="d3">
+		  <div>
+		  <p>あるキーを別のキーとして代用します。</p>
+		  
+		  <p class="sample">
+		  def subst <em>KEY</em> =&gt; <em>KEY</em> や <em>キーシーケンス</em> …
+		  </p>
+
+		  <p>キーが入力されると、まずこの代用定義によって入力されたキーが置き換えられます。その後、<a href="#key">キー割り当ての変更</a>に従って変換されます。</p>
+		  
+		  <p class="sample">
+		  def subst A =&gt; B<br>
+		  key B =&gt; C<br>
+		  </p>
+		  
+		  <p>上記の例では、<kbd>[A]</kbd> を入力すると、まず代用定義で <kbd>[B]</kbd> が押されたことになって、<kbd>[B]</kbd> が入力された場合は <kbd>[C]</kbd> が最終的に Windows へ入力されるので、結局 <kbd>[A]</kbd> を押すと <kbd>[C]</kbd> が押されたことになります。</p>
+
+		  <p>代用定義は、キーマップでキーが変更されるより前に実行されます。例えば、109 キーボード上で 104 キーボードや Dvorak のエミュレートをしたいときに使用します。</p>
+
+		  <p><code>=&gt;</code> の左右は<a href="#key">キー割り当ての変更</a>のものと同じものが指定でき意味も同じになりますが、右側は先頭が <code><em>FUNCTION</em></code> ではなく <code><em>KEY</em></code> でなければならず、先頭の <code><em>KEY</em></code> しか意味を持ちません。</p>
+
+		  <p>以下色々な例。</p>
+		  
+		  <p class="sample">
+		  def subst A =&gt; C-B<br>
+		  key *B =&gt; S-*C<br>
+		  </p>
+
+		  <p>上記の例では <kbd>[A]</kbd> を入力すると、最終的に <kbd>[Shift]</kbd> + <kbd>[C]</kbd> が Windows へ出力されます。</p>
+		  
+		  <p class="sample">
+		  def subst A =&gt; B C D $Hoge &amp;Toggle(Lock0)<br>
+		  </p>
+		  
+		  <p>上記の例では <kbd>[A]</kbd> を入力すると、<kbd>[B]</kbd> が Windows へ出力されます。<code>C D $Hoge &amp;Toggle(Lock0)</code> は無視されます。</p>
+		  
+		  <p class="sample">
+		  keyseq $COLON = ~S-*Colon<br>
+		  def subst S-*Semicolon =&gt; $COLON<br>
+		  </p>
+		  
+		  <p>上記の例では <kbd>[Shift]</kbd> + <kbd>[;]</kbd> を入力すると、<kbd>[:]</kbd> になり、<kbd>[Control]</kbd> + <kbd>[Shift]</kbd> + <kbd>[;]</kbd> を入力すると、<kbd>[Control]</kbd> + <kbd>[:]</kbd> になります。</p>
+		  </div>
 	    </dl>
 	    </div>
 

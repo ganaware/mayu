@@ -142,6 +142,9 @@ public:
   /// add
   KeySeq &add(const Action &i_action);
 
+  /// get the first modified key of this key sequence
+  ModifiedKey getFirstModifiedKey() const;
+  
   ///
   const tstringi &getName() const { return m_name; }
   

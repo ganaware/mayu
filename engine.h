@@ -216,7 +216,7 @@ private:
   /// is modifier pressed ?
   bool isPressed(Modifier::Type i_mt);
   /// fix modifier key
-  bool fixModifierKey(ModifiedKey *o_mkey, Keymap::AssignMode *o_am);
+  bool fixModifierKey(ModifiedKey *io_mkey, Keymap::AssignMode *o_am);
 
   /// output to log
   void outputToLog(const Key *i_key, const ModifiedKey &i_mkey,
@@ -239,7 +239,7 @@ private:
   ///
   void generateKeyboardEvents(const Current &i_c);
   ///
-  void generateKeyboardEvents(const Current &i_c, bool i_isModifier);
+  void beginGeneratingKeyboardEvents(const Current &i_c, bool i_isModifier);
   
   /// pop all pressed key on win32
   void keyboardResetOnWin32();

@@ -5,31 +5,32 @@
 
 define KBD104on109
 
+def subst ~S-*”¼Šp/‘SŠp		=> $REVERSE_SOLIDUS
+def subst  S-*”¼Šp/‘SŠp		=> $TILDE
+def subst  A-”¼Šp/‘SŠp		=> $ToggleIME
+def subst  S-*_2		=> $COMMERCIAL_AT
+def subst  S-*_6		=> $CIRCUMFLEX_ACCENT
+def subst  S-*_7		=> $AMPERSAND
+def subst  S-*_8		=> $ASTERISK
+def subst  S-*_9		=> $LEFT_PARENTHESIS
+def subst  S-*_0		=> $RIGHT_PARENTHESIS
+def subst  S-*Hyphen		=> $LOW_LINE
+def subst ~S-*Caret		=> $EQUALS_SIGN
+def subst  S-*Caret		=> $PLUS_SIGN
+def subst ~S-*Atmark		=> $LEFT_SQUARE_BRACKET
+def subst  S-*Atmark		=> $LEFT_CURLY_BRACKET
+def subst ~S-*OpenBracket	=> $RIGHT_SQUARE_BRACKET
+def subst  S-*OpenBracket	=> $RIGHT_CURLY_BRACKET
+def subst ~S-*CloseBracket	=> $REVERSE_SOLIDUS
+def subst  S-*CloseBracket	=> $VERTICAL_LINE
+def subst  S-*Semicolon		=> $COLON
+def subst ~S-*Colon		=> $APOSTROPHE
+def subst  S-*Colon		=> $QUOTATION_MARK
+def subst    *–³•ÏŠ·		=> *Space
+def subst    *•ÏŠ·		=> *Space
+def subst    *‚Ð‚ç‚ª‚È		=> *Space
+def subst    *‰p”		=> S-*‰p”
+def subst *ReverseSolidus	=> *RightShift
+
 keymap Global
-  key ~S-*”¼Šp/‘SŠp	=> $GRAVE_ACCENT
-  key  S-*”¼Šp/‘SŠp	=> $TILDE
-  key  A-”¼Šp/‘SŠp	=> $ToggleIME
-  key  S-*_2		=> $COMMERCIAL_AT
-  key  S-*_6		=> $CIRCUMFLEX_ACCENT
-  key  S-*_7		=> $AMPERSAND
-  key  S-*_8		=> $ASTERISK
-  key  S-*_9		=> $LEFT_PARENTHESIS
-  key  S-*_0		=> $RIGHT_PARENTHESIS
-  key  S-*Hyphen	=> $LOW_LINE
-  key ~S-*Caret		=> $EQUALS_SIGN
-  key  S-*Caret		=> $PLUS_SIGN
-  key ~S-*Atmark	=> $LEFT_SQUARE_BRACKET
-  key  S-*Atmark	=> $LEFT_CURLY_BRACKET
-  key ~S-*OpenBracket	=> $RIGHT_SQUARE_BRACKET
-  key  S-*OpenBracket	=> $RIGHT_CURLY_BRACKET
-  key ~S-*CloseBracket	=> $REVERSE_SOLIDUS
-  key  S-*CloseBracket	=> $VERTICAL_LINE
-  key  S-*Semicolon	=> $COLON
-  key ~S-*Colon		=> $APOSTROPHE
-  key  S-*Colon		=> $QUOTATION_MARK
-  key    *–³•ÏŠ·	=> *Space
-  key    *•ÏŠ·		=> *Space
-  key    *‚Ð‚ç‚ª‚È	=> *Space
-  key    *‰p”		=> S-*‰p”
-  mod shift += ReverseSolidus
-  key *ReverseSolidus	=> *RightShift
+ mod shift += ReverseSolidus

@@ -144,21 +144,25 @@ bool Engine::isPressed(Modifier::Type i_mt)
 
 
 // fix modifier key (if fixed, return true)
-bool Engine::fixModifierKey(ModifiedKey *o_mkey, Keymap::AssignMode *o_am)
+bool Engine::fixModifierKey(ModifiedKey *io_mkey, Keymap::AssignMode *o_am)
 {
+  // for all modifier ...
   for (int i = Modifier::Type_begin; i != Modifier::Type_end; ++ i)
   {
+    // get modifier assignments (list of modifier keys)
     const Keymap::ModAssignments &ma =
       m_currentKeymap->getModAssignments(static_cast<Modifier::Type>(i));
-    for (Keymap::ModAssignments::const_iterator j = ma.begin();
-	 j != ma.end(); ++ j)
-      if (o_mkey->m_key == (*j).m_key)
+    
+    for (Keymap::ModAssignments::const_iterator
+	   j = ma.begin(); j != ma.end(); ++ j)
+      if (io_mkey->m_key == (*j).m_key) // is io_mkey a modifier ?
       {
 	{
 	  Acquire a(&m_log, 1);
 	  m_log << _T("* Modifier Key") << std::endl;
 	}
-	o_mkey->m_modifier.dontcare(static_cast<Modifier::Type>(i));
+	// set dontcare for this modifier
+	io_mkey->m_modifier.dontcare(static_cast<Modifier::Type>(i));
 	*o_am = (*j).m_assignMode;
 	return true;
       }
@@ -525,16 +529,50 @@ void Engine::generateKeyboardEvents(const Current &i_c)
 
 
 // generate keyboard events for current key
-void Engine::generateKeyboardEvents(const Current &i_c, bool i_isModifier)
+void Engine::beginGeneratingKeyboardEvents(
+  const Current &i_c, bool i_isModifier)
 {
   //             (1)             (2)             (3)  (4)   (1)
   // up/down:    D-              U-              D-   U-    D-
   // keymap:     m_currentKeymap m_currentKeymap X    X     m_currentKeymap
   // memo:       &Prefix(X)      ...             ...  ...   ...
   // m_isPrefix: false           true            true false false
-  
+
+  Current cnew(i_c);
+
   bool isPhysicallyPressed
-    = i_c.m_mkey.m_modifier.isPressed(Modifier::Type_Down);
+    = cnew.m_mkey.m_modifier.isPressed(Modifier::Type_Down);
+  
+  // substitute
+  ModifiedKey mkey = m_setting->m_keyboard.searchSubstitute(cnew.m_mkey);
+  if (mkey.m_key)
+  {
+    cnew.m_mkey = mkey;
+    if (isPhysicallyPressed)
+    {
+      cnew.m_mkey.m_modifier.off(Modifier::Type_Up);
+      cnew.m_mkey.m_modifier.on(Modifier::Type_Down);
+    }
+    else
+    {
+      cnew.m_mkey.m_modifier.on(Modifier::Type_Up);
+      cnew.m_mkey.m_modifier.off(Modifier::Type_Down);
+    }
+    for (int i = Modifier::Type_begin; i != Modifier::Type_end; ++ i)
+    {
+      Modifier::Type type = static_cast<Modifier::Type>(i);
+      if (cnew.m_mkey.m_modifier.isDontcare(type) &&
+	  !i_c.m_mkey.m_modifier.isDontcare(type))
+	cnew.m_mkey.m_modifier.press(
+	  type, i_c.m_mkey.m_modifier.isPressed(type));
+    }
+    
+    {
+      Acquire a(&m_log, 1);
+      m_log << _T("* substitute") << std::endl;
+    }
+    outputToLog(mkey.m_key, cnew.m_mkey, 1);
+  }
   
   // for prefix key
   const Keymap *tmpKeymap = m_currentKeymap;
@@ -550,10 +588,10 @@ void Engine::generateKeyboardEvents(const Current &i_c, bool i_isModifier)
   // generate key event !
   m_generateKeyboardEventsRecursionGuard = 0;
   if (isPhysicallyPressed)
-    generateEvents(i_c, i_c.m_keymap, &Event::before_key_down);
-  generateKeyboardEvents(i_c);
+    generateEvents(cnew, cnew.m_keymap, &Event::before_key_down);
+  generateKeyboardEvents(cnew);
   if (!isPhysicallyPressed)
-    generateEvents(i_c, i_c.m_keymap, &Event::after_key_up);
+    generateEvents(cnew, cnew.m_keymap, &Event::after_key_up);
       
   // for m_emacsEditKillLine function
   if (m_emacsEditKillLine.m_doForceReset)
@@ -677,9 +715,9 @@ void Engine::keyboardHandler()
     if (c.m_mkey.m_key)
     {
       if (!c.m_mkey.m_key->m_isPressed && isPhysicallyPressed)
-	m_currentKeyPressCount ++;
+	++ m_currentKeyPressCount;
       else if (c.m_mkey.m_key->m_isPressed && !isPhysicallyPressed)
-	m_currentKeyPressCount --;
+	-- m_currentKeyPressCount;
       c.m_mkey.m_key->m_isPressed = isPhysicallyPressed;
     }
     
@@ -727,12 +765,12 @@ void Engine::keyboardHandler()
 	  Current cnew = c;
 	  cnew.m_mkey.m_modifier.off(Modifier::Type_Up);
 	  cnew.m_mkey.m_modifier.on(Modifier::Type_Down);
-	  generateKeyboardEvents(cnew, true);
+	  beginGeneratingKeyboardEvents(cnew, true);
 	  
 	  cnew = c;
 	  cnew.m_mkey.m_modifier.on(Modifier::Type_Up);
 	  cnew.m_mkey.m_modifier.off(Modifier::Type_Down);
-	  generateKeyboardEvents(cnew, true);
+	  beginGeneratingKeyboardEvents(cnew, true);
 	}
 	m_oneShotKey = NULL;
       }
@@ -742,7 +780,7 @@ void Engine::keyboardHandler()
     {
       outputToLog(&key, c.m_mkey, 1);
       m_oneShotKey = NULL;
-      generateKeyboardEvents(c, isModifier);
+      beginGeneratingKeyboardEvents(c, isModifier);
     }
     
     // if counter is zero, reset modifiers and keys on win32

@@ -223,6 +223,13 @@ void Keyboard::addAlias(const tstringi &i_aliasName, Key *i_key)
   m_aliases.insert(Aliases::value_type(i_aliasName, i_key));
 }
 
+// add substitute
+void Keyboard::addSubstitute(const ModifiedKey &i_mkeyFrom,
+			     const ModifiedKey &i_mkeyTo)
+{
+  m_substitutes.push_front(Substitute(i_mkeyFrom, i_mkeyTo));
+}
+
 
 // add a modifier key
 void Keyboard::addModifier(Modifier::Type i_mt, Key *i_key)
@@ -278,4 +285,15 @@ Key *Keyboard::searchKeyByNonAliasName(const tstringi &i_name)
       return &*i;
   }
   return NULL;
+}
+
+/// search a substitute
+ModifiedKey Keyboard::searchSubstitute(const ModifiedKey &i_mkey)
+{
+  for (Substitutes::const_iterator
+	 i = m_substitutes.begin(); i != m_substitutes.end(); ++ i)
+    if (i->m_mkeyFrom.m_key == i_mkey.m_key &&
+	i->m_mkeyFrom.m_modifier.doesMatch(i_mkey.m_modifier))
+      return i->m_mkeyTo;
+  return ModifiedKey();				// not found (.m_mkey is NULL)
 }

@@ -126,6 +126,7 @@
 		| "def" <DEFINE_LOCK>
 		| "def" <DEFINE_SYNC_KEY>
 		| "def" <DEFINE_ALIAS>
+		| "def" <DEFINE_SUBSTITUTE>
 
 	<DEFINE_KEY> : "key" <KEY_NAMES> "=" <SCAN_CODES>
 
@@ -156,6 +157,9 @@
 	<ALIASED_KEY_NAME>
 		: <ALIAS_NAME>
 		| <KEY_NAME>
+
+	<DEFINE_SUBSTITUTE>
+		: "subst" <ASSIGN_MODIFIED_KEY_NAME>+ "=>" <KEY_SEQUENCE>
 
 #
 # KEYMAP DEFINITION

@@ -29,7 +29,7 @@
        "key"
        "\\|event\\s +\\(prefixed\\|after-key-up\\|before-key-down\\)"
        "\\|keyseq"
-       "\\|def\\s +\\(key\\|alias\\|mod\\|sync\\)"
+       "\\|def\\s +\\(key\\|alias\\|mod\\|sync\\|subst\\)"
        "\\|mod"
        "\\|keymap"
        "\\|keymap2"

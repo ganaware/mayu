@@ -303,11 +303,26 @@ private:
     HASHED_KEYS_SIZE = 128,			///
   };
   typedef std::list<Key> Keys;			///
-  typedef std::map<tstringi, Key *> Aliases; /// key name aliases
+  typedef std::map<tstringi, Key *> Aliases;	/// key name aliases
+  ///
+  class Substitute
+  {
+  public:
+    ModifiedKey m_mkeyFrom;
+    ModifiedKey m_mkeyTo;
+  public:
+    Substitute(const ModifiedKey &i_mkeyFrom,
+	       const ModifiedKey &i_mkeyTo)
+      : m_mkeyFrom(i_mkeyFrom), m_mkeyTo(i_mkeyTo)
+    {
+    }
+  };
+  typedef std::list<Substitute> Substitutes;	/// substitutes
 
 private:
   Keys m_hashedKeys[HASHED_KEYS_SIZE];		///
   Aliases m_aliases;				///
+  Substitutes m_substitutes;			/// 
   Key m_syncKey;				/// key used to synchronize
   
 private:
@@ -348,6 +363,10 @@ public:
   /// add a key name alias
   void addAlias(const tstringi &i_aliasName, Key *i_key);
   
+  /// add substitute
+  void addSubstitute(const ModifiedKey &i_mkeyFrom,
+		     const ModifiedKey &i_mkeyTo);
+  
   /// get a sync key
   Key *getSyncKey() { return &m_syncKey; }
   
@@ -365,6 +384,9 @@ public:
 
   /// search a key by non-alias name
   Key *searchKeyByNonAliasName(const tstringi &i_name);
+
+  /// search a substitute
+  ModifiedKey searchSubstitute(const ModifiedKey &i_mkey);
 
   /// get modifiers
   Mods &getModifiers(Modifier::Type i_mt) { return m_mods[i_mt]; }

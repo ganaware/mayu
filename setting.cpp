@@ -291,6 +291,32 @@ void SettingLoader::load_DEFINE_ALIAS()
 }
 
 
+// <DEFINE_SUBSTITUTE>
+void SettingLoader::load_DEFINE_SUBSTITUTE()
+{
+  typedef std::list<ModifiedKey> AssignedKeys;
+  AssignedKeys assignedKeys;
+  do
+  {
+    ModifiedKey mkey;
+    mkey.m_modifier =
+      load_MODIFIER(Modifier::Type_ASSIGN, m_defaultAssignModifier);
+    mkey.m_key = load_KEY_NAME();
+    assignedKeys.push_back(mkey);
+  } while (*lookToken() != _T("=>"));
+  getToken();
+  
+  KeySeq *keySeq = load_KEY_SEQUENCE();
+  ModifiedKey mkey = keySeq->getFirstModifiedKey();
+  if (!mkey.m_key)
+    throw ErrorMessage() << _T("no key is specified for substitute.");
+  
+  for (AssignedKeys::iterator i = assignedKeys.begin();
+       i != assignedKeys.end(); ++ i)
+    m_setting->m_keyboard.addSubstitute(*i, mkey);
+}
+
+
 // <KEYBOARD_DEFINITION>
 void SettingLoader::load_KEYBOARD_DEFINITION()
 {
@@ -307,6 +333,9 @@ void SettingLoader::load_KEYBOARD_DEFINITION()
   
   // <DEFINE_ALIAS>
   else if (*t == _T("alias")) load_DEFINE_ALIAS();
+  
+  // <DEFINE_SUBSTITUTE>
+  else if (*t == _T("subst")) load_DEFINE_SUBSTITUTE();
   
   //
   else throw ErrorMessage() << _T("syntax error `") << *t << _T("'.");
@@ -410,7 +439,7 @@ Modifier SettingLoader::load_MODIFIER(Modifier::Type i_mode,
     break;
   }
   
-  for (i = Modifier::Type_begin; i != Modifier::Type_end; i++)
+  for (i = Modifier::Type_begin; i != Modifier::Type_end; ++ i)
     if (!isModifierSpecified.isOn(Modifier::Type(i)))
       switch (flag)
       {
@@ -790,7 +819,8 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const tstringi &i_name,
 // <KEY_ASSIGN>
 void SettingLoader::load_KEY_ASSIGN()
 {
-  std::list<ModifiedKey> assignedKeys;
+  typedef std::list<ModifiedKey> AssignedKeys;
+  AssignedKeys assignedKeys;
   
   ModifiedKey mkey;
   mkey.m_modifier =
@@ -817,8 +847,8 @@ void SettingLoader::load_KEY_ASSIGN()
 
   ASSERT(m_currentKeymap);
   KeySeq *keySeq = load_KEY_SEQUENCE();
-  for (std::list<ModifiedKey>::iterator i = assignedKeys.begin();
-       i != assignedKeys.end(); i++)
+  for (AssignedKeys::iterator i = assignedKeys.begin();
+       i != assignedKeys.end(); ++ i)
     m_currentKeymap->addAssignment(*i, keySeq);
 }
 
@@ -833,7 +863,7 @@ void SettingLoader::load_EVENT_ASSIGN()
   
   Token *t = getToken();
   Key **e;
-  for (e = Event::events; *e; e ++)
+  for (e = Event::events; *e; ++ e)
     if (*t == (*e)->getName())
     {
       mkey.m_key = *e;
@@ -1300,7 +1330,7 @@ void SettingLoader::load(const tstringi &i_filename)
   }
     
   // m_prefixes
-  m_prefixesRefCcount --;
+  -- m_prefixesRefCcount;
   if (m_prefixesRefCcount == 0)
     delete m_prefixes;
 

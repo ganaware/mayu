@@ -156,6 +156,27 @@ KeySeq &KeySeq::add(const Action &i_action)
 }
 
 
+/// get the first modified key of this key sequence
+ModifiedKey KeySeq::getFirstModifiedKey() const
+{
+  if (0 < m_actions.size())
+  {
+    const Action *a = m_actions.front();
+    switch (a->getType())
+    {
+      case Action::Type_key:
+	return reinterpret_cast<const ActionKey *>(a)->m_modifiedKey;
+      case Action::Type_keySeq:
+	return reinterpret_cast<const ActionKeySeq *>(a)->
+	  m_keySeq->getFirstModifiedKey();
+      default:
+	break;
+    }
+  }
+  return ModifiedKey();				// failed
+}
+
+
 // stream output
 tostream &operator<<(tostream &i_ost, const KeySeq &i_ks)
 {
