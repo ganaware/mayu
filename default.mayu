@@ -510,6 +510,12 @@ window AcrobatReader /AcroRd32.exe:.*:MDIClient:/ : EmacsMove
  key BS			=> PageUp
 
 
+## VNC ........................................................................
+## http://www.uk.research.att.com/vnc
+
+window VNC /vncviewer.exe:VNCviewer$/ : KeymapDefault
+
+
 ## Edmax ......................................................................
 ## http://www.bekkoame.ne.jp/~t.mzaki/
 
