@@ -294,7 +294,11 @@ window	Emacs	/:Emacs$/ : Emacsen
  keyseq $Notepad/save-as	= &PostMessage(ToParentWindow, 273, 1, 0)
 
 keymap2	NotepadC-X : GeneralC-X
- event prefixed		=> &HelpMessage("メモ帳 C-x-", "C-x C-s\t上書き保存\r\nC-x C-f\t開く\t\r\nC-x k\t\t新規作成\r\nC-x C-c\t終了")
+ event prefixed		=> &HelpMessage("メモ帳 C-x-", \
+	"C-x C-s\t上書き保存\r\n"	\
+	"C-x C-f\t開く\t\r\n"		\
+	"C-x k\t\t新規作成\r\n"		\
+	"C-x C-c\t終了")
  event before-key-down	=> &HelpMessage
  key C-S		=> $Notepad/save-as	# 上書き保存(S)
  key C-F		=> $Notepad/open	# 開く(O)...
