@@ -1,0 +1,306 @@
+body {
+  color:#555;
+  font-size:10pt;
+  font-family:Arial,sans-serif;
+  background-color:#fff;
+  background-image:url(bg.png);
+  margin:0pt;
+  padding:0pt;
+
+  scrollbar-3dlight-color:#000;
+  scrollbar-highlight-color:#fff;
+  scrollbar-face-color:#ccc;
+  scrollbar-shadow-color:#555;
+  scrollbar-darkshadow-color:#000;
+  scrollbar-arrow-color:#555;
+  scrollbar-base-color:#fff;
+  scrollbar-track-color:#555;
+}
+
+a {
+  color:#000;
+}
+a:hover, a:active {
+  text-decoration:underline;
+  background-color:#ffa;
+}
+img {
+  border-width:0pt;
+}
+code, code a {
+  font-size:10pt;
+  font-family:Courier New,monospace;
+  color:#a00;
+}
+em {
+  color:#000;
+}
+kbd {
+  font-weight:bold;
+  font-family:Courier New,monospace;
+  color:#55a;
+}
+p.noindent {
+  text-indent:0em;
+}
+
+
+/* contents */
+
+.contents {
+  color:#000;
+  margin:0pt;
+  padding:0pt;
+  border-left-width:4pt; border-top-width:1pt;
+  border-style: solid none none solid;
+  border-color:#000;
+}
+.contents a {
+  text-decoration:none;
+}
+.contents div {
+  margin:0pt;
+  padding:0pt;
+}
+.contents .section, .contents .appendix {
+  background-color:#ccc;
+  font-weight:bold;
+}
+.contents .section ol, .contents .appendix ol {
+  margin:0pt;
+  padding:0pt; padding-left:28pt;
+}
+.contents .appendix ol {
+  list-style-type: upper-alpha;
+}
+.contents .subsection {
+  color:#555;
+  font-weight:normal;
+  background-color:#fff;
+  border-color:#000;
+  border-width:1pt;
+  border-style: solid none solid solid;
+  padding-top:1pt;
+  margin-left:-24pt;
+}
+.contents .subsection ol {
+  margin:0pt;
+  padding:0pt;
+  padding-left:24pt;
+  list-style-type: lower-roman;
+}
+.contents .subsubsection {
+  margin:1pt;
+  margin-left:-10pt;
+  background-color:#eee;
+  padding:1pt;
+  line-height:11pt;
+}
+.contents .subsubsection ul {
+  padding:0pt;
+  margin:0pt;
+  margin-left:16pt;
+  list-style-type: disc;
+}
+
+/* manual */
+
+.manual a {
+  text-decoration:underline;
+}
+.manual a code {
+  text-decoration:underline;
+}
+
+.manual {
+  color:#333;
+  margin:0pt;
+  padding:0pt;
+  border-left-width:4pt;
+  border-top-width:1pt;
+  border-style: solid none none solid;
+  border-color:#000;
+  background-color:#ccc;
+  line-height:14pt;
+}
+.manual .banner {
+  font-family:"ＭＳ Ｐ明朝";
+  padding:4pt;
+  margin:0pt;
+}
+.manual .title {
+  font-family:"ＭＳ Ｐ明朝";
+  padding:0pt;
+  margin:0pt; margin-bottom:-2pt;
+  margin-left:2pt; /* .marnual .d1 の半分？ なぜ？*/
+}
+.manual .copyright {
+  text-align:right;
+  font-weight:bold;
+  font-size:8pt;
+  padding:4pt;
+  color:#555;
+}
+.manual .copyright a {
+  color:#555;
+}
+.manual .main {
+  margin-bottom:1000pt;
+}
+
+.manual dl {
+  padding:0pt;
+  margin:0pt;
+}
+
+.manual .h1 {
+  padding:4pt; padding-left:10pt;
+  margin:0pt;
+  font-weight:bold;
+}
+.manual .h1 a, .manual .h1 a code {
+  text-decoration:none;
+}
+.manual .d1 {
+  padding:8pt; padding-right:8pt; padding-left:16pt;
+  margin:0pt; margin-left:4pt;
+  background-color:#fff;
+  border-color:#000;
+  border-width:1pt;
+  border-style: solid none solid solid;
+}
+.manual .d1 p {
+  margin-top:3pt;
+  margin-bottom:3pt;
+  text-indent:1em;
+}
+.manual .d1 p.continue {
+  text-indent:0em;
+}
+.manual .d1 ol, .manual .d1 ul {
+  margin-top:4pt;
+  margin-bottom:4pt;
+}
+.manual .d1 ol li, .manual .d1 ul li {
+  margin-left:-10pt;
+  line-height:12pt;
+  padding-top:1pt;
+  padding-bottom:1pt;
+}
+.manual .h2 {
+  padding:4pt; padding-right:0pt;
+  font-weight:bold;
+}
+.manual .h2 a, .manual .h2 a code {
+  text-decoration:none;
+}
+.manual .d2 {
+  background-color:#eee;
+  margin:0pt; margin-left:20pt; margin-right:-8pt;
+  padding:8pt; padding-right:8pt; padding-left:16pt;
+}
+.manual .h3 {
+  padding:4pt; padding-right:0pt;
+  font-weight:bold;
+}
+.manual .h3 a, .manual .h3 a code {
+  text-decoration:none;
+}
+.manual .d3 {
+  margin-left:10pt;
+  padding:4pt; padding-left:8pt; padding-right:8pt;
+  border-color:#777;
+  border-width:3pt;
+  border-style: dotted;
+}
+.manual .function .h3 em {
+  font-weight:normal;
+}
+.manual .h4 {
+  font-weight:bold;
+}
+.manual .d4 {
+  margin:0pt;
+  margin-left:10pt;
+  padding:4pt;
+}
+.manual .history dt {
+  font-weight:bold;
+}
+.manual .history ul li {
+  margin-left:-30pt;
+}
+.manual .history ul ul li {
+  margin-left:0pt;
+}
+
+.manual .sample, .manual p.sample {
+  white-space:nowrap;
+  text-indent:0em;
+  padding-left:8pt; padding-right:8pt;
+  font-size:10pt;
+  font-family:Courier New,monospace;
+  color:#a00;
+  border-color:#a00;
+  border-width:1pt;
+  border-style: solid;
+  margin-left:4pt;
+  background-color:#fff;
+}
+
+.manual .bug {
+  font-weight:bold;
+  color:#f00;
+}
+
+table {
+  color:#000;
+  border-width:1pt;
+  border-color:#000;
+  border-style: solid;
+  background-color:#ccc;
+  border-collapse:collapse;
+  border-spacing:0pt;
+}
+table.default-settings th {
+  font-family:Arial,sans-serif;
+  font-size:10pt;
+  padding-left:4pt; padding-right:4pt;
+}
+table.default-settings td {
+  font-family:Arial,sans-serif;
+  font-size:10pt;
+  background-color:#fff;
+  padding-left:4pt; padding-right:4pt;
+  margin:10pt;
+}
+table.default-settings .name th {
+  border-width:1pt;
+  border-color:#000;
+  border-style: solid none none none;
+}
+table.default-settings .name td {
+  border-width:1pt;
+  border-color:#000;
+  border-style: solid none none none;
+}
+table.default-settings .name-english th {
+  border-width:2pt;
+  border-color:#000;
+  border-style: double none none none;
+}
+table.default-settings .name-english td {
+  border-width:2pt;
+  border-color:#000;
+  border-style: double none none none;
+}
+
+p.tree {
+  white-space:nowrap;
+  text-indent:0em;
+  line-height:10pt;
+}
+
+p.tree span {
+  color:#55a;
+}
