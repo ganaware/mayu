@@ -111,104 +111,110 @@ public:
 ///
 class DlgSetting
 {
-  HWND hwnd;					///
-  HWND hwndMayuPaths;				///
+  HWND m_hwnd;					///
+  HWND m_hwndMayuPaths;				///
   LayoutManager m_layoutManager;		/// 
   
   ///
-  Registry reg;
+  Registry m_reg;
   /** @name ANONYMOUS */
   enum
   {
-    maxMayuPaths = 256,				///
+    MAX_MAYU_PATHS = 256,			///
   };
 
   typedef DlgEditSettingData Data;		///
 
   ///
-  void insertItem(int index, const Data &data)
+  void insertItem(int i_index, const Data &i_data)
   {
     LVITEM item;
     item.mask = LVIF_TEXT;
-    item.iItem = index;
+    item.iItem = i_index;
     
     item.iSubItem = 0;
-    item.pszText = (char *)data.name.c_str();
-    _true( ListView_InsertItem(hwndMayuPaths, &item) != -1 );
+    item.pszText = const_cast<char *>(i_data.m_name.c_str());
+    CHECK_TRUE( ListView_InsertItem(m_hwndMayuPaths, &item) != -1 );
 
-    ListView_SetItemText(hwndMayuPaths, index,1,(char *)data.filename.c_str());
-    ListView_SetItemText(hwndMayuPaths, index,2,(char *)data.symbols.c_str());
+    ListView_SetItemText(m_hwndMayuPaths, i_index, 1,
+			 const_cast<char *>(i_data.m_filename.c_str()));
+    ListView_SetItemText(m_hwndMayuPaths, i_index, 2,
+			 const_cast<char *>(i_data.m_symbols.c_str()));
   }
   
   ///
-  void setItem(int index, const Data &data)
+  void setItem(int i_index, const Data &i_data)
   {
-    ListView_SetItemText(hwndMayuPaths, index,0,(char *)data.name.c_str());
-    ListView_SetItemText(hwndMayuPaths, index,1,(char *)data.filename.c_str());
-    ListView_SetItemText(hwndMayuPaths, index,2,(char *)data.symbols.c_str());
+    ListView_SetItemText(m_hwndMayuPaths, i_index, 0,
+			 const_cast<char *>(i_data.m_name.c_str()));
+    ListView_SetItemText(m_hwndMayuPaths, i_index, 1,
+			 const_cast<char *>(i_data.m_filename.c_str()));
+    ListView_SetItemText(m_hwndMayuPaths, i_index, 2,
+			 const_cast<char *>(i_data.m_symbols.c_str()));
   }
 
   ///
-  void getItem(int index, Data *data_r)
+  void getItem(int i_index, Data *o_data)
   {
     char buf[GANA_MAX_PATH];
     LVITEM item;
     item.mask = LVIF_TEXT;
-    item.iItem = index;
+    item.iItem = i_index;
     item.pszText = buf;
     item.cchTextMax = sizeof(buf);
     
     item.iSubItem = 0;
-    _true( ListView_GetItem(hwndMayuPaths, &item) );
-    data_r->name = item.pszText;
+    CHECK_TRUE( ListView_GetItem(m_hwndMayuPaths, &item) );
+    o_data->m_name = item.pszText;
     
     item.iSubItem = 1;
-    _true( ListView_GetItem(hwndMayuPaths, &item) );
-    data_r->filename = item.pszText;
+    CHECK_TRUE( ListView_GetItem(m_hwndMayuPaths, &item) );
+    o_data->m_filename = item.pszText;
 
     item.iSubItem = 2;
-    _true( ListView_GetItem(hwndMayuPaths, &item) );
-    data_r->symbols = item.pszText;
+    CHECK_TRUE( ListView_GetItem(m_hwndMayuPaths, &item) );
+    o_data->m_symbols = item.pszText;
   }
 
   ///
-  void setSelectedItem(int index)
+  void setSelectedItem(int i_index)
   {
-    ListView_SetItemState(hwndMayuPaths, index, LVIS_SELECTED, LVIS_SELECTED);
+    ListView_SetItemState(m_hwndMayuPaths, i_index,
+			  LVIS_SELECTED, LVIS_SELECTED);
   }
 
   ///
   int getSelectedItem()
   {
-    if (ListView_GetSelectedCount(hwndMayuPaths) == 0)
+    if (ListView_GetSelectedCount(m_hwndMayuPaths) == 0)
       return -1;
     for (int i = 0; ; i ++)
     {
-      if (ListView_GetItemState(hwndMayuPaths, i, LVIS_SELECTED))
+      if (ListView_GetItemState(m_hwndMayuPaths, i, LVIS_SELECTED))
 	return i;
     }
   }
 
 public:
   ///
-  DlgSetting(HWND hwnd_)
-    : hwnd(hwnd_),
-      hwndMayuPaths(NULL),
-      reg(MAYU_REGISTRY_ROOT)
+  DlgSetting(HWND i_hwnd)
+    : m_hwnd(i_hwnd),
+      m_hwndMayuPaths(NULL),
+      m_reg(MAYU_REGISTRY_ROOT)
   {
   }
   
   /// WM_INITDIALOG
   BOOL wmInitDialog(HWND /* focus */, LPARAM /* lParam */)
   {
-    setSmallIcon(hwnd, IDI_ICON_mayu);
-    setBigIcon(hwnd, IDI_ICON_mayu);
+    setSmallIcon(m_hwnd, IDI_ICON_mayu);
+    setBigIcon(m_hwnd, IDI_ICON_mayu);
     
-    _true( hwndMayuPaths = GetDlgItem(hwnd, IDC_LIST_mayuPaths) );
+    CHECK_TRUE( m_hwndMayuPaths = GetDlgItem(m_hwnd, IDC_LIST_mayuPaths) );
 
     // create list view colmn
     RECT rc;
-    GetClientRect(hwndMayuPaths, &rc);
+    GetClientRect(m_hwndMayuPaths, &rc);
     
     LVCOLUMN lvc; 
     lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT; 
@@ -216,14 +222,14 @@ public:
     lvc.cx = (rc.right - rc.left) / 3;
 
     istring str = loadString(IDS_mayuPathName);
-    lvc.pszText = (char *)str.c_str();
-    _must_be( ListView_InsertColumn(hwndMayuPaths, 0, &lvc), ==, 0 );
+    lvc.pszText = const_cast<char *>(str.c_str());
+    CHECK( 0 ==, ListView_InsertColumn(m_hwndMayuPaths, 0, &lvc) );
     str = loadString(IDS_mayuPath);
-    lvc.pszText = (char *)str.c_str();
-    _must_be( ListView_InsertColumn(hwndMayuPaths, 1, &lvc), ==, 1 );
+    lvc.pszText = const_cast<char *>(str.c_str());
+    CHECK( 1 ==, ListView_InsertColumn(m_hwndMayuPaths, 1, &lvc) );
     str = loadString(IDS_mayuSymbols);
-    lvc.pszText = (char *)str.c_str();
-    _must_be( ListView_InsertColumn(hwndMayuPaths, 2, &lvc), ==, 2 );
+    lvc.pszText = const_cast<char *>(str.c_str());
+    CHECK( 2 ==, ListView_InsertColumn(m_hwndMayuPaths, 2, &lvc) );
 
     Data data;
     insertItem(0, data);				// TODO: why ?
@@ -232,77 +238,77 @@ public:
     Regexp split("^([^;]*);([^;]*);(.*)$");
     StringTool::istring dot_mayu;
     int i;
-    for (i = 0; i < maxMayuPaths; i ++)
+    for (i = 0; i < MAX_MAYU_PATHS; i ++)
     {
       char buf[100];
       snprintf(buf, sizeof(buf), ".mayu%d", i);
-      if (!reg.read(buf, &dot_mayu))
+      if (!m_reg.read(buf, &dot_mayu))
 	break;
       if (split.doesMatch(dot_mayu))
       {
-	data.name = split[1];
-	data.filename = split[2];
-	data.symbols = split[3];
+	data.m_name = split[1];
+	data.m_filename = split[2];
+	data.m_symbols = split[3];
 	insertItem(i, data);
       }
     }
 
-    _true( ListView_DeleteItem(hwndMayuPaths, i) );	// TODO: why ?
+    CHECK_TRUE( ListView_DeleteItem(m_hwndMayuPaths, i) );	// TODO: why ?
 
     // arrange list view size
-    ListView_SetColumnWidth(hwndMayuPaths, 0, LVSCW_AUTOSIZE);
-    ListView_SetColumnWidth(hwndMayuPaths, 1, LVSCW_AUTOSIZE);
-    ListView_SetColumnWidth(hwndMayuPaths, 2, LVSCW_AUTOSIZE);
+    ListView_SetColumnWidth(m_hwndMayuPaths, 0, LVSCW_AUTOSIZE);
+    ListView_SetColumnWidth(m_hwndMayuPaths, 1, LVSCW_AUTOSIZE);
+    ListView_SetColumnWidth(m_hwndMayuPaths, 2, LVSCW_AUTOSIZE);
 
-    ListView_SetExtendedListViewStyle(hwndMayuPaths, LVS_EX_FULLROWSELECT);
+    ListView_SetExtendedListViewStyle(m_hwndMayuPaths, LVS_EX_FULLROWSELECT);
 
     // set selection
     int index;
-    reg.read(".mayuIndex", &index, 0);
+    m_reg.read(".mayuIndex", &index, 0);
     setSelectedItem(index);
 
     // set layout manager
-    m_layoutManager.addItem(GetDlgItem(hwnd, IDC_STATIC_mayuPaths),
+    m_layoutManager.addItem(GetDlgItem(m_hwnd, IDC_STATIC_mayuPaths),
 			    LayoutManager::ORIGIN_LEFT_EDGE,
 			    LayoutManager::ORIGIN_TOP_EDGE,
 			    LayoutManager::ORIGIN_RIGHT_EDGE,
 			    LayoutManager::ORIGIN_BOTTOM_EDGE);
-    m_layoutManager.addItem(GetDlgItem(hwnd, IDC_LIST_mayuPaths),
+    m_layoutManager.addItem(GetDlgItem(m_hwnd, IDC_LIST_mayuPaths),
 			    LayoutManager::ORIGIN_LEFT_EDGE,
 			    LayoutManager::ORIGIN_TOP_EDGE,
 			    LayoutManager::ORIGIN_RIGHT_EDGE,
 			    LayoutManager::ORIGIN_BOTTOM_EDGE);
-    m_layoutManager.addItem(GetDlgItem(hwnd, IDC_BUTTON_up),
+    m_layoutManager.addItem(GetDlgItem(m_hwnd, IDC_BUTTON_up),
 			    LayoutManager::ORIGIN_RIGHT_EDGE,
 			    LayoutManager::ORIGIN_CENTER,
 			    LayoutManager::ORIGIN_RIGHT_EDGE,
 			    LayoutManager::ORIGIN_CENTER);
-    m_layoutManager.addItem(GetDlgItem(hwnd, IDC_BUTTON_down),
+    m_layoutManager.addItem(GetDlgItem(m_hwnd, IDC_BUTTON_down),
 			    LayoutManager::ORIGIN_RIGHT_EDGE,
 			    LayoutManager::ORIGIN_CENTER,
 			    LayoutManager::ORIGIN_RIGHT_EDGE,
 			    LayoutManager::ORIGIN_CENTER);
-    m_layoutManager.addItem(GetDlgItem(hwnd, IDC_BUTTON_add),
+    m_layoutManager.addItem(GetDlgItem(m_hwnd, IDC_BUTTON_add),
 			    LayoutManager::ORIGIN_CENTER,
 			    LayoutManager::ORIGIN_BOTTOM_EDGE,
 			    LayoutManager::ORIGIN_CENTER,
 			    LayoutManager::ORIGIN_BOTTOM_EDGE);
-    m_layoutManager.addItem(GetDlgItem(hwnd, IDC_BUTTON_edit),
+    m_layoutManager.addItem(GetDlgItem(m_hwnd, IDC_BUTTON_edit),
 			    LayoutManager::ORIGIN_CENTER,
 			    LayoutManager::ORIGIN_BOTTOM_EDGE,
 			    LayoutManager::ORIGIN_CENTER,
 			    LayoutManager::ORIGIN_BOTTOM_EDGE);
-    m_layoutManager.addItem(GetDlgItem(hwnd, IDC_BUTTON_delete),
+    m_layoutManager.addItem(GetDlgItem(m_hwnd, IDC_BUTTON_delete),
 			    LayoutManager::ORIGIN_CENTER,
 			    LayoutManager::ORIGIN_BOTTOM_EDGE,
 			    LayoutManager::ORIGIN_CENTER,
 			    LayoutManager::ORIGIN_BOTTOM_EDGE);
-    m_layoutManager.addItem(GetDlgItem(hwnd, IDCANCEL),
+    m_layoutManager.addItem(GetDlgItem(m_hwnd, IDCANCEL),
 			    LayoutManager::ORIGIN_CENTER,
 			    LayoutManager::ORIGIN_BOTTOM_EDGE,
 			    LayoutManager::ORIGIN_CENTER,
 			    LayoutManager::ORIGIN_BOTTOM_EDGE);
-    m_layoutManager.addItem(GetDlgItem(hwnd, IDOK),
+    m_layoutManager.addItem(GetDlgItem(m_hwnd, IDOK),
 			    LayoutManager::ORIGIN_CENTER,
 			    LayoutManager::ORIGIN_BOTTOM_EDGE,
 			    LayoutManager::ORIGIN_CENTER,
@@ -314,7 +320,7 @@ public:
   BOOL wmSize(DWORD /* fwSizeType */, short /* nWidth */, short /* nHeight */)
   {
     m_layoutManager.adjust();
-    RedrawWindow(hwnd, NULL, NULL,
+    RedrawWindow(m_hwnd, NULL, NULL,
 		 RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
     return TRUE;
   }
@@ -322,29 +328,29 @@ public:
   /// WM_CLOSE
   BOOL wmClose()
   {
-    EndDialog(hwnd, 0);
+    EndDialog(m_hwnd, 0);
     return TRUE;
   }
   
   /// WM_COMMAND
-  BOOL wmCommand(int /* notify_code */, int id, HWND /* hwnd_control */)
+  BOOL wmCommand(int /* notify_code */, int i_id, HWND /* hwnd_control */)
   {
     char buf[GANA_MAX_PATH];
-    switch (id)
+    switch (i_id)
     {
       case IDC_BUTTON_up:
       case IDC_BUTTON_down:
       {
-	int count = ListView_GetItemCount(hwndMayuPaths);
+	int count = ListView_GetItemCount(m_hwndMayuPaths);
 	if (count < 2)
 	  return TRUE;
 	int index = getSelectedItem();
 	if (index < 0 ||
-	    (id == IDC_BUTTON_up && index == 0) ||
-	    (id == IDC_BUTTON_down && index == count - 1))
+	    (i_id == IDC_BUTTON_up && index == 0) ||
+	    (i_id == IDC_BUTTON_down && index == count - 1))
 	  return TRUE;
 
-	int target = (id == IDC_BUTTON_up) ? index - 1 : index + 1;
+	int target = (i_id == IDC_BUTTON_up) ? index - 1 : index + 1;
 
 	Data dataIndex, dataTarget;
 	getItem(index, &dataIndex);
@@ -363,8 +369,8 @@ public:
 	if (0 <= index)
 	  getItem(index, &data);
 	if (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_DIALOG_editSetting),
-			   hwnd, dlgEditSetting_dlgProc, (LPARAM)&data))
-	  if (!data.name.empty())
+			   m_hwnd, dlgEditSetting_dlgProc, (LPARAM)&data))
+	  if (!data.m_name.empty())
 	  {
 	    insertItem(0, data);
 	    setSelectedItem(0);
@@ -377,8 +383,8 @@ public:
 	int index = getSelectedItem();
 	if (0 <= index)
 	{
-	  _true( ListView_DeleteItem(hwndMayuPaths, index) );
-	  int count = ListView_GetItemCount(hwndMayuPaths);
+	  CHECK_TRUE( ListView_DeleteItem(m_hwndMayuPaths, index) );
+	  int count = ListView_GetItemCount(m_hwndMayuPaths);
 	  if (count == 0)
 	    ;
 	  else if (count == index)
@@ -397,7 +403,7 @@ public:
 	  return TRUE;
 	getItem(index, &data);
 	if (DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_DIALOG_editSetting),
-			   hwnd, dlgEditSetting_dlgProc, (LPARAM)&data))
+			   m_hwnd, dlgEditSetting_dlgProc, (LPARAM)&data))
 	{
 	  setItem(index, data);
 	  setSelectedItem(index);
@@ -407,32 +413,33 @@ public:
       
       case IDOK:
       {
-	int count = ListView_GetItemCount(hwndMayuPaths);
+	int count = ListView_GetItemCount(m_hwndMayuPaths);
 	int index;
 	for (index = 0; index < count; index ++)
 	{
 	  snprintf(buf, sizeof(buf), ".mayu%d", index);
 	  Data data;
 	  getItem(index, &data);
-	  reg.write(buf, data.name + ";" + data.filename + ";" + data.symbols);
+	  m_reg.write(buf, data.m_name + ";" +
+		      data.m_filename + ";" + data.m_symbols);
 	}
 	for (; ; index ++)
 	{
 	  snprintf(buf, sizeof(buf), ".mayu%d", index);
-	  if (!reg.remove(buf))
+	  if (!m_reg.remove(buf))
 	    break;
 	}
 	index = getSelectedItem();
 	if (index < 0)
 	  index = 0;
-	reg.write(".mayuIndex", index);
-	EndDialog(hwnd, 1);
+	m_reg.write(".mayuIndex", index);
+	EndDialog(m_hwnd, 1);
 	return TRUE;
       }
       
       case IDCANCEL:
       {
-	_true( EndDialog(hwnd, 0) );
+	CHECK_TRUE( EndDialog(m_hwnd, 0) );
 	return TRUE;
       }
     }
@@ -441,25 +448,26 @@ public:
 };
 
 
-BOOL CALLBACK dlgSetting_dlgProc(HWND hwnd, UINT message,
-				 WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK dlgSetting_dlgProc(
+  HWND i_hwnd, UINT i_message, WPARAM i_wParam, LPARAM i_lParam)
 {
   DlgSetting *wc;
-  getUserData(hwnd, &wc);
+  getUserData(i_hwnd, &wc);
   if (!wc)
-    switch (message)
+    switch (i_message)
     {
       case WM_INITDIALOG:
-	wc = setUserData(hwnd, new DlgSetting(hwnd));
-	return wc->wmInitDialog((HWND)wParam, lParam);
+	wc = setUserData(i_hwnd, new DlgSetting(i_hwnd));
+	return wc->wmInitDialog(reinterpret_cast<HWND>(i_wParam), i_lParam);
     }
   else
-    switch (message)
+    switch (i_message)
     {
       case WM_SIZE:
-	return wc->wmSize(wParam, LOWORD(lParam), HIWORD(lParam));
+	return wc->wmSize(i_wParam, LOWORD(i_lParam), HIWORD(i_lParam));
       case WM_COMMAND:
-	return wc->wmCommand(HIWORD(wParam), LOWORD(wParam), (HWND)lParam);
+	return wc->wmCommand(HIWORD(i_wParam), LOWORD(i_wParam),
+			     reinterpret_cast<HWND>(i_lParam));
       case WM_CLOSE:
 	return wc->wmClose();
       case WM_NCDESTROY:

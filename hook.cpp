@@ -196,10 +196,10 @@ static void notifyName(HWND hwnd, Notify::Type type = Notify::TypeName)
   nfc->type = type;
   nfc->threadId = GetCurrentThreadId();
   nfc->hwnd = hwnd;
-  strncpy(nfc->className, className.c_str(), lengthof(nfc->className));
-  nfc->className[lengthof(nfc->className) - 1] = '\0';
-  strncpy(nfc->titleName, titleName.c_str(), lengthof(nfc->titleName));
-  nfc->titleName[lengthof(nfc->titleName) - 1] = '\0';
+  strncpy(nfc->className, className.c_str(), NUMBER_OF(nfc->className));
+  nfc->className[NUMBER_OF(nfc->className) - 1] = '\0';
+  strncpy(nfc->titleName, titleName.c_str(), NUMBER_OF(nfc->titleName));
+  nfc->titleName[NUMBER_OF(nfc->titleName) - 1] = '\0';
   notify(nfc, sizeof(*nfc));
   delete nfc;
 }

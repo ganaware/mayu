@@ -1,15 +1,15 @@
 // ////////////////////////////////////////////////////////////////////////////
 // dlgsetting.h
 
-#ifndef __dlgsetting_h__
-#define __dlgsetting_h__
 
+#ifndef _DLGSETTING_H
+#  define _DLGSETTING_H
 
-#include <windows.h>
-
+#  include <windows.h>
 
 ///
-BOOL CALLBACK dlgSetting_dlgProc(HWND hwnd, UINT message,
-				 WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK dlgSetting_dlgProc(
+  HWND i_hwnd, UINT i_message, WPARAM i_wParam, LPARAM i_lParam);
 
-#endif __dlgsetting_h__
+
+#endif // _DLGSETTING_H

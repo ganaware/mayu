@@ -2,15 +2,13 @@
 // msgstream.h
 
 
-#ifndef __msgstream_h__
-#define __msgstream_h__
+#ifndef _MSGSTREAM_H
+#  define _MSGSTREAM_H
 
 
-#include "misc.h"
-
-#include "multithread.h"
-
-#include <iostream>
+#  include "misc.h"
+#  include "multithread.h"
+#  include <iostream>
 
 
 // ////////////////////////////////////////////////////////////////////////////
@@ -137,4 +135,4 @@ public:
 };
 
 
-#endif // __msgstream_h__
+#endif // _MSGSTREAM_H

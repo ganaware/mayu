@@ -199,7 +199,7 @@ static bool string2logfont(LOGFONT *lf, const string &strlf)
   lf->lfPitchAndFamily = (BYTE)atoi(p);
   if (!(p = StringTool::mbstok_(NULL, ","))) return false;
   strncpy(lf->lfFaceName, p, sizeof(lf->lfFaceName));
-  lf->lfFaceName[lengthof(lf->lfFaceName) - 1] = '\0';
+  lf->lfFaceName[NUMBER_OF(lf->lfFaceName) - 1] = '\0';
   return true;
 }
 
@@ -224,7 +224,7 @@ bool Registry::write(HKEY root, const string &path, const string &name,
 		     const LOGFONT &value)
 {
   char buf[1024];
-  _snprintf(buf, lengthof(buf), "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%s",
+  _snprintf(buf, NUMBER_OF(buf), "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%s",
 	    value.lfHeight, value.lfWidth, value.lfEscapement,
 	    value.lfOrientation, value.lfWeight, value.lfItalic,
 	    value.lfUnderline, value.lfStrikeOut, value.lfCharSet,

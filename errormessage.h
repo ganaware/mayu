@@ -2,47 +2,50 @@
 // errormessage.h
 
 
-#ifndef __errormessage_h__
-#define __errormessage_h__
+#ifndef _ERRORMESSAGE_H
+#  define _ERRORMESSAGE_H
 
 
-#include <strstream>
-#include <string>
+#  include <strstream>
+#  include <string>
 
 
 ///
 class ErrorMessage
 {
-  std::ostrstream ost;		///
+  std::ostrstream m_ost;			///
   
 public:
   ///
   ErrorMessage() { }
   ///
-  ErrorMessage(const ErrorMessage &em) { ost << em.getMessage(); }
+  ErrorMessage(const ErrorMessage &i_em) { m_ost << i_em.getMessage(); }
 
   /// get error message
   std::string getMessage() const
   {
     ErrorMessage &em = *const_cast<ErrorMessage *>(this);
-    std::string msg(em.ost.str(), em.ost.pcount());
-    em.ost.freeze(false);
+    std::string msg(em.m_ost.str(), em.m_ost.pcount());
+    em.m_ost.freeze(false);
     return msg;
   }
   
   /// add message
-  template<class T> ErrorMessage &operator<<(const T &t)
-  { ost << t; return *this; }
-  
+  template<class T> ErrorMessage &operator<<(const T &i_t)
+  {
+    m_ost << i_t;
+    return *this;
+  }
 
   /// stream output
-  friend std::ostream &operator<<(std::ostream &ost, const ErrorMessage &em);
+  friend std::ostream &
+  operator<<(std::ostream &i_ost, const ErrorMessage &i_em);
 };
 
 
 /// stream output
-inline std::ostream &operator<<(std::ostream &ost, const ErrorMessage &em)
-{ return ost << em.getMessage(); }
+inline std::ostream &operator<<(std::ostream &i_ost, const ErrorMessage &i_em)
+{ return i_ost << i_em.getMessage(); }
 
 
 ///
@@ -50,10 +53,9 @@ class WarningMessage : public ErrorMessage
 {
 public:
   /// add message
-  template<class T> WarningMessage &operator<<(const T &t)
-  { ErrorMessage::operator<<(t); return *this; }
+  template<class T> WarningMessage &operator<<(const T &i_t)
+  { ErrorMessage::operator<<(i_t); return *this; }
 };
 
 
-#endif // __errormessage_h__
-
+#endif // _ERRORMESSAGE_H

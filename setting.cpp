@@ -96,7 +96,7 @@ void getHomeDirectories(std::list<istring> *o_pathes)
     o_pathes->push_back(userprofile);
   
   char buf[GANA_MAX_PATH];
-  if (GetModuleFileName(GetModuleHandle(NULL), buf, lengthof(buf)))
+  if (GetModuleFileName(GetModuleHandle(NULL), buf, NUMBER_OF(buf)))
   {
     PathRemoveFileSpec(buf);
     o_pathes->push_back(buf);
@@ -340,7 +340,7 @@ Modifier SettingLoader::load_MODIFIER(Modifier::Type mode, Modifier modifier)
       { "L9-", Modifier::Lock9 },
     };
 
-    for (int i = 0; i < lengthof(map); i++)
+    for (int i = 0; i < NUMBER_OF(map); i++)
       if (*t == map[i].s)
       {
 	getToken();
@@ -637,13 +637,13 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
 		{ "lock9", Modifier::Lock9 },
 	      };
 	      int i;
-	      for (i = 0; i < lengthof(map); i++)
+	      for (i = 0; i < NUMBER_OF(map); i++)
 		if (*t == map[i].s)
 		{
 		  t->setData((long)map[i].mt);
 		  break;
 		}
-	      if (i == lengthof(map))
+	      if (i == NUMBER_OF(map))
 		throw ErrorMessage() << "`" << *t << "' unknown lock name.";
 	      break;
 	    }
@@ -707,13 +707,13 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
 		{ Function::toParentWindow, "toParentWindow" },
 	      };
 	      int i;
-	      for (i = 0; i < lengthof(window); i++)
+	      for (i = 0; i < NUMBER_OF(window); i++)
 		if (*t == window[i].name)
 		{
 		  t->setData(window[i].window);
 		  break;
 		}
-	      if (i == lengthof(window))
+	      if (i == NUMBER_OF(window))
 		throw ErrorMessage() << "`" << *t
 				     << "': invalid target window.";
 	      break;
@@ -733,13 +733,13 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
 	      };
 	      t->setData(SW_SHOW);
 	      int i;
-	      for (i = 0; i < lengthof(show); i++)
+	      for (i = 0; i < NUMBER_OF(show); i++)
 		if (*t == show[i].name)
 		{
 		  t->setData(show[i].show);
 		  break;
 		}
-	      if (i == lengthof(show))
+	      if (i == NUMBER_OF(show))
 		throw ErrorMessage() << "`" << *t
 				     << "': unknown show command.";
 	      break;
@@ -760,13 +760,13 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const istring &name, bool isInParen)
 	      };
 	      t->setData(Function::GravityNW);
 	      int i;
-	      for (i = 0; i < lengthof(gravity); i++)
+	      for (i = 0; i < NUMBER_OF(gravity); i++)
 		if (*t == gravity[i].m_name)
 		{
 		  t->setData(gravity[i].m_gravity);
 		  break;
 		}
-	      if (i == lengthof(gravity))
+	      if (i == NUMBER_OF(gravity))
 		throw ErrorMessage() << "`" << *t
 				     << "': unknown gravity symbol.";
 	      break;
@@ -1135,7 +1135,7 @@ void SettingLoader::load(const istring &filename)
       "L5-", "L6-", "L7-", "L8-", "L9-", 
     };
     prefix = new vector<istring>;
-    for (int i = 0; i < lengthof(prefix_); i++)
+    for (int i = 0; i < NUMBER_OF(prefix_); i++)
       prefix->push_back(prefix_[i]);
     sort(prefix->begin(), prefix->end(), prefixSortPred);
   }

@@ -2,27 +2,26 @@
 // dlgeditsetting.h
 
 
-#ifndef __dlgeditsetting_h__
-#define __dlgeditsetting_h__
+#ifndef _DLGEDITSETTING_H
+#  define _DLGEDITSETTING_H
+
+#  ifndef _STRINGTOOL_H
+#    include "stringtool.h"
+#  endif // _STRINGTOOL_H
 
 
-#include <windows.h>
+/// dialog procedure of "Edit Setting" dialog box
+BOOL CALLBACK dlgEditSetting_dlgProc(
+  HWND i_hwnd, UINT i_message, WPARAM i_wParam, LPARAM i_lParam);
 
-#include "stringtool.h"
-
-
-///
-BOOL CALLBACK dlgEditSetting_dlgProc(HWND hwnd, UINT message,
-				     WPARAM wParam, LPARAM lParam);
-
-///
+/// parameters for "Edit Setting" dialog box
 class DlgEditSettingData
 {
 public:
-  StringTool::istring name;	///
-  StringTool::istring filename;	///
-  StringTool::istring symbols;	///
+  StringTool::istring m_name;			/// setting name
+  StringTool::istring m_filename;		/// filename of setting
+  StringTool::istring m_symbols; /// symbol list (-Dsymbol1;-Dsymbol2;-D...)
 };
 
 
-#endif __dlgeditsetting_h__
+#endif _DLGEDITSETTING_H

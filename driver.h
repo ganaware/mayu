@@ -2,21 +2,19 @@
 // driver.h
 
 
-#ifndef __driver_h__
-#define __driver_h__
+#ifndef _DRIVER_H
+#  define _DRIVER_H
 
-
-#include <winioctl.h>
+#  include <winioctl.h>
 
 
 ///
-#define MAYU_DEVICE_FILE_NAME "\\\\.\\MayuDetour1"
+#  define MAYU_DEVICE_FILE_NAME "\\\\.\\MayuDetour1"
 ///
-#define MAYU_DRIVER_NAME "mayud"
-
+#  define MAYU_DRIVER_NAME "mayud"
 
 /// Ioctl value (equivalent to CancelIo API)
-#define IOCTL_MAYU_DETOUR_CANCEL					 \
+#  define IOCTL_MAYU_DETOUR_CANCEL					 \
 CTL_CODE(FILE_DEVICE_KEYBOARD, 0x0001, METHOD_BUFFERED, FILE_ANY_ACCESS)
 
 
@@ -47,4 +45,4 @@ public:
 };
 
 
-#endif // __driver_h__
+#endif // _DRIVER_H

@@ -2,18 +2,17 @@
 // engine.h
 
 
-#ifndef __engine_h__
-#define __engine_h__
+#ifndef _ENGINE_H
+#  define _ENGINE_H
 
+#  include "multithread.h"
+#  include "setting.h"
+#  include "msgstream.h"
 
-#include "multithread.h"
-#include "setting.h"
-#include "msgstream.h"
-
-#include <set>
+#  include <set>
 
 ///
-#define WM_engineNotify (WM_APP + 110)
+#  define WM_engineNotify (WM_APP + 110)
 /** @name ANONYMOUS */
 enum {
   engineNotify_shellExecute,			///
@@ -250,4 +249,4 @@ public:
 };
 
 
-#endif // __engine_h__
+#endif // _ENGINE_H

@@ -1,15 +1,15 @@
 // ////////////////////////////////////////////////////////////////////////////
 // dlglog.h
 
-#ifndef __dlglog_h__
-#define __dlglog_h__
+#ifndef _DLGLOG_H
+#  define _DLGLOG_H
 
-
-#include <windows.h>
+#  include <windows.h>
 
 
 ///
-BOOL CALLBACK dlgLog_dlgProc(HWND hwnd, UINT message,
-			     WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK dlgLog_dlgProc(
+  HWND i_hwnd, UINT i_message, WPARAM i_wParam, LPARAM i_lParam);
 
-#endif __dlglog_h__
+
+#endif // _DLGLOG_H

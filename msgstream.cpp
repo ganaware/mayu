@@ -92,7 +92,7 @@ int omsgbuf::sync()
     if (msgDebugLevel <= debugLevel)
       str += string(begin, end - begin - 1);
     buf[0] = end[-1];
-    setp(buf, buf + lengthof(buf));
+    setp(buf, buf + NUMBER_OF(buf));
     pbump(1);
   }
   return 0;

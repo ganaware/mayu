@@ -259,7 +259,7 @@ void Engine::generateKeyEvent(Key *key, bool doPress, bool isByAssign)
       if (!doPress)
 	kid.Flags |= KEYBOARD_INPUT_DATA::BREAK;
       DWORD len;
-      _true( WriteFile(device, &kid, sizeof(kid), &len, NULL) );
+      CHECK_TRUE( WriteFile(device, &kid, sizeof(kid), &len, NULL) );
     }
     
     lastPressedKey = doPress ? key : NULL;
@@ -827,7 +827,7 @@ void Engine::keyboardHandler(void *This)
 void Engine::keyboardHandler()
 {
   // initialize ok
-  _true( SetEvent(eEvent) );
+  CHECK_TRUE( SetEvent(eEvent) );
     
   // loop
   Key key;
@@ -966,7 +966,7 @@ void Engine::keyboardHandler()
     
     key.initialize();
   }
-  _true( SetEvent(eEvent) );
+  CHECK_TRUE( SetEvent(eEvent) );
 }
   
 
@@ -1030,16 +1030,16 @@ Engine::Engine(omsgstream &log_)
   }
 
   // create event for sync
-  _true( eSync = CreateEvent(NULL, FALSE, FALSE, NULL) );
+  CHECK_TRUE( eSync = CreateEvent(NULL, FALSE, FALSE, NULL) );
 }
 
 
 // start keyboard handler thread
 void Engine::start()
 {
-  _true( eEvent = CreateEvent(NULL, FALSE, FALSE, NULL) );
-  _true( 0 <= _beginthread(keyboardHandler, 0, this) );
-  _must_be( WaitForSingleObject(eEvent, INFINITE), ==, WAIT_OBJECT_0 );
+  CHECK_TRUE( eEvent = CreateEvent(NULL, FALSE, FALSE, NULL) );
+  CHECK_TRUE( 0 <= _beginthread(keyboardHandler, 0, this) );
+  CHECK( WAIT_OBJECT_0 ==, WaitForSingleObject(eEvent, INFINITE) );
 }
 
 
@@ -1059,7 +1059,7 @@ void Engine::stop()
       
       // wait for message handler thread terminate
     } while (WaitForSingleObject(eEvent, 100) != WAIT_OBJECT_0);
-    _true( CloseHandle(eEvent) );
+    CHECK_TRUE( CloseHandle(eEvent) );
     eEvent = NULL;
 
     // stop mayud
@@ -1085,10 +1085,10 @@ void Engine::stop()
 Engine::~Engine()
 {
   stop();
-  _true( CloseHandle(eSync) );
+  CHECK_TRUE( CloseHandle(eSync) );
   
   // close device
-  _true( CloseHandle(device) );
+  CHECK_TRUE( CloseHandle(device) );
 }
 
 
@@ -1218,7 +1218,7 @@ bool Engine::syncNotify()
   Acquire a(&cs);
   if (!isSynchronizing)
     return false;
-  _true( SetEvent(eSync) );
+  CHECK_TRUE( SetEvent(eSync) );
   return true;
 }
 
@@ -1289,7 +1289,7 @@ void Engine::shellExecute()
   };
 
   const char *errorMessage = "Unknown error.";
-  for (int i = 0; i < lengthof(err); i++)
+  for (size_t i = 0; i < NUMBER_OF(err); i++)
     if (r == err[i].err)
     {
       errorMessage = err[i].str;

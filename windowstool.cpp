@@ -70,7 +70,7 @@ void unsetSmallIcon(HWND hwnd)
 {
   HICON hicon = setSmallIcon(hwnd, -1);
   if (hicon)
-    _true( DestroyIcon(hicon) );
+    CHECK_TRUE( DestroyIcon(hicon) );
 }
 
 
@@ -79,7 +79,7 @@ void unsetBigIcon(HWND hwnd)
 {
   HICON hicon = setBigIcon(hwnd, -1);
   if (hicon)
-    _true( DestroyIcon(hicon) );
+    CHECK_TRUE( DestroyIcon(hicon) );
 }
 
 

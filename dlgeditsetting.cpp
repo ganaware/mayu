@@ -17,39 +17,40 @@ using namespace std;
 ///
 class DlgEditSetting
 {
-  HWND hwnd;			///
-  HWND hwndMayuPathName;	///
-  HWND hwndMayuPath;		///
-  HWND hwndSymbols;		///
+  HWND m_hwnd;					///
+  HWND m_hwndMayuPathName;			///
+  HWND m_hwndMayuPath;				///
+  HWND m_hwndSymbols;				///
 
-  DlgEditSettingData *data;	///
+  DlgEditSettingData *m_data;			///
 
 public:
   ///
-  DlgEditSetting(HWND hwnd_)
-    : hwnd(hwnd_),
-      hwndMayuPathName(NULL),
-      hwndMayuPath(NULL),
-      hwndSymbols(NULL),
-      data(NULL)
+  DlgEditSetting(HWND i_hwnd)
+    : m_hwnd(i_hwnd),
+      m_hwndMayuPathName(NULL),
+      m_hwndMayuPath(NULL),
+      m_hwndSymbols(NULL),
+      m_data(NULL)
   {
   }
   
   /// WM_INITDIALOG
-  BOOL wmInitDialog(HWND /* focus */, LPARAM lParam)
+  BOOL wmInitDialog(HWND /* focus */, LPARAM i_lParam)
   {
-    data = (DlgEditSettingData *)lParam;
+    m_data = reinterpret_cast<DlgEditSettingData *>(i_lParam);
     
-    setSmallIcon(hwnd, IDI_ICON_mayu);
-    setBigIcon(hwnd, IDI_ICON_mayu);
+    setSmallIcon(m_hwnd, IDI_ICON_mayu);
+    setBigIcon(m_hwnd, IDI_ICON_mayu);
     
-    _true( hwndMayuPathName = GetDlgItem(hwnd, IDC_EDIT_mayuPathName) );
-    _true( hwndMayuPath = GetDlgItem(hwnd, IDC_EDIT_mayuPath) );
-    _true( hwndSymbols = GetDlgItem(hwnd, IDC_EDIT_symbols) );
+    CHECK_TRUE( m_hwndMayuPathName
+		= GetDlgItem(m_hwnd, IDC_EDIT_mayuPathName) );
+    CHECK_TRUE( m_hwndMayuPath = GetDlgItem(m_hwnd, IDC_EDIT_mayuPath) );
+    CHECK_TRUE( m_hwndSymbols = GetDlgItem(m_hwnd, IDC_EDIT_symbols) );
     
-    Edit_SetText(hwndMayuPathName, data->name.c_str());
-    Edit_SetText(hwndMayuPath, data->filename.c_str());
-    Edit_SetText(hwndSymbols, data->symbols.c_str());
+    Edit_SetText(m_hwndMayuPathName, m_data->m_name.c_str());
+    Edit_SetText(m_hwndMayuPath, m_data->m_filename.c_str());
+    Edit_SetText(m_hwndSymbols, m_data->m_symbols.c_str());
     
     return TRUE;
   }
@@ -57,21 +58,21 @@ public:
   /// WM_CLOSE
   BOOL wmClose()
   {
-    _true( EndDialog(hwnd, 0) );
+    CHECK_TRUE( EndDialog(m_hwnd, 0) );
     return TRUE;
   }
   
   /// WM_COMMAND
-  BOOL wmCommand(int /* notify_code */, int id, HWND /* hwnd_control */)
+  BOOL wmCommand(int /* i_notify_code */, int i_id, HWND /* i_hwnd_control */)
   {
     char buf[GANA_MAX_PATH];
-    switch (id)
+    switch (i_id)
     {
       case IDC_BUTTON_browse:
       {
 	string title = loadString(IDS_openMayu);
 	string filter = loadString(IDS_openMayuFilter);
-	for (size_t i = 0; i < filter.size(); i++)
+	for (size_t i = 0; i < filter.size(); ++ i)
 	  if (filter[i] == '|')
 	    filter[i] = '\0';
 
@@ -79,34 +80,34 @@ public:
 	OPENFILENAME of;
 	memset(&of, 0, sizeof(of));
 	of.lStructSize = sizeof(of);
-	of.hwndOwner = hwnd;
+	of.hwndOwner = m_hwnd;
 	of.lpstrFilter = filter.c_str();
 	of.nFilterIndex = 1;
 	of.lpstrFile = buf;
-	of.nMaxFile = lengthof(buf);
+	of.nMaxFile = NUMBER_OF(buf);
 	of.lpstrTitle = title.c_str();
 	of.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST |
 	  OFN_HIDEREADONLY | OFN_PATHMUSTEXIST;
 	if (GetOpenFileName(&of))
-	  Edit_SetText(hwndMayuPath, buf);
+	  Edit_SetText(m_hwndMayuPath, buf);
 	return TRUE;
       }
       
       case IDOK:
       {
-	Edit_GetText(hwndMayuPathName, buf, lengthof(buf));
-	data->name = buf;
-	Edit_GetText(hwndMayuPath, buf, lengthof(buf));
-	data->filename = buf;
-	Edit_GetText(hwndSymbols, buf, lengthof(buf));
-	data->symbols = buf;
-	_true( EndDialog(hwnd, 1) );
+	Edit_GetText(m_hwndMayuPathName, buf, NUMBER_OF(buf));
+	m_data->m_name = buf;
+	Edit_GetText(m_hwndMayuPath, buf, NUMBER_OF(buf));
+	m_data->m_filename = buf;
+	Edit_GetText(m_hwndSymbols, buf, NUMBER_OF(buf));
+	m_data->m_symbols = buf;
+	CHECK_TRUE( EndDialog(m_hwnd, 1) );
 	return TRUE;
       }
       
       case IDCANCEL:
       {
-	_true( EndDialog(hwnd, 0) );
+	CHECK_TRUE( EndDialog(m_hwnd, 0) );
 	return TRUE;
       }
     }
@@ -115,23 +116,25 @@ public:
 };
 
 
-BOOL CALLBACK dlgEditSetting_dlgProc(HWND hwnd, UINT message,
-				     WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK dlgEditSetting_dlgProc(HWND i_hwnd, UINT i_message,
+				     WPARAM i_wParam, LPARAM i_lParam)
 {
   DlgEditSetting *wc;
-  getUserData(hwnd, &wc);
+  getUserData(i_hwnd, &wc);
   if (!wc)
-    switch (message)
+    switch (i_message)
     {
       case WM_INITDIALOG:
-	wc = setUserData(hwnd, new DlgEditSetting(hwnd));
-	return wc->wmInitDialog((HWND)wParam, lParam);
+	wc = setUserData(i_hwnd, new DlgEditSetting(i_hwnd));
+	return wc->wmInitDialog(
+	  reinterpret_cast<HWND>(i_wParam), i_lParam);
     }
   else
-    switch (message)
+    switch (i_message)
     {
       case WM_COMMAND:
-	return wc->wmCommand(HIWORD(wParam), LOWORD(wParam), (HWND)lParam);
+	return wc->wmCommand(HIWORD(i_wParam), LOWORD(i_wParam),
+			     reinterpret_cast<HWND>(i_lParam));
       case WM_CLOSE:
 	return wc->wmClose();
       case WM_NCDESTROY:

@@ -2,16 +2,16 @@
 // stringtool.h
 
 
-#ifndef __stringtool_h__
-#define __stringtool_h__
+#ifndef _STRINGTOOL_H
+#  define _STRINGTOOL_H
 
+#  ifndef _MISC_H
+#    include "misc.h"
+#  endif //_MISC_H
 
-#include "misc.h"
-
-#include <string>
-
-#include <ctype.h>
-#include <mbstring.h>
+#  include <string>
+#  include <ctype.h>
+#  include <mbstring.h>
 
 
 /// string tool
@@ -20,23 +20,23 @@ namespace StringTool
   using std::string;
 
 /// (const char *s)
-#define S_	const char *s
+#  define S_	const char *s
 /// (const char *s, char c)
-#define SC_	const char *s, char c
+#  define SC_	const char *s, char c
 /// (const char *s, size_t n)
-#define SN_	const char *s, size_t n
+#  define SN_	const char *s, size_t n
 /// (const char *s1, const char *s2)
-#define SS_	const char *s1, const char *s2
+#  define SS_	const char *s1, const char *s2
 /// (const char *s1, const char *s2, size_t n)
-#define SSN_	const char *s1, const char *s2, size_t n
+#  define SSN_	const char *s1, const char *s2, size_t n
 /// (const char *s, char *c, size_t n)
-#define SCN_	const char *s, char *c, size_t n
-#define _S	(u_char *)s
-#define _SC	(u_char *)s, (int)(u_char)c
-#define _SN	(u_char *)s, n
-#define _SS	(u_char *)s1, (u_char *)s2
-#define _SSN	(u_char *)s1, (u_char *)s2, n
-#define _SCN	(u_char *)s, (int)(u_char)c, n
+#  define SCN_	const char *s, char *c, size_t n
+#  define _S	(u_char *)s
+#  define _SC	(u_char *)s, (int)(u_char)c
+#  define _SN	(u_char *)s, n
+#  define _SS	(u_char *)s1, (u_char *)s2
+#  define _SSN	(u_char *)s1, (u_char *)s2, n
+#  define _SCN	(u_char *)s, (int)(u_char)c, n
   
   // multi byte functions
   
@@ -94,18 +94,18 @@ namespace StringTool
   // token							       
   /** */inline char * mbstok_    (SS_ ) { return (char *)_mbstok    (_SS ); }
 
-#undef S_
-#undef SC_
-#undef SN_
-#undef SS_
-#undef SSN_
-#undef SCN_
-#undef _S
-#undef _SC
-#undef _SN
-#undef _SS
-#undef _SSN
-#undef _SCN
+#  undef S_
+#  undef SC_
+#  undef SN_
+#  undef SS_
+#  undef SSN_
+#  undef SCN_
+#  undef _S
+#  undef _SC
+#  undef _SN
+#  undef _SS
+#  undef _SSN
+#  undef _SCN
 
   ///
   inline char *strchr_(const char *s, char c)
@@ -164,11 +164,11 @@ namespace StringTool
   };
 
 /// (const char)
-#define CC_	const char
+#  define CC_	const char
 /// (const istring)
-#define CIS_	const istring
+#  define CIS_	const istring
 /// (const string)
-#define CS_	const string
+#  define CS_	const string
   
   /** */inline bool operator<(CIS_ &i , CC_  *s )  { return i.compare(s) < 0; }
   /** */inline bool operator<(CC_  *s , CIS_ &i )  { return 0 < i.compare(s); }
@@ -189,10 +189,10 @@ namespace StringTool
   /** */inline bool operator!=(CIS_ &i , CS_  &s ) { return i.compare(s) != 0;}
   /** */inline bool operator!=(CIS_ &i1, CIS_ &i2) { return i1.compare(i2)!=0;}
 
-#undef CC_
-#undef CIS_
-#undef CS_
+#  undef CC_
+#  undef CIS_
+#  undef CS_
 }
 
 
-#endif // __stringtool_h__
+#endif // _STRINGTOOL_H

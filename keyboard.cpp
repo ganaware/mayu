@@ -89,7 +89,7 @@ Modifier::Modifier()
     ImeLock, ImeComp, NumLock, CapsLock, ScrollLock,
     Lock0, Lock1, Lock2, Lock3, Lock4, Lock5, Lock6, Lock7, Lock8, Lock9,
   };
-  for (int i = 0; i < lengthof(defaultDontCare); i++)
+  for (size_t i = 0; i < NUMBER_OF(defaultDontCare); ++ i)
     dontcare(defaultDontCare[i]);
 }
 
@@ -137,7 +137,7 @@ std::ostream &operator<<(std::ostream &i_ost, const Modifier &i_m)
 	{ Modifier::Lock8, "L8-" }, { Modifier::Lock9, "L9-" },
       };
 
-  for (size_t i = 0; i < lengthof(mods); i++)
+  for (size_t i = 0; i < NUMBER_OF(mods); i++)
     if (!i_m.isDontcare(mods[i].m_mt) && i_m.isPressed(mods[i].m_mt))
       i_ost << mods[i].m_symbol;
 

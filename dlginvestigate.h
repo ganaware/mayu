@@ -1,26 +1,28 @@
 // ////////////////////////////////////////////////////////////////////////////
 // dlginvestigate.h
 
-#ifndef __dlginvestigate_h__
-#define __dlginvestigate_h__
+
+#ifndef _DLGINVESTIGATE_H
+#  define _DLGINVESTIGATE_H
+
+#  ifndef _STRINGTOOL_H
+#    include "stringtool.h"
+#  endif // _STRINGTOOL_H
 
 
-#include <windows.h>
-#include "stringtool.h"
-
-
-///
-BOOL CALLBACK dlgInvestigate_dlgProc(HWND hwnd, UINT message,
-				     WPARAM wParam, LPARAM lParam);
+/// dialog procedure of "Investigate" dialog box
+BOOL CALLBACK dlgInvestigate_dlgProc(
+  HWND i_hwnd, UINT i_message, WPARAM i_wParam, LPARAM i_lParam);
 
 class Engine;
 
-///
+/// parameters for "Investigate" dialog box
 class DlgInvestigateData
 {
 public:
-  Engine *m_engine;
-  HWND m_hwndLog;
+  Engine *m_engine;				/// engine
+  HWND m_hwndLog;				/// log
 };
 
-#endif __dlginvestigate_h__
+
+#endif // _DLGINVESTIGATE_H

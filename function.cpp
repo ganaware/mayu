@@ -140,7 +140,7 @@ static void helpVariable(const Function::FuncData &fd)
     return;
 
   char buf[20];
-  snprintf(buf, lengthof(buf), "%d", fd.engine.m_variable);
+  snprintf(buf, NUMBER_OF(buf), "%d", fd.engine.m_variable);
 
   fd.engine.m_helpTitle = fd.args[0].getString();
   fd.engine.m_helpMessage = buf;
@@ -312,7 +312,7 @@ static void windowIdentify(const Function::FuncData &fd)
   if (!ok)
   {
     UINT WM_Targetted = RegisterWindowMessage(WM_Targetted_name);
-    _true( PostMessage(fd.hwnd, WM_Targetted, 0, 0) );
+    CHECK_TRUE( PostMessage(fd.hwnd, WM_Targetted, 0, 0) );
   }
 }
 

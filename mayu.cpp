@@ -105,7 +105,7 @@ private:
     assert(hMailslot != INVALID_HANDLE_VALUE);
 
     // initialize ok
-    _true( SetEvent(mhEvent) );
+    CHECK_TRUE( SetEvent(mhEvent) );
     
     // loop
     while (true)
@@ -122,8 +122,8 @@ private:
       {
 	case Notify::TypeMayuExit: // terminate thread
 	{
-	  _true( CloseHandle(hMailslot) );
-	  _true( SetEvent(mhEvent) );
+	  CHECK_TRUE( CloseHandle(hMailslot) );
+	  CHECK_TRUE( SetEvent(mhEvent) );
 	  return;
 	}
 	
@@ -131,8 +131,8 @@ private:
 	case Notify::TypeName:
 	{
 	  NotifySetFocus *n = (NotifySetFocus *)buf;
-	  n->className[lengthof(n->className) - 1] = '\0';
-	  n->titleName[lengthof(n->titleName) - 1] = '\0';
+	  n->className[NUMBER_OF(n->className) - 1] = '\0';
+	  n->titleName[NUMBER_OF(n->titleName) - 1] = '\0';
 	  
 	  if (n->type == Notify::TypeSetFocus)
 	    engine.setFocus(n->hwnd, n->threadId,
@@ -242,7 +242,7 @@ private:
 	      case WM_RBUTTONUP:
 	      {
 		POINT p;
-		_true( GetCursorPos(&p) );
+		CHECK_TRUE( GetCursorPos(&p) );
 		SetForegroundWindow(hwnd);
 		HMENU hMenuSub = GetSubMenu(This->hMenuTaskTray, 0);
 		if (This->engine.getIsEnabled())
@@ -251,7 +251,7 @@ private:
 		else
 		  CheckMenuItem(hMenuSub, ID_MENUITEM_disable,
 				MF_CHECKED | MF_BYCOMMAND);
-		_true( SetMenuDefaultItem(hMenuSub,
+		CHECK_TRUE( SetMenuDefaultItem(hMenuSub,
 					  ID_MENUITEM_investigate, FALSE) );
 
 		// create reload menu
@@ -357,8 +357,8 @@ private:
 	      case ID_MENUITEM_help:
 	      {
 		char buf[GANA_MAX_PATH];
-		_true( GetModuleFileName(hInst, buf, lengthof(buf)) );
-		_true( PathRemoveFileSpec(buf) );
+		CHECK_TRUE( GetModuleFileName(hInst, buf, NUMBER_OF(buf)) );
+		CHECK_TRUE( PathRemoveFileSpec(buf) );
 	    
 		istring helpFilename = buf;
 		helpFilename += "\\";
@@ -473,14 +473,14 @@ private:
 	std::string helpMessage, helpTitle;
 	engine.getHelpMessages(&helpMessage, &helpTitle);
 	StringTool::mbsfill(ni.szInfo, helpMessage.c_str(),
-			    lengthof(ni.szInfo));
+			    NUMBER_OF(ni.szInfo));
 	StringTool::mbsfill(ni.szInfoTitle, helpTitle.c_str(),
-			    lengthof(ni.szInfoTitle));
+			    NUMBER_OF(ni.szInfoTitle));
 	ni.dwInfoFlags = NIIF_INFO;
       }
       else
 	ni.szInfo[0] = ni.szInfoTitle[0] = '\0';
-      _true( Shell_NotifyIcon(i_doesAdd ? NIM_ADD : NIM_MODIFY, &ni) );
+      CHECK_TRUE( Shell_NotifyIcon(i_doesAdd ? NIM_ADD : NIM_MODIFY, &ni) );
     }
   }
 
@@ -497,9 +497,9 @@ public:
       m_canUseTasktrayBaloon(
 	PACKVERSION(5, 0) <= getDllVersion(TEXT("shlwapi.dll")))
   {
-    _true( Register_focus() );
-    _true( Register_target() );
-    _true( Register_tasktray() );
+    CHECK_TRUE( Register_focus() );
+    CHECK_TRUE( Register_target() );
+    CHECK_TRUE( Register_tasktray() );
 
     // change dir
     std::list<istring> pathes;
@@ -516,12 +516,12 @@ public:
 				CW_USEDEFAULT, CW_USEDEFAULT, 
 				CW_USEDEFAULT, CW_USEDEFAULT, 
 				NULL, NULL, hInst, this);
-    _true( hwndTaskTray );
+    CHECK_TRUE( hwndTaskTray );
     
     hwndLog =
       CreateDialogParam(hInst, MAKEINTRESOURCE(IDD_DIALOG_log), NULL,
 			dlgLog_dlgProc, (LPARAM)&log);
-    _true( hwndLog );
+    CHECK_TRUE( hwndLog );
 
     DlgInvestigateData did;
     did.m_engine = &engine;
@@ -529,12 +529,12 @@ public:
     hwndInvestigate =
       CreateDialogParam(hInst, MAKEINTRESOURCE(IDD_DIALOG_investigate), NULL,
 			dlgInvestigate_dlgProc, (LPARAM)&did);
-    _true( hwndInvestigate );
+    CHECK_TRUE( hwndInvestigate );
 
     hwndVersion =
       CreateDialog(hInst, MAKEINTRESOURCE(IDD_DIALOG_version), NULL,
 		   dlgVersion_dlgProc);
-    _true( hwndVersion );
+    CHECK_TRUE( hwndVersion );
 
     // attach log
     SendMessage(GetDlgItem(hwndLog, IDC_EDIT_log), EM_SETLIMITTEXT, 0, 0);
@@ -553,7 +553,7 @@ public:
     ni.uCallbackMessage = WM_TASKTRAYNOTIFY;
     string tip = loadString(IDS_mayu);
     strncpy(ni.szTip, tip.c_str(), sizeof(ni.szTip));
-    ni.szTip[lengthof(ni.szTip) - 1] = '\0';
+    ni.szTip[NUMBER_OF(ni.szTip) - 1] = '\0';
     if (m_canUseTasktrayBaloon)
       ni.cbSize = sizeof(ni);
     else
@@ -565,9 +565,9 @@ public:
     assert(hMenuTaskTray);
     
     // start message handler thread
-    _true( mhEvent = CreateEvent(NULL, FALSE, FALSE, NULL) );
-    _true( 0 <= _beginthread(notifyHandler, 0, this) );
-    _must_be( WaitForSingleObject(mhEvent, INFINITE), ==, WAIT_OBJECT_0 );
+    CHECK_TRUE( mhEvent = CreateEvent(NULL, FALSE, FALSE, NULL) );
+    CHECK_TRUE( 0 <= _beginthread(notifyHandler, 0, this) );
+    CHECK( WAIT_OBJECT_0 ==, WaitForSingleObject(mhEvent, INFINITE) );
 
     // set initial lock state
     notifyLockState();
@@ -580,23 +580,23 @@ public:
     log.detach();
     
     // destroy windows
-    _true( DestroyWindow(hwndVersion) );
-    _true( DestroyWindow(hwndInvestigate) );
-    _true( DestroyWindow(hwndLog) );
-    _true( DestroyWindow(hwndTaskTray) );
+    CHECK_TRUE( DestroyWindow(hwndVersion) );
+    CHECK_TRUE( DestroyWindow(hwndInvestigate) );
+    CHECK_TRUE( DestroyWindow(hwndLog) );
+    CHECK_TRUE( DestroyWindow(hwndTaskTray) );
     
     // wait for message handler thread terminate
     Notify n = { Notify::TypeMayuExit };
     notify(&n, sizeof(n));
-    _must_be( WaitForSingleObject(mhEvent, INFINITE), ==, WAIT_OBJECT_0 );
-    _true( CloseHandle(mhEvent) );
+    CHECK( WAIT_OBJECT_0 ==, WaitForSingleObject(mhEvent, INFINITE) );
+    CHECK_TRUE( CloseHandle(mhEvent) );
 
     // destroy menu
     DestroyMenu(hMenuTaskTray);
     
     // delete tasktray icon
-    _true( Shell_NotifyIcon(NIM_DELETE, &ni) );
-    _true( DestroyIcon(ni.hIcon) );
+    CHECK_TRUE( Shell_NotifyIcon(NIM_DELETE, &ni) );
+    CHECK_TRUE( DestroyIcon(ni.hIcon) );
 
     // stop keyboard handler thread
     engine.stop();
@@ -618,15 +618,15 @@ public:
 #pragma message("\t\t****\tstrftime(... \"%%#c\" ...) fails.")
 #pragma message("\t\t****\tWhy ? Bug of Borland C++ 5.5 ?   ")
 #pragma message("\t\t****\t                         - nayuta")
-      strftime(buf, lengthof(buf),
+      strftime(buf, NUMBER_OF(buf),
 	       "%Y/%m/%d %H:%M:%S (Compiled by Borland C++)", localtime(&now));
 #else
-      strftime(buf, lengthof(buf), "%#c", localtime(&now));
+      strftime(buf, NUMBER_OF(buf), "%#c", localtime(&now));
 #endif
       
       Acquire a(&log, 0);
       log << loadString(IDS_mayu) << " "VERSION" @ " << buf << endl;
-      _true( GetModuleFileName(hInst, buf, lengthof(buf)) );
+      CHECK_TRUE( GetModuleFileName(hInst, buf, NUMBER_OF(buf)) );
       log << buf << endl << endl;
     }
     load();
@@ -710,20 +710,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
   hInst = hInstance;
 
   // set locale
-  _true( setlocale(LC_ALL, "") );
+  CHECK_TRUE( setlocale(LC_ALL, "") );
 
   // common controls
   INITCOMMONCONTROLSEX icc;
   icc.dwSize = sizeof(icc);
   icc.dwICC = ICC_LISTVIEW_CLASSES;
-  _true( InitCommonControlsEx(&icc) );
+  CHECK_TRUE( InitCommonControlsEx(&icc) );
 
   // convert old registry to new registry
   convertRegistry();
   
   // is another mayu running ?
   HANDLE mutex = CreateMutex((SECURITY_ATTRIBUTES *)NULL,
-			     TRUE, mutexMayuExclusiveRunning);
+			     TRUE, MUTEX_MAYU_EXCLUSIVE_RUNNING);
   if (GetLastError() == ERROR_ALREADY_EXISTS)
   {
     // another mayu already running
@@ -733,7 +733,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
     return 1;
   }
   
-  _false( installHooks() );
+  CHECK_FALSE( installHooks() );
   try
   {
     Mayu().messageLoop();
@@ -744,8 +744,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
     MessageBox((HWND)NULL, e.getMessage().c_str(), title.c_str(),
 	       MB_OK | MB_ICONSTOP);
   }
-  _false( uninstallHooks() );
+  CHECK_FALSE( uninstallHooks() );
   
-  _true( CloseHandle(mutex) );
+  CHECK_TRUE( CloseHandle(mutex) );
   return 0;
 }

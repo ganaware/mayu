@@ -34,8 +34,8 @@ public:
     
     char buf[1024], buf2[1024];
     Edit_GetText(GetDlgItem(hwnd, IDC_STATIC_version), buf,
-		 lengthof(buf));
-    snprintf(buf2, lengthof(buf2), buf, VERSION);
+		 NUMBER_OF(buf));
+    snprintf(buf2, NUMBER_OF(buf2), buf, VERSION);
     Edit_SetText(GetDlgItem(hwnd, IDC_STATIC_version), buf2);
     return TRUE;
   }
@@ -43,7 +43,7 @@ public:
   /// WM_CLOSE
   BOOL wmClose()
   {
-    _true( EndDialog(hwnd, 0) );
+    CHECK_TRUE( EndDialog(hwnd, 0) );
     return TRUE;
   }
 
@@ -54,15 +54,15 @@ public:
     {
       case IDOK:
       {
-	_true( EndDialog(hwnd, 0) );
+	CHECK_TRUE( EndDialog(hwnd, 0) );
 	return TRUE;
       }
       case IDC_BUTTON_download:
       {
 	char buf[1024];
-	Edit_GetText(GetDlgItem(hwnd, IDC_STATIC_url), buf, lengthof(buf));
+	Edit_GetText(GetDlgItem(hwnd, IDC_STATIC_url), buf, NUMBER_OF(buf));
 	ShellExecute(NULL, "open", buf, NULL, NULL, SW_SHOWNORMAL);
-	_true( EndDialog(hwnd, 0) );
+	CHECK_TRUE( EndDialog(hwnd, 0) );
 	return TRUE;
       }
     }

@@ -2,56 +2,48 @@
 // misc.h
 
 
-#ifndef __misc_h__
-#define __misc_h__
+#ifndef _MISC_H
+#  define _MISC_H
+
+#  include "compiler_specific.h"
+
+#  include <windows.h>
+#  include <assert.h>
 
 
-#include "compiler_specific.h"
+typedef unsigned char u_char;		/// unsigned char
+typedef unsigned short u_short;		/// unsigned short
+typedef unsigned long u_long;		/// unsigned long
 
-#include <windows.h>
-#include <assert.h>
+#  ifdef NDEBUG
+#    define ASSERT(exp)		exp
+#    define CHECK(cond, exp)	exp
+#    define CHECK_TRUE(exp)	exp
+#    define CHECK_FALSE(exp)	exp
+#  else // NDEBUG
+#    define ASSERT(exp)		assert(exp)
+#    define CHECK(cond, exp)	assert(cond (exp))
+#    define CHECK_TRUE(exp)	assert(!!(exp))
+#    define CHECK_FALSE(exp)	assert(!(exp))
+#  endif // NDEBUG
 
 
-typedef unsigned char u_char;		///
-typedef unsigned short u_short;		///
-typedef unsigned long u_long;		///
+/// get number of array elements
+#  define NUMBER_OF(a) (sizeof(a) / sizeof((a)[0]))
 
-///
-#define lengthof(a) (sizeof(a) / sizeof((a)[0]))
+/// max path length
+#  define GANA_MAX_PATH		(MAX_PATH * 4)
 
-#ifdef NDEBUG
-///
-#define _must_be(exp, op, v) exp
-#else // NDEBUG
-#define _must_be(exp, op, v) assert((exp) op (v))
-#endif // NDEBUG
-
-///
-#define _true(exp)  _must_be(!!(exp), ==, true)
-///
-#define _false(exp) _true(!(exp))
-///
-#define _NULL(exp)  _false(exp)
-///
-#define _not_NULL(exp)  _true(exp)
-
-// misc max length
-
-/// path
-#define GANA_MAX_PATH		(MAX_PATH * 4)
-/// global atom
-#define GANA_MAX_ATOM_LENGTH	256
+/// max length of global atom
+#  define GANA_MAX_ATOM_LENGTH	256
 
 /// max
-#define MAX(a, b)	(((b) < (a)) ? (a) : (b))
+#  undef MAX
+#  define MAX(a, b)	(((b) < (a)) ? (a) : (b))
+
 /// min
-#define MIN(a, b)	(((a) < (b)) ? (a) : (b))
+#  undef MIN
+#  define MIN(a, b)	(((a) < (b)) ? (a) : (b))
 
 
-/// C++ standard library namespace
-namespace std
-{
-}
-
-
-#endif // __misc_h__
+#endif // _MISC_H

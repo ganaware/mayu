@@ -749,7 +749,7 @@ void Regexp::regexp::regcomp(const R_char *exp)
   
   // First pass: determine size, legality.
   CRegValidator tester(exp);
-  _true( tester.reg(false, &flags) );
+  CHECK_TRUE( tester.reg(false, &flags) );
 
   // Small enough for pointer-storage convention?
   if (
@@ -770,7 +770,7 @@ void Regexp::regexp::regcomp(const R_char *exp)
   
   // Second pass: emit code. 
   CRegCompiler comp(exp, program);
-  _true( comp.reg(false, &flags) );
+  CHECK_TRUE( comp.reg(false, &flags) );
 
   PROGRAM *scan = program + 1;		// First BRANCH.
   assert(OP(scan) == BRANCH);

@@ -25,21 +25,21 @@ class Target
     if (rop2)
     {
       RECT rc;
-      _true( GetWindowRect(hwnd, &rc) );
+      CHECK_TRUE( GetWindowRect(hwnd, &rc) );
       int width = rcWidth(&rc);
       int height = rcHeight(&rc);
     
       HANDLE hpen = SelectObject(hdc, GetStockObject(WHITE_PEN));
       HANDLE hbr  = SelectObject(hdc, GetStockObject(NULL_BRUSH));
-      _true( Rectangle(hdc, 0, 0, width    , height    ) );
-      _true( Rectangle(hdc, 1, 1, width - 1, height - 1) );
-      _true( Rectangle(hdc, 2, 2, width - 2, height - 2) );
+      CHECK_TRUE( Rectangle(hdc, 0, 0, width    , height    ) );
+      CHECK_TRUE( Rectangle(hdc, 1, 1, width - 1, height - 1) );
+      CHECK_TRUE( Rectangle(hdc, 2, 2, width - 2, height - 2) );
       SelectObject(hdc, hpen);
       SelectObject(hdc, hbr);
       // no need to DeleteObject StockObject
       SetROP2(hdc, rop2);
     }
-    _true( ReleaseDC(hwnd, hdc) );
+    CHECK_TRUE( ReleaseDC(hwnd, hdc) );
   }
   
   ///
@@ -53,7 +53,7 @@ class Target
   /// WM_CREATE
   int wmCreate(CREATESTRUCT * /* cs */)
   {
-    _true( hCursor = LoadCursor(hInst, MAKEINTRESOURCE(IDC_CURSOR_target)) );
+    CHECK_TRUE( hCursor = LoadCursor(hInst, MAKEINTRESOURCE(IDC_CURSOR_target)) );
     return 0;
   }
 
@@ -67,8 +67,8 @@ class Target
     if (GetCapture() != hwnd)
     {
       RECT rc;
-      _true( GetClientRect(hwnd, &rc) );
-      _true( DrawIcon(hdc, (rcWidth(&rc) - GetSystemMetrics(SM_CXICON)) / 2,
+      CHECK_TRUE( GetClientRect(hwnd, &rc) );
+      CHECK_TRUE( DrawIcon(hdc, (rcWidth(&rc) - GetSystemMetrics(SM_CXICON)) / 2,
 		      (rcHeight(&rc) - GetSystemMetrics(SM_CYICON)) / 2,
 		      hCursor) );
     }
@@ -92,7 +92,7 @@ class Target
     {
       PointWindow &pw = *(PointWindow *)lParam;
       RECT rc;
-      _true( GetWindowRect(hwnd, &rc) );
+      CHECK_TRUE( GetWindowRect(hwnd, &rc) );
       if (PtInRect(&rc, pw.p))
 	if (isRectInRect(&rc, &pw.rc))
 	{
@@ -110,7 +110,7 @@ class Target
     {
       PointWindow &pw = *(PointWindow *)lParam;
       RECT rc;
-      _true( GetWindowRect(hwnd, &rc) );
+      CHECK_TRUE( GetWindowRect(hwnd, &rc) );
       if (PtInRect(&rc, pw.p))
       {
 	pw.hwnd = hwnd;
@@ -127,9 +127,9 @@ class Target
     if (GetCapture() == hwnd)
     {
       PointWindow pw;
-      _true( GetCursorPos(&pw.p) );
+      CHECK_TRUE( GetCursorPos(&pw.p) );
       pw.hwnd = 0;
-      _true( GetWindowRect(GetDesktopWindow(), &pw.rc) );
+      CHECK_TRUE( GetWindowRect(GetDesktopWindow(), &pw.rc) );
       EnumWindows(windowFromPoint, (LPARAM)&pw);
       while (1)
       {
@@ -157,8 +157,8 @@ class Target
   {
     SetCapture(hwnd);
     SetCursor(hCursor);
-    _true( InvalidateRect(hwnd, NULL, TRUE) );
-    _true( UpdateWindow(hwnd) );
+    CHECK_TRUE( InvalidateRect(hwnd, NULL, TRUE) );
+    CHECK_TRUE( UpdateWindow(hwnd) );
     return 0;
   }
 
@@ -169,8 +169,8 @@ class Target
       invertFrame(preHwnd);
     preHwnd = NULL;
     ReleaseCapture();
-    _true( InvalidateRect(hwnd, NULL, TRUE) );
-    _true( UpdateWindow(hwnd) );
+    CHECK_TRUE( InvalidateRect(hwnd, NULL, TRUE) );
+    CHECK_TRUE( UpdateWindow(hwnd) );
     return 0;
   }
 
