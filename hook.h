@@ -109,7 +109,6 @@ extern DllImport int installHooks();
 extern DllImport int uninstallHooks();
 extern DllImport bool notify(void *data, size_t sizeof_data);
 extern DllImport void notifyLockState();
-extern DllImport bool setTaskTrayHwnd(HWND wnd);
 #  endif // !_HOOK_CPP
 
 

@@ -525,7 +525,9 @@ public:
 				  CW_USEDEFAULT, CW_USEDEFAULT, 
 				  NULL, NULL, g_hInst, this);
     CHECK_TRUE( m_hwndTaskTray );
-    setTaskTrayHwnd(m_hwndTaskTray);
+    
+    // set window handle of tasktray to hooks
+    g_hookData->m_hwndTaskTray = m_hwndTaskTray;
     
     m_hwndLog =
       CreateDialogParam(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_log), NULL,
@@ -588,7 +590,7 @@ public:
     m_log.detach();
    
     // stop notify from mayu.dll
-    setTaskTrayHwnd(NULL);
+    g_hookData->m_hwndTaskTray = NULL;
     
     // destroy windows
     CHECK_TRUE( DestroyWindow(m_hwndVersion) );

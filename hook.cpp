@@ -418,10 +418,3 @@ DllExport int uninstallHooks()
   g_hookData->m_hHookCallWndProc = NULL;
   return 0;
 }
-
-/// set window handle of tasktray
-DllExport bool setTaskTrayHwnd(HWND wnd)
-{
-  g_hookData->m_hwndTaskTray = wnd;
-  return true;
-}
