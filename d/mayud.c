@@ -9,7 +9,6 @@
 #pragma warning(3 : 4061 4100 4132 4701 4706)
 
 #include "keyque.c"
-#include "../src/input/kbdclass/kbdclass.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Device Extensions
@@ -79,6 +78,7 @@ NTSTATUS detourPower         (IN PDEVICE_OBJECT, IN PIRP);
 NTSTATUS filterPower         (IN PDEVICE_OBJECT, IN PIRP);
 #endif // !MAYUD_NT4
 
+VOID CancelKeyboardClassRead(IN PIRP, IN PDEVICE_OBJECT);
 NTSTATUS readq(KeyQue*, PIRP);
 
 #ifdef ALLOC_PRAGMA
@@ -89,6 +89,9 @@ NTSTATUS readq(KeyQue*, PIRP);
 ///////////////////////////////////////////////////////////////////////////////
 // Global Constants / Variables
 
+BOOLEAN g_isXp;
+ULONG g_SpinLock_offset;
+ULONG g_RequestIsPending_offset;
 
 // Device names
 #define UnicodeString(str) { sizeof(str) - sizeof(UNICODE_NULL),	\
@@ -128,6 +131,27 @@ NTSTATUS DriverEntry(IN PDRIVER_OBJECT driverObject,
   DetourDeviceExtension *detourDevExt = NULL;
   
   UNREFERENCED_PARAMETER(registryPath);
+
+
+  // Environment specific initialize
+#ifdef MAYUD_NT4
+  g_isXp = FALSE;
+  g_SpinLock_offset = 48;
+  g_RequestIsPending_offset = 0;
+#else /* !MAYUD_NT4 */
+  if (IoIsWdmVersionAvailable(1, 0x20)) { // is WindowsXP
+    g_isXp = TRUE;
+    g_SpinLock_offset = 108;
+    g_RequestIsPending_offset = 0;
+  } else if (IoIsWdmVersionAvailable(1, 0x10)) { // is Windows2000
+    g_isXp =FALSE;
+    g_SpinLock_offset = 116;
+    g_RequestIsPending_offset = 48;
+  } else { // Unknown version
+    status = STATUS_UNKNOWN_REVISION;
+    goto error;
+  }
+#endif /* MAYUD_NT4 */
 
   // initialize global variables
   _IopInvalidDeviceRequest = driverObject->MajorFunction[IRP_MJ_CREATE];
@@ -302,6 +326,30 @@ NTSTATUS mayuAddDevice(IN PDRIVER_OBJECT driverObject,
   return status;
 }
 
+VOID CancelKeyboardClassRead(PIRP cancelIrp, PDEVICE_OBJECT kbdClassDevObj)
+{
+  PVOID kbdClassDevExt;
+  BOOLEAN isSafe;
+  PKSPIN_LOCK SpinLock;
+  KIRQL currentIrql;
+
+  kbdClassDevExt = kbdClassDevObj->DeviceExtension;
+  SpinLock = (PKSPIN_LOCK)((ULONG)kbdClassDevExt + g_SpinLock_offset);
+  KeAcquireSpinLock(SpinLock, &currentIrql);
+  if (g_isXp == TRUE) {
+    isSafe = cancelIrp->CancelRoutine ? TRUE : FALSE;
+  } else {
+    isSafe = *(BOOLEAN*)((ULONG)kbdClassDevExt + g_RequestIsPending_offset);
+  }
+  if (isSafe == TRUE) {
+    KeReleaseSpinLock(SpinLock, currentIrql);
+    IoCancelIrp(cancelIrp);
+  } else {
+    KeReleaseSpinLock(SpinLock, currentIrql);
+  }
+  return;
+}
+
 // unload driver
 VOID mayuUnloadDriver(IN PDRIVER_OBJECT driverObject)
 {
@@ -316,7 +364,7 @@ VOID mayuUnloadDriver(IN PDRIVER_OBJECT driverObject)
     FilterDeviceExtension *filterDevExt
       = (FilterDeviceExtension*)devObj->DeviceExtension;
     PDEVICE_OBJECT delObj;
-    PDEVICE_EXTENSION kbdClassDevExt;
+    PDEVICE_OBJECT kbdClassDevObj;
 
     // detach
     IoDetachDevice(filterDevExt->kbdClassDevObj);
@@ -326,17 +374,11 @@ VOID mayuUnloadDriver(IN PDRIVER_OBJECT driverObject)
     // finalize read que
     KqFinalize(&filterDevExt->readQue);
     cancelIrp = filterDevExt->irpq;
-    kbdClassDevExt =
-      (PDEVICE_EXTENSION)filterDevExt->kbdClassDevObj->DeviceExtension;
+    filterDevExt->irpq = NULL;
+    kbdClassDevObj = filterDevExt->kbdClassDevObj;
     KeReleaseSpinLock(&filterDevExt->lock, currentIrql);
     if (cancelIrp) {
-      KeAcquireSpinLock(&kbdClassDevExt->SpinLock, &currentIrql);
-      if (kbdClassDevExt->RequestIsPending == TRUE) {
-	KeReleaseSpinLock(&kbdClassDevExt->SpinLock, currentIrql);
-	IoCancelIrp(cancelIrp);
-      } else {
-	KeReleaseSpinLock(&kbdClassDevExt->SpinLock, currentIrql);
-      }
+      CancelKeyboardClassRead(cancelIrp, kbdClassDevObj);
     }
     // delete device objects
     delObj= devObj;
@@ -553,21 +595,14 @@ NTSTATUS detourCreate(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
     if (filterDevObj) {
       FilterDeviceExtension *filterDevExt =
 	(FilterDeviceExtension*)filterDevObj->DeviceExtension;
-      PDEVICE_EXTENSION kbdClassDevExt;
+      PDEVICE_OBJECT kbdClassDevObj;
 
       KeAcquireSpinLock(&filterDevExt->lock, &currentIrql);
       irpCancel = filterDevExt->kbdClassDevObj->CurrentIrp;
-      kbdClassDevExt =
-	(PDEVICE_EXTENSION)filterDevExt->kbdClassDevObj->DeviceExtension;
+      kbdClassDevObj = filterDevExt->kbdClassDevObj;
       KeReleaseSpinLock(&filterDevExt->lock, currentIrql);
       if (irpCancel) {
-	KeAcquireSpinLock(&kbdClassDevExt->SpinLock, &currentIrql);
-	if (kbdClassDevExt->RequestIsPending == TRUE) {
-	  KeReleaseSpinLock(&kbdClassDevExt->SpinLock, currentIrql);
-	  IoCancelIrp(irpCancel);
-	} else {
-	  KeReleaseSpinLock(&kbdClassDevExt->SpinLock, currentIrql);
-	}
+	CancelKeyboardClassRead(irpCancel, kbdClassDevObj);
       }
     }
 
@@ -651,7 +686,7 @@ NTSTATUS detourWrite(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
     if (filterDevObj) {
       FilterDeviceExtension *filterDevExt =
 	(FilterDeviceExtension*)filterDevObj->DeviceExtension;
-      PDEVICE_EXTENSION kbdClassDevExt;
+      PDEVICE_OBJECT kbdClassDevObj;
 
       KeAcquireSpinLock(&filterDevExt->lock, &currentIrql);
 
@@ -664,17 +699,10 @@ NTSTATUS detourWrite(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
       // cancel filter irp
       irpCancel = filterDevExt->irpq; 
       filterDevExt->irpq = NULL;
-      kbdClassDevExt =
-	(PDEVICE_EXTENSION)filterDevExt->kbdClassDevObj->DeviceExtension;
+      kbdClassDevObj = filterDevExt->kbdClassDevObj;
       KeReleaseSpinLock(&filterDevExt->lock, currentIrql);
       if (irpCancel) {
-	KeAcquireSpinLock(&kbdClassDevExt->SpinLock, &currentIrql);
-	if (kbdClassDevExt->RequestIsPending == TRUE) {
-	  KeReleaseSpinLock(&kbdClassDevExt->SpinLock, currentIrql);
-	  IoCancelIrp(irpCancel);
-	} else {
-	  KeReleaseSpinLock(&kbdClassDevExt->SpinLock, currentIrql);
-	}
+	CancelKeyboardClassRead(irpCancel, kbdClassDevObj);
       }
       status = STATUS_SUCCESS;
     } else {
