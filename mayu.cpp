@@ -193,6 +193,14 @@ private:
 	  }	  
 	  break;
 	}
+
+	case Notify::Type_log:
+	{
+	  Acquire a(&m_log, 1);
+	  NotifyLog *n = (NotifyLog *)cd->lpData;
+	  m_log << _T("hook log: ") << n->m_msg << std::endl;
+	  break;
+	}
       }
       return true;
   }

@@ -37,6 +37,7 @@ struct Notify
     Type_threadDetach,				/// NotifyThreadDetach
     Type_command,				/// NotifyThreadDetach
     Type_show,				/// NotifyShow
+    Type_log,					/// NotifyLog
   };
   Type m_type;					///
 };
@@ -105,6 +106,15 @@ public:
   Notify::Type m_type;				///
   Show m_show;					///
   bool m_isMDI;					///
+};
+
+
+///
+class NotifyLog
+{
+public:
+  Notify::Type m_type;				///
+  _TCHAR m_msg[GANA_MAX_PATH];			///
 };
 
 

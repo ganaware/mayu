@@ -44,6 +44,7 @@ static Globals g;
 
 static void notifyThreadDetach();
 static void notifyShow(NotifyShow::Show i_show, bool i_isMDI);
+static void notifyLog(_TCHAR *i_msg);
 static bool mapHookData();
 static void unmapHookData();
 
@@ -365,6 +366,16 @@ static void notifyShow(NotifyShow::Show i_show, bool i_isMDI)
   ns.m_show = i_show;
   ns.m_isMDI = i_isMDI;
   notify(&ns, sizeof(ns));
+}
+
+
+/// notify log
+static void notifyLog(_TCHAR *i_msg)
+{
+  NotifyLog nl;
+  nl.m_type = Notify::Type_log;
+  tcslcpy(nl.m_msg, i_msg, NUMBER_OF(nl.m_msg));
+  notify(&nl, sizeof(nl));
 }
 
 
