@@ -8,20 +8,22 @@
 #include "mayurc.h"
 #include "windowstool.h"
 #include "compiler_specific_func.h"
+#include "layoutmanager.h"
 
 #include <cstdio>
 #include <windowsx.h>
 
 
 ///
-class DlgVersion
+class DlgVersion : public LayoutManager
 {
   HWND m_hwnd;		///
   
 public:
   ///
   DlgVersion(HWND i_hwnd)
-    : m_hwnd(i_hwnd)
+    : LayoutManager(i_hwnd),
+      m_hwnd(i_hwnd)
   {
   }
   
@@ -53,6 +55,23 @@ public:
     
     
     Edit_SetText(GetDlgItem(m_hwnd, IDC_EDIT_builtBy), buf);
+    
+    // set layout manager
+    typedef LayoutManager LM;
+
+    addItem(GetDlgItem(m_hwnd, IDC_STATIC_mayuIcon),
+	    LM::ORIGIN_LEFT_EDGE, LM::ORIGIN_TOP_EDGE,
+	    LM::ORIGIN_LEFT_EDGE, LM::ORIGIN_TOP_EDGE);
+    addItem(GetDlgItem(m_hwnd, IDC_EDIT_builtBy),
+	    LM::ORIGIN_LEFT_EDGE, LM::ORIGIN_TOP_EDGE,
+	    LM::ORIGIN_RIGHT_EDGE, LM::ORIGIN_BOTTOM_EDGE);
+    addItem(GetDlgItem(m_hwnd, IDC_BUTTON_download),
+	    LM::ORIGIN_CENTER, LM::ORIGIN_BOTTOM_EDGE,
+	    LM::ORIGIN_CENTER, LM::ORIGIN_BOTTOM_EDGE);
+    addItem(GetDlgItem(m_hwnd, IDOK),
+	    LM::ORIGIN_CENTER, LM::ORIGIN_BOTTOM_EDGE,
+	    LM::ORIGIN_CENTER, LM::ORIGIN_BOTTOM_EDGE);
+    restrictSmallestSize();
     
     return TRUE;
   }
@@ -111,6 +130,8 @@ BOOL CALLBACK dlgVersion_dlgProc(
       case WM_NCDESTROY:
 	delete wc;
 	return TRUE;
+      default:
+	return wc->defaultWMHandler(i_message, i_wParam, i_lParam);
     }
   return FALSE;
 }
