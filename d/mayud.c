@@ -11,6 +11,8 @@
 #include "ioctl.h"
 #include "keyque.c"
 
+//#define USE_TOUCHPAD // very experimental!
+
 #if DBG
 // Enable debug logging only on checked build:
 // We use macro to avoid function call overhead
@@ -53,11 +55,15 @@ typedef struct _FilterDeviceExtension
   PDEVICE_OBJECT detourDevObj;
   PDEVICE_OBJECT kbdClassDevObj; // keyboard class device object
   
+#ifdef USE_TOUCHPAD
   BOOLEAN isKeyboard;
+#endif
   KSPIN_LOCK lock; // lock below datum
   PIRP irpq;
   KeyQue readQue; // when IRP_MJ_READ, the contents of readQue are returned
+#ifdef USE_TOUCHPAD
   BOOLEAN isTouched;
+#endif
 } FilterDeviceExtension;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -91,8 +97,10 @@ NTSTATUS filterPower         (IN PDEVICE_OBJECT, IN PIRP);
 VOID CancelKeyboardClassRead(IN PIRP, IN PDEVICE_OBJECT);
 NTSTATUS readq(KeyQue*, PIRP);
 
+#ifdef USE_TOUCHPAD
 NTSTATUS filterTouchpadCompletion (IN PDEVICE_OBJECT, IN PIRP, IN PVOID);
 NTSTATUS filterTouchpad      (IN PDEVICE_OBJECT, IN PIRP);
+#endif
 
 #ifdef ALLOC_PRAGMA
 #pragma alloc_text( init, DriverEntry )
@@ -123,8 +131,10 @@ UnicodeString(DD_KEYBOARD_DEVICE_NAME_U L"0");
 static UNICODE_STRING KeyboardClassDriverName =
 UnicodeString(L"\\Driver\\kbdclass");
 
+#ifdef USE_TOUCHPAD
 #define TOUCHPAD_SCANCODE 0x7d
 #define TOUCHPAD_PRESSURE_OFFSET 7
+#endif
 
 // Global Variables
 PDRIVER_DISPATCH _IopInvalidDeviceRequest; // Default dispatch function
@@ -346,16 +356,20 @@ NTSTATUS mayuAddDevice(IN PDRIVER_OBJECT driverObject,
   filterDevExt->irpq = NULL;
   status = KqInitialize(&filterDevExt->readQue);
   if (!NT_SUCCESS(status)) goto error;
+#ifdef USE_TOUCHPAD
   filterDevExt->isKeyboard = FALSE;
   filterDevExt->isTouched = FALSE;
+#endif
 
   attachedDevObj = kbdClassDevObj->AttachedDevice;
   while (attachedDevObj)
   {
     DEBUG_LOG(("attached to %T", &(attachedDevObj->DriverObject->DriverName)));
     DEBUG_LOG(("type of attched device: %x", attachedDevObj->DeviceType));
+#ifdef USE_TOUCHPAD
     if (RtlCompareUnicodeString(&KeyboardClassDriverName, &attachedDevObj->DriverObject->DriverName, TRUE) == 0)
       filterDevExt->isKeyboard = TRUE;
+#endif
     attachedDevObj = attachedDevObj->AttachedDevice;
   }
 
@@ -379,6 +393,7 @@ NTSTATUS mayuAddDevice(IN PDRIVER_OBJECT driverObject,
        == _IopInvalidDeviceRequest) ?
       _IopInvalidDeviceRequest : filterPassThrough;
   }
+#ifdef USE_TOUCHPAD
   if (filterDevExt->isKeyboard == FALSE)
   {
     DEBUG_LOG(("filter read: GlidePoint"));
@@ -386,6 +401,7 @@ NTSTATUS mayuAddDevice(IN PDRIVER_OBJECT driverObject,
     filterDevExt->MajorFunction[IRP_MJ_INTERNAL_DEVICE_CONTROL] = filterTouchpad;
   }
   else
+#endif
   {
     DEBUG_LOG(("filter read: Keyboard"));
     filterDevExt->MajorFunction[IRP_MJ_READ] = filterRead;
@@ -645,10 +661,12 @@ NTSTATUS mayuGenericDispatch(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
     FilterDeviceExtension *filterDevExt =
       (FilterDeviceExtension *)deviceObject->DeviceExtension;
 
+#ifdef USE_TOUCHPAD
     if (filterDevExt->isKeyboard == FALSE)
     {
       DEBUG_LOG(("MajorFunction: %x", irpSp->MajorFunction));
     }
+#endif
     return filterDevExt->MajorFunction[irpSp->MajorFunction](deviceObject, irp);
   } else {
     DetourDeviceExtension *detourDevExt = 
@@ -1057,6 +1075,7 @@ NTSTATUS filterPnP(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
 }
 
 
+#ifdef USE_TOUCHPAD
 // 
 NTSTATUS filterTouchpadCompletion(IN PDEVICE_OBJECT deviceObject,
 				 IN PIRP irp, IN PVOID context)
@@ -1162,6 +1181,7 @@ NTSTATUS filterTouchpad(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
 			 NULL, TRUE, TRUE, TRUE);
   return IoCallDriver(filterDevExt->kbdClassDevObj, irp);
 }
+#endif
 
 
 NTSTATUS detourPnP(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
