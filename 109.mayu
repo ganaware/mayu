@@ -165,19 +165,15 @@ def key MM/Send		MM/F9		= E0-0x43 # (MultiMedia Keyboard) F9 送信
 
 def key Break				= E0-0x46 # Break
 def key Home				= E0-0x47
-#def key ↑ Up				= E0-0x48
-def key Up				= E0-0x48
+def key ↑ Up				= E0-0x48
 def key PageUp Prior			= E0-0x49
 
-#def key ← Left			= E0-0x4b
-def key Left				= E0-0x4b
+def key ← Left				= E0-0x4b
 def key MM/MyDocument			= E0-0x4c # (MultiMedia Keyboard) マイドキュメント
-#def key → Right			= E0-0x4d
-def key Right				= E0-0x4d
+def key → Right			= E0-0x4d
 
 def key End				= E0-0x4f
-#def key ↓ Down			= E0-0x50
-def key Down				= E0-0x50
+def key ↓ Down				= E0-0x50
 def key PageDown Next			= E0-0x51
 def key Insert				= E0-0x52
 def key Delete Del			= E0-0x53

@@ -197,6 +197,12 @@ static bool isSymbolChar(_TCHAR i_c)
   if (_istpunct(i_c))
     return !!_tcschr(_T("-+/?_\\"), i_c);
 
+#ifdef UNICODE
+  // check arrows
+  if (_tcschr(_T("\x2190\x2191\x2192\x2193"), i_c)) {
+    return true;
+  }
+#endif // UNICODE
   return _istgraph(i_c);
 }
 
