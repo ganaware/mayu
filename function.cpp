@@ -425,6 +425,40 @@ bool getTypeValue(LogicalOperatorType *o_type, const tstring &i_name)
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// WindowMonitorFromType
+
+
+// WindowMonitorFromType table
+typedef TypeTable<WindowMonitorFromType> TypeTable_WindowMonitorFromType;
+static const TypeTable_WindowMonitorFromType g_windowMonitorFromType[] =
+{
+  { WindowMonitorFromType_primary, _T("primary") },
+  { WindowMonitorFromType_current, _T("current") },
+};
+
+
+// stream output
+tostream &operator<<(tostream &i_ost, WindowMonitorFromType i_data)
+{
+  tstring name;
+  if(getTypeName(&name, i_data, g_windowMonitorFromType,
+                 NUMBER_OF(g_windowMonitorFromType)))
+    i_ost << name;
+  else
+    i_ost << _T("(WindowMonitorFromType internal error)");
+  return i_ost;
+}
+
+
+// get value of WindowMonitorFromType
+bool getTypeValue(WindowMonitorFromType *o_type, const tstring &i_name)
+{
+  return getTypeValue(o_type, i_name, g_windowMonitorFromType,
+                      NUMBER_OF(g_windowMonitorFromType));
+}
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // std::list<tstringq>
 
 
@@ -521,9 +555,14 @@ bool getSuitableMdiWindow(FunctionParam *i_param, HWND *o_hwnd,
     case TargetWindowType_overlapped:
       if (o_rcWindow)
 	GetWindowRect(*o_hwnd, o_rcWindow);
-      if (o_rcParent)
-	SystemParametersInfo(SPI_GETWORKAREA, 0,
-			     reinterpret_cast<void *>(o_rcParent), FALSE);
+      if (o_rcParent) {
+        HMONITOR hm = monitorFromWindow(i_param->m_hwnd,
+                                        MONITOR_DEFAULTTONEAREST);
+        MONITORINFO mi;
+        mi.cbSize = sizeof(mi);
+        getMonitorInfo(hm, &mi);
+        *o_rcParent = mi.rcWork;
+      }
       break;
     case TargetWindowType_mdi:
       if (o_rcWindow)
@@ -1386,6 +1425,126 @@ void Engine::funcWindowMoveVisibly(FunctionParam *i_param,
     y = rcd.bottom - rcHeight(&rc);
   asyncMoveWindow(hwnd, x, y);
 }
+
+
+struct EnumDisplayMonitorsForWindowMonitorToParam
+{
+  std::vector<HMONITOR> m_monitors;
+  std::vector<MONITORINFO> m_monitorinfos;
+  int m_primaryMonitorIdx;
+  int m_currentMonitorIdx;
+
+  HMONITOR m_hmon;
+
+public:
+  EnumDisplayMonitorsForWindowMonitorToParam(HMONITOR i_hmon)
+    : m_hmon(i_hmon),
+      m_primaryMonitorIdx(-1), m_currentMonitorIdx(-1)
+  {
+  }
+};
+
+static BOOL CALLBACK enumDisplayMonitorsForWindowMonitorTo(
+  HMONITOR i_hmon, HDC i_hdc, LPRECT i_rcMonitor, LPARAM i_data)
+{
+  EnumDisplayMonitorsForWindowMonitorToParam &ep =
+    *reinterpret_cast<EnumDisplayMonitorsForWindowMonitorToParam *>(i_data);
+
+  ep.m_monitors.push_back(i_hmon);
+
+  MONITORINFO mi;
+  mi.cbSize = sizeof(mi);
+  getMonitorInfo(i_hmon, &mi);
+  ep.m_monitorinfos.push_back(mi);
+
+  if(mi.dwFlags & MONITORINFOF_PRIMARY)
+    ep.m_primaryMonitorIdx = ep.m_monitors.size() - 1;
+  if(i_hmon == ep.m_hmon)
+    ep.m_currentMonitorIdx = ep.m_monitors.size() - 1;
+
+  return TRUE;
+}
+
+/// move window to other monitor
+void Engine::funcWindowMonitorTo(
+    FunctionParam *i_param, WindowMonitorFromType i_fromType, int i_monitor,
+    BooleanType i_adjustPos, BooleanType i_adjustSize)
+{
+  HWND hwnd;
+  if(! getSuitableWindow(i_param, &hwnd))
+    return;
+
+  HMONITOR hmonCur;
+  hmonCur = monitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+
+  EnumDisplayMonitorsForWindowMonitorToParam ep(hmonCur);
+  enumDisplayMonitors(NULL, NULL, enumDisplayMonitorsForWindowMonitorTo,
+                      reinterpret_cast<LPARAM>(&ep));
+  if(ep.m_monitors.size() < 1 ||
+     ep.m_primaryMonitorIdx < 0 || ep.m_currentMonitorIdx < 0)
+    return;
+
+  int targetIdx;
+  switch(i_fromType) {
+  case WindowMonitorFromType_primary:
+    targetIdx = (ep.m_primaryMonitorIdx + i_monitor) % ep.m_monitors.size();
+    break;
+
+  case WindowMonitorFromType_current:
+    targetIdx = (ep.m_currentMonitorIdx + i_monitor) % ep.m_monitors.size();
+    break;
+  }
+  if(ep.m_currentMonitorIdx == targetIdx)
+    return;
+
+  RECT rcCur, rcTarget, rcWin;
+  rcCur = ep.m_monitorinfos[ep.m_currentMonitorIdx].rcWork;
+  rcTarget = ep.m_monitorinfos[targetIdx].rcWork;
+  GetWindowRect(hwnd, &rcWin);
+
+  int x = rcTarget.left + (rcWin.left - rcCur.left);
+  int y = rcTarget.top + (rcWin.top - rcCur.top);
+  int w = rcWidth(&rcWin);
+  int h = rcHeight(&rcWin);
+
+  if(i_adjustPos) {
+    if(x + w > rcTarget.right)
+      x = rcTarget.right - w;
+    if(x < rcTarget.left)
+      x = rcTarget.left;
+    if(w > rcWidth(&rcTarget)) {
+      x = rcTarget.left;
+      w = rcWidth(&rcTarget);
+    }
+
+    if(y + h > rcTarget.bottom)
+      y = rcTarget.bottom - h;
+    if(y < rcTarget.top)
+      y = rcTarget.top;
+    if(h > rcHeight(&rcTarget)) {
+      y = rcTarget.top;
+      h = rcHeight(&rcTarget);
+    }
+  }
+
+  if(i_adjustPos && i_adjustSize) {
+    if(IsZoomed(hwnd))
+      PostMessage(hwnd, WM_SYSCOMMAND, SC_RESTORE, 0);
+    asyncMoveWindow(hwnd, x, y, w, h);
+  } else {
+    asyncMoveWindow(hwnd, x, y);
+  }
+}
+
+/// move window to other monitor
+void Engine::funcWindowMonitor(
+    FunctionParam *i_param, int i_monitor,
+    BooleanType i_adjustPos, BooleanType i_adjustSize)
+{
+  funcWindowMonitorTo(i_param, WindowMonitorFromType_primary, i_monitor,
+                      i_adjustPos, i_adjustSize);
+}
+
 
 //
 void Engine::funcWindowClingToLeft(FunctionParam *i_param,

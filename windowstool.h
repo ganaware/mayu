@@ -127,6 +127,16 @@ extern void editInsertTextAtLast(HWND i_hwnd, const tstring &i_text,
 extern BOOL (WINAPI *setLayeredWindowAttributes)
   (HWND hwnd, COLORREF crKey, BYTE bAlpha, DWORD dwFlags);
 
+/// MonitorFromWindow API
+extern HMONITOR (WINAPI *monitorFromWindow)(HWND hwnd, DWORD dwFlags);
+
+/// GetMonitorInfo API
+extern BOOL (WINAPI *getMonitorInfo)(HMONITOR hMonitor, LPMONITORINFO lpmi);
+
+/// EnumDisplayMonitors API
+extern BOOL (WINAPI *enumDisplayMonitors)
+  (HDC hdc, LPRECT lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData);
+
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Utility

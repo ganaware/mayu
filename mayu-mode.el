@@ -105,6 +105,8 @@
 	 "\\|WindowSetAlpha"
 	 "\\|WindowRedraw"
 	 "\\|WindowResizeTo"
+	 "\\|WindowMonitor"
+	 "\\|WindowMonitorTo"
 	 "\\|MouseMove"
 	 "\\|MouseWheel"
 	 "\\|ClipboardChangeCase"

@@ -373,6 +373,15 @@ private:
   void funcWindowMoveVisibly(FunctionParam *i_param, 
 			     TargetWindowType i_twt
 			     = TargetWindowType_overlapped);
+  /// move window to other monitor
+  void funcWindowMonitorTo(FunctionParam *i_param,
+                           WindowMonitorFromType i_fromType, int i_monitor,
+                           BooleanType i_adjustPos = BooleanType_true,
+                           BooleanType i_adjustSize = BooleanType_false);
+  /// move window to other monitor
+  void funcWindowMonitor(FunctionParam *i_param, int i_monitor,
+                         BooleanType i_adjustPos = BooleanType_true,
+                         BooleanType i_adjustSize = BooleanType_false);
   ///
   void funcWindowClingToLeft(FunctionParam *i_param, 
 			     TargetWindowType i_twt

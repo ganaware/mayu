@@ -136,6 +136,7 @@ private:
   void load_ARGUMENT(const Keymap **o_arg);	/// &lt;ARGUMENT&gt;
   void load_ARGUMENT(const KeySeq **o_arg);	/// &lt;ARGUMENT&gt;
   void load_ARGUMENT(StrExprArg *o_arg);	/// &lt;ARGUMENT&gt;
+  void load_ARGUMENT(WindowMonitorFromType *o_arg);	/// &lt;ARGUMENT&gt;
   KeySeq *load_KEY_SEQUENCE(
     const tstringi &i_name = _T(""), bool i_isInParen = false,
     Modifier::Type i_mode = Modifier::Type_KEYSEQ); /// &lt;KEY_SEQUENCE&gt;

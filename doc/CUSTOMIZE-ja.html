@@ -1234,6 +1234,29 @@
 			  <p>それぞれ、ウィンドウを最小化、最大化、横方向に最大化、縦方向に最大化します。引数に <code>MDI</code> を指定すると、MDI 子ウィンドウを操作します。</p>
 			</div>
 			
+		    <dt class="h3"><a name="function_WindowMonitor"><code>&amp;WindowMonitor(<em>monitor</em>, <em>adjust_position</em>, <em>adjust_size</em>)</code></a>
+			
+		    <dd class="d3">
+			<div>
+			  <p>ウィンドウをモニタ <code><em>monitor</em></code> へ移動します。<a href="#function_WindowMonitorTo"><code>&amp;WindowMonitorTo(primary, <em>monitor</em>, <em>adjust_position</em>, <em>adjust_size</em>)</code></a> と同じ動作をします。</p>
+			</div>
+			
+		    <dt class="h3"><a name="function_WindowMonitorTo"><code>&amp;WindowMonitorTo(<em>from</em>, <em>monitor</em>, <em>adjust_position</em>, <em>adjust_size</em>)</code></a>
+			
+		    <dd class="d3">
+			<div>
+			  <p>ウィンドウを <code><em>from</em></code> を基準としてモニタ <code><em>monitor</em></code> へ移動します。<code><em>from</em></code> には、次のものが指定できます。</p>
+
+			  <ul>
+			    <li><code>primary</code> : プライマリモニタを基準とします</li>
+			    <li><code>current</code> : 現在ウィンドウがあるモニタを基準とします</li>
+			  </ul>
+
+			  <p><code><em>monitor</em></code> には、数字が指定できます。<code>0</code> が基準となるモニタ、正の数は <code>1</code>: 次のモニタ、<code>2</code>: 次の次のモニタ…、負の数は <code>-1</code>: 前のモニタ、<code>-2</code>: 前の前のモニタ…、を意味します。</p>
+			  <p><code><em>adjust_position</em></code> は省略可能な引数で <code>true</code> か <code>false</code> を指定します。省略すると <code>true</code> が指定されたとみなされます。<code>true</code> が指定された場合、移動先がモニタからはみ出すときにできる限りモニタ内におさまる位置へ移動します。</p>
+			  <p><code><em>adjust_size</em></code> は省略可能な引数で <code>true</code> か <code>false</code> を指定します。省略すると <code>false</code> が指定されたとみなされます。<code><em>adjust_position</em></code> が <code>true</code> の場合のみ有効です。<code>true</code> が指定された場合、移動先がモニタからはみ出すときにモニタ内におさまるようウィンドウの大きさを調整します。</p>
+			</div>
+			
 		    <dt class="h3"><a name="function_WindowMove"><code>&amp;WindowMove(<em>dx</em>, <em>dy</em>)</code></a>
 			
 		    <dd class="d3">

@@ -854,6 +854,17 @@ void SettingLoader::load_ARGUMENT(StrExprArg *o_arg)
 }
 
 
+// &lt;ARGUMENT&gt;
+void SettingLoader::load_ARGUMENT(WindowMonitorFromType *o_arg)
+{
+  Token *t = getToken();
+  if (getTypeValue(o_arg, t->getString()))
+    return;
+  throw ErrorMessage() << _T("`") << *t
+		       << _T("': unknown monitor from type.");
+}
+
+
 // <KEY_SEQUENCE>
 KeySeq *SettingLoader::load_KEY_SEQUENCE(
   const tstringi &i_name, bool i_isInParen, Modifier::Type i_mode)

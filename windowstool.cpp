@@ -315,6 +315,107 @@ BOOL (WINAPI *setLayeredWindowAttributes)
   = initalizeLayerdWindow;
 
 
+// emulate MonitorFromWindow API
+static HMONITOR WINAPI emulateMonitorFromWindow(HWND hwnd, DWORD dwFlags)
+{
+  return reinterpret_cast<HMONITOR>(1); // dummy HMONITOR
+}
+
+// initialize MonitorFromWindow API
+static HMONITOR WINAPI initializeMonitorFromWindow(HWND hwnd, DWORD dwFlags)
+{
+  HMODULE hModule = GetModuleHandle(_T("user32.dll"));
+  if (!hModule)
+    return FALSE;
+
+  FARPROC proc = GetProcAddress(hModule, "MonitorFromWindow");
+  if(proc)
+    monitorFromWindow =
+      reinterpret_cast<HMONITOR (WINAPI *)(HWND, DWORD)>(proc);
+  else
+    monitorFromWindow = emulateMonitorFromWindow;
+
+  return monitorFromWindow(hwnd, dwFlags);
+}
+
+// MonitorFromWindow API
+HMONITOR (WINAPI *monitorFromWindow)(HWND hwnd, DWORD dwFlags)
+    = initializeMonitorFromWindow;
+
+
+// emulate GetMonitorInfo API
+static BOOL WINAPI emulateGetMonitorInfo(HMONITOR hMonitor, LPMONITORINFO lpmi)
+{
+  if(lpmi->cbSize != sizeof(MONITORINFO))
+    return FALSE;
+
+  lpmi->rcMonitor.left = 0;
+  lpmi->rcMonitor.top = 0;
+  lpmi->rcMonitor.right = GetSystemMetrics(SM_CXFULLSCREEN);
+  lpmi->rcMonitor.bottom = GetSystemMetrics(SM_CYFULLSCREEN);
+  SystemParametersInfo(SPI_GETWORKAREA, 0,
+                       reinterpret_cast<PVOID>(&lpmi->rcWork), FALSE);
+  lpmi->dwFlags = MONITORINFOF_PRIMARY;
+
+  return TRUE;
+}
+
+// initialize GetMonitorInfo API
+static
+BOOL WINAPI initializeGetMonitorInfo(HMONITOR hMonitor, LPMONITORINFO lpmi)
+{
+  HMODULE hModule = GetModuleHandle(_T("user32.dll"));
+  if (!hModule)
+    return FALSE;
+
+  FARPROC proc = GetProcAddress(hModule, "GetMonitorInfoA");
+  if(proc)
+    getMonitorInfo =
+      reinterpret_cast<BOOL (WINAPI *)(HMONITOR, LPMONITORINFO)>(proc);
+  else
+    getMonitorInfo = emulateGetMonitorInfo;
+
+  return getMonitorInfo(hMonitor, lpmi);
+}
+
+// GetMonitorInfo API
+BOOL (WINAPI *getMonitorInfo)(HMONITOR hMonitor, LPMONITORINFO lpmi)
+  = initializeGetMonitorInfo;
+
+
+// enumalte EnumDisplayMonitors API
+static BOOL WINAPI emulateEnumDisplayMonitors(
+  HDC hdc, LPRECT lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData)
+{
+  lpfnEnum(reinterpret_cast<HMONITOR>(1), hdc, lprcClip, dwData);
+  return TRUE;
+}
+
+// initialize EnumDisplayMonitors API
+static BOOL WINAPI initializeEnumDisplayMonitors(
+  HDC hdc, LPRECT lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData)
+{
+  HMODULE hModule = GetModuleHandle(_T("user32.dll"));
+  if (!hModule)
+    return FALSE;
+
+  FARPROC proc = GetProcAddress(hModule, "EnumDisplayMonitors");
+  if(proc)
+    enumDisplayMonitors =
+      reinterpret_cast<BOOL (WINAPI *)(HDC, LPRECT, MONITORENUMPROC, LPARAM)>
+      (proc);
+  else
+    enumDisplayMonitors = emulateEnumDisplayMonitors;
+
+  return enumDisplayMonitors(hdc, lprcClip, lpfnEnum, dwData);
+}
+
+// EnumDisplayMonitors API
+BOOL (WINAPI *enumDisplayMonitors)
+    (HDC hdc, LPRECT lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData)
+  = initializeEnumDisplayMonitors;
+
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Utility
 

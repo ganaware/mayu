@@ -203,6 +203,20 @@ extern tostream &operator<<(tostream &i_ost, LogicalOperatorType i_data);
 extern bool getTypeValue(LogicalOperatorType *o_type, const tstring &i_name);
 
 
+///
+enum WindowMonitorFromType
+{
+  WindowMonitorFromType_primary = 0, ///
+  WindowMonitorFromType_current = 1, ///
+};
+
+// stream output
+extern tostream &operator<<(tostream &i_ost, WindowMonitorFromType i_data);
+
+// get value of WindowMonitorFromType
+extern bool getTypeValue(WindowMonitorFromType *o_type, const tstring &i_name);
+
+
 /// stream output
 extern tostream &operator<<(tostream &i_ost,
 			    const std::list<tstringq> &i_data);
