@@ -34,6 +34,7 @@ ForceBuf		db	3		dup (0)
 BlockingID		dd	0
 PassThrough		dd	0
 Canceled		dd	0
+LShiftState		dd	0
 
 VXD_LOCKED_DATA_ENDS
 
@@ -87,8 +88,19 @@ ForceE1:
 	inc		ecx
 ForceBreak:
 	test	ebx, FlagBreak
-	jz		ForceKey
+	jz		CheckLShiftDown
 	or		bl, 80h
+CheckLShiftUp:
+	cmp		bl, 0aah
+	jne		ForceKey
+	cmp		LShiftState, 0
+	je		DevCtrl_Success
+	mov		LShiftState, 0
+	jmp		ForceKey
+CheckLShiftDown:
+	cmp		bl, 2ah
+	jne		ForceKey
+	mov		LShiftState, 1
 ForceKey:
 	mov		byte ptr [ecx], bl
 	inc		ecx
