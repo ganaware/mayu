@@ -119,14 +119,16 @@ void KeySeq::clear()
 
 
 KeySeq::KeySeq(const tstringi &i_name)
-  : m_name(i_name)
+  : m_name(i_name),
+    m_mode(Modifier::Type_KEYSEQ)
 {
 }
 
 
 KeySeq::KeySeq(const KeySeq &i_ks)
   : m_actions(i_ks.m_actions),
-    m_name(i_ks.m_name)
+    m_name(i_ks.m_name),
+    m_mode(i_ks.m_mode)
 {
   copy();
 }
@@ -144,6 +146,7 @@ KeySeq &KeySeq::operator=(const KeySeq &i_ks)
   {
     clear();
     m_actions = i_ks.m_actions;
+    m_mode = i_ks.m_mode;
     copy();
   }
   return *this;
@@ -436,7 +439,7 @@ void Keymap::describe(tostream &i_ost, DescribeParam *i_dp) const
   }
   if (m_parentKeymap)
     i_ost << _T(" : ") << m_parentKeymap->m_name;
-  i_ost << _T(" => ") << *m_defaultKeySeq << std::endl;
+  i_ost << _T(" = ") << *m_defaultKeySeq << std::endl;
 
   // describe modifiers
   if (i_dp->m_doesDescribeModifiers)
@@ -493,7 +496,7 @@ void Keymap::describe(tostream &i_ost, DescribeParam *i_dp) const
       i_ost << _T(" event ") << *i->m_modifiedKey.m_key;
     else
       i_ost << _T(" key ") << i->m_modifiedKey;
-    i_ost << _T("\t=> ") << *i->m_keySeq << std::endl;
+    i_ost << _T("\t= ") << *i->m_keySeq << std::endl;
     i_dp->m_dk.push_back(i->m_modifiedKey);
   }
 

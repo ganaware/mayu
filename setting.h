@@ -108,7 +108,8 @@ private:
   void load_DEFINE_ALIAS();			/// &lt;DEFINE_ALIAS&gt;
   void load_DEFINE_SUBSTITUTE();		/// &lt;DEFINE_SUBSTITUTE&gt;
   void load_KEYBOARD_DEFINITION();		/// &lt;KEYBOARD_DEFINITION&gt;
-  Modifier load_MODIFIER(Modifier::Type i_mode, Modifier i_modifier);
+  Modifier load_MODIFIER(Modifier::Type i_mode, Modifier i_modifier,
+			 Modifier::Type *o_mode = NULL);
 						/// &lt;..._MODIFIER&gt;
   Key *load_KEY_NAME();				/// &lt;KEY_NAME&gt;
   void load_KEYMAP_DEFINITION(const Token *i_which);
@@ -134,8 +135,9 @@ private:
   void load_ARGUMENT(Modifier *o_arg);		/// &lt;ARGUMENT&gt;
   void load_ARGUMENT(const Keymap **o_arg);	/// &lt;ARGUMENT&gt;
   void load_ARGUMENT(const KeySeq **o_arg);	/// &lt;ARGUMENT&gt;
-  KeySeq *load_KEY_SEQUENCE(const tstringi &i_name = _T(""),
-			    bool i_isInParen = false); /// &lt;KEY_SEQUENCE&gt;
+  KeySeq *load_KEY_SEQUENCE(
+    const tstringi &i_name = _T(""), bool i_isInParen = false,
+    Modifier::Type i_mode = Modifier::Type_KEYSEQ); /// &lt;KEY_SEQUENCE&gt;
   void load_KEY_ASSIGN();			/// &lt;KEY_ASSIGN&gt;
   void load_EVENT_ASSIGN();			/// &lt;EVENT_ASSIGN&gt;
   void load_MODIFIER_ASSIGNMENT();		/// &lt;MODIFIER_ASSIGN&gt;

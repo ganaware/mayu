@@ -117,7 +117,9 @@ public:
 
 private:
   Actions m_actions;				///
-  tstringi m_name;				/// 
+  tstringi m_name;				///
+  Modifier::Type m_mode;			/** Either Modifier::Type_KEYSEQ
+                                                    or Modifier::Type_ASSIGN */
 
 private:
   ///
@@ -150,6 +152,21 @@ public:
   
   /// stream output
   friend tostream &operator<<(tostream &i_ost, const KeySeq &i_ks);
+
+  ///
+  bool isCorrectMode(Modifier::Type i_mode) { return m_mode <= i_mode; }
+
+  ///
+  void setMode(Modifier::Type i_mode)
+  {
+    if (m_mode < i_mode)
+      m_mode = i_mode;
+    ASSERT( m_mode == Modifier::Type_KEYSEQ ||
+	    m_mode == Modifier::Type_ASSIGN);
+  }
+
+  ///
+  Modifier::Type getMode() const { return m_mode; }
 };
 
 

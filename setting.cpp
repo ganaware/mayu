@@ -319,10 +319,10 @@ void SettingLoader::load_DEFINE_SUBSTITUTE()
       load_MODIFIER(Modifier::Type_ASSIGN, m_defaultAssignModifier);
     mkey.m_key = load_KEY_NAME();
     assignedKeys.push_back(mkey);
-  } while (*lookToken() != _T("=>"));
+  } while (!(*lookToken() == _T("=>") || *lookToken() == _T("=")));
   getToken();
   
-  KeySeq *keySeq = load_KEY_SEQUENCE();
+  KeySeq *keySeq = load_KEY_SEQUENCE(_T(""), false, Modifier::Type_ASSIGN);
   ModifiedKey mkey = keySeq->getFirstModifiedKey();
   if (!mkey.m_key)
     throw ErrorMessage() << _T("no key is specified for substitute.");
@@ -359,9 +359,12 @@ void SettingLoader::load_KEYBOARD_DEFINITION()
 
 
 // <..._MODIFIER>
-Modifier SettingLoader::load_MODIFIER(Modifier::Type i_mode,
-				      Modifier i_modifier)
+Modifier SettingLoader::load_MODIFIER(
+  Modifier::Type i_mode, Modifier i_modifier, Modifier::Type *o_mode)
 {
+  if (o_mode)
+    *o_mode = Modifier::Type_begin;
+  
   Modifier isModifierSpecified;
   enum { PRESS, RELEASE, DONTCARE } flag = PRESS;
 
@@ -436,6 +439,16 @@ Modifier SettingLoader::load_MODIFIER(Modifier::Type i_mode,
 	}
 	isModifierSpecified.on(mt);
 	flag = PRESS;
+	
+	if (o_mode && *o_mode < mt)
+	{
+	  if (mt < Modifier::Type_BASIC)
+	    *o_mode = Modifier::Type_BASIC;
+	  else if (mt < Modifier::Type_KEYSEQ)
+	    *o_mode = Modifier::Type_KEYSEQ;
+	  else if (mt < Modifier::Type_ASSIGN)
+	    *o_mode = Modifier::Type_ASSIGN;
+	}
 	goto continue_loop;
       }
       
@@ -572,7 +585,7 @@ void SettingLoader::load_KEYMAP_DEFINITION(const Token *i_which)
     if (!isEOL())
     {
       t = getToken();
-      if (*t != _T("=>"))
+      if (!(*t == _T("=>") || *t == _T("=")))
 	throw ErrorMessage() << _T("`") << *t << _T("': syntax error.");
       keySeq = SettingLoader::load_KEY_SEQUENCE();
     }
@@ -827,21 +840,22 @@ void SettingLoader::load_ARGUMENT(const KeySeq **o_arg)
 
 
 // <KEY_SEQUENCE>
-KeySeq *SettingLoader::load_KEY_SEQUENCE(const tstringi &i_name,
-					 bool i_isInParen)
+KeySeq *SettingLoader::load_KEY_SEQUENCE(
+  const tstringi &i_name, bool i_isInParen, Modifier::Type i_mode)
 {
   KeySeq keySeq(i_name);
   while (!isEOL())
   {
-    Modifier modifier =
-      load_MODIFIER(Modifier::Type_KEYSEQ, m_defaultKeySeqModifier);
+    Modifier::Type mode;
+    Modifier modifier = load_MODIFIER(i_mode, m_defaultKeySeqModifier, &mode);
+    keySeq.setMode(mode);
     Token *t = lookToken();
     if (t->isCloseParen() && i_isInParen)
       break;
     else if (t->isOpenParen())
     {
       getToken(); // open paren
-      KeySeq *ks = load_KEY_SEQUENCE(_T(""), true);
+      KeySeq *ks = load_KEY_SEQUENCE(_T(""), true, i_mode);
       getToken(); // close paren
       keySeq.add(ActionKeySeq(ks));
     }
@@ -853,6 +867,11 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(const tstringi &i_name,
       if (ks == NULL)
 	throw ErrorMessage() << _T("`$") << *t
 			     << _T("': unknown keyseq name.");
+      if (!ks->isCorrectMode(i_mode))
+	throw ErrorMessage()
+	  << _T("`$") << *t
+	  << _T("': Some of R-, IL-, IC-, NL-, CL-, SL-, M0...M9- and L0...L9- are used in the keyseq.  They are prohibited in this context.");
+      keySeq.setMode(ks->getMode());
       keySeq.add(ActionKeySeq(ks));
     }
     else if (*t == _T("&")) // <FUNCTION_NAME>
@@ -902,7 +921,7 @@ void SettingLoader::load_KEY_ASSIGN()
   {
     mkey.m_key = load_KEY_NAME();
     assignedKeys.push_back(mkey);
-    if (*lookToken() == _T("=>"))
+    if (*lookToken() == _T("=>") || *lookToken() == _T("="))
       break;
     mkey.m_modifier =
       load_MODIFIER(Modifier::Type_ASSIGN, m_defaultAssignModifier);
@@ -936,8 +955,9 @@ void SettingLoader::load_EVENT_ASSIGN()
   if (!*e)
     throw ErrorMessage() << _T("`") << *t << _T("': invalid event name.");
 
-  if (*getToken() != _T("=>"))
-    throw ErrorMessage() << _T("`=>' is expected.");
+  t = getToken();
+  if (!(*t == _T("=>") || *t == _T("=")))
+    throw ErrorMessage() << _T("`=' is expected.");
 
   ASSERT(m_currentKeymap);
   KeySeq *keySeq = load_KEY_SEQUENCE();
@@ -1028,7 +1048,7 @@ void SettingLoader::load_KEYSEQ_DEFINITION()
   Token *name = getToken();
   if (*getToken() != _T("="))
     throw ErrorMessage() << _T("there must be `=' after keyseq naem");
-  load_KEY_SEQUENCE(name->getString());
+  load_KEY_SEQUENCE(name->getString(), false, Modifier::Type_ASSIGN);
 }
 
 
