@@ -32,6 +32,32 @@ typedef boost::reg_expression<_TCHAR> tregex;
 typedef boost::match_results<const _TCHAR *> tcmatch;
 
 
+/// string with custom stream output
+class tstringq : public tstring
+{
+public:
+  ///
+  tstringq() { }
+  ///
+  tstringq(const tstringq &i_str) : tstring(i_str) { }
+  ///
+  tstringq(const tstring &i_str) : tstring(i_str) { }
+  ///
+  tstringq(const _TCHAR *i_str) : tstring(i_str) { }
+  ///
+  tstringq(const _TCHAR *i_str, size_t i_n) : tstring(i_str, i_n) { }
+  ///
+  tstringq(const _TCHAR *i_str, size_t i_pos, size_t i_n)
+    : tstring(i_str, i_pos, i_n) { }
+  ///
+  tstringq(size_t i_n, _TCHAR i_c) : tstring(i_n, i_c) { }
+};
+
+
+/// stream output
+extern tostream &operator<<(tostream &i_ost, const tstringq &i_data);
+
+
 /// identical to tcmatch except for str()
 class tcmatch_results : public tcmatch
 {

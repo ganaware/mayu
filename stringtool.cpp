@@ -188,6 +188,52 @@ size_t mbslcpy(unsigned char *o_dest, const unsigned char *i_src,
 }
 
 
+/// stream output
+tostream &operator<<(tostream &i_ost, const tstringq &i_data)
+{
+  i_ost << _L("\"");
+  for (const _TCHAR *s = i_data.c_str(); *s; ++ s)
+  {
+    switch (*s)
+    {
+      case _T('\a'): i_ost << _T("\\a"); break;
+      case _T('\f'): i_ost << _T("\\f"); break;
+      case _T('\n'): i_ost << _T("\\n"); break;
+      case _T('\r'): i_ost << _T("\\r"); break;
+      case _T('\t'): i_ost << _T("\\t"); break;
+      case _T('\v'): i_ost << _T("\\v"); break;
+      case _T('"'): i_ost << _T("\\\""); break;
+      default:
+	if (_istlead(*s))
+	{
+	  _TCHAR buf[3] = { s[0], s[1], 0 };
+	  i_ost << buf;
+	  ++ s;
+	}
+	else if (_istprint(*s))
+	{
+	  _TCHAR buf[2] = { *s, 0 };
+	  i_ost << buf;
+	}
+	else
+	{
+	  i_ost << _T("\\x");
+	  _TCHAR buf[5];
+#ifdef _UNICODE
+	  _sntprintf(buf, NUMBER_OF(buf), _T("%04x"), *s);
+#else
+	  _sntprintf(buf, NUMBER_OF(buf), _T("%02x"), *s);
+#endif
+	  i_ost << buf;
+	}
+	break;
+    }
+  }
+  i_ost << _L("\"");
+  return i_ost;
+}
+
+
 // interpret meta characters such as \n
 tstring interpretMetaCharacters(const _TCHAR *i_str, size_t i_len,
 				const _TCHAR *i_quote,

@@ -624,14 +624,14 @@ void SettingLoader::load_ARGUMENT(long *o_arg)
 
 
 // &lt;ARGUMENT&gt;
-void SettingLoader::load_ARGUMENT(tstring *o_arg)
+void SettingLoader::load_ARGUMENT(tstringq *o_arg)
 {
   *o_arg = getToken()->getString();
 }
 
 
 // &lt;ARGUMENT&gt;
-void SettingLoader::load_ARGUMENT(std::list<tstring> *o_arg)
+void SettingLoader::load_ARGUMENT(std::list<tstringq> *o_arg)
 {
   while (true)
   {

@@ -308,9 +308,9 @@ private:
   void funcPostMessage(FunctionParam *i_param, ToWindowType i_window,
 		       UINT i_message, WPARAM i_wParam, LPARAM i_lParam);
   /// ShellExecute
-  void funcShellExecute(FunctionParam *i_param, const tstring &i_operation,
-			const tstring &i_file, const tstring &i_parameters,
-			const tstring &i_directory,
+  void funcShellExecute(FunctionParam *i_param, const tstringq &i_operation,
+			const tstringq &i_file, const tstringq &i_parameters,
+			const tstringq &i_directory,
 			ShowCommandType i_showCommand);
   /// SetForegroundWindow
   void funcSetForegroundWindow(FunctionParam *i_param,
@@ -320,7 +320,8 @@ private:
 			       const tregex &i_windowTitleName
 			       = tregex(_T(".*")));
   /// load setting
-  void funcLoadSetting(FunctionParam *i_param, const tstring &i_name = _T(""));
+  void funcLoadSetting(FunctionParam *i_param,
+		       const tstringq &i_name = _T(""));
   /// virtual key
   void funcVK(FunctionParam *i_param, VKey i_vkey);
   /// wait
@@ -333,10 +334,11 @@ private:
   /// describe bindings
   void funcDescribeBindings(FunctionParam *i_param);
   /// show help message
-  void funcHelpMessage(FunctionParam *i_param, const tstring &i_title = _T(""),
-		       const tstring &i_message = _T(""));
+  void funcHelpMessage(FunctionParam *i_param,
+		       const tstringq &i_title = _T(""),
+		       const tstringq &i_message = _T(""));
   /// show variable
-  void funcHelpVariable(FunctionParam *i_param, const tstring &i_title);
+  void funcHelpVariable(FunctionParam *i_param, const tstringq &i_title);
   /// raise window
   void funcWindowRaise(FunctionParam *i_param,
 		       TargetWindowType i_twt = TargetWindowType_overlapped);
@@ -414,7 +416,7 @@ private:
   /// convert the contents of the Clipboard to lower case
   void funcClipboardDowncaseWord(FunctionParam *i_param);
   /// set the contents of the Clipboard to the string
-  void funcClipboardCopy(FunctionParam *i_param, const tstring &i_text);
+  void funcClipboardCopy(FunctionParam *i_param, const tstringq &i_text);
   ///
   void funcEmacsEditKillLinePred(FunctionParam *i_param,
 				 const KeySeq *i_keySeq1,
@@ -426,8 +428,8 @@ private:
   /// Direct SSTP
   void funcDirectSSTP(FunctionParam *i_param,
 		      const tregex &i_name,
-		      const tstring &i_protocol,
-		      const std::list<tstring> &i_headers);
+		      const tstringq &i_protocol,
+		      const std::list<tstringq> &i_headers);
   // END OF FUNCTION DEFINITION
 #  define FUNCTION_FRIEND
 #  include "functions.h"

@@ -425,13 +425,13 @@ bool getTypeValue(LogicalOperatorType *o_type, const tstring &i_name)
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// std::list<tstring>
+// std::list<tstringq>
 
 
 /// stream output
-tostream &operator<<(tostream &i_ost, const std::list<tstring> &i_data)
+tostream &operator<<(tostream &i_ost, const std::list<tstringq> &i_data)
 {
-  for (std::list<tstring>::const_iterator
+  for (std::list<tstringq>::const_iterator
 	 i = i_data.begin(); i != i_data.end(); ++ i)
   {
     i_ost << *i << _T(", ");
@@ -929,10 +929,10 @@ void Engine::funcPostMessage(FunctionParam *i_param, ToWindowType i_window,
 
 // ShellExecute
 void Engine::funcShellExecute(FunctionParam *i_param,
-			      const tstring &/*i_operation*/,
-			      const tstring &/*i_file*/,
-			      const tstring &/*i_parameters*/,
-			      const tstring &/*i_directory*/,
+			      const tstringq &/*i_operation*/,
+			      const tstringq &/*i_file*/,
+			      const tstringq &/*i_parameters*/,
+			      const tstringq &/*i_directory*/,
 			      ShowCommandType /*i_showCommand*/)
 {
   if (!i_param->m_isPressed)
@@ -1063,7 +1063,7 @@ void Engine::funcSetForegroundWindow(FunctionParam *i_param, const tregex &,
 
 
 // load setting
-void Engine::funcLoadSetting(FunctionParam *i_param, const tstring &i_name)
+void Engine::funcLoadSetting(FunctionParam *i_param, const tstringq &i_name)
 {
   if (!i_param->m_isPressed)
     return;
@@ -1182,8 +1182,8 @@ void Engine::funcDescribeBindings(FunctionParam *i_param)
 }
 
 // show help message
-void Engine::funcHelpMessage(FunctionParam *i_param, const tstring &i_title,
-			     const tstring &i_message)
+void Engine::funcHelpMessage(FunctionParam *i_param, const tstringq &i_title,
+			     const tstringq &i_message)
 {
   if (!i_param->m_isPressed)
     return;
@@ -1196,7 +1196,7 @@ void Engine::funcHelpMessage(FunctionParam *i_param, const tstring &i_title,
 }
 
 // show variable
-void Engine::funcHelpVariable(FunctionParam *i_param, const tstring &i_title)
+void Engine::funcHelpVariable(FunctionParam *i_param, const tstringq &i_title)
 {
   if (!i_param->m_isPressed)
     return;
@@ -1645,7 +1645,7 @@ void Engine::funcClipboardDowncaseWord(FunctionParam *i_param)
 }
 
 // set the contents of the Clipboard to the string
-void Engine::funcClipboardCopy(FunctionParam *i_param, const tstring &i_text)
+void Engine::funcClipboardCopy(FunctionParam *i_param, const tstringq &i_text)
 {
   if (!i_param->m_isPressed)
     return;
@@ -1765,8 +1765,8 @@ public:
 // Direct SSTP
 void Engine::funcDirectSSTP(FunctionParam *i_param,
 			    const tregex &i_name,
-			    const tstring &i_protocol,
-			    const std::list<tstring> &i_headers)
+			    const tstringq &i_protocol,
+			    const std::list<tstringq> &i_headers)
 {
   if (!i_param->m_isPressed)
     return;
@@ -1816,7 +1816,7 @@ void Engine::funcDirectSSTP(FunctionParam *i_param,
   request += _T("\r\n");
 
   bool hasSender = false;
-  for (std::list<tstring>::const_iterator
+  for (std::list<tstringq>::const_iterator
 	 i = i_headers.begin(); i != i_headers.end(); ++ i)
   {
     if (_tcsnicmp(_T("Charset"), i->c_str(), 7) == 0 ||
