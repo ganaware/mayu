@@ -15,6 +15,12 @@ default.mayu    （作者好みの）便利な設定の入ったファイル
 dot.mayu        デフォルトの設定ファイル
 emacsedit.mayu  emacsに似せたキーマップの定義
 
+contrib/ax.mayu            AXキーボード用の設定
+contrib/dvorak.mayu        普通のキーボードでdvorak風に使う設定
+contrib/keitai.mayu        IME入力時にテンキーで携帯電話風に使う設定
+contrib/mayu-settings.txt  このファイル
+
+
 これらについて順に説明していくと、
 
 104.mayu
