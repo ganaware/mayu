@@ -1714,14 +1714,27 @@ void Engine::funcRecenter(FunctionParam *i_param)
 }
 
 // set IME open status
-void Engine::funcSetImeStatus(FunctionParam *i_param, int i_status)
+void Engine::funcSetImeStatus(FunctionParam *i_param, ToggleType i_toggle)
 {
   if (!i_param->m_isPressed)
     return;
   if (m_hwndFocus)
   {
     UINT WM_MAYU_MESSAGE = RegisterWindowMessage(WM_MAYU_MESSAGE_NAME);
-    PostMessage(m_hwndFocus, WM_MAYU_MESSAGE, MayuMessage_funcSetImeStatus, i_status);
+    int status = -1;
+    switch (i_toggle)
+    {
+      case ToggleType_toggle:
+	status = -1;
+	break;
+      case ToggleType_off:
+	status = 0;
+	break;
+      case ToggleType_on:
+	status = 1;
+	break;
+    }
+    PostMessage(m_hwndFocus, WM_MAYU_MESSAGE, MayuMessage_funcSetImeStatus, status);
   }
 }
 
