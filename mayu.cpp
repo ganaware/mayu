@@ -524,12 +524,12 @@ public:
     : m_hwndTaskTray(NULL),
       m_hwndLog(NULL),
       m_WM_TaskbarRestart(RegisterWindowMessage(_T("TaskbarCreated"))),
+      m_canUseTasktrayBaloon(
+	PACKVERSION(5, 0) <= getDllVersion(_T("shlwapi.dll"))),
       m_log(WM_APP_msgStreamNotify),
       m_setting(NULL),
       m_isSettingDialogOpened(false),
-      m_engine(m_log),
-      m_canUseTasktrayBaloon(
-	PACKVERSION(5, 0) <= getDllVersion(_T("shlwapi.dll")))
+      m_engine(m_log)
   {
     CHECK_TRUE( Register_focus() );
     CHECK_TRUE( Register_target() );
