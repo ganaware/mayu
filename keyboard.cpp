@@ -177,6 +177,7 @@ tostream &operator<<(tostream &i_ost, Modifier::Type i_type)
     _T("NumLock"), 
     _T("CapsLock"), 
     _T("ScrollLock"), 
+    _T("KanaLock"), 
     _T("Maximized"), 
     _T("Minimized"), 
     _T("MdiMaximized"), 
