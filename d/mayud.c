@@ -9,6 +9,7 @@
 #pragma warning(3 : 4061 4100 4132 4701 4706)
 
 #include "keyque.c"
+#include "../src/input/kbdclass/kbdclass.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Device Extensions
@@ -303,7 +304,7 @@ NTSTATUS mayuAddDevice(IN PDRIVER_OBJECT driverObject,
 VOID mayuUnloadDriver(IN PDRIVER_OBJECT driverObject)
 {
   KIRQL currentIrql;
-  PIRP irp;
+  PIRP cancelIrp;
   PDEVICE_OBJECT devObj;
   DetourDeviceExtension *detourDevExt;
 
@@ -313,17 +314,28 @@ VOID mayuUnloadDriver(IN PDRIVER_OBJECT driverObject)
     FilterDeviceExtension *filterDevExt
       = (FilterDeviceExtension*)devObj->DeviceExtension;
     PDEVICE_OBJECT delObj;
+    PDEVICE_EXTENSION kbdClassDevExt;
 
     // detach
     IoDetachDevice(filterDevExt->kbdClassDevObj);
     // cancel filter IRP_MJ_READ
     KeAcquireSpinLock(&filterDevExt->lock, &currentIrql);
     // TODO: at this point, the irp may be completed (but what can I do for it ?)
-    if (filterDevExt->irpq)
-      IoCancelIrp(filterDevExt->irpq);
     // finalize read que
     KqFinalize(&filterDevExt->readQue);
+    cancelIrp = filterDevExt->irpq;
+    kbdClassDevExt =
+      (PDEVICE_EXTENSION)filterDevExt->kbdClassDevObj->DeviceExtension;
     KeReleaseSpinLock(&filterDevExt->lock, currentIrql);
+    if (cancelIrp) {
+      KeAcquireSpinLock(&kbdClassDevExt->SpinLock, &currentIrql);
+      if (kbdClassDevExt->RequestIsPending == TRUE) {
+	KeReleaseSpinLock(&kbdClassDevExt->SpinLock, currentIrql);
+	IoCancelIrp(cancelIrp);
+      } else {
+	KeReleaseSpinLock(&kbdClassDevExt->SpinLock, currentIrql);
+      }
+    }
     // delete device objects
     delObj= devObj;
     devObj = devObj->NextDevice;
@@ -334,11 +346,12 @@ VOID mayuUnloadDriver(IN PDRIVER_OBJECT driverObject)
   // cancel filter IRP_MJ_READ
   KeAcquireSpinLock(&detourDevExt->lock, &currentIrql);
   // TODO: at this point, the irp may be completed (but what can I do for it ?)
-  if (detourDevExt->irpq)
-    IoCancelIrp(detourDevExt->irpq);
+  cancelIrp = detourDevExt->irpq;
   // finalize read que
   KqFinalize(&detourDevExt->readQue);
   KeReleaseSpinLock(&detourDevExt->lock, currentIrql);
+  if (cancelIrp)
+    IoCancelIrp(cancelIrp);
   // delete device objects
   IoDeleteDevice(devObj);
 
@@ -359,6 +372,7 @@ VOID mayuDetourReadCancel(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
   KIRQL currentIrql;
 
   IoReleaseCancelSpinLock(irp->CancelIrql);
+#if 0
   KeAcquireSpinLock(&devExt->lock, &currentIrql);
   if (devExt->irpq && irp == deviceObject->CurrentIrp)
     // the current request is being cancelled
@@ -379,6 +393,7 @@ VOID mayuDetourReadCancel(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
     IoReleaseCancelSpinLock(cancelIrql);
     KeReleaseSpinLock(&devExt->lock, currentIrql);
   }
+#endif
   
   irp->IoStatus.Status = STATUS_CANCELLED;
   irp->IoStatus.Information = 0;
@@ -463,7 +478,7 @@ NTSTATUS filterReadCompletion(IN PDEVICE_OBJECT deviceObject,
 
   if (status == STATUS_SUCCESS)
     irp->IoStatus.Status = STATUS_SUCCESS;
-  return status;
+  return irp->IoStatus.Status;
 }
 
 NTSTATUS readq(KeyQue *readQue, PIRP irp)
@@ -526,16 +541,33 @@ NTSTATUS detourCreate(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
   {
     PIRP irpCancel;
     KIRQL currentIrql;
+    PDEVICE_OBJECT filterDevObj;
     
     KeAcquireSpinLock(&detourDevExt->lock, &currentIrql);
     detourDevExt->wasCleanupInitiated = FALSE;
-#if 0
-    irpCancel = cd->kbdClassDevObj->CurrentIrp;
-    if (irpCancel) // cancel filter's read irp
-      IoCancelIrp(irpCancel);
-#endif
     KqClear(&detourDevExt->readQue);
+    filterDevObj = detourDevExt->filterDevObj;
     KeReleaseSpinLock(&detourDevExt->lock, currentIrql);
+    if (filterDevObj) {
+      FilterDeviceExtension *filterDevExt =
+	(FilterDeviceExtension*)filterDevObj->DeviceExtension;
+      PDEVICE_EXTENSION kbdClassDevExt;
+
+      KeAcquireSpinLock(&filterDevExt->lock, &currentIrql);
+      irpCancel = filterDevExt->kbdClassDevObj->CurrentIrp;
+      kbdClassDevExt =
+	(PDEVICE_EXTENSION)filterDevExt->kbdClassDevObj->DeviceExtension;
+      KeReleaseSpinLock(&filterDevExt->lock, currentIrql);
+      if (irpCancel) {
+	KeAcquireSpinLock(&kbdClassDevExt->SpinLock, &currentIrql);
+	if (kbdClassDevExt->RequestIsPending == TRUE) {
+	  KeReleaseSpinLock(&kbdClassDevExt->SpinLock, currentIrql);
+	  IoCancelIrp(irpCancel);
+	} else {
+	  KeReleaseSpinLock(&kbdClassDevExt->SpinLock, currentIrql);
+	}
+      }
+    }
 
     irp->IoStatus.Status = STATUS_SUCCESS;
   }
@@ -566,7 +598,7 @@ NTSTATUS detourRead(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
   PIO_STACK_LOCATION irpSp = IoGetCurrentIrpStackLocation(irp);
   DetourDeviceExtension *detourDevExt =
     (DetourDeviceExtension*)deviceObject->DeviceExtension;
-  KIRQL currentIrql;
+  KIRQL currentIrql, cancelIrql;
 
   KeAcquireSpinLock(&detourDevExt->lock, &currentIrql);
   if (irpSp->Parameters.Read.Length == 0)
@@ -576,9 +608,11 @@ NTSTATUS detourRead(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
   else
     status = readq(&detourDevExt->readQue, irp);
   if (status == STATUS_PENDING) {
+    IoAcquireCancelSpinLock(&cancelIrql);
     IoMarkIrpPending(irp);
     detourDevExt->irpq = irp;
     IoSetCancelRoutine(irp, mayuDetourReadCancel);
+    IoReleaseCancelSpinLock(cancelIrql);
   }
   else {
     IoCompleteRequest(irp, IO_NO_INCREMENT);
@@ -615,9 +649,9 @@ NTSTATUS detourWrite(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
     if (filterDevObj) {
       FilterDeviceExtension *filterDevExt =
 	(FilterDeviceExtension*)filterDevObj->DeviceExtension;
+      PDEVICE_EXTENSION kbdClassDevExt;
 
       KeAcquireSpinLock(&filterDevExt->lock, &currentIrql);
-      IoAcquireCancelSpinLock(&cancelIrql);
 
       len /= sizeof(KEYBOARD_INPUT_DATA);
       len = KqEnque(&filterDevExt->readQue,
@@ -625,13 +659,21 @@ NTSTATUS detourWrite(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
 		    len);
       irp->IoStatus.Information = len * sizeof(KEYBOARD_INPUT_DATA);
       irpSp->Parameters.Write.Length = irp->IoStatus.Information;
-      IoReleaseCancelSpinLock(cancelIrql);
       // cancel filter irp
-      if (filterDevExt->irpq) {
-	IoCancelIrp(filterDevExt->irpq);
-	filterDevExt->irpq = NULL;
-      }
+      irpCancel = filterDevExt->irpq; 
+      filterDevExt->irpq = NULL;
+      kbdClassDevExt =
+	(PDEVICE_EXTENSION)filterDevExt->kbdClassDevObj->DeviceExtension;
       KeReleaseSpinLock(&filterDevExt->lock, currentIrql);
+      if (irpCancel) {
+	KeAcquireSpinLock(&kbdClassDevExt->SpinLock, &currentIrql);
+	if (kbdClassDevExt->RequestIsPending == TRUE) {
+	  KeReleaseSpinLock(&kbdClassDevExt->SpinLock, currentIrql);
+	  IoCancelIrp(irpCancel);
+	} else {
+	  KeReleaseSpinLock(&kbdClassDevExt->SpinLock, currentIrql);
+	}
+      }
       status = STATUS_SUCCESS;
     } else {
       irp->IoStatus.Information = 0;
@@ -709,13 +751,13 @@ NTSTATUS detourDeviceControl(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
   {
     case IOCTL_MAYU_DETOUR_CANCEL:
     {
-      KIRQL cancelIrql;
+      KIRQL currentIrql;
       PIRP irpCancel = NULL;
       
-      IoAcquireCancelSpinLock(&cancelIrql);
+      KeAcquireSpinLock(&detourDevExt->lock, &currentIrql);
       if (detourDevExt->isOpen)
 	irpCancel = detourDevExt->irpq;
-      IoReleaseCancelSpinLock(cancelIrql);
+      KeReleaseSpinLock(&detourDevExt->lock, currentIrql);
       
       if (irpCancel)
 	IoCancelIrp(irpCancel);// at this point, the irpCancel may be completed
@@ -763,17 +805,16 @@ NTSTATUS filterRead(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
     // read from que
   {
     ULONG len = irpSp->Parameters.Read.Length;
-    KIRQL currentIrql;
     
     irp->IoStatus.Information = 0;
-    KeAcquireSpinLock(&detourDevExt->lock, &currentIrql);
+    KeAcquireSpinLock(&filterDevExt->lock, &currentIrql);
     if (len == 0)
       status = STATUS_SUCCESS;
     else if (len % sizeof(KEYBOARD_INPUT_DATA))
       status = STATUS_BUFFER_TOO_SMALL;
     else
       status = readq(&filterDevExt->readQue, irp);
-    KeReleaseSpinLock(&detourDevExt->lock, currentIrql);
+    KeReleaseSpinLock(&filterDevExt->lock, currentIrql);
     if (status != STATUS_PENDING) {
       irp->IoStatus.Status = status;
       IoCompleteRequest(irp, IO_NO_INCREMENT);
@@ -826,11 +867,13 @@ NTSTATUS filterPnP(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
   KIRQL currentIrql;
   NTSTATUS status;
   ULONG minor;
+  PIRP cancelIrp;
 
   minor = irpSp->MinorFunction;
   IoSkipCurrentIrpStackLocation(irp);
   status = IoCallDriver(filterDevExt->kbdClassDevObj, irp);
   switch (minor) {
+  case IRP_MN_SURPRISE_REMOVAL:
   case IRP_MN_REMOVE_DEVICE:
     KeAcquireSpinLock(&detourDevExt->lock, &currentIrql);
     if (detourDevExt->filterDevObj == deviceObject) {
@@ -851,12 +894,13 @@ NTSTATUS filterPnP(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
 
     KeAcquireSpinLock(&filterDevExt->lock, &currentIrql);
     // TODO: at this point, the irp may be completed (but what can I do for it ?)
-    if (filterDevExt->irpq) {
-      IoCancelIrp(filterDevExt->irpq);
-    }
+    cancelIrp = filterDevExt->irpq;
     KqFinalize(&filterDevExt->readQue);
 
     KeReleaseSpinLock(&filterDevExt->lock, currentIrql);
+    if (cancelIrp) {
+      IoCancelIrp(cancelIrp);
+    }
     IoDeleteDevice(deviceObject);
     break;
   default:
