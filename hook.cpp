@@ -202,6 +202,7 @@ static void updateShow(HWND i_hwnd, WPARAM i_show)
 
   // check class name to avoid invalid notify
   GetClassName(i_hwnd, className, NUMBER_OF(className));
+  className[NUMBER_OF(className) - 1] = _T('\0');
   if (_tcsicmp(className, _T("SysShadow")) == 0 ||
       _tcsicmp(className, _T("UserEventWindow")) == 0)
     return;
