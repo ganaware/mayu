@@ -133,7 +133,11 @@
   (use-local-map mayu-mode-map)
 
   (make-local-variable 'comment-start)
-  (setq comment-start "#")
+  (setq comment-start "# ")
+  (make-local-variable 'comment-start-skip)
+  (setq comment-start-skip "\\(^\\|\\s-\\);?#+ *")
+  (make-local-variable 'comment-indent-function)
+  (setq comment-indent-function 'mayu-comment-indent)
   (make-local-variable 'parse-sexp-ignore-comments)
   (setq parse-sexp-ignore-comments t)
 
@@ -144,6 +148,17 @@
 	)
   (set-syntax-table mayu-mode-syntax-table)
   (run-hooks 'mayu-mode-hook))
+
+;;; derived from perl-mode.el
+(defun mayu-comment-indent ()
+  (if (and (bolp) (not (eolp)))
+      0					;Existing comment at bol stays there.
+    (save-excursion
+      (skip-chars-backward " \t")
+      (max (if (bolp)			;Else indent at comment column
+ 	       0			; except leave at least one space if
+ 	     (1+ (current-column)))	; not at beginning of line.
+ 	   comment-column))))
 
 (provide 'mayu-mode)
 
