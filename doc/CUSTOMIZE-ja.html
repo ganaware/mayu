@@ -913,7 +913,7 @@
 			      
 			  <dd class="d3">
 			      <div>
-				<p>現在のキーマップが二段階キーマップの場合、その二段階キーマップを <a href="#function_Prefix"><code>&amp;Prefix</code></a> によって指定したキーマップで定義されているキーを指定します。たとえば、</p>
+				<p>現在のキーマップ (仮に <code>CURRENT</code> という名前とする) が二段階キーマップの場合、<a href="#function_Prefix"><code>&amp;Prefix</code></a><code>(CURRENT)</code> を実行したキーマップで定義されているキーを指定します。引数が無いと 1 段階前のキーマップになりますが、引数に数字を書くとその段階数前のキーマップになります。たとえば、</p>
 				
 				<p class="sample">
 				keymap E<br>
@@ -933,7 +933,7 @@
 				key A = A
 				</p>
 				
-				<p>ここで <kbd>[X]</kbd> <kbd>[X]</kbd> <kbd>[X]</kbd> <kbd>[X]</kbd> <kbd>[A]</kbd> と入力すると <kbd>[C]</kbd> が、<kbd>[X]</kbd> <kbd>[X]</kbd> <kbd>[Y]</kbd> と入力すると <kbd>[B]</kbd> が入力されます。</p>
+				<p>ここで <kbd>[X]</kbd> <kbd>[X]</kbd> <kbd>[X]</kbd> <kbd>[X]</kbd> <kbd>[A]</kbd> と入力すると <kbd>[C]</kbd> が、<kbd>[X]</kbd> <kbd>[X]</kbd> <kbd>[Y]</kbd> <kbd>[A]</kbd> と入力すると <kbd>[B]</kbd> が入力されます。</p>
 			      </div>
 			      
 			  <dt class="h3"><a name="function_KeymapWindow"><code>&amp;KeymapWindow</code></a>
