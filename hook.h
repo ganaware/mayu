@@ -14,14 +14,6 @@ _T("\\\\.\\mailslot\\GANAware\\mayu\\{330F7914-EB5B-49be-ACCE-D2B8DF585B32}") \
 _T(VERSION)
 ///
 #  define WM_MAYU_MESSAGE_NAME _T("GANAware\\mayu\\WM_MAYU_MESSAGE")
-///
-#  define NOTIFY_MUTEX_NAME _T("{ABC8794E-B22F-477f-98A5-4D833F46FE8E}")
-///
-#  define NOTIFY_EVENT_NAME _T("{BCE13EDF-84AB-40be-AF66-8E5A92CAF890}")
-///
-#  define RECEIPT_EVENT_NAME _T("{8D373436-4556-45a6-92FA-8F00E3D71398}")
-///
-#  define EXIT_EVENT_NAME _T("{FF5896A6-1EAA-4ba2-8660-E2B802541D5C}")
 
 ///
 enum MayuMessage
@@ -106,6 +98,7 @@ public:
   BYTE m_syncKey;				///
   bool m_syncKeyIsExtended;			///
   bool m_doesNotifyCommand;			///
+  HWND m_hwndTaskTray;				///
 };
 
 
@@ -121,6 +114,7 @@ extern DllImport int installHooks();
 extern DllImport int uninstallHooks();
 extern DllImport bool notify(void *data, size_t sizeof_data);
 extern DllImport void notifyLockState();
+extern DllImport bool setTaskTrayHwnd(HWND wnd);
 #  endif // !_HOOK_CPP
 
 

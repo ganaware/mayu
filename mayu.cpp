@@ -89,60 +89,21 @@ private:
     return RegisterClass(&wc);
   }
 
-  /// notify handler thread
-  static void notifyHandler(void *i_this)
+  /// notify handler
+  BOOL notifyHandler(COPYDATASTRUCT *cd)
   {
-    reinterpret_cast<Mayu *>(i_this)->notifyHandler();
-  }
-  ///
-  void notifyHandler()
-  {
-    HANDLE hMailslot =
-      CreateMailslot(NOTIFY_MAILSLOT_NAME, NOTIFY_MESSAGE_SIZE,
-		     MAILSLOT_WAIT_FOREVER, (SECURITY_ATTRIBUTES *)NULL);
-    HANDLE hNotifyMutex = CreateMutex(NULL, FALSE, NOTIFY_MUTEX_NAME);
-    HANDLE hNotifyEvent = CreateEvent(NULL, FALSE, FALSE, NOTIFY_EVENT_NAME);
-    HANDLE hReceiptEvent = CreateEvent(NULL, FALSE, FALSE, RECEIPT_EVENT_NAME);
-    HANDLE hExitEvent = CreateEvent(NULL, TRUE, FALSE, EXIT_EVENT_NAME);
-    ASSERT(hMailslot != INVALID_HANDLE_VALUE);
-    ASSERT(hNotifyMutex != INVALID_HANDLE_VALUE);
-    ASSERT(hNotifyEvent != INVALID_HANDLE_VALUE);
-    ASSERT(hReceiptEvent != INVALID_HANDLE_VALUE);
-    ASSERT(hExitEvent != INVALID_HANDLE_VALUE);
-    ResetEvent(hExitEvent);
-
-    // initialize ok
-    CHECK_TRUE( SetEvent(m_mhEvent) );
-    
-    // loop
-    while (true)
-    {
-      DWORD len = 0;
-      BYTE buf[NOTIFY_MESSAGE_SIZE];
-      
-      // wait for message
-      WaitForSingleObject(hNotifyEvent, INFINITE);
-      while (!ReadFile(hMailslot, buf, NOTIFY_MESSAGE_SIZE, &len,
-		       (OVERLAPPED *)NULL));
-      SetEvent(hReceiptEvent);
-      switch (reinterpret_cast<Notify *>(buf)->m_type)
+      switch (cd->dwData)
       {
 	case Notify::Type_mayuExit:		// terminate thread
 	{
-	  SetEvent(hExitEvent);
-	  CHECK_TRUE( CloseHandle(hMailslot) );
-	  CHECK_TRUE( CloseHandle(hNotifyMutex) );
-	  CHECK_TRUE( CloseHandle(hNotifyEvent) );
-	  CHECK_TRUE( CloseHandle(hReceiptEvent) );
-	  CHECK_TRUE( CloseHandle(hExitEvent) );
-	  CHECK_TRUE( SetEvent(m_mhEvent) );
-	  return;
+	  setTaskTrayHwnd(NULL);
+	  break;
 	}
 	
 	case Notify::Type_setFocus:
 	case Notify::Type_name:
 	{
-	  NotifySetFocus *n = (NotifySetFocus *)buf;
+	  NotifySetFocus *n = (NotifySetFocus *)cd->lpData;
 	  n->m_className[NUMBER_OF(n->m_className) - 1] = _T('\0');
 	  n->m_titleName[NUMBER_OF(n->m_titleName) - 1] = _T('\0');
 	  
@@ -193,7 +154,7 @@ private:
 	
 	case Notify::Type_lockState:
 	{
-	  NotifyLockState *n = (NotifyLockState *)buf;
+	  NotifyLockState *n = (NotifyLockState *)cd->lpData;
 	  m_engine.setLockState(n->m_isNumLockToggled,
 				n->m_isCapsLockToggled,
 				n->m_isScrollLockToggled,
@@ -210,22 +171,22 @@ private:
 
 	case Notify::Type_threadDetach:
 	{
-	  NotifyThreadDetach *n = (NotifyThreadDetach *)buf;
+	  NotifyThreadDetach *n = (NotifyThreadDetach *)cd->lpData;
 	  m_engine.threadDetachNotify(n->m_threadId);
 	  break;
 	}
 
 	case Notify::Type_command:
 	{
-	  NotifyCommand *n = (NotifyCommand *)buf;
+	  NotifyCommand *n = (NotifyCommand *)cd->lpData;
 	  m_engine.commandNotify(n->m_hwnd, n->m_message,
 				 n->m_wParam, n->m_lParam);
 	  break;
 	}
       }
-    }
+      return true;
   }
-  
+
   /// window procedure for tasktray
   static LRESULT CALLBACK
   tasktray_wndProc(HWND i_hwnd, UINT i_message,
@@ -245,7 +206,14 @@ private:
     else
       switch (i_message)
       {
+        case WM_COPYDATA:
+	{
+	  COPYDATASTRUCT *cd;
+	  cd = reinterpret_cast<COPYDATASTRUCT *>(i_lParam);
+	  return This->notifyHandler(cd);
+	}
         case WM_QUERYENDSESSION:
+	  setTaskTrayHwnd(NULL);
 	  PostQuitMessage(0);
 	  return TRUE;
 	case WM_APP_msgStreamNotify:
@@ -396,6 +364,7 @@ private:
 		This->showTasktrayIcon();
 		break;
 	      case ID_MENUITEM_quit:
+		setTaskTrayHwnd(NULL);
 		PostQuitMessage(0);
 		break;
 	    }
@@ -567,6 +536,7 @@ public:
 				  CW_USEDEFAULT, CW_USEDEFAULT, 
 				  NULL, NULL, g_hInst, this);
     CHECK_TRUE( m_hwndTaskTray );
+    setTaskTrayHwnd(m_hwndTaskTray);
     
     m_hwndLog =
       CreateDialogParam(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_log), NULL,
@@ -618,11 +588,6 @@ public:
     m_hMenuTaskTray = LoadMenu(g_hInst, MAKEINTRESOURCE(IDR_MENU_tasktray));
     ASSERT(m_hMenuTaskTray);
     
-    // start message handler thread
-    CHECK_TRUE( m_mhEvent = CreateEvent(NULL, FALSE, FALSE, NULL) );
-    CHECK_TRUE( 0 <= _beginthread(notifyHandler, 0, this) );
-    CHECK( WAIT_OBJECT_0 ==, WaitForSingleObject(m_mhEvent, INFINITE) );
-
     // set initial lock state
     notifyLockState();
   }
