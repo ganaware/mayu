@@ -17,6 +17,11 @@
 ///
 #define HOOK_DATA_NAME _T("{08D6E55C-5103-4e00-8209-A1C4AB13BBEF}") _T(VERSION)
 
+// Some applications use different values for below messages
+// when double click of title bar.
+#define SC_MAXIMIZE2 (SC_MAXIMIZE + 2)
+#define SC_MINIMIZE2 (SC_MINIMIZE + 2)
+#define SC_RESTORE2 (SC_RESTORE + 2)
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Global Variables
@@ -193,7 +198,7 @@ static void getClassNameTitleName(HWND i_hwnd, bool i_isInMenu,
 
 
 /// update show
-static void updateShow(HWND i_hwnd, WPARAM i_show)
+static void updateShow(HWND i_hwnd, NotifyShow::Show i_show)
 {
   bool isMDI = false;
 
@@ -215,20 +220,7 @@ static void updateShow(HWND i_hwnd, WPARAM i_show)
       return; // ignore non-MDI child window case
   }
 
-  switch (i_show)
-  {
-    case SIZE_MAXIMIZED:
-      notifyShow(NotifyShow::Show_Maximized, isMDI);
-      break;
-    case SIZE_MINIMIZED:
-      notifyShow(NotifyShow::Show_Minimized, isMDI);
-      break;
-    case SIZE_RESTORED:
-      notifyShow(NotifyShow::Show_Normal, isMDI);
-      break;
-    default:
-      break;
-  }
+  notifyShow(i_show, isMDI);
 }
 
 
@@ -564,19 +556,58 @@ LRESULT CALLBACK callWndProc(int i_nCode, WPARAM i_wParam, LPARAM i_lParam)
 	if (i_wParam)
 	  notifySetFocus();
 	break;
-      case WM_COMMAND:
       case WM_SYSCOMMAND:
+	switch (cwps.wParam)
+	{
+	  case SC_MAXIMIZE:
+	  case SC_MAXIMIZE2:
+	    updateShow(cwps.hwnd, NotifyShow::Show_Maximized);
+	    break;
+	  case SC_MINIMIZE:
+	  case SC_MINIMIZE2:
+	    updateShow(cwps.hwnd, NotifyShow::Show_Minimized);
+	    break;
+	  case SC_RESTORE:
+	  case SC_RESTORE2:
+	    updateShow(cwps.hwnd, NotifyShow::Show_Normal);
+	    break;
+	  default:
+	    break;
+	}
+	/* through below */
+      case WM_COMMAND:
 	notifyCommand(cwps.hwnd, cwps.message, cwps.wParam, cwps.lParam);
 	break;
       case WM_SIZE:
-	updateShow(cwps.hwnd, cwps.wParam);
+	switch (cwps.wParam)
+	{
+	  case SIZE_MAXIMIZED:
+	    updateShow(cwps.hwnd, NotifyShow::Show_Maximized);
+	    break;
+	  case SIZE_MINIMIZED:
+	    updateShow(cwps.hwnd, NotifyShow::Show_Minimized);
+	    break;
+	  case SIZE_RESTORED:
+	    updateShow(cwps.hwnd, NotifyShow::Show_Normal);
+	    break;
+	  default:
+	    break;
+	}
 	break;
       case WM_MOUSEACTIVATE:
 	notifySetFocus();
 	break;
       case WM_ACTIVATE:
-	if (LOWORD(i_wParam) != WA_INACTIVE)
+	if (LOWORD(cwps.wParam) != WA_INACTIVE)
+	{
 	  notifySetFocus();
+	  if (HIWORD(cwps.wParam)) // check minimized flag
+	  {
+	    // minimized flag on
+	    notifyShow(NotifyShow::Show_Minimized, false);
+	    //notifyShow(NotifyShow::Show_Normal, true);
+	  }
+	}
 	break;
       case WM_ENTERMENULOOP:
 	g.m_isInMenu = true;
