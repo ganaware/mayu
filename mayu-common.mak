@@ -11,7 +11,7 @@ VERSION		= 3.30
 
 !if "$(TARGETOS)" == "WINNT"
 OS_SPECIFIC_DEFINES	=  -DUNICODE -D_UNICODE
-DISTRIB_OS	= nt
+DISTRIB_OS	= xp
 !endif
 
 !if "$(TARGETOS)" == "WIN95"
@@ -20,7 +20,7 @@ DISTRIB_OS	= 9x
 !endif
 
 !if "$(TARGETOS)" == "BOTH"
-!error Must specify TARGETOS=WIN95 or TARGETOS=WINNT
+!error You must specify TARGETOS=WINNT
 !endif
 
 

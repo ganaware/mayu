@@ -28,10 +28,6 @@ all:
 	@echo "        nmake MAYU_VC=vct clean"
 	@echo "        nmake MAYU_VC=vct distrib"
 	@echo "        nmake MAYU_VC=vct depend"
-	@echo "Borland C++ 5.5:"
-	@echo "        make -f mayu-bcc.mak batch"
-	@echo "        make -f mayu-bcc.mak batch_clean"
-	@echo "        make -f mayu-bcc.mak batch_distrib"
 	@echo "============================================================================="
 	$(MAKE) -f $(F) $(MAKEFLAGS) batch
 

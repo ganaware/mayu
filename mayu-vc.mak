@@ -67,10 +67,8 @@ distclean::	clean
 batch:
 !if "$(MAYU_VC)" != "vct"
 		-$(MAKE) -k -f mayu-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WINNT
-#		-$(MAKE) -k -f mayu-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WIN95
 !endif
 		-$(MAKE) -k -f mayu-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WINNT nodebug=1
-#		-$(MAKE) -k -f mayu-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WIN95 nodebug=1
 		cd s
 		-$(MAKE) -k -f setup-vc.mak MAYU_VC=$(MAYU_VC) batch
 		cd ..
@@ -78,8 +76,6 @@ batch:
 batch_clean:
 		-$(MAKE) -k -f mayu-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WINNT nodebug=1 clean
 		-$(MAKE) -k -f mayu-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WINNT clean
-#		-$(MAKE) -k -f mayu-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WIN95 nodebug=1 clean
-#		-$(MAKE) -k -f mayu-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WIN95 clean
 		cd s
 		-$(MAKE) -k -f setup-vc.mak MAYU_VC=$(MAYU_VC) batch_clean
 		cd ..
@@ -89,4 +85,3 @@ batch_distclean: batch_clean
 
 batch_distrib: batch
 		-$(MAKE) -k -f mayu-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WINNT nodebug=1 distrib
-#		-$(MAKE) -k -f mayu-vc.mak MAYU_VC=$(MAYU_VC) TARGETOS=WIN95 nodebug=1 distrib

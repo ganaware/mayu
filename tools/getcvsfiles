@@ -11,7 +11,8 @@ sub getcvsfiles {
   close(CVS_Entries);
   my ($i);
   foreach $i ( @lines ) {
-    if ( $i =~ m:^D/([^/]*)/: ) {
+    if ( $i =~ /dummy timestamp/) { # removed file
+    } elsif ( $i =~ m:^D/([^/]*)/: ) {
       &getcvsfiles("$dir/$1");
     } elsif ( $i =~ m:^/([^/]*)/: ) {
       $files{"$dir/$1"} = 1;
