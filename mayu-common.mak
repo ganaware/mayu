@@ -5,7 +5,7 @@
 ###############################################################################
 
 
-VERSION		= 3.20
+VERSION		= 3.21
 
 !if "$(TARGETOS)" == "WINNT"
 OS_SPECIFIC_DEFINES	=  -DUNICODE -D_UNICODE
@@ -121,6 +121,7 @@ DISTRIB_CONTRIBS =				\
 		contrib\dvorak.mayu		\
 		contrib\keitai.mayu		\
 		contrib\ax.mayu			\
+		contrib\98x1.mayu		\
 
 !if "$(TARGETOS)" == "WINNT"
 DISTRIB_DRIVER	= d\i386\mayud.sys d\nt4\i386\mayudnt4.sys
@@ -196,7 +197,7 @@ all:		boost $(OUT_DIR) $(TARGET_1) $(TARGET_2) $(TARGET_3)
 $(OUT_DIR):
 		if not exist "$(OUT_DIR)\\" $(MKDIR) $(OUT_DIR)
 
-unctions.h:	engine.h tools/makefunc
+functions.h:	engine.h tools/makefunc
 		$(MAKEFUNC) < engine.h > functions.h
 
 clean::

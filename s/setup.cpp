@@ -81,6 +81,7 @@ const SetupFile::Data g_setupFiles[] =
   DN(File, ALL, "dvorak.mayu"	    , ToDest, "contrib\\dvorak.mayu"      ),
   DN(File, ALL, "keitai.mayu"	    , ToDest, "contrib\\keitai.mayu"      ),
   DN(File, ALL, "ax.mayu"	    , ToDest, "contrib\\ax.mayu"          ),
+  DN(File, ALL, "98x1.mayu"	    , ToDest, "contrib\\98x1.mayu"        ),
 };
 
 

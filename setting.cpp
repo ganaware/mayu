@@ -99,6 +99,10 @@ void getHomeDirectories(HomeDirectories *o_pathes)
     o_pathes->push_back(userprofile);
   
   _TCHAR buf[GANA_MAX_PATH];
+  DWORD len = GetCurrentDirectory(NUMBER_OF(buf), buf);
+  if (0 < len && len < NUMBER_OF(buf))
+    o_pathes->push_back(buf);
+
   if (GetModuleFileName(GetModuleHandle(NULL), buf, NUMBER_OF(buf)))
     o_pathes->push_back(pathRemoveFileSpec(buf));
 }

@@ -29,7 +29,7 @@ Keyboard_Proc	dd	0
 FlagsBuf		dd	0
 readp			dd	0
 writep			dd	0
-CodeBuf			dd	16	dup (0)
+CodeBuf			dd	64	dup (0)
 ForceBuf		db	3		dup (0)
 BlockingID		dd	0
 
@@ -93,7 +93,7 @@ ReadFromBuffer:
 	add		ecx, 4h
 	mov		readp, ecx
 	sub		ecx, offset CodeBuf
-	cmp		ecx, 14h
+	cmp		ecx, 64
 	jne		DevCtrl_Success
 	mov		readp, offset CodeBuf
 DevCtrl_Success:
@@ -162,7 +162,7 @@ SaveScanCode:
 	mov		writep, eax
 	mov		FlagsBuf, 0h
 	sub		eax, offset CodeBuf
-	cmp		eax, 14h
+	cmp		eax, 64
 	jne		UnBlockReading
 	mov		writep, offset CodeBuf
 UnBlockReading:
@@ -171,8 +171,7 @@ UnBlockReading:
 	je		EatTheCode
 	VMMCall _SignalID <eax>
 EatTheCode:
-	mov		ecx, 0h
-	clc
+	stc
 	ret
 EndProc Mayud
 

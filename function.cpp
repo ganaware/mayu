@@ -2,10 +2,13 @@
 // function.cpp
 
 
-#include "windowstool.h"
 #include "engine.h"
 #include "hook.h"
+#include "mayu.h"
+#include "misc.h"
+#include "registry.h"
 #include "vkeytable.h"
+#include "windowstool.h"
 #include <algorithm>
 
 
@@ -881,10 +884,41 @@ void Engine::shellExecute()
 
 
 // load setting
-void Engine::funcLoadSetting(FunctionParam *i_param)
+void Engine::funcLoadSetting(FunctionParam *i_param, const tstring &i_name)
 {
   if (!i_param->m_isPressed)
     return;
+  if (!i_name.empty())
+  {
+    // set MAYU_REGISTRY_ROOT\.mayuIndex which name is same with i_name
+    Registry reg(MAYU_REGISTRY_ROOT);
+
+    tregex split(_T("^([^;]*);([^;]*);(.*)$"));
+    tstringi dot_mayu;
+    for (size_t i = 0; i < MAX_MAYU_REGISTRY_ENTRIES; ++ i)
+    {
+      _TCHAR buf[100];
+      _sntprintf(buf, NUMBER_OF(buf), _T(".mayu%d"), i);
+      if (!reg.read(buf, &dot_mayu))
+	break;
+      
+      tcmatch_results what;
+      if (boost::regex_match(dot_mayu, what, split) &&
+	  what.str(1) == i_name)
+      {	
+	reg.write(_T(".mayuIndex"), i);
+	goto success;
+      }
+    }
+
+    {
+      Acquire a(&m_log, 0);
+      m_log << _T("unknown setting name: ") << i_name;
+    }
+    return;
+    
+    success: ;
+  }
   PostMessage(m_hwndAssocWindow,
 	      WM_APP_engineNotify, EngineNotify_loadSetting, 0);
 }

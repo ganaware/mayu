@@ -290,7 +290,7 @@ private:
 			const tstring &i_directory,
 			ShowCommandType i_showCommand);
   /// load setting
-  void funcLoadSetting(FunctionParam *i_param);
+  void funcLoadSetting(FunctionParam *i_param, const tstring &i_name = _T(""));
   /// virtual key
   void funcVK(FunctionParam *i_param, VKey i_vkey);
   /// wait

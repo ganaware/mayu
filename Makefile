@@ -4,13 +4,20 @@
 #
 ###############################################################################
 
+F	=	mayu-vc.mak
+
 all:
-	@echo ===============================================================================
-	@echo for WindowsNT/2000
-	@echo Visual C++ 6.0: nmake -f mayu-vc.mak nodebug=1
-	@echo Borland C++ 5.5: make -f mayu-bcc.mak nodebug=1
-	@echo for Windows95/98/Me
-	@echo Visual C++ 6.0: nmake -f mayu-vc.mak nodebug=1 TARGETOS=WIN95
-	@echo Visual C++ 6.0: nmake -f mayu-vc.mak nodebug=1 TARGETOS=WIN95
-	@echo Borland C++ 5.5: make -f mayu-bcc.mak nodebug=1 TARGETOS=WIN95
-	@echo ===============================================================================
+	@echo "============================================================================="
+	@echo "Visual C++ 6.0: nmake"
+	@echo "Borland C++ 5.5: make F=mayu-bcc.mak (NOT IMPREMENTED YET)"
+	@echo "============================================================================="
+	$(MAKE) -f $(F) $(MAKEFLAGS) batch
+
+clean:
+	$(MAKE) -f $(F) $(MAKEFLAGS) batch_clean
+
+distrib:
+	$(MAKE) -f $(F) $(MAKEFLAGS) batch_distrib
+
+depend:
+	$(MAKE) -f $(F) $(MAKEFLAGS) TARGETOS=WINNT depend

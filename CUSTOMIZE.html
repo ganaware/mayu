@@ -591,6 +591,7 @@
 		    <li><code>%HOME%</code>
 		    <li><code>%HOMEDRIVE%%HOMEPATH%</code>
 		    <li><code>%USERPROFILE%</code>
+		    <li><code>mayu.exe</code> のカレントディレクトリ
 		    <li><code>mayu.exe</code> のある場所
 		  </ul>
 		  
@@ -753,7 +754,7 @@
 		  
 	      <dd class="d3">
 		  <div>
-		  <p>設定ファイルを再読み込みします。</p>
+		  <p>設定ファイルを再読み込みします。引数に「設定(I)...」で設定した「名前」を書いておくと、その設定を読み込みます。</p>
 		  </div>
 		  
 	      <dt class="h3"><a name="function_MayuDialog"><code>&amp;MayuDialog(<em>dialog</em>, <em>show_command</em>)</code></a>
@@ -1090,7 +1091,7 @@
 		  <div>
 		  <dl>
 		    <dt class="h4">コンパイラ
-		    <dd class="d4"><div><p>現在対応しているコンパイラは Visual C++ 6.0 SP3 <!--又は Borland C++ 5.5 -->です。</p></div>
+		    <dd class="d4"><div><p>現在対応しているコンパイラは Visual C++ 6.0 SP4 <!--又は Borland C++ 5.5 -->です。</p></div>
 		    <dt class="h4">Platform SDK
 		    <dd class="d4"><div><p>Windows 2000 に対応したものが必要です。MSDN で配布されていますし、マイクロソフトの<a href="http://www.microsoft.com/msdownload/platformsdk/setuplauncher.htm" target="_top">サイト</a>でも配布されています。</p></div>
 		    <dt class="h4">DDK
@@ -1099,6 +1100,8 @@
 		    <dd class="d4"><div><p><a href="http://ourworld.compuserve.com/homepages/John_Maddock/regexpp.htm" target="_top">Regex++</a> が必要です。<a href="http://ourworld.compuserve.com/homepages/John_Maddock/regexpp3.zip" target="_top"><code>regexpp3.zip</code></a> 又は <a href="http://ourworld.compuserve.com/homepages/John_Maddock/regexpp3.tar.gz" target="_top"><code>regexpp3.tar.gz</code></a> をダウンロードしてください。</p></div>
 		    <dt class="h4">Perl</a>
 		    <dd class="d4"><div><p>いくつかの作業の為に <a href="http://www.activestate.com/Products/ActivePerl/" target="_top">ActivePerl</a> が必要です。<code>perl.exe</code> にパスを通しておいてください。Cygwin の Perl でもちゃんと動くかどうかは試してないので分かりません。</p></div>
+		    <dt class="h4">bash, cvs, fileutils, sed, tar
+		    <dd class="d4"><div><p>配布パッケージを作成するためにのみ <a href="http://www.cygwin.com/" target="_top">Cygwin</a> の bash, fileutils, sed, tar 必要です。また、cvs は Cygwin のものを使用することをおすすめします。さもないと改行コードの違いによるトラブルが起こるかもしれません。mayu のソースの改行コードはすべて LF のみになっています。</p></div>
 		  </dl>
 		  </div>
 	      <dt class="h3"><a name="compile_source">ソースの展開</a>
@@ -1159,7 +1162,7 @@
 			<p>Visual C++ 6.0 のコンパイラなどにパスを通しておいて、以下のようにします。
 			</p>
 			<p class="sample">
-			C:\Program Files\mayu&gt; nmake -f mayu-vc.mak batch
+			C:\Program Files\mayu&gt; nmake
 			</p>
 			<p><code>out_win9x/</code>, <code>out_win9x_debug/</code>, <code>out_winnt/</code>, <code>out_winnt_debug/</code> の各ディレクトリに実行ファイルが作成されます。</p>
 			<p><code>d/</code>, <code>d_win9x/</code> ディレクトリ以下にはドライバのソースが入っているので、必要なら適当にコンパイルしてください。</p>
@@ -1170,14 +1173,12 @@
 			<div>
 			<p><em>(3.19 では未サポート)</em> Borland C++ 5.5 のコンパイラなどにパスを通しておいて、さらに <code>bcc.mak</code> の冒頭の注意に従ってライブラリパスに <code>lib/psdk</code> を含めてください。</p>
 			<p class="sample">
-			C:\Program Files\mayu&gt; make -f mayu-bcc.mak nodebug=1
+			C:\Program Files\mayu&gt; make F=mayu-bcc.mak
 			</p>
 			<p>Windows9x 用にコンパイルするには、<code>TARGETOS=WIN95</code> を引数に追加します。</p>
 			<p><code>s</code> ディレクトリ以下のインストーラをコンパイルすることはできますが、<code>d</code> ディレクトリ以下にのドライバをコンパイルする方法は不明です。</p>
 			</div>
 			-->
-		    <dt class="h4">デバッグ情報
-		    <dd class="d4"><div><p>どちらのコンパイラを使う場合でも、<code>nodebug=1</code> を削除すれば、デバッグ情報を生成します。何かパッチを作ったらぜひ作者までお知らせください。</p>
 			</div>
 	    </div>
       </dl>

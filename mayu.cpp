@@ -95,9 +95,13 @@ private:
   ///
   void notifyHandler()
   {
+    DWORD mailslotReadTimeout = MAILSLOT_WAIT_FOREVER;
+#if defined(_WIN95)
+    mailslotReadTimeout = 0;
+#endif
     HANDLE hMailslot =
       CreateMailslot(NOTIFY_MAILSLOT_NAME, NOTIFY_MESSAGE_SIZE,
-		     MAILSLOT_WAIT_FOREVER, (SECURITY_ATTRIBUTES *)NULL);
+		     mailslotReadTimeout, (SECURITY_ATTRIBUTES *)NULL);
     ASSERT(hMailslot != INVALID_HANDLE_VALUE);
 
     // initialize ok
@@ -113,7 +117,13 @@ private:
       if (!ReadFile(hMailslot, buf, NOTIFY_MESSAGE_SIZE, &len,
 		    (OVERLAPPED *)NULL))
 	continue;
-
+#if defined(_WIN95)
+      if (len == 0)
+      {
+        Sleep(1);
+        continue;
+      }
+#endif
       switch (reinterpret_cast<Notify *>(buf)->m_type)
       {
 	case Notify::Type_mayuExit:		// terminate thread
@@ -514,11 +524,13 @@ public:
     CHECK_TRUE( Register_tasktray() );
 
     // change dir
+#if 0
     HomeDirectories pathes;
     getHomeDirectories(&pathes);
     for (HomeDirectories::iterator i = pathes.begin(); i != pathes.end(); ++ i)
       if (SetCurrentDirectory(i->c_str()))
 	break;
+#endif
     
     // create windows, dialogs
     tstringi title = loadString(IDS_mayu);

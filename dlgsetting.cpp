@@ -24,11 +24,6 @@ class DlgSetting : public LayoutManager
   
   ///
   Registry m_reg;
-  /** @name ANONYMOUS */
-  enum
-  {
-    MAX_MAYU_PATHS = 256,			///
-  };
 
   typedef DlgEditSettingData Data;		///
 
@@ -145,7 +140,7 @@ public:
     tregex split(_T("^([^;]*);([^;]*);(.*)$"));
     tstringi dot_mayu;
     int i;
-    for (i = 0; i < MAX_MAYU_PATHS; ++ i)
+    for (i = 0; i < MAX_MAYU_REGISTRY_ENTRIES; ++ i)
     {
       _TCHAR buf[100];
       _sntprintf(buf, NUMBER_OF(buf), _T(".mayu%d"), i);
