@@ -989,6 +989,28 @@
 			  <p><a href="#matchManyClasses"><code>window</code> に複数該当する場合</a>参照。</p>
 			</div>
 			
+		    <dt class="h3"><a name="function_PlugIn"><code>&amp;PlugIn(<em>DLLNAME</em>, <em>FUNCNAME</em>, <em>FUNCPARAM</em>, <em>runAsThread</em>)</code></a>
+			
+		    <dd class="d3">
+			<div>
+			  <p>プラグインを実行します。<code>mayu.exe</code> のあるディレクトリの中の <code>Plugins</code> というディレクトリにプラグイン DLL を置いておくとそのプラグインの中の関数を「窓使いの憂鬱」から直接呼ぶことが出来ます。</p>
+
+			  <p><code><em>DLLNAME</em></code> はプラグイン DLL 名です。<code>Plugins\<em>DLLNAME</em>.dll</code> が使用されます。</p>
+
+			  <p><code><em>FUNCNAME</em></code> は DLL 中の関数名です。DLL は、以下の関数のうちのどれか実装していなければなりません。この引数は省略することができます。省略すると空文字列になります。</p>
+
+			  <p class="sample">
+			  void WINAPI mayu<em>FUNCNAME</em>W(const wchar_t *<em>FUNCPARAM</em>);<br>
+			  void WINAPI mayu<em>FUNCNAME</em>A(const char *<em>FUNCPARAM</em>);<br>
+			  void WINAPI mayu<em>FUNCNAME</em>(const char *<em>FUNCPARAM</em>);<br>
+			  void WINAPI <em>FUNCNAME</em>(const char *<em>FUNCPARAM</em>);
+			  </p>
+
+			  <p><code><em>FUNCPARAM</em></code> は DLL の関数を呼び出すときに渡される引数です。省略すると空文字列 (<code>NULL</code> ではない) になります。</p>
+
+			  <p><code><em>runAsThread</em></code> に <code>true</code> を指定すると指定の関数をスレッドの中で実行します。省略すると <code>false</code> が指定されたことになります。</p>
+			</div>
+			
 		    <dt class="h3"><a name="function_PostMessage"><code>&amp;PostMessage(<em>window</em>, <em>message</em>, <em>wParam</em>, <em>lParam</em>)</code></a>
 			
 		    <dd class="d3">
@@ -1016,49 +1038,6 @@
 			  <p>どのようなメッセージを送ればよいかは Spy++ などで調べられますが、<code>WM_COMMAND</code> と <code>WM_SYSCOMMAND</code> については <a href="#function_InvestigateCommand"><code>&amp;InvestigateCommand</code></a> で調べることもできます。</p>
 			</div>
 			
-		    <dt class="h3"><a name="function_Recenter"><code>&amp;Recenter</code></a>
-			
-		    <dd class="d3">
-			<div>
-			  <p>エディットコントロールかリッチエディットコントロールでのみ動作し、カレットの位置を縦方向の中央に移動させます。</p>
-			</div>
-			
-		    <dt class="h3"><a name="function_Repeat"><code>&amp;Repeat(<em>キーシーケンス</em>, <em>最大回数</em>)</code></a>
-			
-		    <dd class="d3">
-			<div>
-			  <p><a href="#function_Variable"><code>&amp;Variable</code></a> で設定した回数だけ <code><em>キーシーケンス</em></code> を実行します。ただし、実行しすぎると危険なので<em>最大回数</em>を指定できます。<em>最大回数</em>は省略することができ、その場合 10 回が最大になります。</p>
-			  
-			  <p class="sample">
-			  key A = &amp;Variable(0, 10) &amp;Repeat((X))
-			  </p>
-			  
-			  <p>上の例では、<kbd>[A]</kbd> を押すと、<kbd>[X]</kbd> が 10 回入力されます</p>
-			  
-			</div>
-			
-		    <dt class="h3"><a name="function_PlugIn"><code>&amp;PlugIn(<em>DLLNAME</em>, <em>FUNCNAME</em>, <em>FUNCPARAM</em>, <em>runAsThread</em>)</code></a>
-			
-		    <dd class="d3">
-			<div>
-			  <p>プラグインを実行します。<code>mayu.exe</code> のあるディレクトリの中の <code>Plugins</code> というディレクトリにプラグイン DLL を置いておくとそのプラグインの中の関数を「窓使いの憂鬱」から直接呼ぶことが出来ます。</p>
-
-			  <p><code><em>DLLNAME</em></code> はプラグイン DLL 名です。<code>Plugins\<em>DLLNAME</em>.dll</code> が使用されます。</p>
-
-			  <p><code><em>FUNCNAME</em></code> は DLL 中の関数名です。DLL は、以下の関数のうちのどれか実装していなければなりません。この引数は省略することができます。省略すると空文字列になります。</p>
-
-			  <p class="sample">
-			  void WINAPI mayu<em>FUNCNAME</em>W(const wchar_t *<em>FUNCPARAM</em>);<br>
-			  void WINAPI mayu<em>FUNCNAME</em>A(const char *<em>FUNCPARAM</em>);<br>
-			  void WINAPI mayu<em>FUNCNAME</em>(const char *<em>FUNCPARAM</em>);<br>
-			  void WINAPI <em>FUNCNAME</em>(const char *<em>FUNCPARAM</em>);
-			  </p>
-
-			  <p><code><em>FUNCPARAM</em></code> は DLL の関数を呼び出すときに渡される引数です。省略すると空文字列 (<code>NULL</code> ではない) になります。</p>
-
-			  <p><code><em>runAsThread</em></code> に <code>true</code> を指定すると指定の関数をスレッドの中で実行します。省略すると <code>false</code> が指定されたことになります。</p>
-			</div>
-			
 		    <dt class="h3"><a name="function_Prefix"><code>&amp;Prefix(<em>キーマップ名</em>, <em>ignore_modifiers</em>)</code></a>
 			
 		    <dd class="d3">
@@ -1084,6 +1063,27 @@
 			  <p class="continue">が指定されたものとして扱われます。</p>
 			  
 			  <p><a href="#keymap2"><code>keymap2</code></a> を利用しているときには、デフォルトキーが <a href="#function_Undefined"><code>&amp;Undefined</code></a> になっているので、モディファイヤを入力した時にもベルが鳴るはずですが、このように <code>true</code> を指定しておけば鳴らなくなります。(<a href="#mod"><code>mod</code></a> を参照)</p>
+			</div>
+			
+		    <dt class="h3"><a name="function_Recenter"><code>&amp;Recenter</code></a>
+			
+		    <dd class="d3">
+			<div>
+			  <p>エディットコントロールかリッチエディットコントロールでのみ動作し、カレットの位置を縦方向の中央に移動させます。</p>
+			</div>
+			
+		    <dt class="h3"><a name="function_Repeat"><code>&amp;Repeat(<em>キーシーケンス</em>, <em>最大回数</em>)</code></a>
+			
+		    <dd class="d3">
+			<div>
+			  <p><a href="#function_Variable"><code>&amp;Variable</code></a> で設定した回数だけ <code><em>キーシーケンス</em></code> を実行します。ただし、実行しすぎると危険なので<em>最大回数</em>を指定できます。<em>最大回数</em>は省略することができ、その場合 10 回が最大になります。</p>
+			  
+			  <p class="sample">
+			  key A = &amp;Variable(0, 10) &amp;Repeat((X))
+			  </p>
+			  
+			  <p>上の例では、<kbd>[A]</kbd> を押すと、<kbd>[X]</kbd> が 10 回入力されます</p>
+			  
 			</div>
 			
 		    <dt class="h3"><a name="function_SetImeStatus"><code>&amp;SetImeStatus(<em>status</em>)</code></a>
