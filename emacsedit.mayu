@@ -24,7 +24,7 @@ keymap	EmacsMove : Global
  key C-P		=> Up			# ↑
  key C-Q		=> &Prefix(KeymapDefault) # mayu に左右されないキー入力
  key C-S		=> C-F			# 検索
- key C-V		=> Next			# 次頁
+ if ( !ZXCV ) key C-V	=> Next			# 次頁
  key M-V		=> Prior		# 前頁
  key S-Home		=> S-C-Home		# 文頭(選択)
  key S-End		=> S-C-End		# 文末(選択)
@@ -114,7 +114,7 @@ keymap	EmacsEdit
  key C-W		=> C-X					# CUT
  key M-W		=> C-C					# COPY
  key C-U		=> &Variable(0, 4) &Prefix(EmacsC-U)
- key C-X		=> &Prefix(EmacsC-X)
+ if ( !ZXCV ) key C-X	=> &Prefix(EmacsC-X)
  key C-Y		=> C-V					# PASTE
  key C-Slash		=> C-Z					# UNDO
  key M-U		=> $EmacsEdit/upcase-word		# 大文字
@@ -132,7 +132,7 @@ keymap2	EmacsMark
  key C-G		=> $EmacsMark/cancel &Undefined		# キャンセル
  key C-N		=> S-Down	&Prefix(EmacsMark)	# ↓
  key C-P		=> S-Up		&Prefix(EmacsMark)	# ↑
- key C-V		=> S-Next	&Prefix(EmacsMark)	# 次頁
+ if ( !ZXCV ) key C-V	=> S-Next	&Prefix(EmacsMark)	# 次頁
  key M-V		=> S-Prior	&Prefix(EmacsMark)	# 前頁
  key C-W		=> C-X Left Right			# CUT
  key M-W		=> C-C Left Right			# COPY

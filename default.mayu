@@ -288,7 +288,7 @@ keymap2	NotepadC-X : GeneralC-X
  key C-C		=> $WindowClose		# ƒƒ‚’ ‚ÌI—¹(X)
 
 window	Notepad /:Notepad:Edit$/ : EmacsEdit
- key C-X		=> &Prefix(NotepadC-X)
+ if ( !ZXCV ) key C-X	=> &Prefix(NotepadC-X)
  key C-S		=> F3			# ŒŸõ(F)...
  key M-J		=> C-G			# s‚ÖˆÚ“®
 
@@ -311,10 +311,10 @@ window	ASTEC-X /:ASTEC-X$/ : Global
 ## http://www.rimarts.co.jp/index-j.html
 
 window BeckyInternetMail /Rebecca\.exe:BeckyComposeFrameClass:/ : EmacsEdit
- key C-X		=> &Prefix(GeneralC-X)
+ if ( !ZXCV ) key C-X	=> &Prefix(GeneralC-X)
 
 window BeckyInternetMail2 /B2\.exe:Becky2ComposeFrame:/ : EmacsEdit
- key C-X		=> &Prefix(GeneralC-X)
+ if ( !ZXCV ) key C-X	=> &Prefix(GeneralC-X)
 
 
 ## Microsoft Power Point ......................................................
@@ -324,19 +324,19 @@ keymap2	PowerPointC-X : GeneralC-X
 
 window	PowerPoint /POWERPNT\.EXE:.*:(paneClassDC|REComboBox20W|RichEdit20W)$/\
 			: EmacsEdit
- key C-X		=> &Prefix(PowerPointC-X)
+ if ( !ZXCV ) key C-X	=> &Prefix(PowerPointC-X)
 
 
 ## Microsoft Visual Basic 6.0 .................................................
 
 window	VisualBasic /vb6\.exe:.*:VbaWindow$/ : EmacsEdit
- key C-X		=> &Prefix(GeneralC-X)
+ if ( !ZXCV ) key C-X	=> &Prefix(GeneralC-X)
 
 
 ## Microsoft Word .............................................................
 
 window	MicrosoftWord /WINWORD\.EXE:.*:_WwG$/ : EmacsEdit
- key C-X		=> &Prefix(GeneralC-X)
+ if ( !ZXCV ) key C-X	=> &Prefix(GeneralC-X)
 
 
 ## Microsoft Pinball ..........................................................
