@@ -134,7 +134,10 @@ DISTRIB_CONTRIBS =				\
 		contrib\98x1.mayu		\
 
 !if "$(TARGETOS)" == "WINNT"
-DISTRIB_DRIVER	= d\i386\mayud.sys d\nt4\i386\mayudnt4.sys
+DISTRIB_DRIVER	=				\
+		d\i386\mayud.sys		\
+		d\nt4\i386\mayudnt4.sys		\
+		d\test\mayudusb.sys
 !endif
 !if "$(TARGETOS)" == "WIN95"
 DISTRIB_DRIVER	= d_win9x\mayud.vxd
