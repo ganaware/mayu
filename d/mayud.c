@@ -72,6 +72,8 @@ typedef struct CommonData
   ULONG curkbd;
   
   LONG isDetourOpened; // is detour opened ?
+  KSPIN_LOCK lock; // lock below datum
+  PIRP filterIrp;
 } CommonData;
 
 typedef struct _MayuDeviceExtension
@@ -168,6 +170,8 @@ NTSTATUS DriverEntry(IN PDRIVER_OBJECT driverObject,
     cd->detourDevObj->Flags |= DO_POWER_PAGABLE;
 	cd->detourDevObj->Flags &= ~DO_DEVICE_INITIALIZING;
 #endif // !MAYUD_NT4
+    KeInitializeSpinLock(&cd->lock);
+    cd->filterIrp = NULL;
     
     // initialize detour device extension
     cd->detourDevExt = (MayuDeviceExtension*)cd->detourDevObj->DeviceExtension;
@@ -426,17 +430,26 @@ NTSTATUS filterGenericCompletion(IN PDEVICE_OBJECT deviceObject,
 NTSTATUS filterReadCompletion(IN PDEVICE_OBJECT deviceObject,
 			      IN PIRP irp, IN PVOID context)
 {
+  NTSTATUS status;
+
   UNREFERENCED_PARAMETER(context);
   
-  if (irp->PendingReturned)
+  if (irp->PendingReturned) {
+    status = STATUS_PENDING;
     IoMarkIrpPending(irp);
+  } else {
+    status = STATUS_SUCCESS;
+  }
   if (irp->IoStatus.Status == STATUS_SUCCESS)
   {
     KIRQL currentIrql, cancelIrql;
     PIRP irpCancel = NULL;
     CommonData *cd = getCd(deviceObject);
     MayuDeviceExtension *devExt = cd->detourDevExt;
-    
+
+    KeAcquireSpinLock(&cd->lock, &currentIrql);
+    cd->filterIrp = NULL;
+    KeReleaseSpinLock(&cd->lock, currentIrql);
     KeAcquireSpinLock(&devExt->lock, &currentIrql);
     IoAcquireCancelSpinLock(&cancelIrql);
     if (cd->isDetourOpened)
@@ -457,7 +470,9 @@ NTSTATUS filterReadCompletion(IN PDEVICE_OBJECT deviceObject,
     if (irpCancel)
       IoCancelIrp(irpCancel); // at this point, the irpCancel may be completed
   }
-  return STATUS_SUCCESS;
+  if (status == STATUS_SUCCESS)
+    irp->IoStatus.Status = STATUS_SUCCESS;
+  return status;
 }
 
 
@@ -587,8 +602,12 @@ NTSTATUS detourWrite(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
     KeReleaseSpinLock(&devExt->lock, currentIrql);
 
     // cancel filter irp
-    if (irpCancel)
-      IoCancelIrp(irpCancel);
+    KeAcquireSpinLock(&cd->lock, &currentIrql);
+    if (cd->filterIrp) {
+      IoCancelIrp(cd->filterIrp);
+      cd->filterIrp = NULL;
+    }
+    KeReleaseSpinLock(&cd->lock, currentIrql);
     
     status = STATUS_SUCCESS;
   }
@@ -720,6 +739,7 @@ NTSTATUS filterRead(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
   NTSTATUS status;
   PIO_STACK_LOCATION irpSp = IoGetCurrentIrpStackLocation(irp);
   CommonData *cd = getCd(deviceObject);
+  KIRQL currentIrql;
   
   cd->curkbd = ((MayuDeviceExtension*)(deviceObject->DeviceExtension))->kbdnum;
   if (cd->isDetourOpened && !cd->detourDevExt->wasCleanupInitiated)
@@ -758,6 +778,9 @@ NTSTATUS filterRead(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
       return status;
     }
   }
+  KeAcquireSpinLock(&cd->lock, &currentIrql);
+  cd->filterIrp = irp;
+  KeReleaseSpinLock(&cd->lock, currentIrql);
   
   *IoGetNextIrpStackLocation(irp) = *irpSp;
   IoSetCompletionRoutine(irp, filterReadCompletion, NULL, TRUE, TRUE, TRUE);
