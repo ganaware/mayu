@@ -264,7 +264,7 @@ if ( $OPTION_CPP eq "gcc" || $OPTION_CPP eq "g++" ) {
 
 
 sub parseIgnore {
-  @OPTION_IGNORE = split( /;/ , $_[0]);
+  @OPTION_IGNORE = (@OPTION_IGNORE, split( /;/ , $_[0]));
   my($i);
   for ( $i = 0; $i < @OPTION_IGNORE; $i ++ ) {
     # DOS-style-path to UNIX path
