@@ -30,12 +30,12 @@ $(TARGET_3):	$(DLL_3)
 
 boost:
 		cd $(BOOST_DIR)/libs/regex/build/
-		$(MAKE) -i -f bc55.mak
+		$(MAKE) -i -f bcb5.mak
 		cd ../../../../mayu
 
 distclean::	clean
 		cd $(BOOST_DIR)/libs/regex/build/
-		-$(MAKE) -i -f bc55.mak clean
+		-$(MAKE) -i -f bcb5.mak clean
 		cd ../../../../mayu
 
 batch:
