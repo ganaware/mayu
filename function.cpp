@@ -2249,6 +2249,8 @@ class StrExpr
 {
 private:
   tstringq symbol;
+protected:
+  static const Engine *engine;
 public:
   StrExpr(const tstringq &i_symbol) : symbol(i_symbol) {};
 
@@ -2262,9 +2264,12 @@ public:
   virtual tstringq eval() const
   {
     return symbol;
-  };
+  }
+
+  static void setEngine(const Engine *i_engine) { engine = i_engine; }
 };
 
+const Engine *StrExpr::engine = NULL;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // StrExprClipboard
@@ -2287,7 +2292,49 @@ public:
     const tstring value(text == NULL ? _T("") : text);
     closeClipboard(g);
     return value;
-  };
+  }
+};
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// StrExprWindowClassName
+class StrExprWindowClassName : public StrExpr
+{
+public:
+  StrExprWindowClassName(const tstringq &i_symbol) : StrExpr(i_symbol) {};
+
+  ~StrExprWindowClassName() {};
+
+  StrExpr *clone() const
+  {
+    return new StrExprWindowClassName(*this);
+  }
+
+  tstringq eval() const
+  {
+    return engine->getCurrentWindowClassName();
+  }
+};
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// StrExprWindowTitleName
+class StrExprWindowTitleName : public StrExpr
+{
+public:
+  StrExprWindowTitleName(const tstringq &i_symbol) : StrExpr(i_symbol) {};
+
+  ~StrExprWindowTitleName() {};
+
+  StrExpr *clone() const
+  {
+    return new StrExprWindowTitleName(*this);
+  }
+
+  tstringq eval() const
+  {
+    return engine->getCurrentWindowTitleName();
+  }
 };
 
 
@@ -2332,7 +2379,10 @@ StrExprArg::StrExprArg(const tstringq &i_symbol, Type i_type)
     case Builtin:
       if (i_symbol == _T("Clipboard"))
 	expr = new StrExprClipboard(i_symbol);
-      else;
+      else if (i_symbol == _T("WindowClassName"))
+	expr = new StrExprWindowClassName(i_symbol);
+      else if (i_symbol == _T("WindowTitleName"))
+	expr = new StrExprWindowTitleName(i_symbol);
       break;
     default:
       break;
@@ -2349,6 +2399,11 @@ StrExprArg::~StrExprArg()
 tstringq StrExprArg::eval() const
 {
   return expr->eval();
+}
+
+void StrExprArg::setEngine(const Engine *i_engine)
+{
+  StrExpr::setEngine(i_engine);
 }
 
 // stream output

@@ -1350,6 +1350,27 @@
 			<div>
 			  <p>ウィンドウの最前面フラグをトグルします。</p>
 			</div>
+		
+		    <dt class="h3"><a name="arg_subst">引数置換</a>
+			
+		    <dd class="d3">
+			<div>
+			  <p>引数として <code>$</code> で始まるキーワードを指定することにより <code><em>FUNCTION</em></code> に以下の内容を渡すことができます。[]内はそのキーワードを指定できる引数の型です。値の取り出しは <code><em>FUNCTION</em></code> の実行時に行われます。</p>
+			</div>
+			<ul>
+			  <li><code>$Clipboard</code>: [文字列] クリップボードの中身
+			  <li><code>$WindowClassName</code>: [文字列] フォーカスされているウィンドウのクラス名
+			  <li><code>$WindowTitleName</code>: [文字列] フォーカスされているウィンドウのタイトル名
+			</ul>
+			<p>クリップボード内の文字列をURLとしてブラウザで開く例:</p>
+			<p class="sample">
+			key M-C-O = &amp;ShellExecute("open", $Clipboard,,, ShowNormal)
+			</p>
+			<p>フォーカスされているウィンドウのクラス名やタイトル名をクリップボードにコピーする例:</p>
+			<p class="sample">
+			key M-C-C = &amp;ClipboardCopy($WindowClassName)<br>
+			key M-C-T = &amp;ClipboardCopy($WindowTitleName)
+			</p>
 		  </dl>
 		</div>
 		

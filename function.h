@@ -243,6 +243,7 @@ public:
   ~StrExprArg();
   StrExprArg &operator=(const StrExprArg &i_data);
   tstringq eval() const;
+  static void setEngine(const Engine *i_engine);
 };
 
 

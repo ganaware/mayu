@@ -985,6 +985,7 @@ Engine::Engine(tomsgstream &i_log)
 			       PIPE_TYPE_BYTE, 1,
 			       0, 0, 0, NULL);
 #endif // _WINNT
+  StrExprArg::setEngine(this);
 }
 
 

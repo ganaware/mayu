@@ -514,6 +514,13 @@ public:
   /// command notify
   void commandNotify(HWND i_hwnd, UINT i_message, WPARAM i_wParam,
 		     LPARAM i_lParam);
+
+  /// get current window class name
+  const tstringi &getCurrentWindowClassName() const { return m_currentFocusOfThread->m_className; }
+
+  /// get current window title name
+  const tstringi &getCurrentWindowTitleName() const { return m_currentFocusOfThread->m_titleName; }
+
 };
 
 
