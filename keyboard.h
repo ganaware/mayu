@@ -27,14 +27,14 @@ public:
   };
 
 public:
-  u_int8 m_scan;				///
-  u_int8 m_flags;				///
+  USHORT m_scan;				///
+  USHORT m_flags;				///
 
 public:
   ///
   ScanCode() : m_scan(0), m_flags(0) { }
   ///
-  ScanCode(u_int8 i_scan, u_int8 i_flags)
+  ScanCode(USHORT i_scan, USHORT i_flags)
     : m_scan(i_scan), m_flags(i_flags) { }
   ///
   bool operator==(const ScanCode &i_sc) const

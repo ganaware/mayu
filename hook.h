@@ -91,7 +91,7 @@ class HookData
 public:
   HHOOK m_hHookGetMessage;			///
   HHOOK m_hHookCallWndProc;			///
-  BYTE m_syncKey;				///
+  USHORT m_syncKey;				///
   bool m_syncKeyIsExtended;			///
   bool m_doesNotifyCommand;			///
   HWND m_hwndTaskTray;				///
