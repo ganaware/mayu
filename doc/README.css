@@ -6,15 +6,6 @@ body {
   background-image:url(bg.png);
   margin:0pt;
   padding:0pt;
-
-  scrollbar-3dlight-color:#000;
-  scrollbar-highlight-color:#fff;
-  scrollbar-face-color:#ccc;
-  scrollbar-shadow-color:#555;
-  scrollbar-darkshadow-color:#000;
-  scrollbar-arrow-color:#555;
-  scrollbar-base-color:#fff;
-  scrollbar-track-color:#555;
 }
 
 a {
@@ -51,7 +42,7 @@ p.noindent {
   color:#000;
   margin:0pt;
   padding:0pt;
-  border-left-width:4pt; border-top-width:1pt;
+  border-left-width:4pt; border-top-width:1px;
   border-style: solid none none solid;
   border-color:#000;
 }
@@ -78,9 +69,9 @@ p.noindent {
   font-weight:normal;
   background-color:#fff;
   border-color:#000;
-  border-width:1pt;
+  border-width:1px;
   border-style: solid none solid solid;
-  padding-top:1pt;
+  padding-top:1px;
   margin-left:-24pt;
 }
 .contents .subsection ol {
@@ -90,10 +81,10 @@ p.noindent {
   list-style-type: lower-roman;
 }
 .contents .subsubsection {
-  margin:1pt;
+  margin:1px;
   margin-left:-10pt;
   background-color:#eee;
-  padding:1pt;
+  padding:1px;
   line-height:11pt;
 }
 .contents .subsubsection ul {
@@ -117,7 +108,7 @@ p.noindent {
   margin:0pt;
   padding:0pt;
   border-left-width:4pt;
-  border-top-width:1pt;
+  border-top-width:1px;
   border-style: solid none none solid;
   border-color:#000;
   background-color:#ccc;
@@ -166,7 +157,7 @@ p.noindent {
   margin:0pt; margin-left:4pt;
   background-color:#fff;
   border-color:#000;
-  border-width:1pt;
+  border-width:1px;
   border-style: solid none solid solid;
 }
 .manual .d1 p {
@@ -184,8 +175,8 @@ p.noindent {
 .manual .d1 ol li, .manual .d1 ul li {
   margin-left:-10pt;
   line-height:12pt;
-  padding-top:1pt;
-  padding-bottom:1pt;
+  padding-top:1px;
+  padding-bottom:1px;
 }
 .manual .h2 {
   padding:4pt; padding-right:0pt;
@@ -242,7 +233,7 @@ p.noindent {
   font-family:Courier New,monospace;
   color:#a00;
   border-color:#a00;
-  border-width:1pt;
+  border-width:1px;
   border-style: solid;
   margin-left:4pt;
   background-color:#fff;
@@ -255,7 +246,7 @@ p.noindent {
 
 table {
   color:#000;
-  border-width:1pt;
+  border-width:1px;
   border-color:#000;
   border-style: solid;
   background-color:#ccc;
@@ -275,12 +266,12 @@ table.default-settings td {
   margin:10pt;
 }
 table.default-settings .name th {
-  border-width:1pt;
+  border-width:1px;
   border-color:#000;
   border-style: solid none none none;
 }
 table.default-settings .name td {
-  border-width:1pt;
+  border-width:1px;
   border-color:#000;
   border-style: solid none none none;
 }
