@@ -410,6 +410,9 @@ window	TeraTerm /TTermPRO\.exe:VTWin32$/ : Global
  key S-Prior		=> C-Prior		# スクロール
  key S-Next		=> C-Next		# スクロール
  key IC-M-X    IL-M-X	=> $ToggleIME M-X	# for emacs
+ if ( KBD109 )
+   key C-S-ReverseSolidus => C-S-HyphenMinus	# C-_ を入力
+ endif
 
 
 ## Waffle .....................................................................
