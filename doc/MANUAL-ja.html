@@ -69,12 +69,17 @@
 
 	<hr>
 
+	<dl>
+	<dt><a name="rescue_driver">復旧用ドライバについて</a></dt>
+	<dd>
 	<p>NT4.0/2000/XP の場合 mayu ドライバは mayu.exe の実行の有無に関わらずロードされます。このため、たとえ mayu を自動起動にしていなくても、ドライバの不具合によって mayu のアンインストールも含めた操作が不能になる場合があります。その場合でも下記の手順によって Windows の再インストールを回避することができる場合があります。
 	<ol class="decimal">
 	  <li>電源ボタンの長押し等によって一旦、強制的に電源を落したあと回復コンソールを起動します。尚、回復コンソールでの起動ができることを<strong>「窓使いの憂鬱」のインストール前に</strong>確認しておくことをお勧めします。</strong>(参考: <a href="http://support.microsoft.com/default.aspx?scid=kb;ja;314058">Windows XP 回復コンソールについて</a>)
 	  <li>%windir%\system32\drivers 内の mayudrsc.sys を mayud.sys の名前で上書きコピーします。(即ち mayud.sys を mayudrsc.sysで置き換える。)
 	  <li>再起動します。
 	  <li>コントロールパネルから「窓使いの憂鬱」をアンインストールします。
+	</dd>
+	</dl>
 	</ol>
 	</p>
       </ol>
@@ -723,6 +728,16 @@
 	  <dt>2004/??/?? 3.30
 	  <dd>
 	      <ul>
+	      	<li>2000/XP 用ドライバの SMP/HT 対応。
+		<li>2000/XP 用ドライバの PS/2 専用版と USB 対応版のバイナリ統合。
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE-ja.html#function_SetImeStatus"><code>&amp;SetImeStatus</code></a> を追加。
+		<li><code><em>FUNCTION</em></code> の<a href="CUSTOMIZE-ja.html#arg_subst">引数置換</a>機能を追加。
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE-ja.html#function_SetImeString"><code>&amp;SetImeString</code></a> を追加。
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE-ja.html#function_WindowMonitor"><code>&amp;WindowMonitor</code></a> を追加。(Thanks to Hosaka Yuji)
+		<li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE-ja.html#function_WindowMonitorTo"><code>&amp;WindowMonitorTo</code></a> を追加。(Thanks to Hosaka Yuji)
+		<li>既存 <code><em>FUNCTION</em></code> のマルチモニタ対応。(Thanks to Hosaka Yuji)
+		<li>モディファイヤ <a href="CUSTOMIZE-ja.html#modifier"><code>MAX-, MIN-, MMAX-, MMIN-</code></a> を追加。
+		<li><a href="#rescue_driver">復旧用ドライバ</a>を追加。
 		<li>Visual C++ Toolkit 2003 で<a href="CUSTOMIZE-ja.html#compile">ビルド</a>するための様々な注意事項を記載。
 	      </ul>
 	      
