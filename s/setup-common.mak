@@ -22,7 +22,7 @@ DISTRIB_OS	= 9x
 
 DEFINES		= -DSTRICT -D_WIN32_IE=0x0400 $(OS_SPECIFIC_DEFINES) \
 		  $(DEBUGDEFINES)
-BOOST_DIR	= ../../boost
+BOOST_DIR	= ../../boost_$(BOOST_VER)_0
 
 
 # setup.exe	###############################################################

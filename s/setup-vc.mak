@@ -8,6 +8,9 @@
 ###############################################################################
 
 
+!if "$(BOOST_VER)" == ""
+BOOST_VER	= 1_32
+!endif
 INCLUDES	= -I$(BOOST_DIR)	# why here ?
 DEPENDIGNORE	= --ignore=$(BOOST_DIR)
 
@@ -15,8 +18,8 @@ DEPENDIGNORE	= --ignore=$(BOOST_DIR)
 MAYU_VC	= vc6
 !endif
 
-!if ( "$(MAYU_VC)" == "vct" ) || ( "$(MAYU_VC)" == "vc71" )
-MAYU_REGEX_VC	= vc7
+!if ( "$(MAYU_VC)" == "vct" )
+MAYU_REGEX_VC	= vc71
 !else
 MAYU_REGEX_VC	= $(MAYU_VC)
 !endif
