@@ -117,6 +117,7 @@
 	 "\\|DirectSSTP"
 	 "\\|PlugIn"
 	 "\\|Recenter"
+	 "\\|SetImeStatus"
 	 "\\)\\>"
 	 ) . ,function-name-face)
       "Default font-lock-keywords for mayu mode.")))

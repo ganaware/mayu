@@ -1713,6 +1713,18 @@ void Engine::funcRecenter(FunctionParam *i_param)
   }
 }
 
+// set IME open status
+void Engine::funcSetImeStatus(FunctionParam *i_param, int i_status)
+{
+  if (!i_param->m_isPressed)
+    return;
+  if (m_hwndFocus)
+  {
+    UINT WM_MAYU_MESSAGE = RegisterWindowMessage(WM_MAYU_MESSAGE_NAME);
+    PostMessage(m_hwndFocus, WM_MAYU_MESSAGE, MayuMessage_funcSetImeStatus, i_status);
+  }
+}
+
 // Direct SSTP Server
 class DirectSSTPServer
 {

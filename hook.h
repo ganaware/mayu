@@ -16,6 +16,7 @@ enum MayuMessage
 {
   MayuMessage_notifyName,
   MayuMessage_funcRecenter,
+  MayuMessage_funcSetImeStatus,
 };
 
 

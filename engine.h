@@ -438,6 +438,8 @@ private:
 		  const tstringq &i_funcName = _T(""),
 		  const tstringq &i_funcParam = _T(""),
 		  BooleanType i_doesCreateThread = BooleanType_false);
+  /// set IME open status
+  void funcSetImeStatus(FunctionParam *i_param, int i_status = -1);
   // END OF FUNCTION DEFINITION
 #  define FUNCTION_FRIEND
 #  include "functions.h"

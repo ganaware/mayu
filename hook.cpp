@@ -291,6 +291,22 @@ static void funcRecenter(HWND i_hwnd)
   SendMessage(i_hwnd, EM_LINESCROLL, 0, caretLine - line);
 }
 
+// &SetImeStatus
+static void funcSetImeStatus(HWND i_hwnd, int i_status)
+{
+  HIMC hIMC;
+
+  hIMC = ImmGetContext(i_hwnd);
+  if (hIMC == INVALID_HANDLE_VALUE)
+    return;
+
+  if (i_status < 0)
+    i_status = !ImmGetOpenStatus(hIMC);
+
+  ImmSetOpenStatus(hIMC, i_status);
+  ImmReleaseContext(i_hwnd, hIMC);
+}
+
 /// notify lock state
 DllExport void notifyLockState()
 {
@@ -358,6 +374,9 @@ LRESULT CALLBACK getMessageProc(int i_nCode, WPARAM i_wParam, LPARAM i_lParam)
 	    break;
 	  case MayuMessage_funcRecenter:
 	    funcRecenter(msg.hwnd);
+	    break;
+	  case MayuMessage_funcSetImeStatus:
+	    funcSetImeStatus(msg.hwnd, msg.lParam);
 	    break;
 	}
       }
