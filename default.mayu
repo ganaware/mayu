@@ -74,11 +74,9 @@ keymap Global
    key C-S-V		=> &WindowMoveVisibly	# ウィンドウを見える位置へ移動
  endif
 
- if ( KBD109 )
-   if ( ! KBD104on109 )
-     key *半角/全角	=> *Esc			# Esc と半角/全角の入れ替え
-     key *Esc		=> *半角/全角		#	〃
-   endif
+ if ( KBD109 ) and ( ! KBD104on109 )
+   key *半角/全角	=> *Esc			# Esc と半角/全角の入れ替え
+   key *Esc		=> *半角/全角		#	〃
  endif
 
  if ( KBD109 )
@@ -106,8 +104,17 @@ keymap Global
 			   &Wait(100) &WindowClingToBottom
  endif
 
+keymap2 GlobalEscape : Global => &KeymapParent
+ event prefixed		=> &HelpMessage("Global", "ESC-")
+ event before-key-down	=> &HelpMessage
+ key M-C-G		=> &Ignore
+
+keymap Global
  if ( MAP-ESCAPE-TO-META )
-   key ESC		=> &EditNextModifier(M-)
+   key Escape		=> &Prefix(GlobalEscape) &EditNextModifier(M-)
+   if ( KBD109 ) and ( ! KBD104on109 )
+     key 半角/全角	=> &Prefix(GlobalEscape) &EditNextModifier(M-)
+   endif
  endif
 
 
@@ -116,13 +123,6 @@ keymap Global
 #
 
 keymap	KeymapDefault => &Default
-
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 窓使いの憂鬱の仮想キー調査ウィンドウでは全てデフォルト
-#
-
-window	MayuInvestigate /mayu\.exe:#32770:mayuFocus$/ : KeymapDefault
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -151,6 +151,12 @@ keymap2	GeneralC-X : EmacsC-X
  key C-F		=> C-O			# 開く(O)...
  key K			=> C-N			# 新規作成(N)
  key C-C		=> A-Q			# 終了(X)
+
+
+## ダイアログボックス .........................................................
+
+window	DialogBox	/:#32770:/ : Global
+ key C-G		=> Escape
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -193,6 +199,17 @@ window	MDI	/:MDIClient:/ : Global
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 各アプリケーションの設定
 #
+
+
+## 窓使いの憂鬱 ...............................................................
+## http://mayu.sourceforge.net
+
+# 仮想キー調査ウィンドウでは全てデフォルト
+window	MayuInvestigate /mayu\.exe:#32770:mayuFocus$/ : KeymapDefault
+
+# ログウィンドウ
+window	MayuLog ( /mayu\.exe:#32770:/ && /ログ - 窓使いの憂鬱/ ): KeymapDefault
+ key C-G		=> $WindowClose
 
 
 ## Console ....................................................................
@@ -239,13 +256,21 @@ window	MicrosoftJava	/:Microsoft VM For Java\(TM\) Host Window Class:/ \
 ## Emacs ......................................................................
 ## http://www.cs.washington.edu/homes/voelker/ntemacs.html
 
-window	Meadow	/:Meadow$/ : Global
+keymap Emacen : Global
  key C-Yen		=> &Default
+ if ( MAP-ESCAPE-TO-META )			# ESC が M- になるのを阻止する
+   if ( KBD109 ) and ( ! KBD104on109 )
+     key *半角/全角	=> *Esc
+     key *Esc		=> *半角/全角
+   else
+     key Escape		=> &Default
+   endif
+ endif
+
+window	Meadow	/:Meadow$/ : Emacen
  key IC-M-X		=> $ToggleIME M-X
-window	MULE	/:MULE$/ : Global
- key C-Yen		=> &Default
-window	Emacs	/:Emacs$/ : Global
- key C-Yen		=> &Default
+window	MULE	/:MULE$/ : Emacen
+window	Emacs	/:Emacs$/ : Emacen
 
 
 ## Notepad ....................................................................
@@ -449,21 +474,21 @@ window WindowsMediaPlayer /mplayer2.*:(Media Player 2|VideoRenderer)/ : Global
 ## Windows Mine Sweeper .......................................................
 
 window WindowsMineSweeper /winmine.exe:マインスイーパ$/ : Global
- key D-Z	=> &VK(RButton)
- key U-Z	=> &Ignore
- key D-X	=> &VK(MButton)
- key U-X	=> &Ignore
- key D-C	=> &VK(LButton)
- key U-C	=> &Ignore
- key Q		=> F2
- key Num1	=> &MouseMove(-16,  16)
- key Num2	=> &MouseMove(  0,  16)
- key Num3	=> &MouseMove( 16,  16)
- key Num4	=> &MouseMove(-16,   0)
- key Num6	=> &MouseMove( 16,   0)
- key Num7	=> &MouseMove(-16, -16)
- key Num8	=> &MouseMove(  0, -16)
- key Num9	=> &MouseMove( 16, -16)
+ key D-Z		=> &VK(RButton)
+ key U-Z		=> &Ignore
+ key D-X		=> &VK(MButton)
+ key U-X		=> &Ignore
+ key D-C		=> &VK(LButton)
+ key U-C		=> &Ignore
+ key Q			=> F2
+ key Num1		=> &MouseMove(-16,  16)
+ key Num2		=> &MouseMove(  0,  16)
+ key Num3		=> &MouseMove( 16,  16)
+ key Num4		=> &MouseMove(-16,   0)
+ key Num6		=> &MouseMove( 16,   0)
+ key Num7		=> &MouseMove(-16, -16)
+ key Num8		=> &MouseMove(  0, -16)
+ key Num9		=> &MouseMove( 16, -16)
 
 
 ## ICQ2000 ....................................................................
@@ -471,5 +496,12 @@ window WindowsMineSweeper /winmine.exe:マインスイーパ$/ : Global
 if ( GANA )
   window ICQMessageSession \
 	( /ICQ\.exe:#32770:Edit$/ && /Message Session/ ) : EmacsEdit
-   key Enter  => M-S
+   key Enter		=> M-S
 endif
+
+
+## Acrobat Reader .............................................................
+
+window AcrobatReader /AcroRd32.exe:.*:MDIClient:/ : EmacsMove
+ key Space		=> PageDown
+ key BS			=> PageUp

@@ -107,6 +107,7 @@ DISTRIB_CONTRIBS =				\
 		contrib\mayu-settings.txt	\
 		contrib\dvorak.mayu		\
 		contrib\keitai.mayu		\
+		contrib\a.mayu			\
 
 DISTRIB		=			\
 		$(TARGET_1)		\

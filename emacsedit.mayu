@@ -61,9 +61,11 @@ keymap	EmacsMove : Global
 
 keymap	EmacsEdit : EmacsMove
 keymap2	EmacsMark : EmacsEdit => $EmacsMark/cancel &KeymapWindow
-
+keymap2 EmacsMarkEscape : EmacsMark => &KeymapParent
 
 keymap2	EmacsC-X : EmacsEdit
+ event prefixed		=> &HelpMessage("EmacsEdit C-x-", "C-x u\tundo")
+ event before-key-down	=> &HelpMessage
  key *U			=> C-Z					# UNDO
 
 keymap2 EmacsC-U0_9C-U : Global \
@@ -71,7 +73,7 @@ keymap2 EmacsC-U0_9C-U : Global \
  key C-G	=> &HelpMessage &Variable(0, 0) &Ignore
  
 keymap2 EmacsC-U0_9 : EmacsC-U0_9C-U
- event prefixed => &HelpVariable("ŒJ‚è•Ô‚µ")
+ event prefixed		=> &HelpVariable("ŒJ‚è•Ô‚µ")
  key _0 Num0		=> &Variable(10, 0) &Prefix(EmacsC-U0_9)
  key _1 Num1		=> &Variable(10, 1) &Prefix(EmacsC-U0_9)
  key _2 Num2		=> &Variable(10, 2) &Prefix(EmacsC-U0_9)
@@ -85,7 +87,7 @@ keymap2 EmacsC-U0_9 : EmacsC-U0_9C-U
  key C-U		=> &Prefix(EmacsC-U0_9C-U)
 
 keymap2 EmacsC-U : EmacsC-U0_9C-U
- event prefixed => &HelpVariable("ŒJ‚è•Ô‚µ")
+ event prefixed		=> &HelpVariable("ŒJ‚è•Ô‚µ")
  key _0 Num0		=> &Variable(0, 0) &Prefix(EmacsC-U0_9)
  key _1 Num1		=> &Variable(0, 1) &Prefix(EmacsC-U0_9)
  key _2 Num2		=> &Variable(0, 2) &Prefix(EmacsC-U0_9)
@@ -140,3 +142,14 @@ keymap2	EmacsMark
  key Up			=> S-Up		&Prefix(EmacsMark)	# ª
  key Right		=> S-Right	&Prefix(EmacsMark)	# ¨
  key Down		=> S-Down	&Prefix(EmacsMark)	# «
+ if ( MAP-ESCAPE-TO-META )
+   key Escape		=> &Prefix(EmacsMarkEscape) &EditNextModifier(M-)
+   if ( KBD109 ) and ( ! KBD104on109 )
+     key ”¼Šp/‘SŠp	=> &Prefix(EmacsMarkEscape) &EditNextModifier(M-)
+   endif
+ endif
+
+keymap2 EmacsMarkEscape
+ event prefixed		=> &HelpMessage("EmacsMark ESC-", " ")
+ event before-key-down	=> &HelpMessage
+ key M-C-G		=> &Ignore

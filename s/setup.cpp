@@ -70,6 +70,7 @@ const SetupFile setupFiles[] =
   SetupFile(SF::File, SF::NT , "contrib\\mayu-settings.txt", SF::ToDest),
   SetupFile(SF::File, SF::NT , "contrib\\dvorak.mayu"      , SF::ToDest),
   SetupFile(SF::File, SF::NT , "contrib\\keitai.mayu"      , SF::ToDest),
+  SetupFile(SF::File, SF::NT , "contrib\\ax.mayu"          , SF::ToDest),
 };
 
 

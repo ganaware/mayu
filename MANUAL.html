@@ -168,9 +168,12 @@ Copyright &copy; 1999-2000, <a href="http://www.ganaware.org" target="_top">TAGA
       <ul>
 	<li><span class="bug">[仕様]</span> コマンドプロンプトではロックキーとIMEの状態を区別することができません。また、コマンドプロンプトのプロパティに対しては無力です。
 	<li><span class="bug">[仕様]</span> Windows2000 では、「窓使いの憂鬱」を終了させたあとに何かのキーを押さないと終了しません。
+	<li><code>window ASTEC-X ( /:ASTEC-X$/ &amp;&amp; /[xk]term/ ) : Global</code> がうまくはたらかない気がする
+	<li>WindowsRaiseLower, WindowNextFocusや, WindowPreviousFocus を作る。
+	<li>cmkey のようなマウスイベントの置き換え機能をつける。
+	    
 	<li>各国語キーボード対応。各言語のディレクトリをホームディレクトリに加える。キー設定は settings/* に移動(?)
 	<li>どぼらっくの指定をもっとスマートにする。
-	<li><code>window ASTEC-X ( /:ASTEC-X$/ &amp;&amp; /[xk]term/ ) : Global</code> がうまくはたらかない気がする。
 	<li>iexpress を使う。
 	<li>USB キーボードでは動作しないのでなんとかする (めんどくさいな…)。
 	<li>インストーラは、AltIME が入っていたら警告を出す。
@@ -179,10 +182,6 @@ Copyright &copy; 1999-2000, <a href="http://www.ganaware.org" target="_top">TAGA
 	<li>WDM ドライバにして Windows98/ME でも動くようにする。
 	    <ul>
 	      <li>作者は必要性を感じていませんが、やる気のある方がドライバを書いて送っていただければ対応します。
-	    </ul>
-	<li>cmkey のようなマウスイベントの置き換え機能をつける。
-	    <ul>
-	      <li>マウスフィルタドライバを書けば対応できます。(以下同上)
 	    </ul>
 	<li>マルチプロセッサマシンでごくたまにおちるようだ。
 	<li>ドライバのセキュリティに関しての調査・実装。
@@ -329,6 +328,8 @@ Copyright &copy; 1999-2000, <a href="http://www.ganaware.org" target="_top">TAGA
 	    <ul>
 	      <li><kbd>[Control]</kbd> + <kbd>[U]</kbd> 操作の改良。
 	      <li><a href="default.mayu"><code>default.mayu</code></a> を使っている場合は、<code>Global</code> キーマップで <kbd>[英数]</kbd> を <kbd>[Control]</kbd> にしているが、<code>Global</code> キーマップを親キーマップとして持たない <a href="CUSTOMIZE.html#keymap2"><code>keymap2</code></a> の中では (当然ながら) <kbd>[英数]</kbd> を <kbd>[Control]</kbd> として使用できないので、ちゃんと <code>Global</code> キーマップを親キーマップとして持つように設定ファイルを修正。
+	      <li><a href="default.mayu"><code>default.mayu</code></a> で、<code>-DMAP-ESCAPE-TO-META</code> とすると <kbd>[Alt]</kbd> + <kbd>[X]</kbd> などを <kbd>[ESCAPE] [X]</kbd> で代用するようにした。
+	      <li><a href="contrib/ax.mayu"><code>contrib/ax.mayu</code></a> を追加。(Thanks to Nobukazu KAWABE)
 	    </ul>
 	<dt>2000/12/17 version 3.18
 	<dd>
@@ -442,7 +443,7 @@ Copyright &copy; 1999-2000, <a href="http://www.ganaware.org" target="_top">TAGA
 	    <ul>
 	      <li><a href="contrib/dvorak.mayu"><code>contrib/dvorak.mayu</code></a> を追加。(Thanks to KANAI Makoto)
 	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_InvestigateCommand"><code>&amp;InvestigateCommand</code></a> を追加。<a href="CUSTOMIZE.html#function_PostMessage"><code>&amp;PostMessage</code></a> の為の調査用。
-	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_EditNextModifier"><code>&amp;EditNextModifier</code></a> を追加。<kbd>[Alt]</kbd> + <kbd>[X]</kbd> などを <kbd>[ESCAPE][X]</kbd> などで代用することが可能に。
+	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_EditNextModifier"><code>&amp;EditNextModifier</code></a> を追加。<kbd>[Alt]</kbd> + <kbd>[X]</kbd> などを <kbd>[ESCAPE] [X]</kbd> などで代用することが可能に。
 	      <li><code><em>FUNCTION</em></code> <a href="CUSTOMIZE.html#function_Prefix"><code>&amp;Prefix</code></a> を変更。<a href="CUSTOMIZE.html#keymap2"><code>keymap2</code></a> を使うときのお約束 (<code>mod !shift !alt !control !windows</code>) が不要に。
 	      <li>設定ファイルを更新。
 	    </ul>
