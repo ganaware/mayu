@@ -5,6 +5,7 @@
 #include "misc.h"
 
 #include "windowstool.h"
+#include "array.h"
 
 #include <windowsx.h>
 #include <malloc.h>

@@ -32,6 +32,7 @@ writep			dd	0
 CodeBuf			dd	64	dup (0)
 ForceBuf		db	3		dup (0)
 BlockingID		dd	0
+PassThrough		dd	0
 
 VXD_LOCKED_DATA_ENDS
 
@@ -44,6 +45,8 @@ BeginProc MAYUD_Control
     Control_Dispatch SYS_DYNAMIC_DEVICE_INIT, MAYUD_Dynamic_Init
     Control_Dispatch SYS_DYNAMIC_DEVICE_EXIT, MAYUD_Dynamic_Exit
     Control_Dispatch W32_DEVICEIOCONTROL,     MAYUD_W32_DeviceIOControl
+	Control_Dispatch Begin_Message_Mode, MAYUD_Through_Mode
+	Control_Dispatch End_Message_Mode, MAYUD_Filter_Mode
     clc
     ret
 EndProc MAYUD_Control
@@ -139,6 +142,8 @@ VxD_LOCKED_CODE_ENDS
 VXD_PAGEABLE_CODE_SEG
 
 BeginProc Mayud, Hook_Proc Keyboard_Proc
+	cmp		PassThrough, 1
+	je		ThroughTheCode
 CheckE0:
 	cmp		cl, PreCodeE0
 	jnz		CheckE1	
@@ -173,7 +178,20 @@ UnBlockReading:
 EatTheCode:
 	stc
 	ret
+ThroughTheCode:
+	clc
+	ret
 EndProc Mayud
+
+BeginProc MAYUD_Through_Mode
+	mov	PassThrough, 1
+    ret
+EndProc   MAYUD_Through_Mode
+
+BeginProc MAYUD_Filter_Mode
+	mov	PassThrough, 0
+    ret
+EndProc   MAYUD_Filter_Mode
 
 VXD_PAGEABLE_CODE_ENDS
 

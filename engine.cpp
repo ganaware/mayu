@@ -790,7 +790,8 @@ void Engine::keyboardHandler()
       // normal key
     {
       outputToLog(&key, c.m_mkey, 1);
-      m_oneShotKey = NULL;
+      if (isPhysicallyPressed)
+	m_oneShotKey = NULL;
       beginGeneratingKeyboardEvents(c, isModifier);
     }
     

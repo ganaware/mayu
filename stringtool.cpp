@@ -3,6 +3,7 @@
 
 
 #include "stringtool.h"
+#include "array.h"
 #include <locale>
 #include <malloc.h>
 #include <mbstring.h>

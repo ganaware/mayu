@@ -238,6 +238,8 @@ window  ConsoleWindowClass /^ConsoleWindowClass$/ : Global
  key S-Insert		=> $ConsoleWindowClass/paste
  key S-Prior		=> $WM_VSCROLL/SB_PAGEUP
  key S-Next		=> $WM_VSCROLL/SB_PAGEDOWN
+ key S-~NL-Num9		=> $WM_VSCROLL/SB_PAGEUP
+ key S-~NL-Num3		=> $WM_VSCROLL/SB_PAGEDOWN
 
 
 ## Explorer, Internet Explorer ................................................

@@ -4,6 +4,7 @@
 
 #include "registry.h"
 #include "stringtool.h"
+#include "array.h"
 #include <malloc.h>
 
 

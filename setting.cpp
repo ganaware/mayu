@@ -12,6 +12,7 @@
 #include "setting.h"
 #include "windowstool.h"
 #include "vkeytable.h"
+#include "array.h"
 
 #include <algorithm>
 #include <fstream>
