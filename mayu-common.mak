@@ -25,6 +25,7 @@ OBJS_1		=			\
 		function.obj		\
 		keyboard.obj		\
 		keymap.obj		\
+		layoutmanager.obj	\
 		mayu.obj		\
 		parser.obj		\
 		registry.obj		\
@@ -45,6 +46,7 @@ SRCS_1		=			\
 		function.cpp		\
 		keyboard.cpp		\
 		keymap.cpp		\
+		layoutmanager.cpp	\
 		mayu.cpp		\
 		parser.cpp		\
 		registry.cpp		\

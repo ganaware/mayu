@@ -7,14 +7,14 @@
 #include "mayurc.h"
 #include "windowstool.h"
 #include "dlgeditsetting.h"
+#include "layoutmanager.h"
 
 #include <windowsx.h>
 
 
 ///
-class DlgEditSetting
+class DlgEditSetting : public LayoutManager
 {
-  HWND m_hwnd;					///
   HWND m_hwndMayuPathName;			///
   HWND m_hwndMayuPath;				///
   HWND m_hwndSymbols;				///
@@ -24,7 +24,7 @@ class DlgEditSetting
 public:
   ///
   DlgEditSetting(HWND i_hwnd)
-    : m_hwnd(i_hwnd),
+    : LayoutManager(i_hwnd),
       m_hwndMayuPathName(NULL),
       m_hwndMayuPath(NULL),
       m_hwndSymbols(NULL),
@@ -49,6 +49,45 @@ public:
     SetWindowText(m_hwndMayuPath, m_data->m_filename.c_str());
     SetWindowText(m_hwndSymbols, m_data->m_symbols.c_str());
     
+    restrictSmallestSize();
+    
+    // set layout manager
+    typedef LayoutManager LM;
+
+    addItem(GetDlgItem(m_hwnd, IDC_STATIC_mayuPathName));
+    addItem(GetDlgItem(m_hwnd, IDC_EDIT_mayuPathName),
+	    LM::ORIGIN_LEFT_EDGE, LM::ORIGIN_TOP_EDGE,
+	    LM::ORIGIN_RIGHT_EDGE, LM::ORIGIN_TOP_EDGE);
+    addItem(GetDlgItem(m_hwnd, IDC_STATIC_mayuPathNameComment),
+	    LM::ORIGIN_RIGHT_EDGE, LM::ORIGIN_TOP_EDGE,
+	    LM::ORIGIN_RIGHT_EDGE, LM::ORIGIN_TOP_EDGE);
+
+    addItem(GetDlgItem(m_hwnd, IDC_STATIC_mayuPath));
+    addItem(GetDlgItem(m_hwnd, IDC_EDIT_mayuPath),
+	    LM::ORIGIN_LEFT_EDGE, LM::ORIGIN_TOP_EDGE,
+	    LM::ORIGIN_RIGHT_EDGE, LM::ORIGIN_TOP_EDGE);
+    addItem(GetDlgItem(m_hwnd, IDC_BUTTON_browse),
+	    LM::ORIGIN_RIGHT_EDGE, LM::ORIGIN_TOP_EDGE,
+	    LM::ORIGIN_RIGHT_EDGE, LM::ORIGIN_TOP_EDGE);
+
+    addItem(GetDlgItem(m_hwnd, IDC_STATIC_symbols));
+    addItem(GetDlgItem(m_hwnd, IDC_EDIT_symbols),
+	    LM::ORIGIN_LEFT_EDGE, LM::ORIGIN_TOP_EDGE,
+	    LM::ORIGIN_RIGHT_EDGE, LM::ORIGIN_TOP_EDGE);
+    addItem(GetDlgItem(m_hwnd, IDC_STATIC_symbolsComment),
+	    LM::ORIGIN_RIGHT_EDGE, LM::ORIGIN_TOP_EDGE,
+	    LM::ORIGIN_RIGHT_EDGE, LM::ORIGIN_TOP_EDGE);
+    
+    addItem(GetDlgItem(m_hwnd, IDOK),
+	    LM::ORIGIN_CENTER, LM::ORIGIN_TOP_EDGE,
+	    LM::ORIGIN_CENTER, LM::ORIGIN_TOP_EDGE);
+    addItem(GetDlgItem(m_hwnd, IDCANCEL),
+	    LM::ORIGIN_CENTER, LM::ORIGIN_TOP_EDGE,
+	    LM::ORIGIN_CENTER, LM::ORIGIN_TOP_EDGE);
+
+    restrictSmallestSize(LM::RESTRICT_BOTH);
+    restrictLargestSize(LM::RESTRICT_VERTICALLY);
+    
     return TRUE;
   }
   
@@ -58,7 +97,7 @@ public:
     CHECK_TRUE( EndDialog(m_hwnd, 0) );
     return TRUE;
   }
-  
+
   /// WM_COMMAND
   BOOL wmCommand(int /* i_notify_code */, int i_id, HWND /* i_hwnd_control */)
   {
@@ -137,6 +176,8 @@ BOOL CALLBACK dlgEditSetting_dlgProc(HWND i_hwnd, UINT i_message,
       case WM_NCDESTROY:
 	delete wc;
 	return TRUE;
+      default:
+	return wc->defaultWMHandler(i_message, i_wParam, i_lParam);
     }
   return FALSE;
 }

@@ -33,7 +33,7 @@ public:
     _TCHAR buf[1024], buf2[1024];
     Edit_GetText(GetDlgItem(m_hwnd, IDC_STATIC_version), buf,
 		 NUMBER_OF(buf));
-    _sntprintf(buf2, NUMBER_OF(buf2), buf, VERSION);
+    _sntprintf(buf2, NUMBER_OF(buf2), buf, _T(VERSION));
     Edit_SetText(GetDlgItem(m_hwnd, IDC_STATIC_version), buf2);
     return TRUE;
   }

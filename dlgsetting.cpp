@@ -11,106 +11,16 @@
 #include "windowstool.h"
 #include "setting.h"
 #include "dlgeditsetting.h"
+#include "layoutmanager.h"
 
 #include <commctrl.h>
 #include <windowsx.h>
 
 
-class LayoutManager
-{
-public:
-  enum Origin
-  {
-    ORIGIN_LEFT_EDGE,
-    ORIGIN_TOP_EDGE = ORIGIN_LEFT_EDGE,
-    ORIGIN_CENTER,
-    ORIGIN_RIGHT_EDGE,
-    ORIGIN_BOTTOM_EDGE = ORIGIN_RIGHT_EDGE,
-  };
-
-private:
-  class Item
-  {
-  public:
-    HWND m_hwnd;
-    HWND m_hwndParent;
-    RECT m_rc;
-    RECT m_rcParent;
-    Origin m_origin[4];
-  };
-
-  typedef std::list<Item> Items;
-  Items m_items;
-  
-public:
-  bool addItem(HWND i_hwnd, Origin i_originLeft, Origin i_originTop,
-	       Origin i_originBottom, Origin i_originRight)
-  {
-    Item item;
-    if (!i_hwnd)
-      return false;
-    item.m_hwnd = i_hwnd;
-    if (!(GetWindowLong(i_hwnd, GWL_STYLE) & WS_CHILD))
-      return false;
-    item.m_hwndParent = GetParent(i_hwnd);
-    if (!item.m_hwndParent)
-      return false;
-    getChildWindowRect(item.m_hwnd, &item.m_rc);
-    GetWindowRect(item.m_hwndParent, &item.m_rcParent);
-    item.m_origin[0] = i_originLeft;
-    item.m_origin[1] = i_originTop;
-    item.m_origin[2] = i_originBottom;
-    item.m_origin[3] = i_originRight;
-    
-    m_items.push_back(item);
-    return true;
-  }
-  
-  void adjust() const
-  {
-    for (Items::const_iterator i = m_items.begin(); i != m_items.end(); ++ i)
-    {
-      RECT rc;
-      GetWindowRect(i->m_hwndParent, &rc);
-
-      struct { int m_width, m_pos; int m_curWidth; LONG *m_out; }
-      pos[4] =
-      {
-	{ rcWidth(&i->m_rcParent), i->m_rc.left, rcWidth(&rc), &rc.left },
-	{ rcHeight(&i->m_rcParent), i->m_rc.top, rcHeight(&rc), &rc.top },
-	{ rcWidth(&i->m_rcParent), i->m_rc.right, rcWidth(&rc), &rc.right },
-	{ rcHeight(&i->m_rcParent), i->m_rc.bottom, rcHeight(&rc), &rc.bottom }
-      };
-      for (int j = 0; j < 4; ++ j)
-      {
-	switch (i->m_origin[j])
-	{
-	  case ORIGIN_LEFT_EDGE:
-	    *pos[j].m_out = pos[j].m_pos;
-	    break;
-	  case ORIGIN_CENTER:
-	    *pos[j].m_out = pos[j].m_curWidth / 2
-	      - (pos[j].m_width / 2 - pos[j].m_pos);
-	    break;
-	  case ORIGIN_RIGHT_EDGE:
-	    *pos[j].m_out = pos[j].m_curWidth
-	      - (pos[j].m_width - pos[j].m_pos);
-	    break;
-	}
-      }
-      MoveWindow(i->m_hwnd, rc.left, rc.top,
-		 rcWidth(&rc), rcHeight(&rc), FALSE);
-    }
-  }
-};
-
-
 ///
-class DlgSetting
+class DlgSetting : public LayoutManager
 {
-  HWND m_hwnd;					///
   HWND m_hwndMayuPaths;				///
-  LayoutManager m_layoutManager;		/// 
   
   ///
   Registry m_reg;
@@ -195,7 +105,7 @@ class DlgSetting
 public:
   ///
   DlgSetting(HWND i_hwnd)
-    : m_hwnd(i_hwnd),
+    : LayoutManager(i_hwnd),
       m_hwndMayuPaths(NULL),
       m_reg(MAYU_REGISTRY_ROOT)
   {
@@ -267,64 +177,38 @@ public:
     setSelectedItem(index);
 
     // set layout manager
-    m_layoutManager.addItem(GetDlgItem(m_hwnd, IDC_STATIC_mayuPaths),
-			    LayoutManager::ORIGIN_LEFT_EDGE,
-			    LayoutManager::ORIGIN_TOP_EDGE,
-			    LayoutManager::ORIGIN_RIGHT_EDGE,
-			    LayoutManager::ORIGIN_BOTTOM_EDGE);
-    m_layoutManager.addItem(GetDlgItem(m_hwnd, IDC_LIST_mayuPaths),
-			    LayoutManager::ORIGIN_LEFT_EDGE,
-			    LayoutManager::ORIGIN_TOP_EDGE,
-			    LayoutManager::ORIGIN_RIGHT_EDGE,
-			    LayoutManager::ORIGIN_BOTTOM_EDGE);
-    m_layoutManager.addItem(GetDlgItem(m_hwnd, IDC_BUTTON_up),
-			    LayoutManager::ORIGIN_RIGHT_EDGE,
-			    LayoutManager::ORIGIN_CENTER,
-			    LayoutManager::ORIGIN_RIGHT_EDGE,
-			    LayoutManager::ORIGIN_CENTER);
-    m_layoutManager.addItem(GetDlgItem(m_hwnd, IDC_BUTTON_down),
-			    LayoutManager::ORIGIN_RIGHT_EDGE,
-			    LayoutManager::ORIGIN_CENTER,
-			    LayoutManager::ORIGIN_RIGHT_EDGE,
-			    LayoutManager::ORIGIN_CENTER);
-    m_layoutManager.addItem(GetDlgItem(m_hwnd, IDC_BUTTON_add),
-			    LayoutManager::ORIGIN_CENTER,
-			    LayoutManager::ORIGIN_BOTTOM_EDGE,
-			    LayoutManager::ORIGIN_CENTER,
-			    LayoutManager::ORIGIN_BOTTOM_EDGE);
-    m_layoutManager.addItem(GetDlgItem(m_hwnd, IDC_BUTTON_edit),
-			    LayoutManager::ORIGIN_CENTER,
-			    LayoutManager::ORIGIN_BOTTOM_EDGE,
-			    LayoutManager::ORIGIN_CENTER,
-			    LayoutManager::ORIGIN_BOTTOM_EDGE);
-    m_layoutManager.addItem(GetDlgItem(m_hwnd, IDC_BUTTON_delete),
-			    LayoutManager::ORIGIN_CENTER,
-			    LayoutManager::ORIGIN_BOTTOM_EDGE,
-			    LayoutManager::ORIGIN_CENTER,
-			    LayoutManager::ORIGIN_BOTTOM_EDGE);
-    m_layoutManager.addItem(GetDlgItem(m_hwnd, IDCANCEL),
-			    LayoutManager::ORIGIN_CENTER,
-			    LayoutManager::ORIGIN_BOTTOM_EDGE,
-			    LayoutManager::ORIGIN_CENTER,
-			    LayoutManager::ORIGIN_BOTTOM_EDGE);
-    m_layoutManager.addItem(GetDlgItem(m_hwnd, IDOK),
-			    LayoutManager::ORIGIN_CENTER,
-			    LayoutManager::ORIGIN_BOTTOM_EDGE,
-			    LayoutManager::ORIGIN_CENTER,
-			    LayoutManager::ORIGIN_BOTTOM_EDGE);
+    typedef LayoutManager LM;
+    addItem(GetDlgItem(m_hwnd, IDC_STATIC_mayuPaths),
+	    LM::ORIGIN_LEFT_EDGE, LM::ORIGIN_TOP_EDGE,
+	    LM::ORIGIN_RIGHT_EDGE, LM::ORIGIN_BOTTOM_EDGE);
+    addItem(GetDlgItem(m_hwnd, IDC_LIST_mayuPaths),
+	    LM::ORIGIN_LEFT_EDGE, LM::ORIGIN_TOP_EDGE,
+	    LM::ORIGIN_RIGHT_EDGE, LM::ORIGIN_BOTTOM_EDGE);
+    addItem(GetDlgItem(m_hwnd, IDC_BUTTON_up),
+	    LM::ORIGIN_RIGHT_EDGE, LM::ORIGIN_CENTER,
+	    LM::ORIGIN_RIGHT_EDGE, LM::ORIGIN_CENTER);
+    addItem(GetDlgItem(m_hwnd, IDC_BUTTON_down),
+	    LM::ORIGIN_RIGHT_EDGE, LM::ORIGIN_CENTER,
+	    LM::ORIGIN_RIGHT_EDGE, LM::ORIGIN_CENTER);
+    addItem(GetDlgItem(m_hwnd, IDC_BUTTON_add),
+	    LM::ORIGIN_CENTER, LM::ORIGIN_BOTTOM_EDGE,
+	    LM::ORIGIN_CENTER, LM::ORIGIN_BOTTOM_EDGE);
+    addItem(GetDlgItem(m_hwnd, IDC_BUTTON_edit),
+	    LM::ORIGIN_CENTER, LM::ORIGIN_BOTTOM_EDGE,
+	    LM::ORIGIN_CENTER, LM::ORIGIN_BOTTOM_EDGE);
+    addItem(GetDlgItem(m_hwnd, IDC_BUTTON_delete),
+	    LM::ORIGIN_CENTER, LM::ORIGIN_BOTTOM_EDGE,
+	    LM::ORIGIN_CENTER, LM::ORIGIN_BOTTOM_EDGE);
+    addItem(GetDlgItem(m_hwnd, IDCANCEL),
+	    LM::ORIGIN_CENTER, LM::ORIGIN_BOTTOM_EDGE,
+	    LM::ORIGIN_CENTER, LM::ORIGIN_BOTTOM_EDGE);
+    addItem(GetDlgItem(m_hwnd, IDOK),
+	    LM::ORIGIN_CENTER, LM::ORIGIN_BOTTOM_EDGE,
+	    LM::ORIGIN_CENTER, LM::ORIGIN_BOTTOM_EDGE);
+    restrictSmallestSize();
     return TRUE;
   }
 
-  /// WM_SIZE
-  BOOL wmSize(DWORD /* i_fwSizeType */, short /* i_nWidth */,
-	      short /* i_nHeight */)
-  {
-    m_layoutManager.adjust();
-    RedrawWindow(m_hwnd, NULL, NULL,
-		 RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
-    return TRUE;
-  }
-  
   /// WM_CLOSE
   BOOL wmClose()
   {
@@ -476,8 +360,6 @@ BOOL CALLBACK dlgSetting_dlgProc(
   else
     switch (i_message)
     {
-      case WM_SIZE:
-	return wc->wmSize(i_wParam, LOWORD(i_lParam), HIWORD(i_lParam));
       case WM_COMMAND:
 	return wc->wmCommand(HIWORD(i_wParam), LOWORD(i_wParam),
 			     reinterpret_cast<HWND>(i_lParam));
@@ -489,6 +371,8 @@ BOOL CALLBACK dlgSetting_dlgProc(
       case WM_NOTIFY:
 	return wc->wmNotify(static_cast<int>(i_wParam),
 			    reinterpret_cast<NMHDR *>(i_lParam));
+      default:
+	return wc->defaultWMHandler(i_message, i_wParam, i_lParam);
     }
   return FALSE;
 }

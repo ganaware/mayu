@@ -51,9 +51,14 @@
 #define IDC_EDIT_mayuPathName           1016
 #define IDC_EDIT_symbols                1017
 #define IDC_LIST_mayuPaths              1018
-#define IDC_STATIC_mayuPaths            1019
-#define IDC_STATIC_url                  1020
-#define IDC_STATIC_version              1021
+#define IDC_STATIC_mayuPath             1019
+#define IDC_STATIC_mayuPathName         1020
+#define IDC_STATIC_mayuPathNameComment  1021
+#define IDC_STATIC_mayuPaths            1022
+#define IDC_STATIC_symbols              1023
+#define IDC_STATIC_symbolsComment       1024
+#define IDC_STATIC_url                  1025
+#define IDC_STATIC_version              1026
 #define ID_MENUITEM_quit                40001
 #define ID_MENUITEM_reload              40002
 #define ID_MENUITEM_setting             40003

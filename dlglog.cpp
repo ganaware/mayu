@@ -9,14 +9,14 @@
 #include "registry.h"
 #include "windowstool.h"
 #include "msgstream.h"
+#include "layoutmanager.h"
 
 #include <windowsx.h>
 
 
 ///
-class DlgLog
+class DlgLog : public LayoutManager
 {
-  HWND m_hwnd;					///
   HWND m_hwndEdit;				///
   LOGFONT m_lf;					///
   HFONT m_hfontOriginal;			///
@@ -26,7 +26,7 @@ class DlgLog
 public:
   ///
   DlgLog(HWND i_hwnd)
-    : m_hwnd(i_hwnd),
+    : LayoutManager(i_hwnd),
       m_hwndEdit(GetDlgItem(m_hwnd, IDC_EDIT_log)),
       m_hfontOriginal(GetWindowFont(m_hwnd)),
       m_hfont(NULL)
@@ -58,6 +58,24 @@ public:
       (IsDlgButtonChecked(m_hwnd, IDC_CHECK_detail) == BST_CHECKED);
     m_log->setDebugLevel(isChecked ? 1 : 0);
 
+    // set layout manager
+    typedef LayoutManager LM;
+    addItem(GetDlgItem(m_hwnd, IDOK),
+	    LM::ORIGIN_LEFT_EDGE, LM::ORIGIN_BOTTOM_EDGE,
+	    LM::ORIGIN_LEFT_EDGE, LM::ORIGIN_BOTTOM_EDGE);
+    addItem(GetDlgItem(m_hwnd, IDC_EDIT_log),
+	    LM::ORIGIN_LEFT_EDGE, LM::ORIGIN_TOP_EDGE,
+	    LM::ORIGIN_RIGHT_EDGE, LM::ORIGIN_BOTTOM_EDGE);
+    addItem(GetDlgItem(m_hwnd, IDC_BUTTON_clearLog),
+	    LM::ORIGIN_LEFT_EDGE, LM::ORIGIN_BOTTOM_EDGE,
+	    LM::ORIGIN_LEFT_EDGE, LM::ORIGIN_BOTTOM_EDGE);
+    addItem(GetDlgItem(m_hwnd, IDC_BUTTON_changeFont),
+	    LM::ORIGIN_LEFT_EDGE, LM::ORIGIN_BOTTOM_EDGE,
+	    LM::ORIGIN_LEFT_EDGE, LM::ORIGIN_BOTTOM_EDGE);
+    addItem(GetDlgItem(m_hwnd, IDC_CHECK_detail),
+	    LM::ORIGIN_LEFT_EDGE, LM::ORIGIN_BOTTOM_EDGE,
+	    LM::ORIGIN_LEFT_EDGE, LM::ORIGIN_BOTTOM_EDGE);
+    restrictSmallestSize();
     return TRUE;
   }
 
@@ -71,33 +89,6 @@ public:
     // unset icons
     unsetBigIcon(m_hwnd);
     unsetSmallIcon(m_hwnd);
-    return TRUE;
-  }
-  
-  /// WM_SIZE
-  BOOL wmSize(DWORD /* i_fwSizeType */, short i_nWidth, short i_nHeight)
-  {
-    RECT rcLog, rcCl, rcCf, rcD, rcOK;
-    HWND hwndCl = GetDlgItem(m_hwnd, IDC_BUTTON_clearLog);
-    HWND hwndCf = GetDlgItem(m_hwnd, IDC_BUTTON_changeFont);
-    HWND hwndD  = GetDlgItem(m_hwnd, IDC_CHECK_detail);
-    HWND hwndOK = GetDlgItem(m_hwnd, IDOK);
-    CHECK_TRUE( getChildWindowRect(m_hwndEdit, &rcLog) );
-    CHECK_TRUE( getChildWindowRect(hwndCl, &rcCl) );
-    CHECK_TRUE( getChildWindowRect(hwndCf, &rcCf) );
-    CHECK_TRUE( getChildWindowRect(hwndD, &rcD) );
-    CHECK_TRUE( getChildWindowRect(hwndOK, &rcOK) );
-    int d = rcCl.top - rcLog.bottom;
-    int tail = d * 2 + rcHeight(&rcCl);
-    MoveWindow(m_hwndEdit, 0, 0, i_nWidth, i_nHeight - tail, TRUE);
-    MoveWindow(hwndCl, rcCl.left, i_nHeight - (tail + rcHeight(&rcCl)) / 2,
-	       rcWidth(&rcCl), rcHeight(&rcCl), TRUE);
-    MoveWindow(hwndCf, rcCf.left, i_nHeight - (tail + rcHeight(&rcCf)) / 2,
-	       rcWidth(&rcCf), rcHeight(&rcCf), TRUE);
-    MoveWindow(hwndD, rcD.left, i_nHeight - (tail + rcHeight(&rcD)) / 2,
-	       rcWidth(&rcD), rcHeight(&rcD), TRUE);
-    MoveWindow(hwndOK, rcOK.left, i_nHeight - (tail + rcHeight(&rcOK)) / 2,
-	       rcWidth(&rcOK), rcHeight(&rcOK), TRUE);
     return TRUE;
   }
   
@@ -174,8 +165,6 @@ BOOL CALLBACK dlgLog_dlgProc(HWND i_hwnd, UINT i_message,
   else
     switch (i_message)
     {
-      case WM_SIZE:
-	return wc->wmSize(i_wParam, LOWORD(i_lParam), HIWORD(i_lParam));
       case WM_COMMAND:
 	return wc->wmCommand(HIWORD(i_wParam), LOWORD(i_wParam),
 			     reinterpret_cast<HWND>(i_lParam));
@@ -186,6 +175,8 @@ BOOL CALLBACK dlgLog_dlgProc(HWND i_hwnd, UINT i_message,
       case WM_NCDESTROY:
 	delete wc;
 	return TRUE;
+      default:
+	return wc->defaultWMHandler(i_message, i_wParam, i_lParam);
     }
   return FALSE;
 }
