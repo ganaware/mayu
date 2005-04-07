@@ -52,29 +52,29 @@ END
 // Dialog
 //
 
-IDD_DIALOG_main DIALOG DISCARDABLE  0, 0, 263, 179
+IDD_DIALOG_main DIALOG DISCARDABLE  0, 0, 263, 309
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "窓使いの憂鬱セットアップ"
 FONT 9, "MS UI Gothic"
 BEGIN
-    RTEXT           "インストール先(&D):",IDC_STATIC,0,87,52,8
-    EDITTEXT        IDC_EDIT_path,56,84,152,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "参照(&B)...",IDC_BUTTON_browse,212,84,44,14
-    ICON            IDI_ICON_mayu,IDC_STATIC,8,120,20,20
-    GROUPBOX        "",IDC_STATIC,35,100,192,56
+    RTEXT           "インストール先(&D):",IDC_STATIC,0,217,52,8
+    EDITTEXT        IDC_EDIT_path,56,214,152,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "参照(&B)...",IDC_BUTTON_browse,212,214,44,14
+    ICON            IDI_ICON_mayu,IDC_STATIC,8,250,20,20
+    GROUPBOX        "",IDC_STATIC,35,230,192,56
     CONTROL         "All Users のスタートメニューに登録(&A)",
                     IDC_CHECK_registerStartMenu,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,44,110,176,10
+                    WS_TABSTOP,44,240,176,10
     CONTROL         "個人のスタートアップに登録(&S)",
                     IDC_CHECK_registerStartUp,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,44,122,176,10
-    RTEXT           "キーボードの種類(&K):",IDC_STATIC,36,138,64,8
-    COMBOBOX        IDC_COMBO_keyboard,104,136,116,64,CBS_DROPDOWNLIST | 
+                    WS_TABSTOP,44,252,176,10
+    RTEXT           "キーボードの種類(&K):",IDC_STATIC,36,268,64,8
+    COMBOBOX        IDC_COMBO_keyboard,104,266,116,64,CBS_DROPDOWNLIST | 
                     WS_VSCROLL | WS_TABSTOP
-    DEFPUSHBUTTON   "OK",IDOK,76,160,50,14
-    PUSHBUTTON      "キャンセル",IDCANCEL,132,160,50,14
-    GROUPBOX        "注意(&N)",IDC_STATIC,25,4,212,76
-    EDITTEXT        IDC_EDIT_note,31,14,200,62,ES_MULTILINE | ES_AUTOVSCROLL | 
+    DEFPUSHBUTTON   "OK",IDOK,76,290,50,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,132,290,50,14
+    GROUPBOX        "注意(&N)",IDC_STATIC,25,4,212,206
+    EDITTEXT        IDC_EDIT_note,31,14,200,192,ES_MULTILINE | ES_AUTOVSCROLL | 
                     ES_READONLY | NOT WS_BORDER
 END
 
@@ -132,10 +132,19 @@ END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    IDS_note01              "「窓使いの憂鬱」をインストールしたらぜひメーリングリストに参加してください。参加方法は README.html に書かれています。\r\n\r\n"
-    IDS_note02              "標準でないキーボードドライバを利用していると Windows が青画面になって終了してしまうことがあります。"
+    IDS_note01              "◆「窓使いの憂鬱」をインストールしたらぜひメーリングリストに参加してください。参加方法は README.html に書かれています。\r\n\r\n"
+    IDS_note02              "◆標準でないキーボードドライバを利用していると Windows が青画面になって終了してしまうことがあります。"
     IDS_note03              "そのような場合は、標準でないドライバをアンインストールしてください。"
-    IDS_note04              "標準でないドライバとは、ロジテックマウスに付属のドライバや AltIME のドライバなどです。"
+    IDS_note04              "標準でないドライバとは、ロジテックマウスに付属のドライバや AltIME のドライバなどです。\r\n\r\n"
+    IDS_note05		    "◆「窓使いの憂鬱」は、専用のデバイスドライバをインストールします。このドライバは Windows の起動時に実行開始されます。"
+    IDS_note06		    "このため、ドライバの不具合によって Windows へログインさえできなくなる可能性があります。"
+    IDS_note07		    "その場合でも下記の手順によってログイン可能にすることができる場合があります。\r\n\r\n"
+    IDS_note08		    "【1】電源ボタンの長押し等によって一旦、強制的に電源を落したあと回復コンソールを起動します。"
+    IDS_note09		    "尚、回復コンソールでの起動ができることを「窓使いの憂鬱」のインストール前に確認しておくことをお勧めします。"
+    IDS_note10              "(参考: http://support.microsoft.com/default.aspx?scid=kb;ja;314058 )\r\n"
+    IDS_note11              "【2】%WINDIR%\\system32\\drivers\\ 内の mayudrsc.sys を mayud.sys の名前で copy します (即ち mayud.sys を mayudrsc.sys で置き換えます)。\r\n"
+    IDS_note12              "【3】再起動します。\r\n"
+    IDS_note13              "【4】コントロールパネルから「窓使いの憂鬱」をアンインストールします。\r\n"
     IDS_copyFinishUsb       "インストールが終了しました。\nコンピュータを再起動する必要があります。\n今すぐ再起動しますか?"
     IDS_failedToReboot      "再起動に失敗しました。窓使いの憂鬱を実行する前に必ず再起動してください。"
 END
@@ -250,6 +259,15 @@ BEGIN
     IDS_note02              "* Windows may hang up, if you are using a non-standard keybaord driver. "
     IDS_note03              "In that case, please uninstall the non-standard keybaord driver.\r\n"
     IDS_note04              "* Non-standrd keybaord drivers are such as that of Logitech Mouse, and that of AltIME.\r\n"
+    IDS_note05		    "「窓使いの憂鬱」は、専用のデバイスドライバをインストールします。このドライバは Windows の起動時に実行開始されます。"
+    IDS_note06		    "このため、ドライバの不具合によって Windows へログインさえできなくなる可能性があります。"
+    IDS_note07		    "その場合でも下記の手順によってログイン可能にすることができる場合があります。\r\n\r\n"
+    IDS_note08		    "1. 電源ボタンの長押し等によって一旦、強制的に電源を落したあと回復コンソールを起動します。"
+    IDS_note09		    "尚、回復コンソールでの起動ができることを「窓使いの憂鬱」のインストール前に確認しておくことをお勧めします。"
+    IDS_note10              "(参考: http://support.microsoft.com/default.aspx?scid=kb;ja;314058 )\r\n"
+    IDS_note11              "2. %WINDIR%\\system32\\drivers\\ 内の mayudrsc.sys を mayud.sys の名前で copy します (即ち mayud.sys を mayudrsc.sys で置き換えます)。\r\n"
+    IDS_note12              "3. 再起動します。\r\n"
+    IDS_note13              "4. コントロールパネルから「窓使いの憂鬱」をアンインストールします。\r\n"
     IDS_copyFinishUsb       "Install complete.  Do you want to reboot now?"
     IDS_failedToReboot      "Failed to reboot."
 END

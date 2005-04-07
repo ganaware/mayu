@@ -323,10 +323,10 @@ private:
 #endif
     ComboBox_SetCurSel(hwndCombo,
 		       (g_keyboardKind == KEYBOARD_KIND_109) ? 0 : 1);
-    tstring note = g_resource->loadString(IDS_note01);
-    note += g_resource->loadString(IDS_note02);
-    note += g_resource->loadString(IDS_note03);
-    note += g_resource->loadString(IDS_note04);
+    tstring note;
+    for (int i = IDS_note01; i <= IDS_note13; ++ i) {
+      note += g_resource->loadString(i);
+    }
     Edit_SetText(GetDlgItem(m_hwnd, IDC_EDIT_note), note.c_str());
     return TRUE;
   }
