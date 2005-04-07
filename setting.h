@@ -25,9 +25,12 @@ public:
   KeySeqs m_keySeqs;				///
   Symbols m_symbols;				///
   bool m_correctKanaLockHandling;		///
+  unsigned int m_oneShotRepeatableDelay;	///
 
 public:
-  Setting() : m_correctKanaLockHandling(false) { }
+  Setting()
+    : m_correctKanaLockHandling(false),
+      m_oneShotRepeatableDelay(0) { }
 };
 
 

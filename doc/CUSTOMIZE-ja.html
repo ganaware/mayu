@@ -53,7 +53,7 @@
 			    <li><code>CL-</code> は、<kbd>[CapsLock]</kbd> がロック状態であることを表します。
 			    <li><code>SL-</code> は、<kbd>[ScrollLock]</kbd> がロック状態であることを表します。
 			    <li><code>KL-</code> は、<kbd>[カナ]</kbd> がロック状態であることを表します。<br>
-				(<a href="CUSTOMIZE-ja.html#def_option" target="MANUAL">オプション</a>をよく読んでください)<br>
+				(<a href="CUSTOMIZE-ja.html#def_option_KL" target="MANUAL">オプション (KL-)</a>をよく読んでください)<br>
 				109 キーボードなら、<kbd>[Control]</kbd> + <kbd>[Shift]</kbd> + <kbd>[ひらがな]</kbd>。<br>
 				104 キーボードなら、<kbd>[Control]</kbd> + <kbd>[Shift]</kbd> + <kbd>[CapsLock]</kbd>。
 			    <li><code>IL-</code> は、IME が on になっていることを表します
@@ -501,6 +501,8 @@
 			  </p>
 			  
 			  <p>とすると、<kbd>[↑]</kbd> を押しながら何か別のキー (例えば <kbd>[A]</kbd>) を押すと <kbd>[Shift]</kbd> + <kbd>[A]</kbd> と同じことになりますが、<kbd>[↑]</kbd> を押しっぱなしにすると <kbd>[↑]</kbd> がキーリピートして、カーソルが上へ動くということになります。</p>
+
+			  <p>キーリピートが開始するまでの時間を<a href="#def_option_delay_of_oneShotRepeatableModifier">オプション (delay-of !!!)</a> で設定できます。</p>
 			  
 			</div>
 			
@@ -674,7 +676,7 @@
 			  <p>上記の例では <kbd>[Shift]</kbd> + <kbd>[;]</kbd> を入力すると、<kbd>[:]</kbd> になり、<kbd>[Control]</kbd> + <kbd>[Shift]</kbd> + <kbd>[;]</kbd> を入力すると、<kbd>[Control]</kbd> + <kbd>[:]</kbd> になります。</p>
 			</div>
 
-		    <dt class="h3"><a name="def_option">オプション</a>
+		    <dt class="h3"><a name="def_option_KL">オプション (KL-)</a>
 			
 		    <dd class="d3">
 			<div>
@@ -722,6 +724,23 @@
 			  </blockquote>
 			  
 			</div>
+		    </dd>
+
+		    <dt class="h3"><a name="def_option_delay_of_oneShotRepeatableModifier">オプション (delay-of !!!)</a>
+			
+		    <dd class="d3">
+			<div>
+			  <p><a href="#oneShotRepeatableModifier">キーリピート有 One Shot (<code>!!!</code>)</a> のキーリピートが始まるまでの時間を指定します。</p>
+			  
+			  <p class="sample">
+			  def option delay-of !!! = <em>DELAY</em>
+			  </p>
+
+			  <p>最初の <code><em>DELAY</em></code> 回のキーリピートを無視するようにします。</p>
+
+			  <p>デフォルトでは <code><em>DELAY</em></code> は 0 です。</p>
+			</div>
+		    </dd>
 		  </dl>
 		</div>
 		

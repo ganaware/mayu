@@ -336,13 +336,30 @@ void SettingLoader::load_DEFINE_SUBSTITUTE()
 // <DEFINE_OPTION>
 void SettingLoader::load_DEFINE_OPTION()
 {
-  if (*getToken() != _T("KL-"))
-    throw ErrorMessage() << _T("there must be `KL-' after `option'.");
-  
-  if (*getToken() != _T("="))
-    throw ErrorMessage() << _T("there must be `=' after `KL-'.");
+  Token *t = getToken();
+  if (*t == _T("KL-")) {
+    if (*getToken() != _T("=")) {
+      throw ErrorMessage() << _T("there must be `=' after `def option KL-'.");
+    }
 
-  load_ARGUMENT(&m_setting->m_correctKanaLockHandling);
+    load_ARGUMENT(&m_setting->m_correctKanaLockHandling);
+    
+  } else if (*t == _T("delay-of")) {
+    if (*getToken() != _T("!!!")) {
+      throw ErrorMessage()
+	<< _T("there must be `!!!' after `def option delay-of'.");
+    }
+    
+    if (*getToken() != _T("=")) {
+      throw ErrorMessage()
+	<< _T("there must be `=' after `def option delay-of !!!'.");
+    }
+    
+    load_ARGUMENT(&m_setting->m_oneShotRepeatableDelay);
+    
+  } else {
+    throw ErrorMessage() << _T("syntax error `def option ") << *t << _T("'.");
+  }
 }
 
 

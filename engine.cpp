@@ -879,11 +879,18 @@ void Engine::keyboardHandler()
 	if (am == Keymap::AM_oneShotRepeatable	// the key is repeating
 	    && m_oneShotKey.m_key == c.m_mkey.m_key)
 	{
-	  Current cnew = c;
-	  beginGeneratingKeyboardEvents(cnew, false);
-	}
-	else
+	  if (m_oneShotRepeatableRepeatCount <
+	      m_setting->m_oneShotRepeatableDelay) {
+	    ; // delay
+	  } else {
+	    Current cnew = c;
+	    beginGeneratingKeyboardEvents(cnew, false);
+	  }
+	  ++ m_oneShotRepeatableRepeatCount;
+	} else {
 	  m_oneShotKey = c.m_mkey;
+	  m_oneShotRepeatableRepeatCount = 0;
+	}
       }
       else
       {
@@ -902,6 +909,7 @@ void Engine::keyboardHandler()
 	  beginGeneratingKeyboardEvents(cnew, false);
 	}
 	m_oneShotKey.m_key = NULL;
+	m_oneShotRepeatableRepeatCount = 0;
       }
     }
     else if (c.m_mkey.m_key)
@@ -958,6 +966,7 @@ Engine::Engine(tomsgstream &i_log)
     m_currentKeyPressCount(0),
     m_currentKeyPressCountOnWin32(0),
     m_lastGeneratedKey(NULL),
+    m_oneShotRepeatableRepeatCount(0),
     m_isPrefix(false),
     m_currentKeymap(NULL),
     m_currentFocusOfThread(NULL),

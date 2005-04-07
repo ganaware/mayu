@@ -165,6 +165,7 @@
 
 	<DEFINE_OPTION>
 		: "option" "KL-" "=" <bool>
+		| "option" "delay-of" "!!!" "=" <number>
 
 #
 # KEYMAP DEFINITION

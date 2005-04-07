@@ -187,6 +187,7 @@ private:
   Key *m_lastGeneratedKey;			/// last generated key
   Key *m_lastPressedKey[2];			/// last pressed key
   ModifiedKey m_oneShotKey;			/// one shot key
+  unsigned int m_oneShotRepeatableRepeatCount; /// repeat count of one shot key
   bool m_isPrefix;				/// is prefix ?
   bool m_doesIgnoreModifierForPrefix;		/** does ignore modifier key
                                                     when prefixed ? */
