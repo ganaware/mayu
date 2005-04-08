@@ -602,7 +602,19 @@ private:
   {
     m_ni.hIcon  = m_tasktrayIcon[m_engine.getIsEnabled() ? 1 : 0];
     m_ni.szInfo[0] = m_ni.szInfoTitle[0] = _T('\0');
-    return !!Shell_NotifyIcon(i_doesAdd ? NIM_ADD : NIM_MODIFY, &m_ni);
+    if (i_doesAdd) {
+      // http://support.microsoft.com/kb/418138/JA/
+      int guard = 60;
+      for (; !Shell_NotifyIcon(NIM_ADD, &m_ni) && 0 < guard; -- guard) {
+	if (Shell_NotifyIcon(NIM_MODIFY, &m_ni)) {
+	  return true;
+	}
+	Sleep(1000);				// 1sec
+      }
+      return 0 < guard;
+    } else {
+      return !!Shell_NotifyIcon(NIM_MODIFY, &m_ni);
+    }
   }
 
   void showBanner(bool i_isCleared)
