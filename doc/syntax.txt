@@ -72,8 +72,8 @@
 	#	| "\r"	# carriage return
 	#	| "\t"	# horizontal tab
 	#	| "\\"	# \
-	#	| /\\[0-7][0-7]?[0-7]?/	# character as octal
-	#	| /\\x[0-9a-f][0-9a-f]/	# character as hexadecimal
+	#	| /\\[0-7]+/		# character as octal
+	#	| /\\x[0-9a-f]+/	# character as hexadecimal
 
 	<regexp> :
 		  /\REGEXP/
