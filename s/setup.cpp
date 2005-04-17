@@ -77,7 +77,7 @@ const SetupFile::Data g_setupFiles[] =
 				    
   // documents				    
   SN(Dir , ALL, "doc"	 	     , ToDest), // mkdir
-  DN(File, ALL, "banner-ja.png"	     , ToDest, "doc\\banner-ja.png"	 ),
+  DN(File, ALL, "banner-ja.gif"	     , ToDest, "doc\\banner-ja.gif"	 ),
   DN(File, ALL, "edit-setting-ja.png", ToDest, "doc\\edit-setting-ja.png"),
   DN(File, ALL, "investigate-ja.png" , ToDest, "doc\\investigate-ja.png" ),
   DN(File, ALL, "log-ja.png"	     , ToDest, "doc\\log-ja.png"	 ),
