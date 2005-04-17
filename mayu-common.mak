@@ -113,7 +113,7 @@ DISTRIB_SETTINGS =			\
 		dot.mayu		\
 
 DISTRIB_MANUAL	=				\
-		doc\banner-ja.png		\
+		doc\banner-ja.gif		\
 		doc\CONTENTS-ja.html		\
 		doc\CUSTOMIZE-ja.html		\
 		doc\edit-setting-ja.png		\
