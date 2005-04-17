@@ -7,6 +7,7 @@
 
 !if "$(VERSION)" == ""
 VERSION		= 3.30
+#VERSION		= snapshot20050409
 !endif
 
 !if "$(TARGETOS)" == "WINNT"
