@@ -6,8 +6,8 @@
 
 
 !if "$(VERSION)" == ""
-VERSION		= 3.30
-#VERSION		= snapshot20050409
+#VERSION		= 3.31
+VERSION		= snapshot20050425
 !endif
 
 !if "$(TARGETOS)" == "WINNT"
@@ -252,8 +252,8 @@ $(OUT_DIR)\layoutmanager.obj: compiler_specific.h layoutmanager.h misc.h \
 $(OUT_DIR)\mayu.obj: compiler_specific.h compiler_specific_func.h d\ioctl.h \
  dlginvestigate.h dlglog.h dlgsetting.h dlgversion.h driver.h engine.h \
  errormessage.h focus.h function.h functions.h hook.h keyboard.h keymap.h \
- mayu.h mayurc.h misc.h msgstream.h multithread.h parser.h registry.h \
- setting.h stringtool.h target.h windowstool.h
+ mayu.h mayuipc.h mayurc.h misc.h msgstream.h multithread.h parser.h \
+ registry.h setting.h stringtool.h target.h windowstool.h
 $(OUT_DIR)\parser.obj: compiler_specific.h errormessage.h misc.h parser.h \
  stringtool.h
 $(OUT_DIR)\registry.obj: array.h compiler_specific.h misc.h registry.h \

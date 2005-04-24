@@ -16,6 +16,7 @@
 #include "function.h"
 #include "hook.h"
 #include "mayu.h"
+#include "mayuipc.h"
 #include "mayurc.h"
 #include "msgstream.h"
 #include "multithread.h"
@@ -47,6 +48,8 @@ class Mayu
   
   UINT m_WM_TaskbarRestart;			/** window message sent when
                                                     taskber restarts */
+  UINT m_WM_MayuIPC;				/** IPC message sent from
+						    other applications */
   NOTIFYICONDATA m_ni;				/// taskbar icon data
   HICON m_tasktrayIcon[2];			/// taskbar icon
   bool m_canUseTasktrayBaloon;			/// 
@@ -545,6 +548,28 @@ private:
 	    }
 	    return 0;
 	  }
+	  else if (i_message == This->m_WM_MayuIPC)
+	  {
+	    switch (static_cast<MayuIPCCommand>(i_wParam))
+	    {
+	      case MayuIPCCommand_Enable:
+		This->m_engine.enable(!!i_lParam);
+		This->showTasktrayIcon();
+		if (i_lParam)
+		{
+		  Acquire a(&This->m_log, 1);
+		  This->m_log << _T("Enabled by another application.")
+			      << std::endl;
+		}
+		else
+		{
+		  Acquire a(&This->m_log, 1);
+		  This->m_log << _T("Disabled by another application.")
+			      << std::endl;
+		}
+		break;
+	    }
+	  }
       }
     return DefWindowProc(i_hwnd, i_message, i_wParam, i_lParam);
   }
@@ -675,6 +700,7 @@ public:
     : m_hwndTaskTray(NULL),
       m_hwndLog(NULL),
       m_WM_TaskbarRestart(RegisterWindowMessage(_T("TaskbarCreated"))),
+      m_WM_MayuIPC(RegisterWindowMessage(WM_MayuIPC_NAME)),
       m_canUseTasktrayBaloon(
 	PACKVERSION(5, 0) <= getDllVersion(_T("shlwapi.dll"))),
       m_log(WM_APP_msgStreamNotify),
