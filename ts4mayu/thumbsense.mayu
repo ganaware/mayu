@@ -1,0 +1,49 @@
+# ts4mayu.dll を使って ThumbSense を実現するためのサンプル
+# ただし、wheel 等の一部の機能は実現できていない。
+
+# ts4mayu.dll は(恐らく)使われていないキーコード 0xfe をタッチパッド
+# に割り当てている。
+def key TouchPad = 0xfe
+
+keymap Global
+# mod0 をタッチパッドへの接触を意味するモディファイヤとして使う。
+# 0xfe が入力されてしまわないように真のモディファイヤにする。
+  mod mod0 = !TouchPad
+
+# F,J,Space を左ボタンのクリックに割り当てる。
+# リピートの抑制と、クリック継続を両立させるため Lock0 を使う。
+  key ~L0-D-M0-*F ~L0-D-M0-*J ~L0-D-M0-*Space = &VK(D-LButton) &Toggle(Lock0, on)
+  key L0-D-*F L0-D-*J L0-D-*Space = &Ignore
+  key L0-U-*F L0-U-*J L0-U-*Space = &VK(U-LButton) &Toggle(Lock0, off)
+
+# D,K を右ボタンのクリックに割り当てる。
+# リピートの抑制と、クリック継続を両立させるため Lock0 を使う。
+  key ~L0-D-M0-*D ~L0-D-M0-*K = &VK(D-RButton) &Toggle(Lock0, on)
+  key L0-D-*D L0-D-*K = &Ignore
+  key L0-U-*D L0-U-*K = &VK(U-RButton) &Toggle(Lock0, off)
+
+# V,M を左ボタンのダブルクリックに割り当てる。
+# リピートの抑制と、クリック継続を両立させるため Lock0 を使う。
+  key M0-D-*V M0-D-*M = &VK(D-LButton) &VK(U-LButton) &VK(D-LButton) &VK(U-LButton) &Toggle(Lock0, on)
+  key L0-D-*V L0-D-*M = &Ignore
+  key L0-U-*V L0-U-*M = &Toggle(Lock0, off)
+
+# G を第4ボタンのダブルクリックに割り当てる。
+# リピートの抑制と、クリック継続を両立させるため Lock0 を使う。
+  key ~L0-D-M0-*G = &VK(D-XButton1) &Toggle(Lock0, on)
+  key L0-D-*G = &Ignore
+  key L0-U-*G = &VK(U-XButton1) &Toggle(Lock0, off)
+
+# H を第5ボタンのダブルクリックに割り当てる。
+# リピートの抑制と、クリック継続を両立させるため Lock0 を使う。
+  key ~L0-D-M0-*H = &VK(D-XButton2) &Toggle(Lock0, on)
+  key L0-D-*H = &Ignore
+  key L0-U-*H = &VK(U-XButton2) &Toggle(Lock0, off)
+
+# 以下はオリジナルの ThumbSense にはない割り当てを実現する。
+
+# C,Comma を中ボタンのクリックに割り当てる。
+# リピートの抑制と、クリック継続を両立させるため Lock0 を使う。
+#  key ~L0-D-M0-*C ~L0-D-M0-*Comma = &VK(D-MButton) &Toggle(Lock0, on)
+#  key L0-D-*C L0-D-*Comma = &Ignore
+#  key L0-U-*C L0-U-*Comma = &VK(U-MButton) &Toggle(Lock0, off)
