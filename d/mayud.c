@@ -94,7 +94,7 @@ NTSTATUS detourPower         (IN PDEVICE_OBJECT, IN PIRP);
 NTSTATUS filterPower         (IN PDEVICE_OBJECT, IN PIRP);
 #endif // !MAYUD_NT4
 
-VOID CancelKeyboardClassRead(IN PIRP, IN PDEVICE_OBJECT);
+BOOLEAN CancelKeyboardClassRead(IN PIRP, IN PDEVICE_OBJECT);
 NTSTATUS readq(KeyQue*, PIRP);
 
 #ifdef USE_TOUCHPAD
@@ -425,7 +425,7 @@ NTSTATUS mayuAddDevice(IN PDRIVER_OBJECT driverObject,
   return status;
 }
 
-VOID CancelKeyboardClassRead(PIRP cancelIrp, PDEVICE_OBJECT kbdClassDevObj)
+BOOLEAN CancelKeyboardClassRead(PIRP cancelIrp, PDEVICE_OBJECT kbdClassDevObj)
 {
   PVOID kbdClassDevExt;
   BOOLEAN isSafe;
@@ -447,7 +447,7 @@ VOID CancelKeyboardClassRead(PIRP cancelIrp, PDEVICE_OBJECT kbdClassDevObj)
     DEBUG_LOG(("cancel irp not pending"));
     KeReleaseSpinLock(SpinLock, currentIrql);
   }
-  return;
+  return isSafe;
 }
 
 // unload driver
@@ -478,7 +478,7 @@ VOID mayuUnloadDriver(IN PDRIVER_OBJECT driverObject)
     kbdClassDevObj = filterDevExt->kbdClassDevObj;
     KeReleaseSpinLock(&filterDevExt->lock, currentIrql);
     if (cancelIrp) {
-      CancelKeyboardClassRead(cancelIrp, kbdClassDevObj);
+      while (CancelKeyboardClassRead(cancelIrp, kbdClassDevObj) != TRUE);
     }
     // delete device objects
     delObj= devObj;
