@@ -1,0 +1,5 @@
+LIBRARY ts4mayu
+
+EXPORTS
+	ts4mayuInit	@4
+	ts4mayuTerm
