@@ -923,6 +923,37 @@ NTSTATUS detourDeviceControl(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
     case IOCTL_MAYU_GET_LOG:
       status = DEBUG_LOG_RETRIEVE((irp));
       break;
+    case IOCTL_MAYU_FORCE_KEYBOARD_INPUT:
+    {
+      KIRQL currentIrql, cancelIrql;
+
+      // if detour is opened, key datum are forwarded to detour
+      if (irpSp->Parameters.DeviceIoControl.InputBufferLength %
+	  sizeof(KEYBOARD_INPUT_DATA))
+      {
+	status = STATUS_INVALID_PARAMETER;
+	break;
+      }
+      KeAcquireSpinLock(&detourDevExt->lock, &currentIrql);
+      KqEnque(&detourDevExt->readQue,
+	      (KEYBOARD_INPUT_DATA *)irp->AssociatedIrp.SystemBuffer,
+	      irpSp->Parameters.DeviceIoControl.InputBufferLength
+	      / sizeof(KEYBOARD_INPUT_DATA));
+
+      if (detourDevExt->irpq) {
+	if (readq(&detourDevExt->readQue, detourDevExt->irpq) ==
+	    STATUS_SUCCESS) {
+	  IoAcquireCancelSpinLock(&cancelIrql);
+	  IoSetCancelRoutine(detourDevExt->irpq, NULL);
+	  IoReleaseCancelSpinLock(cancelIrql);
+	  IoCompleteRequest(detourDevExt->irpq, IO_KEYBOARD_INCREMENT);
+	  detourDevExt->irpq = NULL;
+	}
+      }
+      KeReleaseSpinLock(&detourDevExt->lock, currentIrql);
+      status = STATUS_SUCCESS;
+      break;
+    }
     default:
       status = STATUS_INVALID_DEVICE_REQUEST;
       break;
