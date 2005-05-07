@@ -956,6 +956,7 @@ Engine::Engine(tomsgstream &i_log)
 #if defined(_WINNT)
     m_readEvent(NULL),
     m_interruptThreadEvent(NULL),
+    m_modThumbSense(NULL),
 #endif // _WINNT
     m_doForceTerminate(false),
     m_isLogMode(false),
@@ -1006,6 +1007,20 @@ Engine::Engine(tomsgstream &i_log)
 			       PIPE_ACCESS_OUTBOUND,
 			       PIPE_TYPE_BYTE, 1,
 			       0, 0, 0, NULL);
+
+  // load and initialize DLL for ThumbSense support if exists
+  m_modThumbSense = LoadLibrary(_T("ts4mayu.dll"));
+  if (m_modThumbSense != NULL)
+  {
+    typedef int (WINAPI *pTs4mayuInit_t)(HANDLE);
+    pTs4mayuInit_t pTs4mayuInit;
+    
+    pTs4mayuInit = (pTs4mayuInit_t)GetProcAddress(m_modThumbSense, "ts4mayuInit");
+    pTs4mayuInit(m_device);
+
+    Acquire a(&m_log, 0);
+    m_log << _T("*** ThumbSense support enabled ***") << std::endl;
+  }
 #endif // _WINNT
   StrExprArg::setEngine(this);
 }
@@ -1165,6 +1180,19 @@ bool Engine::resume()
 
 Engine::~Engine()
 {
+#if defined(_WINNT)
+  // terminate and unload DLL for ThumbSense support if loaded
+  if (m_modThumbSense != NULL)
+  {
+    typedef int (WINAPI *pTs4mayuTerm_t)();
+    pTs4mayuTerm_t pTs4mayuTerm;
+    
+    pTs4mayuTerm = (pTs4mayuTerm_t)GetProcAddress(m_modThumbSense, "ts4mayuTerm");
+    pTs4mayuTerm();
+    FreeLibrary(m_modThumbSense);
+    m_modThumbSense = NULL;
+  }
+#endif // _WINNT
   stop();
   CHECK_TRUE( CloseHandle(m_eSync) );
   
