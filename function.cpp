@@ -2159,8 +2159,8 @@ namespace shu
 	    Acquire a(&i_log);
 	    i_log << std::endl;
 	    i_log << _T("error: &PlugIn() failed to load ") << i_dllName << std::endl;
+	    return false;
 	  }
-	  return false;
 	}
       }
 
