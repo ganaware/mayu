@@ -14,13 +14,15 @@ static int s_terminated;
 static HANDLE s_loopThread;
 static unsigned int s_loopThreadId;
 
+static USHORT s_touchpadScancode;
+
 static void changeTouch(int i_isBreak)
 {
   KEYBOARD_INPUT_DATA kid;
   ULONG len;
 
   kid.UnitId = 0;
-  kid.MakeCode = 0xfe;
+  kid.MakeCode = s_touchpadScancode;
   kid.Flags = i_isBreak;
   kid.Reserved = 0;
   kid.ExtraInformation = 0;
@@ -75,10 +77,12 @@ static unsigned int WINAPI loop(void *dummy)
 }
 
 
-void WINAPI ts4mayuInit(HANDLE i_device)
+void WINAPI ts4mayuInit(HANDLE i_device, USHORT i_touchpadScancode)
 {
   HRESULT result;
   long hdl;
+
+  s_touchpadScancode = i_touchpadScancode;
 
   s_synAPI = NULL;
   s_synDevice = NULL;

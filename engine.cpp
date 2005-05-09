@@ -1021,11 +1021,11 @@ Engine::Engine(tomsgstream &i_log)
   m_modThumbSense = LoadLibrary(_T("ts4mayu.dll"));
   if (m_modThumbSense != NULL)
   {
-    typedef int (WINAPI *pTs4mayuInit_t)(HANDLE);
+    typedef int (WINAPI *pTs4mayuInit_t)(HANDLE, USHORT);
     pTs4mayuInit_t pTs4mayuInit;
     
     pTs4mayuInit = (pTs4mayuInit_t)GetProcAddress(m_modThumbSense, "ts4mayuInit");
-    pTs4mayuInit(m_device);
+    pTs4mayuInit(m_device, TOUCHPAD_SCANCODE);
 
     Acquire a(&m_log, 0);
     m_log << _T("*** ThumbSense support enabled ***") << std::endl;
