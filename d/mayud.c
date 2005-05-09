@@ -132,7 +132,6 @@ static UNICODE_STRING KeyboardClassDriverName =
 UnicodeString(L"\\Driver\\kbdclass");
 
 #ifdef USE_TOUCHPAD
-#define TOUCHPAD_SCANCODE 0x7d
 #define TOUCHPAD_PRESSURE_OFFSET 7
 #endif
 
