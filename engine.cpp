@@ -315,8 +315,11 @@ void Engine::generateKeyEvent(Key *i_key, bool i_doPress, bool i_isByAssign)
 	  kid.Flags |= KEYBOARD_INPUT_DATA::BREAK;
 	DWORD len;
 #if defined(_WINNT)
-	WriteFile(m_device, &kid, sizeof(kid), &len, &m_ol);
-	CHECK_TRUE( GetOverlappedResult(m_device, &m_ol, &len, TRUE) );
+	if (kid.MakeCode != TOUCHPAD_SCANCODE)
+	{
+	  WriteFile(m_device, &kid, sizeof(kid), &len, &m_ol);
+	  CHECK_TRUE( GetOverlappedResult(m_device, &m_ol, &len, TRUE) );
+	}
 #elif defined(_WIN95)
 	DeviceIoControl(m_device, 2, &kid, sizeof(kid), NULL, 0, &len, NULL);
 #else
@@ -773,8 +776,11 @@ void Engine::keyboardHandler()
       else
       {
 #if defined(_WINNT)
-	WriteFile(m_device, &kid, sizeof(kid), &len, &m_ol);
-	GetOverlappedResult(m_device, &m_ol, &len, TRUE);
+	if (kid.MakeCode != TOUCHPAD_SCANCODE)
+	{
+	  WriteFile(m_device, &kid, sizeof(kid), &len, &m_ol);
+	  GetOverlappedResult(m_device, &m_ol, &len, TRUE);
+	}
 #elif defined(_WIN95)
 	DeviceIoControl(m_device, 2, &kid, sizeof(kid), NULL, 0, &len, NULL);
 #else
@@ -791,8 +797,11 @@ void Engine::keyboardHandler()
 	!m_currentKeymap)
     {
 #if defined(_WINNT)
-      WriteFile(m_device, &kid, sizeof(kid), &len, &m_ol);
-      GetOverlappedResult(m_device, &m_ol, &len, TRUE);
+	if (kid.MakeCode != TOUCHPAD_SCANCODE)
+	{
+	  WriteFile(m_device, &kid, sizeof(kid), &len, &m_ol);
+	  GetOverlappedResult(m_device, &m_ol, &len, TRUE);
+	}
 #elif defined(_WIN95)
       DeviceIoControl(m_device, 2, &kid, sizeof(kid), NULL, 0, &len, NULL);
 #else
