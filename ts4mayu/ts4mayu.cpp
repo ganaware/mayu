@@ -51,6 +51,9 @@ static unsigned int WINAPI loop(void *dummy)
       if (result != SYN_OK) {
 	break;
       }
+      if (value == SE_Configuration_Changed) {
+	s_synDevice->SetEventNotification(s_notifyEvent);
+      }
     }
 
     for (;;) {
