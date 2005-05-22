@@ -112,16 +112,29 @@ struct NotifyLog : public Notify
 
 
 ///
+enum MouseHookType
+{
+  MouseHookType_None = 0,				/// none
+  MouseHookType_Wheel = 1 << 0,			/// wheel
+  MouseHookType_WindowMove = 1 << 1,		/// window move
+};
+
+///
 class HookData
 {
 public:
   HHOOK m_hHookGetMessage;			///
   HHOOK m_hHookCallWndProc;			///
+  HHOOK m_hHookMouseProc;			///
   USHORT m_syncKey;				///
   bool m_syncKeyIsExtended;			///
   bool m_doesNotifyCommand;			///
   HWND m_hwndTaskTray;				///
   bool m_correctKanaLockHandling;		/// does use KL- ?
+  MouseHookType m_mouseHookType;		///
+  int m_mouseHookParam;			///
+  HWND m_hwndMouseHookTarget;		///
+  POINT m_mousePos;				///
 };
 
 

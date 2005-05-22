@@ -765,6 +765,16 @@ void SettingLoader::load_ARGUMENT(GravityType *o_arg)
 
 
 // &lt;ARGUMENT&gt;
+void SettingLoader::load_ARGUMENT(MouseHookType *o_arg)
+{
+  Token *t = getToken();
+  if (getTypeValue(o_arg, t->getString()))
+    return;
+  throw ErrorMessage() << _T("`") << *t << _T("': unknown MouseHookType symbol.");
+}
+
+
+// &lt;ARGUMENT&gt;
 void SettingLoader::load_ARGUMENT(MayuDialogType *o_arg)
 {
   Token *t = getToken();

@@ -472,6 +472,9 @@ private:
   void funcSetImeStatus(FunctionParam *i_param, ToggleType i_toggle = ToggleType_toggle);
   /// set string to IME
   void funcSetImeString(FunctionParam *i_param, const StrExprArg &i_data);
+  /// enter to mouse event hook mode
+  void funcMouseHook(FunctionParam *i_param, MouseHookType i_hookType, int i_hookParam);
+
   // END OF FUNCTION DEFINITION
 #  define FUNCTION_FRIEND
 #  include "functions.h"

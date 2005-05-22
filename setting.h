@@ -132,6 +132,7 @@ private:
   void load_ARGUMENT(VKey *o_arg);		/// &lt;ARGUMENT_VK&gt;
   void load_ARGUMENT(ToWindowType *o_arg);	/// &lt;ARGUMENT_WINDOW&gt;
   void load_ARGUMENT(GravityType *o_arg);	/// &lt;ARGUMENT&gt;
+  void load_ARGUMENT(MouseHookType *o_arg);	/// &lt;ARGUMENT&gt;
   void load_ARGUMENT(MayuDialogType *o_arg);	/// &lt;ARGUMENT&gt;
   void load_ARGUMENT(ModifierLockType *o_arg);	/// &lt;ARGUMENT_LOCK&gt;
   void load_ARGUMENT(ToggleType *o_arg);	/// &lt;ARGUMENT&gt;

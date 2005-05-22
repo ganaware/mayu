@@ -85,6 +85,16 @@ extern tostream &operator<<(tostream &i_ost, GravityType i_data);
 extern bool getTypeValue(GravityType *o_type, const tstring &i_name);
 
 
+/// enum MouseHookType is defined in hook.h
+extern enum MouseHookType;
+
+/// stream output
+extern tostream &operator<<(tostream &i_ost, MouseHookType i_data);
+
+/// get value of MouseHookType
+extern bool getTypeValue(MouseHookType *o_type, const tstring &i_name);
+
+
 ///
 enum MayuDialogType
 {

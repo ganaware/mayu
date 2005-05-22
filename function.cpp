@@ -166,6 +166,41 @@ bool getTypeValue(GravityType *o_type, const tstring &i_name)
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// MouseHookType
+
+
+// MouseHookType table
+typedef TypeTable<MouseHookType> TypeTable_MouseHookType;
+static const TypeTable_MouseHookType g_mouseHookTypeTable[] =
+{
+  { MouseHookType_None,  _T("None")  },
+  { MouseHookType_Wheel,  _T("Wheel")  },
+  { MouseHookType_WindowMove,  _T("WindowMove")  },
+};
+
+
+// stream output
+tostream &operator<<(tostream &i_ost, MouseHookType i_data)
+{
+  tstring name;
+  if (getTypeName(&name, i_data,
+		  g_mouseHookTypeTable, NUMBER_OF(g_mouseHookTypeTable)))
+    i_ost << name;
+  else
+    i_ost << _T("(MouseHookType internal error)");
+  return i_ost;
+}
+
+
+// get value of MouseHookType
+bool getTypeValue(MouseHookType *o_type, const tstring &i_name)
+{
+  return getTypeValue(o_type, i_name, g_mouseHookTypeTable,
+		      NUMBER_OF(g_mouseHookTypeTable));
+}
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // MayuDialogType
 
 
@@ -2256,6 +2291,47 @@ void Engine::funcPlugIn(FunctionParam *i_param,
   }
   else
     plugin->exec();
+}
+
+
+void Engine::funcMouseHook(FunctionParam *i_param,
+			   MouseHookType i_hookType, int i_hookParam)
+{
+  GetCursorPos(&g_hookData->m_mousePos);
+  g_hookData->m_mouseHookType = i_hookType;
+  g_hookData->m_mouseHookParam = i_hookParam;
+
+  switch (i_hookType)
+  {
+    case MouseHookType_WindowMove:
+    {
+      // For this type, g_hookData->m_mouseHookParam means
+      // target window type to move.
+      HWND target;
+      bool isMDI;
+
+      // i_hooParam < 0 means target window to move is MDI.
+      if (i_hookParam < 0)
+	isMDI = true;
+      else
+	isMDI = false;
+
+      // abs(i_hookParam) == 2: target is window under mouse cursor
+      // otherwise: target is current focus window
+      if (i_hookParam == 2 || i_hookParam == -2)
+	target = WindowFromPoint(g_hookData->m_mousePos);
+      else
+	target = i_param->m_hwnd;
+
+      g_hookData->m_hwndMouseHookTarget =
+	getToplevelWindow(target, &isMDI);
+      break;
+    default:
+      g_hookData->m_hwndMouseHookTarget = NULL;
+      break;
+    }
+  }
+  return;
 }
 
 

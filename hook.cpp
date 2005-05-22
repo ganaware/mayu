@@ -620,6 +620,68 @@ LRESULT CALLBACK callWndProc(int i_nCode, WPARAM i_wParam, LPARAM i_lParam)
 }
 
 
+static LRESULT CALLBACK lowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
+{
+  if (!g_hookData || nCode < 0 || wParam != WM_MOUSEMOVE)
+    goto through;
+
+  MSLLHOOKSTRUCT *pMsll = (MSLLHOOKSTRUCT*)lParam;
+  LONG dx = pMsll->pt.x - g_hookData->m_mousePos.x;
+  LONG dy = pMsll->pt.y - g_hookData->m_mousePos.y;
+  HWND target = g_hookData->m_hwndMouseHookTarget;
+
+  switch (g_hookData->m_mouseHookType)
+  {
+    case MouseHookType_Wheel:
+      // For this type, g_hookData->m_mouseHookParam means
+      // translate rate mouse move to wheel.
+      mouse_event(MOUSEEVENTF_WHEEL, 0, 0,
+		  g_hookData->m_mouseHookParam * dy, 0);
+      return 1;
+      break;
+    case MouseHookType_WindowMove:
+    {
+      RECT curRect;
+
+      if (!GetWindowRect(target, &curRect))
+	goto through;
+
+      // g_hookData->m_mouseHookParam < 0 means
+      // target window to move is MDI.
+      if (g_hookData->m_mouseHookParam < 0)
+      {
+	HWND parent = GetParent(target);
+	POINT p = {curRect.left, curRect.top};
+
+	if (parent == NULL || !ScreenToClient(parent, &p))
+	  goto through;
+
+	curRect.left = p.x;
+	curRect.top = p.y;
+      }
+	
+      SetWindowPos(target, NULL,
+		   curRect.left + dx,
+		   curRect.top + dy,
+		   0, 0,
+		   SWP_ASYNCWINDOWPOS | SWP_NOACTIVATE |
+		   SWP_NOOWNERZORDER | SWP_NOSIZE | SWP_NOZORDER);
+      g_hookData->m_mousePos = pMsll->pt;
+      goto through;
+      break;
+    }
+    case MouseHookType_None:
+    default:
+      goto through;
+      break;
+  }
+    
+ through:
+  return CallNextHookEx(g_hookData->m_hHookMouseProc,
+			nCode, wParam, lParam);
+}
+
+
 /// install hooks
 DllExport int installHooks()
 {
@@ -629,6 +691,10 @@ DllExport int installHooks()
 		     g.m_hInstDLL, 0);
   g_hookData->m_hHookCallWndProc =
     SetWindowsHookEx(WH_CALLWNDPROC, (HOOKPROC)callWndProc, g.m_hInstDLL, 0);
+  g_hookData->m_mouseHookType = MouseHookType_None;
+  g_hookData->m_hHookMouseProc =
+    SetWindowsHookEx(WH_MOUSE_LL, (HOOKPROC)lowLevelMouseProc,
+		     g.m_hInstDLL, 0);
   return 0;
 }
 
@@ -642,5 +708,8 @@ DllExport int uninstallHooks()
   if (g_hookData->m_hHookCallWndProc)
     UnhookWindowsHookEx(g_hookData->m_hHookCallWndProc);
   g_hookData->m_hHookCallWndProc = NULL;
+  if (g_hookData->m_hHookMouseProc)
+    UnhookWindowsHookEx(g_hookData->m_hHookMouseProc);
+  g_hookData->m_hHookMouseProc = NULL;
   return 0;
 }
