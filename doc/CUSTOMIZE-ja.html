@@ -1046,6 +1046,18 @@
 			  <p>「窓使いの憂鬱」のダイアログボックスを表示したり隠したりします。<code><em>dialog</em></code> には <code>Investigate</code> と <code>Log</code> が指定できます。それぞれ「調査」ダイアログと「ログ」ダイアログです。<code><em>show_command</em></code> には、<code>HIDE</code>, <code>SHOW</code>, <code>SHOWNA</code> などが指定できます。</p>
 			</div>
 			
+		    <dt class="h3"><a name="function_MouseHook"><code>&amp;MouseHook(<em>type</em>, <em>parameter</em>)</code></a>
+			
+		    <dd class="d3">
+			<div>
+			  <p>マウスイベントをフックし <code><em>type</em></code> で指定されるアクションに変換します。 <code><em>parameter</em></code> は整数値で <code><em>type</em></code> 毎に意味が異なります。指定できる <code><em>type</em></code> は以下の通りです。</p>
+			  <ul>
+			    <li><code>None</code> [初期値]変換しません。 <code><em>parameter</em></code> は無視されます。他の <code><em>type</em></code> から元に戻す場合にはこの値を指定します。
+			    <li><code>Wheel</code> マウスの垂直方向の移動をホイールの回転に変換します。この間マウスカーソルは動きません。 <code><em>parameter</em></code> は変換の際の倍率で、正と負では逆回転となります。
+			    <li><code>WindowMove</code> マウスの移動をウィンドウの移動に変換します。この間マウスカーソルは動きます。 <code><em>parameter</em></code> は移動するウィンドウの指定で、 <code>1</code> はアクティブウィンドウ、 <code>2</code> はマウスカーソル位置のウィンドウを意味します。また符号を負にすると対応する MDI 子ウィンドウを移動します。
+			  </ul>
+			</div>
+			
 		    <dt class="h3"><a name="function_MouseMove"><code>&amp;MouseMove(<em>dx</em>, <em>dy</em>)</code></a>
 			
 		    <dd class="d3">
