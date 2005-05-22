@@ -169,7 +169,8 @@ private:
   OVERLAPPED m_ol;				/** for async read/write of
 						    mayu device */
   HANDLE m_hookPipe;				/// named pipe for &SetImeString
-  HMODULE m_modThumbSense;			/// DLL module for ThumbSense
+  HMODULE m_sts4mayu;				/// DLL module for ThumbSense
+  HMODULE m_cts4mayu;				/// DLL module for ThumbSense
 #endif // _WINNT
   bool volatile m_doForceTerminate;		/// terminate engine thread
   bool volatile m_isLogMode;			/// is logging mode ?

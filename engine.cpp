@@ -965,7 +965,8 @@ Engine::Engine(tomsgstream &i_log)
 #if defined(_WINNT)
     m_readEvent(NULL),
     m_interruptThreadEvent(NULL),
-    m_modThumbSense(NULL),
+    m_sts4mayu(NULL),
+    m_cts4mayu(NULL),
 #endif // _WINNT
     m_doForceTerminate(false),
     m_isLogMode(false),
@@ -1018,13 +1019,22 @@ Engine::Engine(tomsgstream &i_log)
 			       0, 0, 0, NULL);
 
   // load and initialize DLL for ThumbSense support if exists
-  m_modThumbSense = LoadLibrary(_T("ts4mayu.dll"));
-  if (m_modThumbSense != NULL)
+  int (WINAPI *pTs4mayuInit)(HANDLE, USHORT);
+
+  m_sts4mayu = LoadLibrary(_T("sts4mayu.dll"));
+  if (m_sts4mayu != NULL)
   {
-    typedef int (WINAPI *pTs4mayuInit_t)(HANDLE, USHORT);
-    pTs4mayuInit_t pTs4mayuInit;
-    
-    pTs4mayuInit = (pTs4mayuInit_t)GetProcAddress(m_modThumbSense, "ts4mayuInit");
+    pTs4mayuInit = (int (WINAPI *)(HANDLE, USHORT))GetProcAddress(m_sts4mayu, "ts4mayuInit");
+    pTs4mayuInit(m_device, TOUCHPAD_SCANCODE);
+
+    Acquire a(&m_log, 0);
+    m_log << _T("*** ThumbSense support enabled ***") << std::endl;
+  }
+
+  m_cts4mayu = LoadLibrary(_T("cts4mayu.dll"));
+  if (m_cts4mayu != NULL)
+  {
+    pTs4mayuInit = (int (WINAPI *)(HANDLE, USHORT))GetProcAddress(m_cts4mayu, "ts4mayuInit");
     pTs4mayuInit(m_device, TOUCHPAD_SCANCODE);
 
     Acquire a(&m_log, 0);
@@ -1191,15 +1201,21 @@ Engine::~Engine()
 {
 #if defined(_WINNT)
   // terminate and unload DLL for ThumbSense support if loaded
-  if (m_modThumbSense != NULL)
+  int (WINAPI *pTs4mayuTerm)();
+  if (m_sts4mayu != NULL)
   {
-    typedef int (WINAPI *pTs4mayuTerm_t)();
-    pTs4mayuTerm_t pTs4mayuTerm;
-    
-    pTs4mayuTerm = (pTs4mayuTerm_t)GetProcAddress(m_modThumbSense, "ts4mayuTerm");
+    pTs4mayuTerm = (int (WINAPI *)())GetProcAddress(m_sts4mayu, "ts4mayuTerm");
     pTs4mayuTerm();
-    FreeLibrary(m_modThumbSense);
-    m_modThumbSense = NULL;
+    FreeLibrary(m_sts4mayu);
+    m_sts4mayu = NULL;
+  }
+
+  if (m_cts4mayu != NULL)
+  {
+    pTs4mayuTerm = (int (WINAPI *)())GetProcAddress(m_cts4mayu, "ts4mayuTerm");
+    pTs4mayuTerm();
+    //FreeLibrary(m_cts4mayu);
+    m_cts4mayu = NULL;
   }
 #endif // _WINNT
   stop();
