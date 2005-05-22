@@ -1197,6 +1197,23 @@ bool Engine::resume()
 }
 
 
+bool Engine::prepairQuit()
+{
+#if defined(_WINNT)
+  // terminate and unload DLL for ThumbSense support if loaded
+  int (WINAPI *pTs4mayuTerm)();
+  if (m_cts4mayu != NULL)
+  {
+    pTs4mayuTerm = (int (WINAPI *)())GetProcAddress(m_cts4mayu, "ts4mayuTerm");
+    pTs4mayuTerm();
+    //FreeLibrary(m_cts4mayu);
+    m_cts4mayu = NULL;
+  }
+#endif // _WINNT
+  return true;
+}
+
+
 Engine::~Engine()
 {
 #if defined(_WINNT)

@@ -248,6 +248,7 @@ private:
 	  return This->notifyHandler(cd);
 	}
         case WM_QUERYENDSESSION:
+	  This->m_engine.prepairQuit();
 	  PostQuitMessage(0);
 	  return TRUE;
 
@@ -272,6 +273,7 @@ private:
 	    case WTS_CONSOLE_CONNECT:
 	      m = "WTS_CONSOLE_CONNECT";
 	      if (!This->m_engine.resume()) {
+		This->m_engine.prepairQuit();
 		PostQuitMessage(0);
 	      }
 	      break;
@@ -440,6 +442,7 @@ private:
 		This->showTasktrayIcon();
 		break;
 	      case ID_MENUITEM_quit:
+		This->m_engine.prepairQuit();
 		PostQuitMessage(0);
 		break;
 	    }
