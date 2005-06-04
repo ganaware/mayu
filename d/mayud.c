@@ -515,7 +515,9 @@ VOID mayuDetourReadCancel(IN PDEVICE_OBJECT deviceObject, IN PIRP irp)
     (DetourDeviceExtension *)deviceObject->DeviceExtension;
   KIRQL currentIrql;
 
+  KeAcquireSpinLock(&devExt->lock, &currentIrql);
   devExt->irpq = NULL;
+  KeReleaseSpinLock(&devExt->lock, currentIrql);
   IoReleaseCancelSpinLock(irp->CancelIrql);
   DEBUG_LOG(("detourReadCancel:"));
 #if 0
