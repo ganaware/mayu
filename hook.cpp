@@ -622,13 +622,13 @@ LRESULT CALLBACK callWndProc(int i_nCode, WPARAM i_wParam, LPARAM i_lParam)
 
 static LRESULT CALLBACK lowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
-  if (!g_hookData || nCode < 0 || wParam != WM_MOUSEMOVE)
-    goto through;
-
   MSLLHOOKSTRUCT *pMsll = (MSLLHOOKSTRUCT*)lParam;
   LONG dx = pMsll->pt.x - g_hookData->m_mousePos.x;
   LONG dy = pMsll->pt.y - g_hookData->m_mousePos.y;
   HWND target = g_hookData->m_hwndMouseHookTarget;
+
+  if (!g_hookData || nCode < 0 || wParam != WM_MOUSEMOVE)
+    goto through;
 
   switch (g_hookData->m_mouseHookType)
   {
