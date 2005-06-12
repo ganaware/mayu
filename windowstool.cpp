@@ -425,6 +425,7 @@ BOOL (WINAPI *enumDisplayMonitors)
 static BOOL WINAPI
 initializeWTSRegisterSessionNotification(HWND hWnd, DWORD dwFlags)
 {
+  LoadLibrary(_T("wtsapi32.dll"));
   HMODULE hModule = GetModuleHandle(_T("wtsapi32.dll"));
   if (!hModule) {
     return FALSE;

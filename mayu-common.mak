@@ -7,7 +7,7 @@
 
 !if "$(VERSION)" == ""
 #VERSION		= 3.31
-VERSION		= snapshot20050425
+VERSION		= snapshot20050612
 !endif
 
 !if "$(TARGETOS)" == "WINNT"

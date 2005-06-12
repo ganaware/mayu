@@ -38,6 +38,7 @@
       <ul>
 	<li><strong>標準でない</strong> キーボードドライバを利用していると Windows2000/XP が青画面になって終了してしまうことがあります。そのような場合は、標準でないドライバをアンインストールするか、「窓使いの憂鬱」の利用をあきらめるしかありません。
 	<li>標準でないドライバとは、<strong>ロジテックマウス</strong>に付属のドライバや <strong>AltIME</strong> のドライバなどです。
+	<li>他人が使用する可能性のある PC へのインストールは危険です。(<a href="#SECURITY">security</a> の章を参照)
       </ul>
       
   <dt class="h1"><a name="INSTALL">2. install</a>
@@ -545,7 +546,18 @@
       <p><a href="CUSTOMIZE-ja.html">カスタマイズ</a>。</p>
 
 
-  <dt class="h1"><a name="BUGS">8. bugs</a>
+  <dt class="h1"><a name="SECURITY">8. security</a>
+      
+  <dd class="d1">
+      <p class="bug">他人が使用する可能性のある PC へ「窓使いの憂鬱」をインストールしてはいけません。</p>
+      
+      <p>「窓使いの憂鬱」はドライバを使用してキーボードに入力されたキーを認識しますが、そのドライバへは全てのユーザーがアクセスできます。ですから、他人のキーボード入力を読み取ることが可能です。</p>
+
+      <p>例えば、ログイン画面での他人のパスワードを得ることも、そのようなアプリケーションを作成することで可能になります。</p>
+  </dd>
+
+
+  <dt class="h1"><a name="BUGS">9. bugs</a>
 
   <dd class="d1">
       <ul>
@@ -555,7 +567,7 @@
 	    
       </ul>
 
-  <dt class="h1"><a name="RELATEDWORK">9. related work</a>
+  <dt class="h1"><a name="RELATEDWORK">10. related work</a>
       
   <dd class="d1">
       <div>
@@ -596,7 +608,7 @@
 	</dl>
       </div>
       
-  <dt class="h1"><a name="REFERENCES">10. references</a>
+  <dt class="h1"><a name="REFERENCES">11. references</a>
       
   <dd class="d1">
       <div>
@@ -627,7 +639,7 @@
 	
       </div>
       
-  <dt class="h1"><a name="COPYRIGHT">11. copyright</a>
+  <dt class="h1"><a name="COPYRIGHT">12. copyright</a>
 
   <dd class="d1">
       <div>
@@ -684,7 +696,7 @@
 	</dl>
       </div>
       
-  <dt class="h1"><a name="SUPPORT">12. support</a>
+  <dt class="h1"><a name="SUPPORT">13. support</a>
       
   <dd class="d1">
       <div>
@@ -696,11 +708,11 @@
 	      <p><a href="http://lists.sourceforge.net/mailman/listinfo/mayu-support" target="_top">Mayu-support Info Page</a> の Subscribing to Mayu-support のフォームに、自分のメールアドレスと、Mayu-support メーリングリストの為のパスワードを入れて Subscribe してください。</p>
 	  <dt class="h2">「窓使いの憂鬱」2ch スレ
 	  <dd class="d2">
-	      <p><a href="http://pc8.2ch.net/test/read.cgi/win/1086283540/" target="_top">2ch にスレ</a>がたってしまったようなので適当に活用しましょう。作者も時々見ています。</p>
+	      <p><a href="http://pc8.2ch.net/test/read.cgi/win/1118469602/" target="_top">2ch にスレ</a>がたってしまったようなので適当に活用しましょう。作者も時々見ています。</p>
 	</dl>
       </div>
       
-  <dt class="h1"><a name="ACKNOWLEDGEMENT">13. acknowledgements</a>
+  <dt class="h1"><a name="ACKNOWLEDGEMENT">14. acknowledgements</a>
 
   <dd class="d1">
       <div>
@@ -715,7 +727,7 @@
 	<p>「窓使いの憂鬱」はたくさんの人の貢献の上に成り立っています。ここに名前を挙げていない方にも心から感謝します。</p>
       </div>
 
-  <dt class="h1"><a name="HISTORY">14. history</a>
+  <dt class="h1"><a name="HISTORY">15. history</a>
       
   <dd class="d1">
       <div>
@@ -723,7 +735,9 @@
 	  <dt>200?/??/?? 3.31
 	  <dd>
 	      <ul>
-		<li>「窓使いの憂鬱」以外のアプリケーションから「窓使いの憂鬱」の動作を on/off できるような仕組みを用意した。使用する場合は、ソースの <code>mayuipc.h</code> を見てください。
+		<li>「窓使いの憂鬱」以外のアプリケーションから「窓使いの憂鬱」の動作を on/off できるような仕組みを用意しました。使用する場合は、ソースの <code>mayuipc.h</code> を見てください。
+		<li>WindowsXP の「ユーザーの切り替え」機能に今度こそ対応…したつもり。
+		<li><a href="#secrity">security</a> という章を追加。
 	      </ul>
 	  </dd>
 	  <dt>2005/04/18 3.30
