@@ -41,13 +41,13 @@ OUT_DIR		= out$(MAYU_VC)_win9x_debug
 #NMAKE_WINVER	= 0x0500	# trick for WS_EX_LAYERED
 
 !ifdef nodebug
-DEBUG_FLAG	= -DNDEBUG
+DEBUG_FLAG	= $(cdebug)
 !else	# nodebug
 DEBUG_FLAG	=
 !endif	# nodebug
 
 {}.cpp{$(OUT_DIR)}.obj:
-	$(cc) -GX $(cdebug) $(cflags) $(cvarsmt) $(DEFINES) $(INCLUDES) \
+	$(cc) -GX $(cflags) $(cvarsmt) $(DEFINES) $(INCLUDES) \
 		$(DEBUG_FLAG) -Fo$@ $(*B).cpp
 {}.rc{$(OUT_DIR)}.res:
 	$(rc) $(rcflags) $(rcvars) /fo$@ $(*B).rc
@@ -57,7 +57,7 @@ guixlibsmt	= $(guilibsmt) libcpmt.lib libcmt.lib
 
 DEPENDFLAGS	= --cpp=vc --ignore='$(INCLUDE)' -p"$$(OUT_DIR)\\"	\
 		--path-delimiter=dos --newline=unix			\
-		$(DEPENDIGNORE) -GX $(cdebug) $(cflags) $(cvarsmt)	\
+		$(DEPENDIGNORE) -GX $(cflags) $(cvarsmt)	\
 		$(DEFINES) $(INCLUDES) $(DEBUG_FLAG)
 
 CLEAN		= $(OUT_DIR)\*.pdb
