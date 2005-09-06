@@ -248,7 +248,7 @@ static bool string2logfont(LOGFONT *o_lf, const tstring &i_strlf)
   tregex lf(_T("^(-?\\d+),(-?\\d+),(-?\\d+),(-?\\d+),(-?\\d+),")
 	    _T("(-?\\d+),(-?\\d+),(-?\\d+),(-?\\d+),(-?\\d+),")
 	    _T("(-?\\d+),(-?\\d+),(-?\\d+),(.+)$"));
-  tcmatch_results what;
+  tsmatch what;
 
   if (!boost::regex_match(i_strlf, what, lf))
     return false;

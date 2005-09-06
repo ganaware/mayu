@@ -301,7 +301,7 @@ bool Keymap::doesSameWindow(const tstringi i_className,
   if (m_type == Type_keymap)
     return false;
 
-  tcmatch_results what;
+  tsmatch what;
   if (boost::regex_search(i_className, what, m_windowClass))
   {
     if (m_type == Type_windowAnd)

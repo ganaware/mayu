@@ -148,7 +148,7 @@ namespace Installer
   tstringi normalizePath(tstringi i_path)
   {
     tregex regSlash(_T("^(.*)/(.*)$"));
-    tcmatch_results what;
+    tsmatch what;
     while (boost::regex_search(i_path, what, regSlash))
       i_path = what.str(1) + _T("\\") + what.str(2);
 
@@ -198,7 +198,7 @@ namespace Installer
     _TCHAR buf[GANA_MAX_PATH];
     CHECK_TRUE( GetModuleFileName(g_hInst, buf, NUMBER_OF(buf)) );
     tregex reg(_T("^(.*)\\\\[^\\\\]*$"));
-    tcmatch_results what;
+    tsmatch what;
     tstringi path(buf);
     if (boost::regex_search(path, what, reg))
       return what.str(1);

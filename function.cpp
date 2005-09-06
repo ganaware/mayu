@@ -1098,7 +1098,7 @@ static BOOL CALLBACK enumWindowsForSetForegroundWindow(
   _TCHAR name[GANA_MAX_ATOM_LENGTH];
   if (!GetClassName(i_hwnd, name, NUMBER_OF(name)))
     return TRUE;
-  tcmatch_results what;
+  tsmatch what;
   if (!boost::regex_search(tstring(name), what, ep.m_fd->m_windowClassName))
     if (ep.m_fd->m_logicalOp == LogicalOperatorType_and)
       return TRUE;				// match failed
@@ -1155,7 +1155,7 @@ void Engine::funcLoadSetting(FunctionParam *i_param, const StrExprArg &i_name)
       if (!reg.read(buf, &dot_mayu))
 	break;
       
-      tcmatch_results what;
+      tsmatch what;
       if (boost::regex_match(dot_mayu, what, split) &&
 	  what.str(1) == i_name.eval())
       {	
@@ -2128,7 +2128,7 @@ void Engine::funcDirectSSTP(FunctionParam *i_param,
   for (ParseDirectSSTPData::DirectSSTPServers::iterator
 	 i = servers.begin(); i != servers.end(); ++ i)
   {
-    tcmatch_results what;
+    tsmatch what;
     if (boost::regex_match(i->second.m_name, what, i_name))
     {
       COPYDATASTRUCT cd;

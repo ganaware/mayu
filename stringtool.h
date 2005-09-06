@@ -29,7 +29,7 @@ typedef std::basic_ifstream<_TCHAR> tifstream;
 /// basic_regex for generic international text
 typedef boost::basic_regex<_TCHAR> tregex;
 /// match_results for generic international text
-typedef boost::match_results<tstring::const_iterator> tcmatch;
+typedef boost::match_results<tstring::const_iterator> tsmatch;
 
 
 /// string with custom stream output
@@ -56,22 +56,6 @@ public:
 
 /// stream output
 extern tostream &operator<<(tostream &i_ost, const tstringq &i_data);
-
-
-/// identical to tcmatch except for str()
-class tcmatch_results : public tcmatch
-{
-public:
-  /** returns match result as tstring.
-      match_results<const _TCHAR *>::operator[]() returns a instance of
-      sub_mtch<const _TCHAR *>.  So, we convert sub_mtch<const _TCHAR *> to
-      tstring. */
-  tstring str(tcmatch::size_type i_n) const
-  {
-    return static_cast<tstring>(
-      static_cast<const tcmatch *>(this)->operator[](i_n));
-  }
-};
 
 
 /// interpret meta characters such as \n

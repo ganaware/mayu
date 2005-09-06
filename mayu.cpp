@@ -340,7 +340,7 @@ private:
 		  tstringi dot_mayu;
 		  if (!reg.read(buf, &dot_mayu))
 		    break;
-		  tcmatch_results what;
+		  tsmatch what;
 		  if (boost::regex_search(dot_mayu, what, getName))
 		  {
 		    MENUITEMINFO mii;

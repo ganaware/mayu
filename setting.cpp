@@ -50,7 +50,7 @@ static bool getFilenameFromRegistry(
     return false;
   
   tregex getFilename(_T("^([^;]*);([^;]*);(.*)$"));
-  tcmatch_results getFilenameResult;
+  tsmatch getFilenameResult;
   if (!boost::regex_match(entry, getFilenameResult, getFilename))
     return false;
   
@@ -62,7 +62,7 @@ static bool getFilenameFromRegistry(
   {
     tstringi symbols = getFilenameResult.str(3);
     tregex symbol(_T("-D([^;]*)(.*)$"));
-    tcmatch_results symbolResult;
+    tsmatch symbolResult;
     while (boost::regex_search(symbols, symbolResult, symbol))
     {
       o_symbols->insert(symbolResult.str(1));
@@ -81,7 +81,7 @@ void getHomeDirectories(HomeDirectories *o_pathes)
       !filename.empty())
   {
     tregex getPath(_T("^(.*[/\\\\])[^/\\\\]*$"));
-    tcmatch_results getPathResult;
+    tsmatch getPathResult;
     if (boost::regex_match(filename, getPathResult, getPath))
       o_pathes->push_back(getPathResult.str(1));
   }

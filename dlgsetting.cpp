@@ -147,7 +147,7 @@ public:
       if (!m_reg.read(buf, &dot_mayu))
 	break;
 
-      tcmatch_results what;
+      tsmatch what;
       if (boost::regex_match(dot_mayu, what, split))
       {
 	data.m_name = what.str(1);
