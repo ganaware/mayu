@@ -19,8 +19,9 @@ DEFS = ts4mayu.def
 TARGET = $(TARGET_NAME)/$(TARGET_NAME).dll
 
 CFLAGS = -DUNICODE -D_UNICODE -D_MT -MT
-INCLUDES = -I../../SynCOMAPIv1_0/Include
-LDFLAGS =  $(dlllflags) /libpath:../../SynCOMAPIv1_0/Lib
+INCLUDES = -I../../SynCOMAPIv1_0/Include -I"$(PROGRAMFILES)"/Touchpad
+LDFLAGS =  $(dlllflags) /libpath:../../SynCOMAPIv1_0/Lib /libpath:"$(PROGRAMFILES)"/Touchpad
+LDLIBS = user32.lib
 
 RM = rd
 MKDIR = md

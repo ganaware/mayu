@@ -315,11 +315,8 @@ void Engine::generateKeyEvent(Key *i_key, bool i_doPress, bool i_isByAssign)
 	  kid.Flags |= KEYBOARD_INPUT_DATA::BREAK;
 	DWORD len;
 #if defined(_WINNT)
-	if (kid.MakeCode != TOUCHPAD_SCANCODE)
-	{
-	  WriteFile(m_device, &kid, sizeof(kid), &len, &m_ol);
-	  CHECK_TRUE( GetOverlappedResult(m_device, &m_ol, &len, TRUE) );
-	}
+	WriteFile(m_device, &kid, sizeof(kid), &len, &m_ol);
+	CHECK_TRUE( GetOverlappedResult(m_device, &m_ol, &len, TRUE) );
 #elif defined(_WIN95)
 	DeviceIoControl(m_device, 2, &kid, sizeof(kid), NULL, 0, &len, NULL);
 #else
@@ -673,9 +670,11 @@ void Engine::keyboardResetOnWin32()
 
 
 // keyboard handler thread
-void Engine::keyboardHandler(void *i_this)
+unsigned int WINAPI Engine::keyboardHandler(void *i_this)
 {
   reinterpret_cast<Engine *>(i_this)->keyboardHandler();
+  _endthreadex(0);
+  return 0;
 }
 void Engine::keyboardHandler()
 {
@@ -700,8 +699,9 @@ void Engine::keyboardHandler()
 	continue;
       
       HANDLE handles[] = { m_readEvent, m_interruptThreadEvent };
-      switch (WaitForMultipleObjects(NUMBER_OF(handles), &handles[0],
-				     FALSE, INFINITE))
+    rewait:
+      switch (MsgWaitForMultipleObjects(NUMBER_OF(handles), &handles[0],
+				     FALSE, INFINITE, QS_POSTMESSAGE))
       {
 	case WAIT_OBJECT_0:			// m_readEvent
 	  if (!GetOverlappedResult(m_device, &m_ol, &len, FALSE))
@@ -744,6 +744,37 @@ void Engine::keyboardHandler()
 	  }
 	  break;
 	  
+        case WAIT_OBJECT_0 + NUMBER_OF(handles):
+	{
+	  MSG message;
+
+	  while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
+	  {
+	    switch (message.message)
+	    {
+	      case WM_APP + 201:
+	      {
+		if (message.wParam)
+		{
+		  m_currentLock.on(Modifier::Type_Touchpad);
+		  m_currentLock.on(Modifier::Type_TouchpadSticky);
+		}
+		else
+		  m_currentLock.off(Modifier::Type_Touchpad);
+		Acquire a(&m_log, 1);
+		m_log << _T("touchpad: ") << message.wParam
+		      << _T(".") << (message.lParam & 0xffff)
+		      << _T(".") << (message.lParam >> 16 & 0xffff)
+		      << std::endl;
+		break;
+	      }
+	      default:
+		break;
+	    }
+	  }
+	  goto rewait;
+	}
+
 	default:
 	  ASSERT( false );
 	  continue;
@@ -776,11 +807,8 @@ void Engine::keyboardHandler()
       else
       {
 #if defined(_WINNT)
-	if (kid.MakeCode != TOUCHPAD_SCANCODE)
-	{
-	  WriteFile(m_device, &kid, sizeof(kid), &len, &m_ol);
-	  GetOverlappedResult(m_device, &m_ol, &len, TRUE);
-	}
+	WriteFile(m_device, &kid, sizeof(kid), &len, &m_ol);
+	GetOverlappedResult(m_device, &m_ol, &len, TRUE);
 #elif defined(_WIN95)
 	DeviceIoControl(m_device, 2, &kid, sizeof(kid), NULL, 0, &len, NULL);
 #else
@@ -797,11 +825,8 @@ void Engine::keyboardHandler()
 	!m_currentKeymap)
     {
 #if defined(_WINNT)
-	if (kid.MakeCode != TOUCHPAD_SCANCODE)
-	{
-	  WriteFile(m_device, &kid, sizeof(kid), &len, &m_ol);
-	  GetOverlappedResult(m_device, &m_ol, &len, TRUE);
-	}
+      WriteFile(m_device, &kid, sizeof(kid), &len, &m_ol);
+      GetOverlappedResult(m_device, &m_ol, &len, TRUE);
 #elif defined(_WIN95)
       DeviceIoControl(m_device, 2, &kid, sizeof(kid), NULL, 0, &len, NULL);
 #else
@@ -943,6 +968,8 @@ void Engine::keyboardHandler()
       m_currentKeyPressCount = 0;
       m_currentKeyPressCountOnWin32 = 0;
       m_oneShotKey.m_key = NULL;
+      if (m_currentLock.isOn(Modifier::Type_Touchpad) == false)
+	m_currentLock.off(Modifier::Type_TouchpadSticky);
     }
     
     key.initialize();
@@ -1017,29 +1044,6 @@ Engine::Engine(tomsgstream &i_log)
 			       PIPE_ACCESS_OUTBOUND,
 			       PIPE_TYPE_BYTE, 1,
 			       0, 0, 0, NULL);
-
-  // load and initialize DLL for ThumbSense support if exists
-  int (WINAPI *pTs4mayuInit)(HANDLE, USHORT);
-
-  m_sts4mayu = LoadLibrary(_T("sts4mayu.dll"));
-  if (m_sts4mayu != NULL)
-  {
-    pTs4mayuInit = (int (WINAPI *)(HANDLE, USHORT))GetProcAddress(m_sts4mayu, "ts4mayuInit");
-    pTs4mayuInit(m_device, TOUCHPAD_SCANCODE);
-
-    Acquire a(&m_log, 0);
-    m_log << _T("*** ThumbSense support enabled ***") << std::endl;
-  }
-
-  m_cts4mayu = LoadLibrary(_T("cts4mayu.dll"));
-  if (m_cts4mayu != NULL)
-  {
-    pTs4mayuInit = (int (WINAPI *)(HANDLE, USHORT))GetProcAddress(m_cts4mayu, "ts4mayuInit");
-    pTs4mayuInit(m_device, TOUCHPAD_SCANCODE);
-
-    Acquire a(&m_log, 0);
-    m_log << _T("*** ThumbSense support enabled ***") << std::endl;
-  }
 #endif // _WINNT
   StrExprArg::setEngine(this);
 }
@@ -1111,7 +1115,7 @@ void Engine::start()
   m_ol.hEvent = m_readEvent;
 #endif // _WINNT
   
-  CHECK_TRUE( 0 <= _beginthread(keyboardHandler, 0, this) );
+  CHECK_TRUE( m_threadHandle = (HANDLE)_beginthreadex(NULL, 0, keyboardHandler, this, 0, &m_threadId) );
   CHECK( WAIT_OBJECT_0 ==, WaitForSingleObject(m_threadEvent, INFINITE) );
 }
 
@@ -1138,6 +1142,9 @@ void Engine::stop()
     } while (WaitForSingleObject(m_threadEvent, 100) != WAIT_OBJECT_0);
     CHECK_TRUE( CloseHandle(m_threadEvent) );
     m_threadEvent = NULL;
+    WaitForSingleObject(m_threadHandle, 100);
+    CHECK_TRUE( CloseHandle(m_threadHandle) );
+    m_threadHandle = NULL;
 
 #if defined(_WINNT)
     // stop mayud
@@ -1199,42 +1206,17 @@ bool Engine::resume()
 
 bool Engine::prepairQuit()
 {
-#if defined(_WINNT)
   // terminate and unload DLL for ThumbSense support if loaded
-  int (WINAPI *pTs4mayuTerm)();
-  if (m_cts4mayu != NULL)
-  {
-    pTs4mayuTerm = (int (WINAPI *)())GetProcAddress(m_cts4mayu, "ts4mayuTerm");
-    pTs4mayuTerm();
-    //FreeLibrary(m_cts4mayu);
-    m_cts4mayu = NULL;
-  }
-#endif // _WINNT
+  manageTs4mayu(_T("sts4mayu.dll"), _T("SynCOM.dll"),
+		false, &m_sts4mayu);
+  manageTs4mayu(_T("cts4mayu.dll"), _T("TouchPad.dll"),
+		false, &m_cts4mayu);
   return true;
 }
 
 
 Engine::~Engine()
 {
-#if defined(_WINNT)
-  // terminate and unload DLL for ThumbSense support if loaded
-  int (WINAPI *pTs4mayuTerm)();
-  if (m_sts4mayu != NULL)
-  {
-    pTs4mayuTerm = (int (WINAPI *)())GetProcAddress(m_sts4mayu, "ts4mayuTerm");
-    pTs4mayuTerm();
-    FreeLibrary(m_sts4mayu);
-    m_sts4mayu = NULL;
-  }
-
-  if (m_cts4mayu != NULL)
-  {
-    pTs4mayuTerm = (int (WINAPI *)())GetProcAddress(m_cts4mayu, "ts4mayuTerm");
-    pTs4mayuTerm();
-    //FreeLibrary(m_cts4mayu);
-    m_cts4mayu = NULL;
-  }
-#endif // _WINNT
   stop();
   CHECK_TRUE( CloseHandle(m_eSync) );
   
@@ -1246,6 +1228,65 @@ Engine::~Engine()
   CHECK_TRUE( CloseHandle(m_hookPipe) );
 #endif // _WINNT
 }
+
+
+void Engine::manageTs4mayu(TCHAR *i_ts4mayuDllName,
+			   TCHAR *i_dependDllName,
+			   bool i_load, HMODULE *i_pTs4mayu)
+{
+  Acquire a(&m_log, 0);
+
+  if (i_load == false)
+  {
+    if (*i_pTs4mayu)
+    {
+      bool (WINAPI *pTs4mayuTerm)();
+
+      pTs4mayuTerm = (bool (WINAPI*)())GetProcAddress(*i_pTs4mayu, "ts4mayuTerm");
+      if (pTs4mayuTerm() == true)
+	FreeLibrary(*i_pTs4mayu);
+      *i_pTs4mayu = NULL;
+      m_log << i_ts4mayuDllName <<_T(" unloaded") << std::endl;
+    }
+  }
+  else
+  {
+    if (*i_pTs4mayu)
+    {
+      m_log << i_ts4mayuDllName << _T(" already loaded") << std::endl;
+    }
+    else
+    {
+      if (SearchPath(NULL, i_dependDllName, NULL, 0, NULL, NULL) == 0)
+      {
+	m_log << _T("load ") << i_ts4mayuDllName
+	      << _T(" failed: can't find ") << i_dependDllName
+	      << std::endl;
+      }
+      else
+      {
+	*i_pTs4mayu = LoadLibrary(i_ts4mayuDllName);
+	if (*i_pTs4mayu == NULL)
+	{
+	  m_log << _T("load ") << i_ts4mayuDllName
+		<< _T(" failed: can't find it") << std::endl;
+	}
+	else
+	{
+	  bool (WINAPI *pTs4mayuInit)(UINT);    
+
+	  pTs4mayuInit = (bool (WINAPI*)(UINT))GetProcAddress(*i_pTs4mayu, "ts4mayuInit");
+	  if (pTs4mayuInit(m_threadId) == true)
+	    m_log << i_ts4mayuDllName <<_T(" loaded") << std::endl;
+	  else
+	    m_log << i_ts4mayuDllName
+		  <<_T(" load failed: can't initialize") << std::endl;
+	}
+      }
+    }
+  }
+}
+
 
 // set m_setting
 bool Engine::setSetting(Setting *i_setting)
@@ -1277,6 +1318,12 @@ bool Engine::setSetting(Setting *i_setting)
   }
   
   m_setting = i_setting;
+
+  manageTs4mayu(_T("sts4mayu.dll"), _T("SynCOM.dll"),
+		m_setting->m_sts4mayu, &m_sts4mayu);
+  manageTs4mayu(_T("cts4mayu.dll"), _T("TouchPad.dll"),
+		m_setting->m_cts4mayu, &m_cts4mayu);
+
   g_hookData->m_correctKanaLockHandling = m_setting->m_correctKanaLockHandling;
   if (m_currentFocusOfThread)
   {

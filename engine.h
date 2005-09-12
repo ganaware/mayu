@@ -159,6 +159,8 @@ private:
                                                     mayu-device ? */
   HANDLE m_threadEvent;				/** 1. thread has been started
 						    2. thread is about to end*/
+  HANDLE m_threadHandle;
+  unsigned m_threadId;
   tstring m_mayudVersion;			/// version of mayud.sys
 #if defined(_WINNT)
   HANDLE m_readEvent;				/** reading from mayu device
@@ -234,7 +236,7 @@ public:
   
 private:
   /// keyboard handler thread
-  static void keyboardHandler(void *i_this);
+  static unsigned int WINAPI keyboardHandler(void *i_this);
   ///
   void keyboardHandler();
 
@@ -290,6 +292,10 @@ private:
 
   /// close mayu device
   void close();
+
+  /// load/unload [sc]ts4mayu.dll
+  void manageTs4mayu(TCHAR *i_ts4mayuDllName, TCHAR *i_dependDllName,
+		     bool i_load, HMODULE *i_pTs4mayu);
 
 private:
   // BEGINING OF FUNCTION DEFINITION

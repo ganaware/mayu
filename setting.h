@@ -25,11 +25,15 @@ public:
   KeySeqs m_keySeqs;				///
   Symbols m_symbols;				///
   bool m_correctKanaLockHandling;		///
+  bool m_sts4mayu;				///
+  bool m_cts4mayu;				///
   unsigned int m_oneShotRepeatableDelay;	///
 
 public:
   Setting()
     : m_correctKanaLockHandling(false),
+      m_sts4mayu(false),
+      m_cts4mayu(false),
       m_oneShotRepeatableDelay(0) { }
 };
 

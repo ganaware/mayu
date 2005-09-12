@@ -357,6 +357,22 @@ void SettingLoader::load_DEFINE_OPTION()
     
     load_ARGUMENT(&m_setting->m_oneShotRepeatableDelay);
     
+  } else if (*t == _T("sts4mayu")) {
+    if (*getToken() != _T("=")) {
+      throw ErrorMessage()
+	<< _T("there must be `=' after `def option sts4mayu'.");
+    }
+    
+    load_ARGUMENT(&m_setting->m_sts4mayu);
+    
+  } else if (*t == _T("cts4mayu")) {
+    if (*getToken() != _T("=")) {
+      throw ErrorMessage()
+	<< _T("there must be `=' after `def option cts4mayu'.");
+    }
+    
+    load_ARGUMENT(&m_setting->m_cts4mayu);
+    
   } else {
     throw ErrorMessage() << _T("syntax error `def option ") << *t << _T("'.");
   }
@@ -440,6 +456,8 @@ Modifier SettingLoader::load_MODIFIER(
       { _T("MIN-"), Modifier::Type_Minimized },
       { _T("MMAX-"), Modifier::Type_MdiMaximized },
       { _T("MMIN-"), Modifier::Type_MdiMinimized },
+      { _T("T-"), Modifier::Type_Touchpad },
+      { _T("TS-"), Modifier::Type_TouchpadSticky },
       { _T("M0-"), Modifier::Type_Mod0 },
       { _T("M1-"), Modifier::Type_Mod1 },
       { _T("M2-"), Modifier::Type_Mod2 },
@@ -945,7 +963,7 @@ KeySeq *SettingLoader::load_KEY_SEQUENCE(
       if (!ks->isCorrectMode(i_mode))
 	throw ErrorMessage()
 	  << _T("`$") << *t
-	  << _T("': Some of R-, IL-, IC-, NL-, CL-, SL-, KL-, MAX-, MIN-, MMAX-, MMIN-, M0...M9- and L0...L9- are used in the keyseq.  They are prohibited in this context.");
+	  << _T("': Some of R-, IL-, IC-, NL-, CL-, SL-, KL-, MAX-, MIN-, MMAX-, MMIN-, T-, TS-, M0...M9- and L0...L9- are used in the keyseq.  They are prohibited in this context.");
       keySeq.setMode(ks->getMode());
       keySeq.add(ActionKeySeq(ks));
     }
@@ -1443,6 +1461,7 @@ void SettingLoader::load(const tstringi &i_filename)
       _T("R-"), _T("IL-"), _T("IC-"), _T("I-"),	// <ASSIGN_MODIFIER>
       _T("NL-"), _T("CL-"), _T("SL-"), _T("KL-"),
       _T("MAX-"), _T("MIN-"), _T("MMAX-"), _T("MMIN-"),
+      _T("T-"), _T("TS-"),
       _T("M0-"), _T("M1-"), _T("M2-"), _T("M3-"), _T("M4-"),
       _T("M5-"), _T("M6-"), _T("M7-"), _T("M8-"), _T("M9-"), 
       _T("L0-"), _T("L1-"), _T("L2-"), _T("L3-"), _T("L4-"),

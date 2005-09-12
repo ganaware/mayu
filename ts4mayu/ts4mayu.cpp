@@ -11,8 +11,8 @@
 #pragma comment(lib, "TouchPad.lib")
 #endif /* CTS4MAYU */
 
-static HINSTANCE s_instance;
-static HANDLE s_device;
+static HANDLE s_instance;
+static UINT s_engineThreadId;
 
 #ifdef STS4MAYU
 static ISynAPI *s_synAPI;
@@ -28,21 +28,14 @@ static HTOUCHPAD s_hTP[16];
 static int s_devNum;
 #endif /* CTS4MAYU */
 
-static USHORT s_touchpadScancode;
-
 static void changeTouch(int i_isBreak)
 {
-  KEYBOARD_INPUT_DATA kid;
-  ULONG len;
+  PostThreadMessage(s_engineThreadId, WM_APP + 201, i_isBreak ? 0 : 1, 0);
+}
 
-  kid.UnitId = 0;
-  kid.MakeCode = s_touchpadScancode;
-  kid.Flags = i_isBreak;
-  kid.Reserved = 0;
-  kid.ExtraInformation = 0;
-
-  DeviceIoControl(s_device, IOCTL_MAYU_FORCE_KEYBOARD_INPUT,
-		  &kid, sizeof(kid), NULL, 0, &len, NULL);
+static void postEvent(WPARAM wParam, LPARAM lParam)
+{
+  PostThreadMessage(s_engineThreadId, WM_APP + 201, wParam, lParam);
 }
 
 #ifdef STS4MAYU
@@ -94,12 +87,25 @@ static unsigned int WINAPI loop(void *dummy)
 }
 #endif /* STS4MAYU */
 #ifdef CTS4MAYU
-static void CALLBACK TouchpadFunc(HTOUCHPAD hTP, LPFEEDHDR lpFeedHdr, LPARAM lParam)
+static void CALLBACK TouchpadFunc(HTOUCHPAD hTP, LPFEEDHDR lpFeedHdr, LPARAM i_lParam)
 {
 	LPRAWFEED lpRawFeed;
 	static int isTouched = 0;
+	static WPARAM s_wParam;
+	static LPARAM s_lParam;
+	WPARAM wParam;
+	LPARAM lParam;
 
 	lpRawFeed = (LPRAWFEED)(lpFeedHdr + 1);
+#if 1
+	wParam = lpRawFeed->wPressure;
+	lParam = lpRawFeed->y << 16 | lpRawFeed->x;
+	if (wParam != s_wParam || lParam != s_lParam) {
+	  postEvent(wParam, lParam);
+	  s_wParam = wParam;
+	  s_lParam = lParam;
+	}
+#else
 	if (isTouched) {
 	  if (!lpRawFeed->wPressure) {
 	    changeTouch(1);
@@ -111,6 +117,7 @@ static void CALLBACK TouchpadFunc(HTOUCHPAD hTP, LPFEEDHDR lpFeedHdr, LPARAM lPa
 	    isTouched = 1;
 	  }
 	}
+#endif
 	EnableWindowsCursor(hTP, TRUE);
 }
 
@@ -128,10 +135,9 @@ static BOOL CALLBACK DevicesFunc(LPGENERICDEVICE device, LPARAM lParam)
 }
 #endif /* CTS4MAYU */
 
-void WINAPI ts4mayuInit(HANDLE i_device, USHORT i_touchpadScancode)
+bool WINAPI ts4mayuInit(UINT i_engineThreadId)
 {
-  s_device = i_device;
-  s_touchpadScancode = i_touchpadScancode;
+  s_engineThreadId = i_engineThreadId;
 
 #ifdef STS4MAYU
   HRESULT result;
@@ -173,7 +179,7 @@ void WINAPI ts4mayuInit(HANDLE i_device, USHORT i_touchpadScancode)
     goto error_on_init;
   }
 
-  return;
+  return true;
 
 error_on_init:
   if (s_notifyEvent) {
@@ -187,15 +193,18 @@ error_on_init:
   if (s_synAPI) {
     s_synAPI->Release();
   }
+
+  return false;
 #endif /* STS4MAYU */
 #ifdef CTS4MAYU
   // enumerate devices
   EnumDevices(DevicesFunc, NULL);
+  return true;
 #endif /* CTS4MAYU */
 }
 
 
-void WINAPI ts4mayuTerm()
+bool WINAPI ts4mayuTerm()
 {
 #ifdef STS4MAYU
   s_terminated = 1;
@@ -217,11 +226,14 @@ void WINAPI ts4mayuTerm()
   if (s_synAPI) {
     s_synAPI->Release();
   }
+
+  return true;
 #endif /* STS4MAYU */
 #ifdef CTS4MAYU
   for (int i = 0; i < s_devNum; i++) {
     StopFeed(s_hTP[i]);
   }
+  return false;
 #endif /* CTS4MAYU */
 }
 

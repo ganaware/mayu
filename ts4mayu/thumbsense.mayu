@@ -1,75 +1,76 @@
 # ts4mayu.dll を使って ThumbSense を実現するためのサンプル
 # オリジナルの ThumbSense のキー割り当て全てを実現しているわけではない。
 
-# ts4mayu.dll は(恐らく)使われていないキーコード 0xfe をタッチパッド
-# に割り当てている。
-def key TouchPad = 0xfe
-
-keymap Global
-# mod0 をタッチパッドへの接触を意味するモディファイヤとして使う。
-# mod0 が既に使用されている場合には、空いている mod* を替りに使うこと。
-# 0xfe が入力されてしまわないように真のモディファイヤにする。
-  mod mod0 = !TouchPad
-
-# 以下ではリピートの抑制と、クリック継続を両立させるため Lock0 を使っている。
-# Lock0 が既に使用されている場合には、空いている Lock* を替りに使うこと。
-
 # F,J,Space を左ボタンのクリックに割り当てる。
-  key ~L0-D-M0-*F ~L0-D-M0-*J ~L0-D-M0-*Space = &VK(D-LButton) &Toggle(Lock0, on)
-  key L0-D-*F L0-D-*J L0-D-*Space = &Ignore
-  key L0-U-*F L0-U-*J L0-U-*Space = &VK(U-LButton) &Toggle(Lock0, off)
+  key TS-*F TS-*J TS-*Space = &VK(LButton)
+# クリックがリピートされるのを防ぐ
+  key D-R-TS-*F D-R-TS-*J D-R-TS-*Space = &Ignore
 
 # D,K を右ボタンのクリックに割り当てる。
-  key ~L0-D-M0-*D ~L0-D-M0-*K = &VK(D-RButton) &Toggle(Lock0, on)
-  key L0-D-*D L0-D-*K = &Ignore
-  key L0-U-*D L0-U-*K = &VK(U-RButton) &Toggle(Lock0, off)
+  key TS-*D TS-*K = &VK(RButton)
+# クリックがリピートされるのを防ぐ
+  key D-R-TS-*D D-R-TS-*K = &Ignore
 
-# V,M を左ボタンのダブルクリックに割り当てる。
-  key M0-D-*V M0-D-*M = &VK(D-LButton) &VK(U-LButton) &VK(D-LButton) &VK(U-LButton) &Toggle(Lock0, on)
-  key L0-D-*V L0-D-*M = &Ignore
-  key L0-U-*V L0-U-*M = &Toggle(Lock0, off)
+# V を左ボタンのダブルクリックに割り当てる。
+  key D-T-*V = &VK(LButton) &Wait(10) &VK(LButton)
+# クリックがリピートされるのを防ぎ、キー離したときは無視する。
+  key D-R-T-*V U-T-*V = &Ignore
 
-# G を第4ボタンのダブルクリックに割り当てる。
-  key ~L0-D-M0-*G = &VK(D-XButton1) &Toggle(Lock0, on)
-  key L0-D-*G = &Ignore
-  key L0-U-*G = &VK(U-XButton1) &Toggle(Lock0, off)
+# G を第4ボタンのクリックに割り当てる。
+  key TS-*G = &VK(XButton1)
+# クリックがリピートされるのを防ぐ
+  key D-R-TS-*G = &Ignore
 
-# H を第5ボタンのダブルクリックに割り当てる。
-  key ~L0-D-M0-*H = &VK(D-XButton2) &Toggle(Lock0, on)
-  key L0-D-*H = &Ignore
-  key L0-U-*H = &VK(U-XButton2) &Toggle(Lock0, off)
+# H を第5ボタンのクリックに割り当てる。
+  key TS-*H = &VK(XButton2)
+# クリックがリピートされるのを防ぐ
+  key D-R-TS-*H = &Ignore
 
-# S,L を押すとマウスの縦移動がホイール回転になるようにする。
-  key D-~L0-M0-S D-~L0-M0-L = &MouseHook(Wheel, -1) &Toggle(Lock0, on)
-  key U-L0-*S U-L0-*L = &MouseHook(None, 0) &Toggle(Lock0, off)
-  key D-L0-*S D-L0-*L = &Ignore
+# S,L を押しながらの上下方向ドラッグをホイール回転にする。
+  key D-TS-*S D-TS-*L = &MouseHook(Wheel, -5)
+# リピートは無視。
+  key D-R-TS-*S D-R-TS-*L = &Ignore
+# キーを離したら解除する。
+  key U-TS-*S U-TS-*L = &MouseHook(None, 0)
 
-# A を押すとマウスの移動に伴いアクティブウィンドウが移動するようにする。
-  key D-~L0-M0-A = &MouseHook(WindowMove, 1) &Toggle(Lock0, on)
-  key U-L0-*A = &MouseHook(None, 0) &Toggle(Lock0, off)
-  key D-L0-*A = &Ignore
+# A を押しながらドラッグするとアクティブウィンドウが移動する。
+  key D-TS-*A = &MouseHook(WindowMove, 1)
+# リピートは無視。
+  key D-R-TS-*A = &Ignore
+# キーを離したら解除する。
+  key U-TS-*A = &MouseHook(None, 0)
 
-# R を押すとウィンドウの最大化/解除をトグルする。
-  key M0-R = &WindowMaximize
+# R でウィンドウの最大化/解除をトグルする。
+  key T-R = &WindowMaximize
 
-# W,B を押すとウィンドウを閉じる。
-  key M0-W M0-B = &WindowClose
+# W,B でウィンドウを閉じる。
+  key T-W T-B = &WindowClose
+
+# M で My Document を開く。
+  key T-M = &ShellExecute("open", "C:\\WINDOWS\\explorer.exe", "::{450D8FBA-AD25-11D0-98A8-0800361B1103}",, ShowNormal)
+
+# O で Outlook Express を起動する。
+  key T-O = &ShellExecute("open", "C:\\Program Files\\Outlook Express\\msimn.exe",,, ShowNormal)
+
+# I で Internet Explorer を起動する。
+  key T-I = &ShellExecute("open", "C:\\Program Files\\Internet Explorer\\iexplore.exe",,, ShowNormal)
+
+# P でコマンドプロンプトを起動する。
+  key T-P = &ShellExecute("open", "C:\\WINDOWS\\system32\\cmd.exe",,, ShowNormal)
 
 # 以下はオリジナルの ThumbSense にはない割り当てを実現する。
 
-# C,Comma を中ボタンのクリックに割り当てる。
-#  key ~L0-D-M0-*C ~L0-D-M0-*Comma = &VK(D-MButton) &Toggle(Lock0, on)
-#  key L0-D-*C L0-D-*Comma = &Ignore
-#  key L0-U-*C L0-U-*Comma = &VK(U-MButton) &Toggle(Lock0, off)
+# C を中ボタンのクリックに割り当てる。
+#  key TS-*C = &VK(MButton)
+#  key D-R-TS-*C = &Ignore
 
-# Control+A を押すとマウスの移動に伴いアクティブ MDI ウィンドウが
-# 移動するようにする。
-#  key D-~L0-M0-C-A = &MouseHook(WindowMove, -1) &Toggle(Lock0, on)
+# ウインドウが最大化されている時に A を押しながらドラッグすると
+# アクティブ MDI 子アクティブウィンドウが移動する。
+#  key D-TS-MAX-*A = &MouseHook(WindowMove, -1)
 
-# Shift+A を押すとマウスの移動に伴いマウスカーソル直下のウィンドウが
-# 移動するようにする。
-#  key D-~L0-M0-S-A = &MouseHook(WindowMove, 2) &Toggle(Lock0, on)
+# Control+A を押しながらドラッグするとマウスカーソル直下のウィンドウが移動する。
+#  key D-TS-C-*A = &MouseHook(WindowMove, 2)
 
-# Control+Shift+A を押すとマウスの移動に伴いマウスカーソル直下の MDI
-# ウィンドウが移動するようにする。
-#  key D-~L0-M0-C-S-A = &MouseHook(WindowMove, -2) &Toggle(Lock0, on)
+# ウインドウが最大化されている時に Control+A を押しながらドラッグすると
+# マウスカーソル直下の MDI 子アクティブウィンドウが移動する。
+#  key D-TS-MAX-C-*A = &MouseHook(WindowMove, -2)
